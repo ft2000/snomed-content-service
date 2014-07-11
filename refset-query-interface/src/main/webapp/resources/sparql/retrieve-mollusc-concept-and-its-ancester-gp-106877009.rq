@@ -1,0 +1,44 @@
+#retrieves all property of Concept 106877009, its parent and grand parent
+prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+prefix owl: <http://www.w3.org/2002/07/owl#>
+prefix xsd: <http://www.w3.org/2001/XMLSchema#>
+prefix sn: <http://snomedtools.info/snomed/term/>
+
+CONSTRUCT 
+{
+    ?s ?prop ?o.
+  	?s rdfs:subClassOf ?p.
+    ?sDescription rdfs:label ?sDescLabel.
+
+  	?p ?pProp ?op.
+  	?p rdfs:subClassOf ?gp.
+    ?pDescription rdfs:label ?pDescLabel.
+
+  
+   	?gp ?gProp ?ogp.
+ 	?gp sn:description ?description.
+    ?description rdfs:label ?descLabel.
+} 
+WHERE 
+{
+   
+   bind (<http://snomedtools.info/snomed/version/1/concept/rdfs/106877009>
+        as ?s)
+    
+    ?s ?prop ?o.
+ 	optional { ?s sn:description ?sDescription.
+               ?sDescription rdfs:label ?sDescLabel.}
+               	
+	?s rdfs:subClassOf ?p.
+	?p ?pProp ?op.
+ 	optional { ?p sn:description ?pDescription.
+               ?pDescription rdfs:label ?pDescLabel.}
+	
+	?p rdfs:subClassOf ?gp.
+	
+ 	?gp ?gProp ?ogp.
+ 	optional { ?gp sn:description ?description.
+               ?description rdfs:label ?descLabel.}
+	
+} 

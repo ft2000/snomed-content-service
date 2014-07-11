@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?><project-modules id="moduleCoreId" project-version="1.5.0">
+	<wb-module deploy-name="refset-query-interface">
+        <wb-resource deploy-path="/" source-path="/target/m2e-wtp/web-resources"/>
+		<wb-resource deploy-path="/" source-path="/src/main/webapp" tag="defaultRootSource"/>
+		<wb-resource deploy-path="/WEB-INF/classes" source-path="/src/main/java"/>
+		<wb-resource deploy-path="/WEB-INF/classes" source-path="/src/main/resources"/>
+        <dependent-module archiveName="marmotta-sparql-3.2.1.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/marmotta-sparql/marmotta-sparql">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="marmotta-core-3.2.1.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/marmotta-core/marmotta-core">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="strftime-3.2.1.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/strftime/strftime">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="marmotta-client-js-3.2.1.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/marmotta-client-js/marmotta-client-js">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="marmotta-commons-3.2.1.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/marmotta-commons/marmotta-commons">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="marmotta-model-vocabs-3.2.1.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/marmotta-model-vocabs/marmotta-model-vocabs">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="marmotta-util-filter-3.2.1.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/marmotta-util-filter/marmotta-util-filter">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="marmotta-rio-vcard-3.2.1.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/marmotta-rio-vcard/marmotta-rio-vcard">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="marmotta-rio-api-3.2.1.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/marmotta-rio-api/marmotta-rio-api">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="marmotta-rio-ical-3.2.1.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/marmotta-rio-ical/marmotta-rio-ical">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="marmotta-rio-rss-3.2.1.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/marmotta-rio-rss/marmotta-rio-rss">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="marmotta-util-facading-3.2.1.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/marmotta-util-facading/marmotta-util-facading">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="marmotta-sail-transactions-3.2.1.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/marmotta-sail-transactions/marmotta-sail-transactions">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="marmotta-util-tripletable-3.2.1.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/marmotta-util-tripletable/marmotta-util-tripletable">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="kiwi-sparql-3.2.1.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/kiwi-sparql/kiwi-sparql">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="kiwi-triplestore-3.2.1.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/kiwi-triplestore/kiwi-triplestore">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+		<property name="java-output-path" value="target/classes"/>
+        <property name="context-root" value="refset"/>
+	</wb-module>
+</project-modules>
