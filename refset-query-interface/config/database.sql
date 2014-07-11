@@ -1,0 +1,11 @@
+--Create a postgres login role
+CREATE ROLE refset LOGIN
+ENCRYPTED PASSWORD 'refset'
+NOSUPERUSER INHERIT CREATEDB NOCREATEROLE NOREPLICATION;
+--create database
+-- DROP DATABASE snomed;
+CREATE DATABASE snomed
+WITH OWNER = refset
+ENCODING = 'UTF8' 
+TABLESPACE = pg_default
+LC_COLLATE = 'en_US.UTF-8'
