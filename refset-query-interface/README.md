@@ -40,8 +40,11 @@ Jena full text search queries will only work if a full text index is created. Th
 Above command will start Fuseki end point is running as http://localhost:3030/snomed/query
 
 Now some guidelines to run query
-If you are running select query on Marmotta endpoint then select browse as output option and if it is Fuseki end point then select Table.
-Construct query select XML-Jena option for Fuseki end point you can also select plain text or json option for any query type if using Fuseki endpoint. Queries are available in resources/sparql folder. These are just demo queries. Real time query can be more complex.
+If you are running select query on Marmotta endpoint then use browse as output option. And if it is Fuseki end point then use table.
+
+Construct query use XML-Jena option for Fuseki end point. You can also use plain text or json option for any query type if using Fuseki endpoint. 
+
+Queries are available in resources/sparql folder. These are just demo queries. Real time query can be more complex.
 
 
 
