@@ -1,0 +1,21 @@
+#search a term in description labels and retrieves first 20 concept which matches search criteria
+prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+prefix owl: <http://www.w3.org/2002/07/owl#>
+prefix xsd: <http://www.w3.org/2001/XMLSchema#>
+prefix sn: <http://snomedtools.info/snomed/term/>
+PREFIX search: <http://marmotta.apache.org/vocabulary/sparql-functions#>
+
+
+
+SELECT ?s ?desc ?dLabel
+ 
+WHERE 
+{
+
+	?s sn:description ?desc.
+	?desc rdfs:label ?dLabel.
+    FILTER( search:fulltext-search(str(?dLabel), "body Structure", lang(?dLabel)) )	
+} 
+
+LIMIT 20
