@@ -16,7 +16,7 @@ To add new end point - just add new endpoint in relevant blocks of home.jsp
 At present it is configured with a sparql end point with a Marmotta web server expected to run on port 9090. 
 You can start marmotta server locally by using marmotta webapp launcher available in your marmotta platform - ..launchers/marmotta-webapp
 
-	mvn tomcat7:run -Dmarmotta.port=9090 -Dmarmotta.home=/tmp/marmotaa-app 
+	mvn tomcat7:run -Dmarmotta.port=9090 -Dmarmotta.home=/tmp/marmotta-app 
 
 obviously you must have loaded data before running marmotta end points and it can be done using kiwi loader. 
 Create required database and user using config/database.sql and run below command with required input data.

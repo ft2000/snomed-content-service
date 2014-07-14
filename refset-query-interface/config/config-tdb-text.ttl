@@ -52,7 +52,7 @@ text:TextIndexLucene  rdfs:subClassOf   text:TextIndex .
     .
 
 <#dataset> rdf:type      tdb:DatasetTDB ;
-    tdb:location "/Users/gouri/ihts/apache-jena-2.11.2/snomed/" ;
+    tdb:location "../apache-jena-2.11.2/snomed/" ;
     ##tdb:unionDefaultGraph true ;
     .
 
