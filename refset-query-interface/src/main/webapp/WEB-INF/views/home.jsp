@@ -69,10 +69,7 @@
         queries: [
 		 { "name": "EAR Concept & its Ancestor",
     		"queryURL": "resources/sparql/retrieve-ear-concept-and-its-ancester-gp-1910005.rq"
- 		 },
- 		 { "name": "EAR Concept & its descendants and their descendants if any",
-     		"queryURL": "resources/sparql/retrieve-ear-concept-and-its-descendant-and-their-descendant-1910005-select.rq"
-  		 }
+ 		 }
         ]
         };
 
@@ -142,10 +139,9 @@
                     <li role='presentation' class="" ><a data-value="tabs" role='menuitem' tabindex='-1' href='#'>browse</a></li>
                     <li role='presentation' class="" ><a data-value="tsv" role='menuitem' tabindex='-1' href='#'>table-Jena</a></li>
                     <li role='presentation' class="" ><a data-value="text" role='menuitem' tabindex='-1' href='#'>plain text</a></li>
-                    <li role='presentation' class="" ><a data-value="json" role='menuitem' tabindex='-1' href='#'>JSON</a></li>
                     <li role='presentation' class="" ><a data-value="xml" role='menuitem' tabindex='-1' href='#'>XML-Jena</a></li>
-                    <li role='presentation' class="" ><a data-value="application/sparql-results+xml" role='menuitem' tabindex='-1' href='#'>XML-Marmotta</a></li>
-
+                    <li role='presentation' class="" ><a data-value="application/rdf+xml" role='menuitem' tabindex='-1' href='#'>XML-Marmotta</a></li>
+                    <li role='presentation' class="" ><a data-value="xml" role='menuitem' tabindex='-1' href='#'>ASK</a></li>
                   </ul>
                 </div>
 
