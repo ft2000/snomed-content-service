@@ -6,3 +6,6 @@ pom.xml.next
 release.properties
 *.class
 /target/
+.project
+.settings
+.classpath
