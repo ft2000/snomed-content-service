@@ -139,6 +139,8 @@ _.extend( RemoteSparqlServiceResult.prototype, {
         return this.asXML();
       case "tsv":
         return this.asTable( config );
+      case "tabs":
+      	return this.asTable(config);
     }
 
     return null;
