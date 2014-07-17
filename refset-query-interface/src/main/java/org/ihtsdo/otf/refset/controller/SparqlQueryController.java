@@ -1,4 +1,4 @@
-package org.ihtsdo.refset;
+package org.ihtsdo.otf.refset.controller;
 
 import java.text.DateFormat;
 import java.util.Date;
@@ -12,17 +12,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 /**
- * Handles requests for the application home page.
+ * Controller to endpoint calls .
  */
 @Controller
-public class HomeController {
+public class SparqlQueryController {
 	
-	private static final Logger logger = LoggerFactory.getLogger(HomeController.class);
-	
+	private static final Logger logger = LoggerFactory.getLogger(SparqlQueryController.class);
+	///TBD add service call for different endpoints and add security using spring security later
 	/**
 	 * Simply selects the home view to render by returning its name.
 	 */
-	@RequestMapping(value = "/", method = RequestMethod.GET)
+	@RequestMapping(value = "/refset/qi/v10", method = RequestMethod.GET)
 	public String home(Locale locale, Model model) {
 		logger.info("Welcome home! The client locale is {}.", locale);
 		

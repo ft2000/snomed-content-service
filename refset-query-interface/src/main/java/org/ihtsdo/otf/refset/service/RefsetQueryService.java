@@ -1,4 +1,4 @@
-package org.ihtsdo.refset.service;
+package org.ihtsdo.otf.refset.service;
 
 /**
  * @author Episteme Partners Ltd
