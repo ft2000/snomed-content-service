@@ -54,8 +54,8 @@
       // configuration
       var config = {
         endpoints: {
-		  "default" : "http://localhost:9090/sparql/select",
-		  "Snomed-Jena(TDB)" : "http://localhost:3030/snomed/query",
+		  "default" : "http://content.ihtsdotools.org/:9090/sparql/select",
+		  "Snomed-Jena(TDB)" : "http://content.ihtsdotools.org:3030/snomed/query",
 		  "Henrik's Fuseki" : "https://sparql.sparklingideas.co.uk/snomed/query"
 		  //you can add other points or change port
         },
