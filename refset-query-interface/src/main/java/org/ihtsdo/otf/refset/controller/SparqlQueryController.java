@@ -12,12 +12,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 /**
- * Controller to endpoint calls .
+ * Controller for endpoint calls .
  */
 @Controller
 public class SparqlQueryController {
-	
+		
 	private static final Logger logger = LoggerFactory.getLogger(SparqlQueryController.class);
+
 	///TBD add service call for different endpoints and add security using spring security later
 	/**
 	 * Simply selects the home view to render by returning its name.

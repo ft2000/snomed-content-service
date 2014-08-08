@@ -36,7 +36,6 @@ _.extend( RemoteSparqlServiceResult.prototype, {
     }
 
     return {
-      count: data.results.bindings.length,
       data: json,
       mime: "application/json"
     };

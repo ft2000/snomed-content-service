@@ -45,6 +45,5 @@ If you are running select query on Marmotta endpoint then use browse as output o
 Construct query use XML-Jena option for Fuseki end point. You can also use plain text or json option for any query type if using Fuseki endpoint. 
 
 Queries are available in resources/sparql folder. These are just demo queries. Real time query can be more complex.
-
-
+&copy; IHTSDO
 

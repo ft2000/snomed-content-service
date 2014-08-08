@@ -1,27 +1,17 @@
-#retrieves all property of Concept 106877009, its parent and grand parent
 prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 prefix owl: <http://www.w3.org/2002/07/owl#>
 prefix xsd: <http://www.w3.org/2001/XMLSchema#>
 prefix sn: <http://snomedtools.info/snomed/term/>
 
-CONSTRUCT 
-{
-    ?s ?prop ?o.
-  	?p ?pProp ?op.
-  
-   	?gp ?gProp ?ogp.
-} 
+SELECT ?p ?j
 WHERE 
 {
    
-   bind (<http://snomedtools.info/snomed/version/1/concept/rdfs/106877009>
+   bind (<http://snomedtools.info/snomed/version/1/concept/rdfs/1910005>
         as ?s)
     
-    ?s ?prop ?o.
 	?s rdfs:subClassOf ?p.
-	?p ?pProp ?op.
-	?p rdfs:subClassOf ?gp.
-	
- 	?gp ?gProp ?ogp.
+    ?p ?prop ?j.
+    ?p rdfs:label "Entire sensory organ (body structure)"@en.
 } 
