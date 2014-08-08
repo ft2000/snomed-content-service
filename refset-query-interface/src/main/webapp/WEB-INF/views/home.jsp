@@ -54,9 +54,13 @@
       // configuration
       var config = {
         endpoints: {
-		  "default" : "http://content.ihtsdotools.org/:9090/sparql/select",
-		  "Snomed-Jena(TDB)" : "http://content.ihtsdotools.org:3030/snomed/query",
+    	  "default" : "sparql/jena/stream",
+		  "Marmotta" : "sparql/kiwi/stream",
+    	  "Fuseki-Update" : "sparql/jena/update",
+		  "Marmotta-Update" : "sparql/kiwi/update",
+
 		  "Henrik's Fuseki" : "https://sparql.sparklingideas.co.uk/snomed/query"
+
 		  //you can add other points or change port
         },
         prefixes: {
@@ -132,16 +136,13 @@
               <div class="form-group">
                 <label for="displayFormat">Results</label>
                 <div class="dropdown ">
-                  <a data-toggle="dropdown" class="btn btn-custom2 display-format" href="#" data-value="tabs">
-                    <span>browse</span> <i class="icon-collapse"></i>
+                  <a data-toggle="dropdown" class="btn btn-custom2 display-format" href="#" data-value="tsv">
+                    <span>Select Query</span> <i class="icon-collapse"></i>
                   </a>
                   <ul class="dropdown-menu formats  " role="menu" aria-labelledby="dropdownMenu2">
-                    <li role='presentation' class="" ><a data-value="tabs" role='menuitem' tabindex='-1' href='#'>browse</a></li>
-                    <li role='presentation' class="" ><a data-value="tsv" role='menuitem' tabindex='-1' href='#'>table-Jena</a></li>
-                    <li role='presentation' class="" ><a data-value="text" role='menuitem' tabindex='-1' href='#'>plain text</a></li>
-                    <li role='presentation' class="" ><a data-value="xml" role='menuitem' tabindex='-1' href='#'>XML-Jena</a></li>
-                    <li role='presentation' class="" ><a data-value="application/rdf+xml" role='menuitem' tabindex='-1' href='#'>XML-Marmotta</a></li>
-                    <li role='presentation' class="" ><a data-value="xml" role='menuitem' tabindex='-1' href='#'>ASK</a></li>
+                    <li role='presentation' class="" ><a data-value="text" role='menuitem' tabindex='-1' href='#'>Ask</a></li>
+                    <li role='presentation' class="" ><a data-value="xml" role='menuitem' tabindex='-1' href='#'>XML(Construct or Describe)</a></li>
+                    <li role='presentation' class="" ><a data-value="json" role='menuitem' tabindex='-1' href='#'>Any Query</a></li>
                   </ul>
                 </div>
 
