@@ -68,11 +68,11 @@
           "rdfs":     "http://www.w3.org/2000/01/rdf-schema#",
           "owl":      "http://www.w3.org/2002/07/owl#",
           "xsd":      "http://www.w3.org/2001/XMLSchema#",
-          "sn" :      "http://snomedtools.info/snomed/term/"
+          "sn" :      "http://snomed.info/snomed/term/"
         },
         queries: [
 		 { "name": "EAR Concept & its Ancestor",
-    		"queryURL": "resources/sparql/retrieve-ear-concept-and-its-ancester-gp-1910005.rq"
+    		"queryURL": "resources/sparql/Ear_parent_who_is_known_as_Entire sensory organ(FSN).rq"
  		 }
         ]
         };
@@ -140,8 +140,8 @@
                     <span>Select Query</span> <i class="icon-collapse"></i>
                   </a>
                   <ul class="dropdown-menu formats  " role="menu" aria-labelledby="dropdownMenu2">
-                    <li role='presentation' class="" ><a data-value="text" role='menuitem' tabindex='-1' href='#'>Ask</a></li>
-                    <li role='presentation' class="" ><a data-value="xml" role='menuitem' tabindex='-1' href='#'>XML(Construct or Describe)</a></li>
+                    <li role='presentation' class="" ><a data-value="tsv" role='menuitem' tabindex='-1' href='#'>Select Query</a></li>
+                    <li role='presentation' class="" ><a data-value="xml" role='menuitem' tabindex='-1' href='#'>XML(Construct or Describe or Ask)</a></li>
                     <li role='presentation' class="" ><a data-value="json" role='menuitem' tabindex='-1' href='#'>Any Query</a></li>
                   </ul>
                 </div>
