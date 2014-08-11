@@ -3,7 +3,7 @@ prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 prefix owl: <http://www.w3.org/2002/07/owl#>
 prefix xsd: <http://www.w3.org/2001/XMLSchema#>
-prefix sn: <http://snomedtools.info/snomed/term/>
+prefix sn: <http://snomed.info/sct/term/>
 
 CONSTRUCT 
 {
@@ -15,7 +15,7 @@ CONSTRUCT
 WHERE 
 {
    
-   bind (<http://snomedtools.info/snomed/version/1/concept/rdfs/106877009>
+   bind (<http://snomed.info/sct/version/1/concept/rdfs/106877009>
         as ?s)
     
     ?s ?prop ?o.

@@ -8,7 +8,7 @@ DESCRIBE ?s
 WHERE 
 {
    
-   bind (<http://snomedtools.info/snomed/version/1/concept/rdfs/1910005>
+   bind (<http://snomed.info/sct/version/1/concept/rdfs/1910005>
         as ?s)
     
     ?s ?prop ?o.
