@@ -14,7 +14,7 @@ INSERT {
 }
 WHERE 
 {
-   bind (<http://snomedtools.info/snomed/version/1/description/rdfs/1219322012>
+   bind (<http://snomed.info/sct/version/1/description/rdfs/1219322012>
         as ?desc)
     
  OPTIONAL {?desc rdfs:label ?label.}	

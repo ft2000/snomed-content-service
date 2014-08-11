@@ -8,10 +8,10 @@ SELECT ?p ?j
 WHERE 
 {
    
-   bind (<http://snomedtools.info/snomed/version/1/concept/rdfs/1910005>
+   bind (<http://snomed.info/sct/version/1/concept/rdfs/1910005>
         as ?s)
     
 	?s rdfs:subClassOf ?p.
     ?p ?prop ?j.
-    ?p rdfs:label "Entire sensory organ (body structure)"@en.
+    ?p rdfs:label "Entire sensory organ (body structure)"@en-gb.
 } 
