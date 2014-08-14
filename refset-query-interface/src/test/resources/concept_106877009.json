@@ -1,0 +1,132 @@
+{
+  "@graph": [
+    {
+      "@id": "http://snomed.info/sct/version/1/concept/rdfs/106877009",
+      "@type": "rdfs:Class",
+      "sn:active": true,
+      "description": [
+        "http://snomed.info/sct/version/1/description/rdfs/1219323019",
+        "http://snomed.info/sct/version/1/description/rdfs/171311018",
+        "http://snomed.info/sct/version/1/description/rdfs/585376010",
+        "http://snomed.info/sct/version/1/description/rdfs/2615891015",
+        "http://snomed.info/sct/version/1/description/rdfs/2606367017",
+        "http://snomed.info/sct/version/1/description/rdfs/1219322012"
+      ],
+      "sn:effectiveTime": {
+        "@type": "xsd:date",
+        "@value": "2002-01-31"
+      },
+      "module": "http://snomed.info/sct/version/1/concept/rdfs/900000000000207008",
+      "status": "http://snomed.info/sct/version/1/concept/rdfs/900000000000074008",
+      "label": {
+        "@language": "en-gb",
+        "@value": "Phylum Mollusca (organism)"
+      },
+      "subClassOf": "http://snomed.info/sct/version/1/concept/rdfs/387961004"
+    },
+    {
+      "@id": "http://snomed.info/sct/version/1/description/rdfs/1219322012",
+      "sn:active": true,
+      "sn:effectiveTime": {
+        "@type": "xsd:date",
+        "@value": "2002-07-31"
+      },
+      "label": {
+        "@language": "en-gb",
+        "@value": "Mollusc"
+      }
+    },
+    {
+      "@id": "http://snomed.info/sct/version/1/description/rdfs/1219323019",
+      "sn:active": true,
+      "sn:effectiveTime": {
+        "@type": "xsd:date",
+        "@value": "2004-01-31"
+      },
+      "label": {
+        "@language": "en-gb",
+        "@value": "Phylum: Mollusca"
+      }
+    },
+    {
+      "@id": "http://snomed.info/sct/version/1/description/rdfs/171311018",
+      "sn:active": false,
+      "sn:effectiveTime": {
+        "@type": "xsd:date",
+        "@value": "2006-07-31"
+      },
+      "label": {
+        "@language": "en-gb",
+        "@value": "Kingdom animalia - phylum mollusca"
+      }
+    },
+    {
+      "@id": "http://snomed.info/sct/version/1/description/rdfs/2606367017",
+      "sn:active": true,
+      "sn:effectiveTime": {
+        "@type": "xsd:date",
+        "@value": "2006-07-31"
+      },
+      "label": {
+        "@language": "en-gb",
+        "@value": "Phylum Mollusca (organism)"
+      }
+    },
+    {
+      "@id": "http://snomed.info/sct/version/1/description/rdfs/2615891015",
+      "sn:active": true,
+      "sn:effectiveTime": {
+        "@type": "xsd:date",
+        "@value": "2006-07-31"
+      },
+      "label": {
+        "@language": "en-gb",
+        "@value": "Phylum Mollusca"
+      }
+    },
+    {
+      "@id": "http://snomed.info/sct/version/1/description/rdfs/585376010",
+      "sn:active": false,
+      "sn:effectiveTime": {
+        "@type": "xsd:date",
+        "@value": "2006-07-31"
+      },
+      "label": {
+        "@language": "en-gb",
+        "@value": "Kingdom animalia - phylum mollusca (organism)"
+      }
+    }
+  ],
+  "@context": {
+    "effectiveTime": {
+      "@id": "http://snomed.info/sct/term/effectiveTime",
+      "@type": "xsd:date"
+    },
+    "active": {
+      "@id": "http://snomed.info/sct/term/active",
+      "@type": "http://www.w3.org/2001/XMLSchema#boolean"
+    },
+    "label": "http://www.w3.org/2000/01/rdf-schema#label",
+    "subClassOf": {
+      "@id": "http://www.w3.org/2000/01/rdf-schema#subClassOf",
+      "@type": "@id"
+    },
+    "description": {
+      "@id": "http://snomed.info/sct/term/description",
+      "@type": "@id"
+    },
+    "status": {
+      "@id": "http://snomed.info/sct/term/status",
+      "@type": "@id"
+    },
+    "module": {
+      "@id": "http://snomed.info/sct/term/module",
+      "@type": "@id"
+    },
+    "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+    "sn": "http://snomed.info/sct/term/",
+    "xsd": "http://www.w3.org/2001/XMLSchema#",
+    "owl": "http://www.w3.org/2002/07/owl#",
+    "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+  }
+}

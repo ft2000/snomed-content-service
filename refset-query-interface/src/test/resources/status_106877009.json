@@ -1,0 +1,61 @@
+{
+  "@graph": [
+    {
+      "@id": "http://snomed.info/sct/version/1/concept/rdfs/106877009",
+      "status": "http://snomed.info/sct/version/1/concept/rdfs/900000000000074008"
+    },
+    {
+      "@id": "http://snomed.info/sct/version/1/concept/rdfs/900000000000074008",
+      "@type": "rdfs:Class",
+      "sn:active": true,
+      "description": [
+        "http://snomed.info/sct/version/1/description/rdfs/900000000000169019",
+        "http://snomed.info/sct/version/1/description/rdfs/900000000000170018",
+        "http://snomed.info/sct/version/1/description/rdfs/900000000000171019"
+      ],
+      "sn:effectiveTime": {
+        "@type": "xsd:date",
+        "@value": "2002-01-31"
+      },
+      "module": "http://snomed.info/sct/version/1/concept/rdfs/900000000000012004",
+      "status": "http://snomed.info/sct/version/1/concept/rdfs/900000000000074008",
+      "label": {
+        "@language": "en-gb",
+        "@value": "Necessary but not sufficient concept definition status (core metadata concept)"
+      },
+      "subClassOf": "http://snomed.info/sct/version/1/concept/rdfs/900000000000444006"
+    }
+  ],
+  "@context": {
+    "description": {
+      "@id": "http://snomed.info/sct/term/description",
+      "@type": "@id"
+    },
+    "subClassOf": {
+      "@id": "http://www.w3.org/2000/01/rdf-schema#subClassOf",
+      "@type": "@id"
+    },
+    "label": "http://www.w3.org/2000/01/rdf-schema#label",
+    "status": {
+      "@id": "http://snomed.info/sct/term/status",
+      "@type": "@id"
+    },
+    "module": {
+      "@id": "http://snomed.info/sct/term/module",
+      "@type": "@id"
+    },
+    "effectiveTime": {
+      "@id": "http://snomed.info/sct/term/effectiveTime",
+      "@type": "xsd:date"
+    },
+    "active": {
+      "@id": "http://snomed.info/sct/term/active",
+      "@type": "http://www.w3.org/2001/XMLSchema#boolean"
+    },
+    "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+    "sn": "http://snomed.info/sct/term/",
+    "xsd": "http://www.w3.org/2001/XMLSchema#",
+    "owl": "http://www.w3.org/2002/07/owl#",
+    "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+  }
+}

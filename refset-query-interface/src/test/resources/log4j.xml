@@ -12,7 +12,7 @@
 	
 	<!-- Application Loggers -->
 	<logger name="org.ihtsdo.refset">
-		<level value="info" />
+		<level value="debug" />
 	</logger>
 	
 	<!-- 3rdparty Loggers -->
