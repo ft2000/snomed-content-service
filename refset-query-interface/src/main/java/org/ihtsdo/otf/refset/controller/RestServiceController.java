@@ -7,6 +7,7 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
+import org.ihtsdo.otf.refset.common.UriFormatter;
 import org.ihtsdo.otf.refset.service.RefsetQueryException;
 import org.ihtsdo.otf.refset.service.RefsetQueryService;
 import org.slf4j.Logger;
@@ -19,11 +20,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
+import com.wordnik.swagger.annotations.Api;
+import com.wordnik.swagger.annotations.ApiOperation;
+import com.wordnik.swagger.annotations.ApiParam;
+
 /**
  * @author Episteme Partners
  *
  */
 @Controller
+@Api(value="Refset Rest Apis", description="Service to read SNOMED data to create refset", listingPath="/rest/apis/concept")
 @RequestMapping("/module/{moduleid}/release/{releaseid}")
 public class RestServiceController {
 	
@@ -34,19 +40,26 @@ public class RestServiceController {
 
 	private static final String EFFECTIVE_DATE_QUERY = "effective.date.query";;
 
-	private static final String STATUS_QUERY = "status.query";;
+	private static final String STATUS_QUERY = "status.query";
+	
+	private static final String NAMED_GRAPH_KEYWORD = "FROM NAMED";
 	
 	@Resource(name = "sparql.queries")
 	private Map<String, String> qMap;
-	
+		
 	@Resource(name = "fusekiRefsetQueryService")
 	private RefsetQueryService qService;
 	
 	@RequestMapping(method=RequestMethod.GET, value="/{sctid}")
 	@ResponseStatus(value = HttpStatus.OK)
-    public ResponseEntity<String> getItemDetails(@PathVariable String moduleid, @PathVariable String releaseid, @PathVariable String sctid ) {
+	@ApiOperation(value = "Retrieves details of concept for given sct id")
+    public ResponseEntity<String> getItemDetails(
+    		@ApiParam(name="moduleid", value="The id of a module", required=true) @PathVariable String moduleid, 
+    		@ApiParam(name="releaseid", value="The id of a release e.g. 20120131", required=true) @PathVariable String releaseid, 
+    		@ApiParam(name="sctid", value="The id of a concept", required=true) @PathVariable String sctid ) {
 
-		String query = String.format(qMap.get(CONCEPT_QUERY), moduleid, releaseid, sctid);
+		String query = String.format(qMap.get(CONCEPT_QUERY), NAMED_GRAPH_KEYWORD + UriFormatter.getNamedGraphUri(moduleid, releaseid),
+				UriFormatter.getConceptUri(sctid));
 		logger.debug(String.format("Executing Query %s", query));
 
     	try {
@@ -69,7 +82,9 @@ public class RestServiceController {
 	@ResponseStatus(value = HttpStatus.OK)
     public ResponseEntity<String> getStatus(@PathVariable String moduleid, @PathVariable String releaseid, @PathVariable String sctid ) {
 
-		String query = String.format(qMap.get(STATUS_QUERY), moduleid, releaseid, sctid);
+		String query = String.format(qMap.get(STATUS_QUERY), NAMED_GRAPH_KEYWORD + UriFormatter.getNamedGraphUri(moduleid, releaseid),
+				UriFormatter.getConceptUri(sctid));
+
 		logger.debug(String.format("Executing Query %s", query));
 
     	try {
@@ -92,7 +107,8 @@ public class RestServiceController {
 	@ResponseStatus(value = HttpStatus.OK)
     public ResponseEntity<String> getEffectiveDate(@PathVariable String moduleid, @PathVariable String releaseid, @PathVariable String sctid ) {
 
-		String query = String.format(qMap.get(EFFECTIVE_DATE_QUERY), moduleid, releaseid, sctid);
+		String query = String.format(qMap.get(EFFECTIVE_DATE_QUERY), NAMED_GRAPH_KEYWORD + UriFormatter.getNamedGraphUri(moduleid, releaseid),
+				UriFormatter.getConceptUri(sctid));
 		logger.debug(String.format("Executing Query %s", query));
 
     	try {

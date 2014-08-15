@@ -22,7 +22,7 @@
 			 	prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 				prefix owl: <http://www.w3.org/2002/07/owl#>
 				prefix xsd: <http://www.w3.org/2001/XMLSchema#>
-				prefix sn: <http://snomed.info/sct/term/>
+				prefix sn: <http://sct.snomed.info/#>
 				
 				CONSTRUCT 
 				{
@@ -31,12 +31,19 @@
 				    ?desc ?dProp ?dO.
 				    
 				} 
+				
+				#All named graph
+				%1$s
+				
 				WHERE 
 				{
-                  	bind(%s as ?s)
-				    ?s ?prop ?o.
-				    ?s sn:description ?desc.
-				    ?desc ?dProp ?dO.
+					GRAPH ?g 
+					{
+                  		bind(%2$s as ?s)
+				    	?s ?prop ?o.
+				    	?s sn:description ?desc.
+				    	?desc ?dProp ?dO.
+		    		}
 				}
 			  ]]>
 			
@@ -49,14 +56,18 @@
 			 	prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 				prefix owl: <http://www.w3.org/2002/07/owl#>
 				prefix xsd: <http://www.w3.org/2001/XMLSchema#>
-				prefix sn: <http://snomed.info/sct/term/>
+				prefix sn: <http://sct.snomed.info/#>
 				
 				SELECT  ?effectiveTime
-				
+				#All named graph
+				%1$s
 				WHERE 
 				{
-                  	bind(%s as ?s)
-				    ?s sn:effectiveTime ?effectiveTime.
+					GRAPH ?g 
+					{
+						bind(%2$s as ?s)
+				    	?s sn:effectiveTime ?effectiveTime.
+				    }
 				}
 			  ]]>
 			
@@ -69,7 +80,7 @@
 				prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 				prefix owl: <http://www.w3.org/2002/07/owl#>
 				prefix xsd: <http://www.w3.org/2001/XMLSchema#>
-				prefix sn: <http://snomed.info/sct/term/>
+				prefix sn: <http://sct.snomed.info/#>
 				
 							
 				CONSTRUCT 
@@ -77,12 +88,16 @@
 				    ?s sn:status ?status.
 					?status ?p ?o.
 				} 
+				#All named graph
+				%1$s
 				WHERE 
 				{
-				   
-                  	bind(%s as ?s)				    
-				    ?s sn:status ?status.
-					?status ?p ?o.
+				   GRAPH ?g
+				   {
+				   		bind(%2$s as ?s)				    
+				    	?s sn:status ?status.
+						?status ?p ?o.
+					}
 					
 				} 
 

@@ -11,17 +11,24 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetup;
+import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
 import java.util.Map;
 
+import org.ihtsdo.otf.refset.common.UriFormatter;
 import org.ihtsdo.otf.refset.service.RefsetQueryException;
 import org.ihtsdo.otf.refset.service.RefsetQueryService;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -29,6 +36,8 @@ import org.springframework.test.web.servlet.MockMvc;
  * @author Episteme Partners
  *
  */
+@RunWith( PowerMockRunner.class )
+@PrepareForTest( UriFormatter.class )
 public class RestServiceIntegrationTest {
 	
 	private static final String CONCEPT_QUERY = "concept.query";
@@ -62,6 +71,7 @@ public class RestServiceIntegrationTest {
 	@Mock
 	private Map<String, String> qMap;
 
+
 	
 	
 	/**
@@ -75,6 +85,17 @@ public class RestServiceIntegrationTest {
 	    when(qMap.get(CONCEPT_QUERY)).thenReturn("some sparql %s");
 	    when(qMap.get(STATUS_QUERY)).thenReturn("some sparql %s");
 	    when(qMap.get(EFFECTIVE_DATE_QUERY)).thenReturn("some sparql %s");
+	    
+	    mockStatic(UriFormatter.class, new Answer<String>() {
+
+			@Override
+			public String answer(InvocationOnMock invocation) throws Throwable {
+				// TODO Auto-generated method stub
+				return "Default URI";
+			}
+		});
+	    when(UriFormatter.getNamedGraphUri(anyString(), anyString())).thenReturn("some string");
+	    when(UriFormatter.getConceptUri(anyString())).thenReturn("some string");
 
 	}
 	
