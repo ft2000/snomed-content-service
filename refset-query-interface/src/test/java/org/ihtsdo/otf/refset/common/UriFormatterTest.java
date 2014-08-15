@@ -3,16 +3,8 @@
  */
 package org.ihtsdo.otf.refset.common;
 
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.doThrow;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetup;
-import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
 import java.util.EnumMap;
 
@@ -21,7 +13,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
@@ -52,16 +43,16 @@ public class UriFormatterTest {
 	@Mock
 	private EnumMap<URIFormats, String> formats;
 	
-	
-	
-
+	private UriFormatter formatter;
 	/**
 	 * @throws java.lang.Exception
 	 */
 	@Before
 	public void setUp() throws Exception {
 		
-		
+		formatter = new UriFormatter();
+		formatter.setFormats(formats);
+
 		when(formats.get(URIFormats.baseUri)).thenReturn(BASE_URI);
 		
 		when(formats.get(URIFormats.namedGraphUriFmt)).thenReturn(NAMED_GRAPH_URI_FMT);
@@ -72,7 +63,6 @@ public class UriFormatterTest {
 		
 		when(formats.get(URIFormats.moduleUriFmt)).thenReturn(MODULE_URI_FMT);
 
-		UriFormatter.setFormats(formats);
 
 
 	}
