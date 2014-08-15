@@ -37,7 +37,6 @@
 	<bean id="fusekiRefsetQueryService" class="org.ihtsdo.otf.refset.service.RefsetHttpQueryServiceImpl">
 		<property name="endpointUri" value="${fuseki.endpoints}"/>
 		<property name="template" ref="producerTemplate" />
-		<property name="serializer" ref="xmljsonCtx" />
 	</bean>
 	
 	<bean id="kiwiRefsetQueryService" class="org.ihtsdo.otf.refset.service.RefsetHttpQueryServiceImpl">

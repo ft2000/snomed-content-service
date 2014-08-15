@@ -142,7 +142,7 @@
                   <ul class="dropdown-menu formats  " role="menu" aria-labelledby="dropdownMenu2">
                     <li role='presentation' class="" ><a data-value="tsv" role='menuitem' tabindex='-1' href='#'>Select Query</a></li>
                     <li role='presentation' class="" ><a data-value="xml" role='menuitem' tabindex='-1' href='#'>XML(Construct or Describe or Ask)</a></li>
-                    <li role='presentation' class="" ><a data-value="json" role='menuitem' tabindex='-1' href='#'>Any Query</a></li>
+                    <li role='presentation' class="" ><a data-value="json" role='menuitem' tabindex='-1' href='#'>Json</a></li>
                   </ul>
                 </div>
 

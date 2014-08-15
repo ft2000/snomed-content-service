@@ -31,9 +31,6 @@ public class RefsetHttpQueryServiceImpl implements RefsetQueryService {
 
 	private ProducerTemplate template;
 	
-	private CamelContext serializer;
-
-	
 
 
 	/* (non-Javadoc)
@@ -123,23 +120,16 @@ public class RefsetHttpQueryServiceImpl implements RefsetQueryService {
 	             exchange.getIn().setHeaders(headers);				
 			}
 		});
+		
 		if(exchange.isFailed()) {
+			//TODO need more sophisticated handling here
 			Exception remoteException = exchange.getException();
+			logger.error(remoteException.getMessage(), remoteException.fillInStackTrace());
 			throw new RefsetQueryException(remoteException.getMessage(), remoteException.fillInStackTrace());
 		}
 		
         return exchange;
 	}
-	
-	
-	
-	/**
-	 * @param serializer the serializer to set
-	 */
-	public void setSerializer(CamelContext serializer) {
-		this.serializer = serializer;
-	}
-	
 	
 
 }
