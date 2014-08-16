@@ -6,10 +6,17 @@
 		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.0.xsd">
 		<!-- application wide configurations  -->		
 		
-		<util:map id="kiwi.outputMapper" >
+		<!-- util:map id="kiwi.outputMapper" >
 			<entry key="json" value="application/json" />
 			<entry key="tsv" value="tabs" />
 			<entry key="xml" value="application/xml" />
+			<entry key="csv" value="text/csv" />
+		</util:map-->
+		<!-- Bigdat output reusing -->
+		<util:map id="kiwi.outputMapper" >
+			<entry key="json" value="application/sparql-results+json" />
+			<entry key="tsv" value="text/tab-separated-values" />
+			<entry key="xml" value="application/sparql-results+xml" />
 			<entry key="csv" value="text/csv" />
 		</util:map>
 		
