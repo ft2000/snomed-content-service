@@ -68,11 +68,11 @@
           "rdfs":     "http://www.w3.org/2000/01/rdf-schema#",
           "owl":      "http://www.w3.org/2002/07/owl#",
           "xsd":      "http://www.w3.org/2001/XMLSchema#",
-          "sn" :      "http://snomed.info/snomed/term/"
+          "sn" :      "http://sct.snomed.info/#"
         },
         queries: [
 		 { "name": "EAR Concept & its Ancestor",
-    		"queryURL": "resources/sparql/Ear_parent_who_is_known_as_Entire sensory organ(FSN).rq"
+    		"queryURL": "resources/sparql/Ear_parent_who_is_known_as_entire_sensory_organ_FSN.rq"
  		 }
         ]
         };
