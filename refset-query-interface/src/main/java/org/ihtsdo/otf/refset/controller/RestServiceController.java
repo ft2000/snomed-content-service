@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
@@ -28,7 +29,7 @@ import com.wordnik.swagger.annotations.ApiParam;
  * @author Episteme Partners
  *
  */
-@Controller
+@RestController
 @Api(value="Refset Rest Apis", description="Service to read SNOMED data to create refset", listingPath="/rest/apis/concept")
 @RequestMapping("/module/{moduleid}/release/{releaseid}")
 public class RestServiceController {
@@ -50,7 +51,7 @@ public class RestServiceController {
 	@Resource(name = "fusekiRefsetQueryService")
 	private RefsetQueryService qService;
 	
-	@RequestMapping(method=RequestMethod.GET, value="/{sctid}")
+	@RequestMapping(method=RequestMethod.GET, value="/{sctid}", produces = "application/json")
 	@ResponseStatus(value = HttpStatus.OK)
 	@ApiOperation(value = "Retrieves details of concept for given sct id")
     public ResponseEntity<String> getItemDetails(
@@ -78,7 +79,7 @@ public class RestServiceController {
 		}         
     }
 	
-	@RequestMapping(method=RequestMethod.GET, value="/{sctid}/status")
+	@RequestMapping(method=RequestMethod.GET, value="/{sctid}/status", produces = "application/json")
 	@ResponseStatus(value = HttpStatus.OK)
     public ResponseEntity<String> getStatus(@PathVariable String moduleid, @PathVariable String releaseid, @PathVariable String sctid ) {
 
@@ -103,7 +104,7 @@ public class RestServiceController {
 		}         
     }
 	
-	@RequestMapping(method=RequestMethod.GET, value="/{sctid}/effectivedate")
+	@RequestMapping(method=RequestMethod.GET, value="/{sctid}/effectivedate", produces = "application/json")
 	@ResponseStatus(value = HttpStatus.OK)
     public ResponseEntity<String> getEffectiveDate(@PathVariable String moduleid, @PathVariable String releaseid, @PathVariable String sctid ) {
 
