@@ -12,11 +12,25 @@
 	<!-- DispatcherServlet Context: defines this servlet's request-processing infrastructure -->
 	
 	<!-- Enables the Spring MVC @Controller programming model -->
-	<annotation-driven />
+	<annotation-driven>
+		<message-converters register-defaults="true">
+	        <beans:bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
+	            <beans:property name="objectMapper">
+	                <beans:bean class="com.fasterxml.jackson.databind.ObjectMapper">
+	                    <beans:property name="serializationInclusion">
+	                        <beans:value type="com.fasterxml.jackson.annotation.JsonInclude.Include">NON_EMPTY</beans:value>
+	                    </beans:property>
+	                </beans:bean>
+	            </beans:property>
+	        </beans:bean>
+	    </message-converters>		
+	</annotation-driven>
 	<default-servlet-handler/>
 
 	<!-- Handles HTTP GET requests for /resources/** by efficiently serving up static resources in the ${webappRoot}/resources directory -->
 	<resources mapping="/resources/**" location="/resources/" />
+	<resources mapping="/webjars/**" location="classpath:/META-INF/resources/webjars/"/>
+	
 	<context:property-placeholder
          location="/resources/refset-${env}.properties" ignore-resource-not-found="false"/>	
 
@@ -26,9 +40,11 @@
 		<beans:property name="suffix" value=".jsp" />
 	</beans:bean>
 	
+	
 	<context:component-scan base-package="org.ihtsdo.otf.refset" />
 	
 	<beans:import resource="service-camel-route.xml"/>
 	<beans:import resource="sparql-queries.xml"/>
 	<beans:import resource="common-app-config.xml"/>
+	<beans:import resource="spring-refset-browse-service-stub-data.xml"/>
 </beans:beans>

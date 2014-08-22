@@ -37,6 +37,13 @@
 			<artifactId>spring-webmvc</artifactId>
 			<version>${org.springframework-version}</version>
 		</dependency>
+		
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-test</artifactId>
+			<version>${org.springframework-version}</version>
+			<scope>test</scope>
+		</dependency>
 				
 		<!-- AspectJ -->
 		<dependency>
@@ -126,11 +133,11 @@
 			
 		</dependency>
 		
-		<!-- dependency>
-	        <groupId>org.apache.marmotta</groupId>
-			<artifactId>marmotta-sparql</artifactId>
-			<version>3.2.1</version>
-		</dependency-->
+		<dependency>
+        	<groupId>org.springframework.hateoas</groupId>
+        	<artifactId>spring-hateoas</artifactId>
+        	<version>0.15.0.RELEASE</version>
+    	</dependency>
 		
 		<dependency>
 		  <groupId>org.hibernate</groupId>
@@ -233,16 +240,7 @@
 	        <version>2.4</version>
 	        <classifier>jdk15</classifier>
 	    </dependency>
-		<dependency>
-			<groupId>org.scala-lang</groupId>
-			<artifactId>scala-library</artifactId>
-			<version>2.10.4</version>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-test</artifactId>
-			<version>1.1.4.RELEASE</version>
-		</dependency>
+
 		<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
@@ -253,7 +251,39 @@
 		    <groupId>com.mangofactory</groupId>
 		    <artifactId>swagger-springmvc</artifactId>
 		    <version>0.6.5</version>
-		</dependency>		
+		</dependency>
+		
+		<dependency>
+			<groupId>org.codehaus.jackson</groupId>
+			<artifactId>jackson-core-asl</artifactId>
+			<version>${jackson.version}</version>
+		</dependency>
+
+	    <dependency>
+	        <groupId>org.springframework.batch</groupId>
+	        <artifactId>spring-batch-core</artifactId>
+	        <version>3.0.1.RELEASE</version>
+	    </dependency>
+	    
+		<dependency>
+			<groupId>net.sf.opencsv</groupId>
+			<artifactId>opencsv</artifactId>
+			<version>2.0</version>
+		</dependency>
+
+
+		<dependency>
+			<groupId>org.springframework.data</groupId>
+			<artifactId>spring-data-commons</artifactId>
+			<version>1.8.1.RELEASE</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.webjars</groupId>
+			<artifactId>swagger-ui</artifactId>
+			<version>2.0.12</version>
+		</dependency>
+
 	</dependencies>
     <build>
         <plugins>
