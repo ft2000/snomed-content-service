@@ -7,12 +7,18 @@ import java.util.List;
 
 import javax.validation.constraints.NotNull;
 
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
+import org.springframework.util.StringUtils;
+
 /**
  * @author Episteme Partners
  *
  */
 public class Refset {
-		
+	private static final DateTimeFormatter formatter = DateTimeFormat.forPattern("yyyyMMdd");
+
 	
 	@NotNull
 	private String id;
@@ -45,6 +51,8 @@ public class Refset {
 	private String typeId;
 	
 	private String superRefsetTypeId;
+	
+
 
 	/**
 	 * @return the typeId
@@ -134,10 +142,16 @@ public class Refset {
 	 * @return the created
 	 */
 	public String getCreated() {
+
+		if( !StringUtils.isEmpty(created) ) {
+
+			DateTime dt = formatter.parseDateTime(created);
+			created = dt.toString();
+		}
+		
 		return created;
 	}
 
-	
 	public void setCreated(String date) {
 		
 		this.created = date;
@@ -204,6 +218,14 @@ public class Refset {
 	 * @return the publishedDate
 	 */
 	public String getPublishedDate() {
+		
+		if( !StringUtils.isEmpty(publishedDate) ) {
+			
+			DateTime dt = formatter.parseDateTime(publishedDate);
+
+			publishedDate = dt.toString();
+		}
+		
 		return publishedDate;
 	}
 
@@ -219,6 +241,13 @@ public class Refset {
 	 * @return the effectiveDate
 	 */
 	public String getEffectiveTime() {
+		//TODO NEED TO GET ISO TIME HENCE THIS WORKAROUND. Util date based conversion is gets 2013-01-12T00:00:00.+0000 which is not ISO as required at fronend
+		if( !StringUtils.isEmpty(effectiveTime) ) {
+			DateTime dt = formatter.parseDateTime(effectiveTime);
+
+			effectiveTime = dt.toString();
+		}
+		
 		return effectiveTime;
 	}
 
@@ -239,7 +268,9 @@ public class Refset {
 	   
 	   return ( this.id == r.id );
 	   
-   }	
+   }
+   
+   
    
    @Override
    public String toString() {

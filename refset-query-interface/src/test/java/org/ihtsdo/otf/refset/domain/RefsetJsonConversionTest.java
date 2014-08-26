@@ -8,6 +8,7 @@ import static org.junit.Assert.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -76,7 +77,7 @@ public class RefsetJsonConversionTest {
 		Refset r = new Refset();
 		
 		r.setId("700043003");
-		r.setCreated(new Date().toString());
+		r.setCreated("20130119");
 		r.setCreatedBy("Junit Refset Editor");
 		r.setDescription("GP/FP health issue reference set (foundation metadata concept)");
 		
@@ -132,7 +133,7 @@ public class RefsetJsonConversionTest {
 		r.setLanguageCode("en-GB");
 		
 		r.setPublished(true);
-		r.setPublishedDate(new Date().toString());
+		r.setPublishedDate("20130119");
 		
 		r.setTypeId("5000");
 		r.setSuperRefsetTypeId("none");

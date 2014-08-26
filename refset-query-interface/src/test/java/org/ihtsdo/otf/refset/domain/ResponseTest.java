@@ -56,10 +56,10 @@ public class ResponseTest {
 		for (int i = 0; i < 11; i++) {
 			
 			Refset r = new Refset();
-			r.setCreated( new Date().toString() );
+			r.setCreated( "20130119");
 			r.setCreatedBy( "Junit Author - " + i );
 			r.setDescription( "Junit Refset" );
-			r.setEffectiveTime( new Date().toString() );
+			r.setEffectiveTime( "20130119");
 			r.setId( "2000000" + i + 10 );
 			
 			rs.add(r);

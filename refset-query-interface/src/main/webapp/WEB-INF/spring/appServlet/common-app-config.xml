@@ -45,6 +45,27 @@
 		</bean>	
 		
 		<bean id="documentationConfig" class="com.mangofactory.swagger.configuration.DocumentationConfig"/>	
+		
+		
+		<bean id="conversionService" class="org.springframework.format.support.FormattingConversionServiceFactoryBean">
+	        <property name="registerDefaultFormatters" value="false" />
+	        <property name="formatters">
+	        <set>
+	            <bean class="org.springframework.format.number.NumberFormatAnnotationFormatterFactory" />
+	        </set>
+	        </property>
+	        <property name="formatterRegistrars">
+	        <set>
+	          <bean class="org.springframework.format.datetime.joda.JodaTimeFormatterRegistrar">
+	              <property name="dateFormatter">
+	                  <bean class="org.springframework.format.datetime.joda.DateTimeFormatterFactoryBean">
+	                      <property name="pattern" value="yyyyMMdd"/>
+	                  </bean>
+	              </property>
+	          </bean>
+	      </set>
+	      </property>
+	    </bean>			
 
 
 </beans>

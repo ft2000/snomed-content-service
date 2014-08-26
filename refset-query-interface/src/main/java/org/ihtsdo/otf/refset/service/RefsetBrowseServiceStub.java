@@ -31,8 +31,19 @@ public class RefsetBrowseServiceStub implements RefsetBrowseService {
 	public List<Refset> getRefsets(Integer page, Integer size) throws RefsetServiceException {
 
 		LOGGER.debug("getRefsets");
+		if( page == 1 && size == 10) { return dataService.getRefSets();}
 		
-		return dataService.getRefSets().subList(0, 10);
+		List<Refset> refsets = dataService.getRefSets();
+		
+		int total = refsets.size();
+		
+		int from_temp = page >= 1 ? (Math.min(total, Math.abs(page * size)) - size) : 0;
+		
+		int from = from_temp >= 0 ? from_temp : 0;
+		
+		int temp = Math.min(total, Math.abs(page * size));
+		int to = temp <= total ? temp : total;
+		return refsets.subList(from, to);
 		
 	}
 
