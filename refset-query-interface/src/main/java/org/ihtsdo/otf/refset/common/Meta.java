@@ -9,6 +9,22 @@ public class Meta extends ResourceSupport {
 	
 	private String message;
 	
+	private int noOfRecords;
+	
+
+	/**
+	 * @return the noOfRecords
+	 */
+	public int getNoOfRecords() {
+		return noOfRecords;
+	}
+
+	/**
+	 * @param noOfRecords the noOfRecords to set
+	 */
+	public void setNoOfRecords(int noOfRecords) {
+		this.noOfRecords = noOfRecords;
+	}
 
 	/**
 	 * @return the status

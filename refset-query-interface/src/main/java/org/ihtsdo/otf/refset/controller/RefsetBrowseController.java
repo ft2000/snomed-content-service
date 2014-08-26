@@ -55,6 +55,7 @@ public class RefsetBrowseController {
 		Response<Map<String, Object>> response = new Response<Map<String, Object>>();
 		Meta m = new Meta();
 		m.add( linkTo( methodOn( RefsetBrowseController.class ).getRefsets( page, size ) ).withSelfRel() );
+		
 		response.setMeta(m);
 
     	try {
@@ -63,7 +64,7 @@ public class RefsetBrowseController {
 
 			Map<String, Object> data = new HashMap<String, Object>();
 			data.put("refsets", refSets);
-			
+			m.setNoOfRecords(refSets.size());
 			response.setData(data);
 			
 			m.setMessage(SUCESS);

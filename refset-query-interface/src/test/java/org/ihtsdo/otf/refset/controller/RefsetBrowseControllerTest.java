@@ -11,6 +11,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -76,7 +77,7 @@ public class RefsetBrowseControllerTest {
 		when(refset.getDescription()).thenReturn("Junit Refset"); 
 		when(refset.getModuleId()).thenReturn("Junit_module_1");
 		when(refset.getMembers()).thenReturn(null);
-		when(refset.getCreated()).thenReturn(new Date().toString());
+		when(refset.getCreated()).thenReturn(Calendar.getInstance().getTime().toString());
 		when(refset.getCreatedBy()).thenReturn("Junit author");
 		when(refset.getType()).thenReturn(RefsetType.simple);
 	}

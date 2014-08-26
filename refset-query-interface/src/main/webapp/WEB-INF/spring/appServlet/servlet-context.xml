@@ -4,6 +4,7 @@
 	xmlns:beans="http://www.springframework.org/schema/beans"
 	xmlns:context="http://www.springframework.org/schema/context"
 	xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:p="http://www.springframework.org/schema/p"
 	xsi:schemaLocation="http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd
 		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
@@ -12,21 +13,48 @@
 	<!-- DispatcherServlet Context: defines this servlet's request-processing infrastructure -->
 	
 	<!-- Enables the Spring MVC @Controller programming model -->
-	<annotation-driven>
+	<annotation-driven conversion-service="conversionService">
 		<message-converters register-defaults="true">
-	        <beans:bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
-	            <beans:property name="objectMapper">
-	                <beans:bean class="com.fasterxml.jackson.databind.ObjectMapper">
-	                    <beans:property name="serializationInclusion">
-	                        <beans:value type="com.fasterxml.jackson.annotation.JsonInclude.Include">NON_EMPTY</beans:value>
-	                    </beans:property>
-	                </beans:bean>
-	            </beans:property>
+	        <beans:bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter" >
+	           
+	            <beans:property name="objectMapper" ref="objectMapper" />
+
 	        </beans:bean>
 	    </message-converters>		
 	</annotation-driven>
 	<default-servlet-handler/>
+	
+	<beans:bean id="objectMapper"
+	    class="org.springframework.http.converter.json.Jackson2ObjectMapperFactoryBean"
+	    p:indentOutput="true" p:simpleDateFormat="yyyy-MM-dd'T'HH:mm:ss.SSSZ" 
+	    p:serializationInclusion-ref="NOT_EMPTY">
+	</beans:bean>
+	<beans:bean
+	    class="org.springframework.beans.factory.config.MethodInvokingFactoryBean"
+	    p:targetObject-ref="objectMapper" p:targetMethod="registerModule">
+	    <beans:property name="arguments">
+	        <beans:list>
+	            <beans:bean class="com.fasterxml.jackson.datatype.joda.JodaModule" />
+	        </beans:list>
+	    </beans:property>
+	</beans:bean>
+	
 
+	<util:constant static-field="com.fasterxml.jackson.annotation.JsonInclude.Include.NON_EMPTY" id="NOT_EMPTY"/>
+	<util:constant static-field="org.springframework.format.annotation.DateTimeFormat.ISO.DATE_TIME" id="ISO.DATE_TIME"/>
+	
+	
+
+
+	<beans:bean
+	    class="org.springframework.beans.factory.config.MethodInvokingFactoryBean"
+	    p:targetObject-ref="objectMapper" p:targetMethod="registerModule">
+	    <beans:property name="arguments">
+	        <beans:list>
+	            <beans:bean class="com.fasterxml.jackson.datatype.joda.JodaModule" />
+	        </beans:list>
+	    </beans:property>
+	</beans:bean>
 	<!-- Handles HTTP GET requests for /resources/** by efficiently serving up static resources in the ${webappRoot}/resources directory -->
 	<resources mapping="/resources/**" location="/resources/" />
 	<resources mapping="/webjars/**" location="classpath:/META-INF/resources/webjars/"/>

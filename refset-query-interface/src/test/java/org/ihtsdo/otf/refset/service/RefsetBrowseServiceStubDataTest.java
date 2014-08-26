@@ -36,7 +36,7 @@ public class RefsetBrowseServiceStubDataTest {
 		
 		assertNotNull(refsets);
 		assertTrue(!refsets.isEmpty());
-		assertEquals(60, refsets.size());
+		assertEquals(59, refsets.size());
 		
 		
 	}
