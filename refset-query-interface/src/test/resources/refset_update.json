@@ -1,0 +1,73 @@
+{ 
+	  "id" : "450971007",
+      "moduleId" : "900000000000012004",
+      "description" : "GP/FP reason for encounter reference set (foundation metadata concept)",
+      "createdBy" : "Refset Stub",
+      "created" : "2013-01-12T00:00:00.000Z",
+      "languageCode" : "en_US",
+      "type" : "simple",
+      "members" : [ {
+        "id" : "4838992819439356323",
+        "moduleId" : "900000000000012000",
+        "referenceComponentId" : "303271000119101",
+        "effectiveTime" : "2012-01-12T00:00:00.000Z",
+        "active" : true
+      }, {
+        "id" : "-4405041780209726780",
+        "moduleId" : "900000000000012000",
+        "referenceComponentId" : "303281000119103",
+        "effectiveTime" : "2012-01-12T00:00:00.000Z",
+        "active" : true
+      }, {
+        "id" : "3346835690906338267",
+        "moduleId" : "900000000000012000",
+        "referenceComponentId" : "309041000119102",
+        "effectiveTime" : "2012-01-12T00:00:00.000Z",
+        "active" : true
+      }, {
+        "id" : "4101752474995543198",
+        "moduleId" : "900000000000012000",
+        "referenceComponentId" : "309051000119100",
+        "effectiveTime" : "2012-01-12T00:00:00.000Z",
+        "active" : true
+      }, {
+        "id" : "-1680229466276609069",
+        "moduleId" : "900000000000012000",
+        "referenceComponentId" : "202747007",
+        "effectiveTime" : "2012-01-12T00:00:00.000Z",
+        "active" : true
+      }, {
+        "id" : "-6588698997429744345",
+        "moduleId" : "900000000000012000",
+        "referenceComponentId" : "202755000",
+        "effectiveTime" : "2012-01-12T00:00:00.000Z",
+        "active" : true
+      }, {
+        "id" : "-6525262381864957718",
+        "moduleId" : "900000000000012000",
+        "referenceComponentId" : "202751009",
+        "effectiveTime" : "2012-01-12T00:00:00.000Z",
+        "active" : true
+      }, {
+        "id" : "6754108641307412239",
+        "moduleId" : "900000000000012000",
+        "referenceComponentId" : "31848007",
+        "effectiveTime" : "2012-01-12T00:00:00.000Z",
+        "active" : true
+      }, {
+        "id" : "2195795514567967316",
+        "moduleId" : "900000000000012000",
+        "referenceComponentId" : "202932007",
+        "effectiveTime" : "2012-01-12T00:00:00.000Z",
+        "active" : true
+      }, {
+        "id" : "5907070721074155003",
+        "moduleId" : "900000000000012000",
+        "referenceComponentId" : "15705761000119100",
+        "effectiveTime" : "2012-01-12T00:00:00.000Z",
+        "active" : true
+      } ],
+      "publishedDate" : "2013-01-19T00:00:00.000Z",
+      "effectiveTime" : "2013-01-19T00:00:00.000Z",
+      "published" : true
+    }
