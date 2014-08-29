@@ -3,6 +3,7 @@
  */
 package org.ihtsdo.otf.refset.domain;
 
+import java.util.Collections;
 import java.util.List;
 
 import javax.validation.constraints.NotNull;
@@ -11,6 +12,8 @@ import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.springframework.util.StringUtils;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * @author Episteme Partners
@@ -51,6 +54,9 @@ public class Refset {
 	private String typeId;
 	
 	private String superRefsetTypeId;
+	
+	@JsonIgnore
+	private MetaData metaData;
 	
 
 
@@ -143,7 +149,7 @@ public class Refset {
 	 */
 	public String getCreated() {
 
-		if( !StringUtils.isEmpty(created) ) {
+		if( !StringUtils.isEmpty(created) && created.matches("\\d{4}\\d{2}\\d{2}")) {
 
 			DateTime dt = formatter.parseDateTime(created);
 			created = dt.toString();
@@ -189,6 +195,12 @@ public class Refset {
 	 * @return the members
 	 */
 	public List<Member> getMembers() {
+		
+		if(members == null) {
+			
+			members = Collections.emptyList();
+			
+		}
 		return members;
 	}
 
@@ -219,7 +231,7 @@ public class Refset {
 	 */
 	public String getPublishedDate() {
 		
-		if( !StringUtils.isEmpty(publishedDate) ) {
+		if( !StringUtils.isEmpty(publishedDate) && publishedDate.matches("\\d{4}\\d{2}\\d{2}")) {
 			
 			DateTime dt = formatter.parseDateTime(publishedDate);
 
@@ -242,7 +254,7 @@ public class Refset {
 	 */
 	public String getEffectiveTime() {
 		//TODO NEED TO GET ISO TIME HENCE THIS WORKAROUND. Util date based conversion is gets 2013-01-12T00:00:00.+0000 which is not ISO as required at fronend
-		if( !StringUtils.isEmpty(effectiveTime) ) {
+		if( !StringUtils.isEmpty(effectiveTime) && effectiveTime.matches("\\d{4}\\d{2}\\d{2}") ) {
 			DateTime dt = formatter.parseDateTime(effectiveTime);
 
 			effectiveTime = dt.toString();
@@ -281,5 +293,20 @@ public class Refset {
 	   		this.effectiveTime, this.isPublished, this.languageCode, this.members, this.moduleId, this.publishedDate,
 	   		this.superRefsetTypeId, this.type, this.typeId );
    }
+
+	/**
+	 * @return the meta
+	 */
+	public MetaData getMetaData() {
+		
+		return metaData == null ? new MetaData() : metaData;
+	}
+	
+	/**
+	 * @param meta the meta to set
+	 */
+	public void setMetaData(MetaData meta) {
+		this.metaData = meta;
+	}
 
 }

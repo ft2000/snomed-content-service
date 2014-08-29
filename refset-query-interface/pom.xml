@@ -13,10 +13,22 @@
 		<org.springframework-version>4.0.6.RELEASE</org.springframework-version>
 		<org.aspectj-version>1.6.10</org.aspectj-version>
 		<org.slf4j-version>1.6.6</org.slf4j-version>
-		<refset-query-interface-app-port>8081</refset-query-interface-app-port>
 		<camel-version>2.13.2</camel-version>
 		<com.fasterxml.jackson-version>2.4.0</com.fasterxml.jackson-version>
-		<powermock-version>1.5.5</powermock-version>
+		<org.powermock-version>1.5.5</org.powermock-version>
+		<net.sf.supercsv-version>2.2.0</net.sf.supercsv-version>
+		<!-- graph db -->
+		<com.orientechnologies-version>1.7.8</com.orientechnologies-version>
+		<com.tinkerpop.blueprints-version>2.5.0</com.tinkerpop.blueprints-version>
+		<commons.configuration-version>1.9</commons.configuration-version>
+		
+		
+		
+		<!-- meta -->
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<refset-query-interface-app-port>8081</refset-query-interface-app-port>
+		
 	</properties>
 	<dependencies>
 		<!-- Spring -->
@@ -161,13 +173,13 @@
 		<dependency>
 			<groupId>org.powermock</groupId>
 			<artifactId>powermock-api-mockito</artifactId>
-			<version>${powermock-version}</version>
+			<version>${org.powermock-version}</version>
 		</dependency>
 		
 		<dependency>
 			<groupId>org.powermock</groupId>
 			<artifactId>powermock-module-junit4</artifactId>
-			<version>${powermock-version}</version>
+			<version>${org.powermock-version}</version>
 		</dependency>
 		
 		<dependency>
@@ -286,12 +298,12 @@
 		<dependency>
 			<groupId>net.sf.supercsv</groupId>
 			<artifactId>super-csv</artifactId>
-			<version>2.2.0</version>
+			<version>${net.sf.supercsv-version}</version>
 		</dependency>
 		<dependency>
 			<groupId>net.sf.supercsv</groupId>
 			<artifactId>super-csv-dozer</artifactId>
-			<version>2.2.0</version>
+			<version>${net.sf.supercsv-version}</version>
 		</dependency>
 
 
@@ -306,7 +318,61 @@
 			<artifactId>swagger-ui</artifactId>
 			<version>2.0.12</version>
 		</dependency>
+		<!-- to work with graph db -->
 
+		
+		<dependency>
+		  <groupId>com.orientechnologies</groupId>
+		  <artifactId>orientdb-enterprise</artifactId>
+		  <version>${com.orientechnologies-version}</version>
+		</dependency>
+		
+		<dependency>
+		  <groupId>com.orientechnologies</groupId>
+		  <artifactId>orientdb-client</artifactId>
+		  <version>${com.orientechnologies-version}</version>
+		</dependency>
+		
+		<dependency>
+		  <groupId>com.orientechnologies</groupId>
+		  <artifactId>orientdb-graphdb</artifactId>
+		  <version>${com.orientechnologies-version}</version>
+		</dependency>
+		
+		<dependency>
+		  <groupId>com.orientechnologies</groupId>
+		  <artifactId>orientdb-tools</artifactId>
+		  <version>${com.orientechnologies-version}</version>
+		</dependency>
+		
+        <dependency>
+            <groupId>commons-configuration</groupId>
+            <artifactId>commons-configuration</artifactId>
+            <version>${commons.configuration-version}</version>
+        </dependency>	
+		<dependency>
+		     <groupId>com.orientechnologies</groupId>
+		     <artifactId>orientdb-lucene</artifactId>
+		  	 <version>1.7</version>
+		</dependency>        
+        
+		<dependency>
+		   <groupId>com.tinkerpop.blueprints</groupId>
+		   <artifactId>blueprints-core</artifactId>
+		   <version>${com.tinkerpop.blueprints-version}</version>
+		</dependency>			
+        <dependency>
+            <groupId>com.tinkerpop.gremlin</groupId>
+            <artifactId>gremlin-java</artifactId>
+		   <version>${com.tinkerpop.blueprints-version}</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+        	<groupId>com.thinkaurelius.thrift</groupId>
+        	<artifactId>thrift-server</artifactId>
+        	<version>0.3.3</version>
+        </dependency>
 	</dependencies>
     <build>
         <plugins>

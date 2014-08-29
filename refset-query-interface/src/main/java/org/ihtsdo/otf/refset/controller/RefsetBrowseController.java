@@ -10,14 +10,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Resource;
+
 import org.ihtsdo.otf.refset.common.Meta;
 import org.ihtsdo.otf.refset.common.Response;
 import org.ihtsdo.otf.refset.domain.Refset;
+import org.ihtsdo.otf.refset.exception.EntityNotFoundException;
 import org.ihtsdo.otf.refset.exception.RefsetServiceException;
 import org.ihtsdo.otf.refset.service.RefsetBrowseService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -42,7 +44,7 @@ public class RefsetBrowseController {
 
 	private static final String SUCESS = "Success";
 	
-	@Autowired
+	@Resource(name = "browseGraphService")
 	private RefsetBrowseService bService;
 	
 	@RequestMapping( method = RequestMethod.GET, produces = "application/json" )
@@ -120,6 +122,15 @@ public class RefsetBrowseController {
 
 			return new ResponseEntity<Response<Map<String,Object>>>(response, HttpStatus.OK);
 	    	
+		} catch (EntityNotFoundException e) {
+			
+			String message = String.format("Error occurred during service call : %s", e.getMessage());
+			logger.error(message);
+			m.setMessage(message); 
+			m.setStatus(HttpStatus.NOT_FOUND);
+			
+			return new ResponseEntity<Response<Map<String,Object>>>(response, HttpStatus.NOT_FOUND);
+
 		}       
     }
 	

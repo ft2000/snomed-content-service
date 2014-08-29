@@ -20,10 +20,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
 import org.supercsv.cellprocessor.ParseBool;
-import org.supercsv.cellprocessor.ParseDate;
 import org.supercsv.cellprocessor.ParseLong;
 import org.supercsv.cellprocessor.constraint.NotNull;
-import org.supercsv.cellprocessor.constraint.UniqueHashCode;
 import org.supercsv.cellprocessor.ift.CellProcessor;
 import org.supercsv.io.dozer.CsvDozerBeanReader;
 import org.supercsv.io.dozer.ICsvDozerBeanReader;
@@ -115,8 +113,8 @@ public class RefsetBrowseServiceStubData {
 		refsetIdsAndMembers.put("450971007", 900);
 		refsetIdsAndMembers.put("703870008", 1200);
 		refsetIdsAndMembers.put("447566000", 1500);
-		refsetIdsAndMembers.put("447565001", 18000);
-		refsetIdsAndMembers.put("700043013", 21000);
+		refsetIdsAndMembers.put("447565001", 1800);
+		refsetIdsAndMembers.put("700043013", 2100);
 		refsetIdsAndMembers.put("450973015", 2400);
 		refsetIdsAndMembers.put("450971017", 2700);
 		refsetIdsAndMembers.put("703870018", 3000);
@@ -128,7 +126,7 @@ public class RefsetBrowseServiceStubData {
 		refsetIdsAndMembers.put("450971027", 900);
 		refsetIdsAndMembers.put("703870028", 1200);
 		refsetIdsAndMembers.put("447566020", 1500);
-		refsetIdsAndMembers.put("447565021", 18000);
+		refsetIdsAndMembers.put("447565021", 1800);
 		
 		refsetIdsAndMembers.put("700043033", 2100);
 		refsetIdsAndMembers.put("450973035", 2400);
@@ -246,7 +244,7 @@ public class RefsetBrowseServiceStubData {
 	 */
 	public   Refset getRefSet(String refSetId) throws RefsetServiceException {
 		
-		List<Refset> refSets = getRefSets().subList(0, 10);
+		List<Refset> refSets = getRefSets();
 				
 		Refset result = null;
 		
@@ -283,7 +281,7 @@ public class RefsetBrowseServiceStubData {
 			s.configureBeanMapping(Member.class, MEMBER_MAPPING);
 			Member m = null;
 			while( (m = s.read(Member.class, getMemberProcessors())) != null ) {
-	            
+	            m.setId(UUID.randomUUID().toString());
 	            members.add(m);
 
 			}
@@ -322,7 +320,7 @@ public class RefsetBrowseServiceStubData {
 		/**String[] columns = new String[] {"id", "description", "created", "createdBy", "languageCode", 
 				"type", "publishedDate", "effectiveTime", "moduleId", "published"};*/
 		final CellProcessor[] processors = new CellProcessor[] { 
-				new UniqueHashCode(), // id
+				new NotNull(), // id
 				new NotNull(), // description
 				new NotNull(), // publishedDate
 				new NotNull(), // createdBy
@@ -343,7 +341,7 @@ public class RefsetBrowseServiceStubData {
 		/**	private static String[] MEMBER_MAPPING = new String[] {"referenceComponentId", "effectiveTime", "active", "moduleId"}; */
 		final CellProcessor[] processors = new CellProcessor[] { 
 				
-				new UniqueHashCode(), // referenceComponentId
+				new NotNull(), // referenceComponentId
 				new NotNull(new ParseLong()), // effectiveTime
 				new NotNull(new ParseBool()), // active
 				new NotNull(), // moduleId

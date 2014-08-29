@@ -6,6 +6,7 @@ package org.ihtsdo.otf.refset.service;
 import java.util.List;
 
 import org.ihtsdo.otf.refset.domain.Refset;
+import org.ihtsdo.otf.refset.exception.EntityNotFoundException;
 import org.ihtsdo.otf.refset.exception.RefsetServiceException;
 
 /**
@@ -27,7 +28,7 @@ public interface RefsetBrowseService {
 	 * @return
 	 * @throws RefsetServiceException
 	 */
-	public Refset getRefset(String refsetId) throws RefsetServiceException ;
+	public Refset getRefset(String refsetId) throws RefsetServiceException, EntityNotFoundException ;
 
 
 }
