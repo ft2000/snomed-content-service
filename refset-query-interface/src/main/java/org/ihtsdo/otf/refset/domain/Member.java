@@ -1,7 +1,14 @@
 package org.ihtsdo.otf.refset.domain;
 
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
+import org.springframework.util.StringUtils;
+
 public class Member {
 	
+	private static final DateTimeFormatter formatter = DateTimeFormat.forPattern("yyyyMMdd");
+
 	private String id;
 	
 	private String moduleId;
@@ -16,6 +23,15 @@ public class Member {
 	 * @return the effectiveTime
 	 */
 	public String getEffectiveTime() {
+		
+		if( !StringUtils.isEmpty(effectiveTime) 
+				&& effectiveTime.matches("\\d{4}\\d{2}\\d{2}")) {
+			
+			DateTime dt = formatter.parseDateTime(effectiveTime);
+
+			effectiveTime = dt.toString();
+		}
+		
 		return effectiveTime;
 	}
 	/**
@@ -59,6 +75,7 @@ public class Member {
 	 * @param isActive the isActive to set
 	 */
 	public void setActive(boolean isActive) {
+		
 		this.isActive = isActive;
 	}
 	/**

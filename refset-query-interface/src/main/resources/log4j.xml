@@ -14,6 +14,10 @@
 	<logger name="org.ihtsdo.otf.refset">
 		<level value="debug" />
 	</logger>
+	<logger name="com.tinkerpop.blueprints">
+		<level value="debug" />
+	</logger>
+	
 	
 	<!-- 3rdparty Loggers -->
 	<logger name="org.springframework.core">

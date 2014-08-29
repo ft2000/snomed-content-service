@@ -26,19 +26,9 @@
 	
 	<beans:bean id="objectMapper"
 	    class="org.springframework.http.converter.json.Jackson2ObjectMapperFactoryBean"
-	    p:indentOutput="true" p:simpleDateFormat="yyyy-MM-dd'T'HH:mm:ss.SSSZ" 
-	    p:serializationInclusion-ref="NOT_EMPTY">
-	</beans:bean>
-	<beans:bean
-	    class="org.springframework.beans.factory.config.MethodInvokingFactoryBean"
-	    p:targetObject-ref="objectMapper" p:targetMethod="registerModule">
-	    <beans:property name="arguments">
-	        <beans:list>
-	            <beans:bean class="com.fasterxml.jackson.datatype.joda.JodaModule" />
-	        </beans:list>
-	    </beans:property>
-	</beans:bean>
-	
+	    p:indentOutput="true" p:serializationInclusion-ref="NOT_EMPTY">
+	    <beans:property name="modulesToInstall" value="com.fasterxml.jackson.datatype.joda.JodaModule" />
+	</beans:bean>	
 
 	<util:constant static-field="com.fasterxml.jackson.annotation.JsonInclude.Include.NON_EMPTY" id="NOT_EMPTY"/>
 	<util:constant static-field="org.springframework.format.annotation.DateTimeFormat.ISO.DATE_TIME" id="ISO.DATE_TIME"/>
@@ -59,8 +49,8 @@
 	<resources mapping="/resources/**" location="/resources/" />
 	<resources mapping="/webjars/**" location="classpath:/META-INF/resources/webjars/"/>
 	
-	<context:property-placeholder
-         location="/resources/refset-${env}.properties" ignore-resource-not-found="false"/>	
+	<context:property-placeholder 
+         location="classpath:refset-${env}.properties" ignore-resource-not-found="false"/>	
 
 	<!-- Resolves views selected for rendering by @Controllers to .jsp resources in the /WEB-INF/views directory -->
 	<beans:bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
@@ -75,4 +65,5 @@
 	<beans:import resource="sparql-queries.xml"/>
 	<beans:import resource="common-app-config.xml"/>
 	<beans:import resource="spring-refset-browse-service-stub-data.xml"/>
+	<beans:import resource="refset-graph-server-config.xml"/>	
 </beans:beans>

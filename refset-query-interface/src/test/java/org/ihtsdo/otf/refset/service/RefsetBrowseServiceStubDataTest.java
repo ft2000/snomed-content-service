@@ -16,11 +16,12 @@ import org.springframework.context.support.FileSystemXmlApplicationContext;
 public class RefsetBrowseServiceStubDataTest {
 	
 	private RefsetBrowseServiceStubData data;
+	private ApplicationContext ctx;
 
 	@Before
 	public void setUp() throws Exception {
 		
-		ApplicationContext ctx = new FileSystemXmlApplicationContext("src/main/webapp/WEB-INF/spring/appServlet/spring-refset-browse-service-stub-data.xml");
+		ctx = new FileSystemXmlApplicationContext("src/main/webapp/WEB-INF/spring/appServlet/spring-refset-browse-service-stub-data.xml");
 		data = ctx.getBean("refsetBrosweServiceStubData", RefsetBrowseServiceStubData.class);
 		
 	}

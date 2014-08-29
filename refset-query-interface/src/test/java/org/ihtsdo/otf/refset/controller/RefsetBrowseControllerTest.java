@@ -12,7 +12,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
 import org.ihtsdo.otf.refset.domain.Refset;
