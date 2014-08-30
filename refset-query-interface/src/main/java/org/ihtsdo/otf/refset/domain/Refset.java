@@ -9,9 +9,6 @@ import java.util.List;
 import javax.validation.constraints.NotNull;
 
 import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
-import org.springframework.util.StringUtils;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -20,7 +17,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  *
  */
 public class Refset {
-	private static final DateTimeFormatter formatter = DateTimeFormat.forPattern("yyyyMMdd");
 
 	
 	@NotNull
@@ -37,7 +33,7 @@ public class Refset {
 	private String createdBy;
 	
 	@NotNull
-	private String created;
+	private DateTime created;
 
 	private String languageCode;
 	
@@ -47,9 +43,9 @@ public class Refset {
 		
 	private boolean isPublished;
 	
-	private String publishedDate;
+	private DateTime publishedDate;
 	
-	private String effectiveTime;
+	private DateTime effectiveTime;
 	
 	private String typeId;
 	
@@ -59,6 +55,48 @@ public class Refset {
 	private MetaData metaData;
 	
 
+
+	/**
+	 * @return the created
+	 */
+	public DateTime getCreated() {
+		return created;
+	}
+
+	/**
+	 * @param created the created to set
+	 */
+	public void setCreated(DateTime created) {
+		this.created = created;
+	}
+
+	/**
+	 * @return the publishedDate
+	 */
+	public DateTime getPublishedDate() {
+		return publishedDate;
+	}
+
+	/**
+	 * @param publishedDate the publishedDate to set
+	 */
+	public void setPublishedDate(DateTime publishedDate) {
+		this.publishedDate = publishedDate;
+	}
+
+	/**
+	 * @return the effectiveTime
+	 */
+	public DateTime getEffectiveTime() {
+		return effectiveTime;
+	}
+
+	/**
+	 * @param effectiveTime the effectiveTime to set
+	 */
+	public void setEffectiveTime(DateTime effectiveTime) {
+		this.effectiveTime = effectiveTime;
+	}
 
 	/**
 	 * @return the typeId
@@ -144,24 +182,6 @@ public class Refset {
 		this.createdBy = createdBy;
 	}
 
-	/**
-	 * @return the created
-	 */
-	public String getCreated() {
-
-		if( !StringUtils.isEmpty(created) && created.matches("\\d{4}\\d{2}\\d{2}")) {
-
-			DateTime dt = formatter.parseDateTime(created);
-			created = dt.toString();
-		}
-		
-		return created;
-	}
-
-	public void setCreated(String date) {
-		
-		this.created = date;
-	}
 
 	/**
 	 * @return the languageCode
@@ -226,49 +246,13 @@ public class Refset {
 		this.isPublished = isPublished;
 	}
 
-	/**
-	 * @return the publishedDate
-	 */
-	public String getPublishedDate() {
-		
-		if( !StringUtils.isEmpty(publishedDate) && publishedDate.matches("\\d{4}\\d{2}\\d{2}")) {
-			
-			DateTime dt = formatter.parseDateTime(publishedDate);
 
-			publishedDate = dt.toString();
-		}
-		
-		return publishedDate;
-	}
 
-	/**
-	 * @param publishedDate the publishedDate to set
-	 */
-	public void setPublishedDate(String publishedDate) {
-		this.publishedDate = publishedDate;
-	}
-	
 
-	/**
-	 * @return the effectiveDate
-	 */
-	public String getEffectiveTime() {
-		//TODO NEED TO GET ISO TIME HENCE THIS WORKAROUND. Util date based conversion is gets 2013-01-12T00:00:00.+0000 which is not ISO as required at fronend
-		if( !StringUtils.isEmpty(effectiveTime) && effectiveTime.matches("\\d{4}\\d{2}\\d{2}") ) {
-			DateTime dt = formatter.parseDateTime(effectiveTime);
 
-			effectiveTime = dt.toString();
-		}
-		
-		return effectiveTime;
-	}
 
-	/**
-	 * @param effectiveDate the effectiveDate to set
-	 */
-	public void setEffectiveTime(String effectiveDate) {
-		this.effectiveTime = effectiveDate;
-	}
+
+
 	
    @Override 
    public boolean equals(Object input) {

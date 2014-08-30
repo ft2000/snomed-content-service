@@ -6,13 +6,13 @@ package org.ihtsdo.otf.refset.domain;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.ihtsdo.otf.refset.common.Meta;
 import org.ihtsdo.otf.refset.common.Response;
+import org.joda.time.DateTime;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -56,10 +56,10 @@ public class ResponseTest {
 		for (int i = 0; i < 11; i++) {
 			
 			Refset r = new Refset();
-			r.setCreated( "20130119");
+			r.setCreated( new DateTime() );
 			r.setCreatedBy( "Junit Author - " + i );
 			r.setDescription( "Junit Refset" );
-			r.setEffectiveTime( "20130119");
+			r.setEffectiveTime( new DateTime() );
 			r.setId( "2000000" + i + 10 );
 			
 			rs.add(r);

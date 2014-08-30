@@ -3,17 +3,14 @@
  */
 package org.ihtsdo.otf.refset.domain;
 
-import static org.junit.Assert.*;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.joda.time.DateTime;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -77,7 +74,7 @@ public class RefsetJsonConversionTest {
 		Refset r = new Refset();
 		
 		r.setId("700043003");
-		r.setCreated("20130119");
+		r.setCreated( new DateTime() );
 		r.setCreatedBy("Junit Refset Editor");
 		r.setDescription("GP/FP health issue reference set (foundation metadata concept)");
 		
@@ -133,7 +130,7 @@ public class RefsetJsonConversionTest {
 		r.setLanguageCode("en-GB");
 		
 		r.setPublished(true);
-		r.setPublishedDate("20130119");
+		r.setPublishedDate( new DateTime());
 		
 		r.setTypeId("5000");
 		r.setSuperRefsetTypeId("none");

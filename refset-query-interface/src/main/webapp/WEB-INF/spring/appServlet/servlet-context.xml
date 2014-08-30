@@ -20,11 +20,23 @@
 	            <beans:property name="objectMapper" ref="objectMapper" />
 
 	        </beans:bean>
+		<!-- beans:bean class="org.springframework.http.converter.ByteArrayHttpMessageConverter"/>
+        <beans:bean class="org.springframework.http.converter.xml.Jaxb2RootElementHttpMessageConverter"/>
+        <beans:bean class="org.springframework.http.converter.StringHttpMessageConverter"/>
+        <beans:bean class="org.springframework.http.converter.support.AllEncompassingFormHttpMessageConverter"/>
+        <beans:bean class="org.springframework.http.converter.feed.AtomFeedHttpMessageConverter"/>
+        <beans:bean class="org.springframework.http.converter.BufferedImageHttpMessageConverter"/>
+        <beans:bean class="org.springframework.http.converter.FormHttpMessageConverter"/>
+        <beans:bean class="org.springframework.http.converter.xml.Jaxb2CollectionHttpMessageConverter"/>
+        <beans:bean class="org.springframework.http.converter.xml.MarshallingHttpMessageConverter"/>
+        <beans:bean class="org.springframework.http.converter.ResourceHttpMessageConverter"/>
+        <beans:bean class="org.springframework.http.converter.xml.SourceHttpMessageConverter"/ -->
+ 	        
 	    </message-converters>		
 	</annotation-driven>
 	<default-servlet-handler/>
 	
-	<beans:bean id="objectMapper"
+	<beans:bean id="pObjectMapper"
 	    class="org.springframework.http.converter.json.Jackson2ObjectMapperFactoryBean"
 	    p:indentOutput="true" p:serializationInclusion-ref="NOT_EMPTY">
 	    <beans:property name="modulesToInstall" value="com.fasterxml.jackson.datatype.joda.JodaModule" />
@@ -32,19 +44,16 @@
 
 	<util:constant static-field="com.fasterxml.jackson.annotation.JsonInclude.Include.NON_EMPTY" id="NOT_EMPTY"/>
 	<util:constant static-field="org.springframework.format.annotation.DateTimeFormat.ISO.DATE_TIME" id="ISO.DATE_TIME"/>
-	
-	
 
 
-	<beans:bean
-	    class="org.springframework.beans.factory.config.MethodInvokingFactoryBean"
-	    p:targetObject-ref="objectMapper" p:targetMethod="registerModule">
-	    <beans:property name="arguments">
-	        <beans:list>
-	            <beans:bean class="com.fasterxml.jackson.datatype.joda.JodaModule" />
-	        </beans:list>
-	    </beans:property>
+	<beans:bean id="objectMapper" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+	    <beans:property name="targetObject" ref="pObjectMapper"/>
+	    <beans:property name="targetMethod" value="disable"/>
+	    <beans:property name="arguments" value="WRITE_DATES_AS_TIMESTAMPS"/>
 	</beans:bean>
+
+
+	
 	<!-- Handles HTTP GET requests for /resources/** by efficiently serving up static resources in the ${webappRoot}/resources directory -->
 	<resources mapping="/resources/**" location="/resources/" />
 	<resources mapping="/webjars/**" location="classpath:/META-INF/resources/webjars/"/>

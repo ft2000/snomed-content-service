@@ -7,13 +7,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.ihtsdo.otf.refset.domain.Member;
 import org.ihtsdo.otf.refset.domain.Refset;
 import org.ihtsdo.otf.refset.domain.RefsetType;
 import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-import org.joda.time.LocalDateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
@@ -37,21 +36,27 @@ public class RefsetConvertor {
 	 */
 	protected static Map<String, Object> getRefsetProperties(Refset r) {
 		
+		LOGGER.info("getRefsetProperties {}", r);
+		
 		Map<String, Object> props = new HashMap<String, Object>();
 		
 		if (r == null) {
 			
 			return props;
 		}
+		DateTime effDate = r.getEffectiveTime();
 		
-		if(!StringUtils.isEmpty(r.getEffectiveTime()))
-			props.put(RGC.EFFECTIVE_DATE, getDateTime(r.getEffectiveTime()));
+		if( effDate != null )
+			props.put(RGC.EFFECTIVE_DATE, effDate.getMillis());
 		
-		if(!StringUtils.isEmpty(r.getCreated()))
-			props.put(RGC.CREATED, getDateTime(r.getCreated()));
+		DateTime created = r.getCreated();
+		if( created != null )
+			props.put(RGC.CREATED, created.getMillis());
 		
-		if(!StringUtils.isEmpty(r.getPublishedDate()))
-			props.put(RGC.PUBLISHED_DATE, getDateTime(r.getPublishedDate()));
+		DateTime publishedDate = r.getPublishedDate();
+		
+		if( publishedDate != null)
+			props.put(RGC.PUBLISHED_DATE, publishedDate.getMillis());
 		
 		if(!StringUtils.isEmpty(r.getDescription()))
 				props.put(RGC.DESC, r.getDescription());
@@ -67,8 +72,9 @@ public class RefsetConvertor {
 		
 		if(!StringUtils.isEmpty(r.getModuleId()))
 			props.put(RGC.MODULE_ID, r.getModuleId());
-
-		if(!StringUtils.isEmpty(r.getType().getName()))
+		
+		RefsetType type = r.getType();
+		if(type != null && !StringUtils.isEmpty(type.getName()))
 			props.put(RGC.TYPE, r.getType().getName());
 
 		if(!StringUtils.isEmpty(r.getTypeId()))
@@ -78,6 +84,9 @@ public class RefsetConvertor {
 
 		if(!StringUtils.isEmpty(r.getId()))
 			props.put(RGC.ID, r.getId());//This has to be updated by real refsetId after publishing
+		
+		LOGGER.info("getRefsetProperties property map size {}", props.size());
+
 		return props;
 	}
 	
@@ -88,13 +97,17 @@ public class RefsetConvertor {
 	 */
 	protected static Map<String, Object> getMemberProperties(Member m) {
 		// TODO Auto-generated method stub
+		LOGGER.info("getMemberProperties {}", m);
+
 		Map<String, Object> props = new HashMap<String, Object>();
 		if(m == null) {
 			
 			return props;
 		}
-		if(!StringUtils.isEmpty(m.getEffectiveTime()))
-			props.put(RGC.EFFECTIVE_DATE, getDateTime(m.getEffectiveTime()));
+		
+		DateTime effDate = m.getEffectiveTime();
+		if(effDate != null)
+			props.put(RGC.EFFECTIVE_DATE, effDate.getMillis());
 		
 		if(!StringUtils.isEmpty(m.getModuleId()))
 			props.put(RGC.MODULE_ID, m.getModuleId());
@@ -106,51 +119,104 @@ public class RefsetConvertor {
 
 		if(!StringUtils.isEmpty(m.getId()))
 			props.put(RGC.ID, m.getId());
-		
+
+		LOGGER.info("getMemberProperties size {}", props.size());
+
 		return props;
 	}
 	
 	protected static Refset convert2Refset(Vertex vR) {
 		
 		Refset r = new Refset();
+		Set<String> keys = vR.getPropertyKeys();
 		
-		String created = vR.getProperty(RGC.CREATED);
-		r.setCreated(created);
+		if ( keys.contains(RGC.CREATED) ) {
 		
-		String createdBy = vR.getProperty(RGC.CREATED_BY);
-		r.setCreatedBy(createdBy);
+			long created = vR.getProperty(RGC.CREATED);
+			r.setCreated(new DateTime(created));
+		}
 		
-		String description = vR.getProperty(RGC.DESC);
-		r.setDescription(description);
+		if ( keys.contains(RGC.CREATED_BY) ) {
+			
+			String createdBy = vR.getProperty(RGC.CREATED_BY);
+			r.setCreatedBy(createdBy);
+			
+		}
 		
-		String effectiveDate = vR.getProperty(RGC.EFFECTIVE_DATE);
-		r.setEffectiveTime(effectiveDate);
 		
-		String id = vR.getProperty(RGC.ID);
-		r.setId(id);
+		if ( keys.contains(RGC.DESC) ) {
+			
+			String description = vR.getProperty(RGC.DESC);
+			r.setDescription(description);
+			
+		}
 		
-		String languageCode = vR.getProperty(RGC.LANG_CODE);
-		r.setLanguageCode(languageCode);
+		if ( keys.contains(RGC.EFFECTIVE_DATE) ) {
+			
+			long effectiveDate = vR.getProperty(RGC.EFFECTIVE_DATE);
+			r.setEffectiveTime(new DateTime(effectiveDate));
+			
+		}
 		
-		String moduleId = vR.getProperty(RGC.MODULE_ID);
-		r.setModuleId(moduleId);
+		if ( keys.contains(RGC.ID) ) {
+			
+			String id = vR.getProperty(RGC.ID);
+			r.setId(id);
+		}
 		
-		boolean isPublished = vR.getProperty(RGC.PUBLISHED);
-		r.setPublished(isPublished);
+		if ( keys.contains(RGC.LANG_CODE) ) {
+			
+			String languageCode = vR.getProperty(RGC.LANG_CODE);
+			r.setLanguageCode(languageCode);
+			
+		}
 		
-		String publishedDate = vR.getProperty(RGC.PUBLISHED_DATE);
-		r.setPublishedDate(publishedDate);
+		if ( keys.contains(RGC.MODULE_ID) ) {
+			
+			String moduleId = vR.getProperty(RGC.MODULE_ID);
+			r.setModuleId(moduleId);
+			
+		}
 		
-		String superRefsetTypeId = vR.getProperty(RGC.SUPER_REFSET_TYPE_ID);
-		r.setSuperRefsetTypeId(superRefsetTypeId);
+		if ( keys.contains(RGC.PUBLISHED) ) {
+			
+			boolean isPublished = vR.getProperty(RGC.PUBLISHED);
+			r.setPublished(isPublished);
+			
+		}
 		
-		String type = vR.getProperty(RGC.TYPE);
 		
-		r.setType(RefsetType.valueOf(type));
+		if ( keys.contains(RGC.PUBLISHED_DATE) ) {
+			
+			long publishedDate = vR.getProperty(RGC.PUBLISHED_DATE);
+			r.setPublishedDate(new DateTime(publishedDate));
+			
+		}
 		
-		String typeId = vR.getProperty(RGC.TYPE_ID);
-		r.setTypeId(typeId);
 		
+		if ( keys.contains(RGC.SUPER_REFSET_TYPE_ID) ) {
+			
+			String superRefsetTypeId = vR.getProperty(RGC.SUPER_REFSET_TYPE_ID);
+			r.setSuperRefsetTypeId(superRefsetTypeId);
+			
+		}
+		
+		if ( keys.contains(RGC.TYPE) ) {
+			
+			String type = vR.getProperty(RGC.TYPE);
+			
+			r.setType(RefsetType.valueOf(type));
+			
+		}
+
+		if ( keys.contains(RGC.TYPE_ID) ) {
+			
+			String typeId = vR.getProperty(RGC.TYPE_ID);
+			r.setTypeId(typeId);
+			
+		}
+
+
 		Iterable<Edge> eRs = vR.getEdges(Direction.IN, "members");
 		
 		if(eRs != null) {
@@ -161,22 +227,49 @@ public class RefsetConvertor {
 				
 				Vertex vM = eR.getVertex(Direction.OUT);
 				
+				Set<String> mKeys = vM.getPropertyKeys();
+				
 				Member m = new Member();
-				String lId = vM.getProperty(RGC.ID);
+				
+				if ( mKeys.contains(RGC.ID) ) {
+					
+					String lId = vM.getProperty(RGC.ID);
 
-				m.setId(lId);
+					m.setId(lId);
+					
+				}
+				
+				if ( mKeys.contains(RGC.MODULE_ID) ) {
+					
+					
+					String mModuleId = vM.getProperty(RGC.MODULE_ID);
+					m.setModuleId(mModuleId);
+					
+				}
+				
+				
+				if ( mKeys.contains(RGC.ACTIVE) ) {
+					
+					boolean isActive = vM.getProperty(RGC.ACTIVE);
+					m.setActive(isActive);
+					
+				}
+				
+				
+				if ( mKeys.contains(RGC.EFFECTIVE_DATE) ) {
+					
+					long effectivetime = vM.getProperty(RGC.EFFECTIVE_DATE);
+					m.setEffectiveTime(new DateTime(effectivetime));
+					
+				}
 
-				String mModuleId = vM.getProperty(RGC.MODULE_ID);
-				m.setModuleId(mModuleId);
-				
-				boolean isActive = vM.getProperty(RGC.ACTIVE);
-				m.setActive(isActive);
-				
-				String effectivetime = vM.getProperty(RGC.EFFECTIVE_DATE);
-				m.setEffectiveTime(effectivetime);
-				
-				String referenceComponentId = vM.getProperty(RGC.REFERENCE_COMPONENT_ID);
-				m.setReferenceComponentId(referenceComponentId);
+				if ( mKeys.contains(RGC.REFERENCE_COMPONENT_ID) ) {
+					
+					String referenceComponentId = vM.getProperty(RGC.REFERENCE_COMPONENT_ID);
+					m.setReferenceComponentId(referenceComponentId);
+					
+				}
+
 				
 				members.add(m);
 			}
@@ -186,7 +279,7 @@ public class RefsetConvertor {
 		}
 
 		
-		LOGGER.debug("Returning Refset as {} ", r.toString());
+		LOGGER.info("Returning Refset as {} ", r.toString());
 
 		return r;
 		
@@ -196,16 +289,11 @@ public class RefsetConvertor {
 	 * @param date
 	 * @return
 	 */
-	private static DateTime getDateTime(String date) {
-		String tmp = date;
+	private static DateTime getDateTime(DateTime date) {
 		
-		if(!StringUtils.isEmpty(date) && date.contains("Z")) {
-			
-			tmp = date.replace("Z", "");
-			
-		}
 		
-		return LocalDateTime.parse(tmp).toDateTime(DateTimeZone.getDefault());
+		
+		return date;
 		
 		
 	}

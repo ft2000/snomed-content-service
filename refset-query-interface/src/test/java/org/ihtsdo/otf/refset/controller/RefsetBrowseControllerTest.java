@@ -11,7 +11,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-import java.util.Calendar;
 import java.util.List;
 
 import org.ihtsdo.otf.refset.domain.Refset;
@@ -19,6 +18,7 @@ import org.ihtsdo.otf.refset.domain.RefsetType;
 import org.ihtsdo.otf.refset.exception.RefsetServiceException;
 import org.ihtsdo.otf.refset.service.RefsetBrowseService;
 import org.ihtsdo.otf.refset.service.RefsetBrowseServiceStubData;
+import org.joda.time.DateTime;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -76,7 +76,7 @@ public class RefsetBrowseControllerTest {
 		when(refset.getDescription()).thenReturn("Junit Refset"); 
 		when(refset.getModuleId()).thenReturn("Junit_module_1");
 		when(refset.getMembers()).thenReturn(null);
-		when(refset.getCreated()).thenReturn(Calendar.getInstance().getTime().toString());
+		when(refset.getCreated()).thenReturn(new DateTime());
 		when(refset.getCreatedBy()).thenReturn("Junit author");
 		when(refset.getType()).thenReturn(RefsetType.simple);
 	}

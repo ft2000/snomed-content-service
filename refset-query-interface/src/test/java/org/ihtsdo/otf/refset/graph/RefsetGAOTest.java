@@ -128,21 +128,21 @@ public class RefsetGAOTest {
 	
 	@Test
 	public void testGetReftest() throws RefsetServiceException, RefsetGraphAccessException, EntityNotFoundException {
-		Refset input = rs.get(0);
+		Refset i = rs.get(0);
 		
-		gao.addRefset(data.getRefSet(input.getId()));
+		gao.addRefset(data.getRefSet(i.getId()));
 
-		Refset r = gao.getRefset(input.getId());
+		Refset r = gao.getRefset(i.getId());
 
 		assertNotNull(r);
-		assertEquals(input.getCreated(), r.getCreated());
+		assertEquals(i.getCreated().getMillis(), r.getCreated().getMillis(), 100);
 		
-		assertEquals(input.getDescription(), r.getDescription());
-		assertEquals(input.getModuleId(), r.getModuleId());
-		assertEquals(input.getPublishedDate(), r.getPublishedDate());
-		assertEquals(input.isPublished(), r.isPublished());
-		assertEquals(input.getType(), r.getType());
-		assertEquals(input.getEffectiveTime(), r.getEffectiveTime());
+		assertEquals(i.getDescription(), r.getDescription());
+		assertEquals(i.getModuleId(), r.getModuleId());
+		assertEquals(i.getPublishedDate().getMillis(), r.getPublishedDate().getMillis(), 100);
+		assertEquals(i.isPublished(), r.isPublished());
+		assertEquals(i.getType(), r.getType());
+		assertEquals(i.getEffectiveTime().getMillis(), r.getEffectiveTime().getMillis(), 100);
 
 		
 	}
