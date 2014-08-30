@@ -55,18 +55,25 @@ public class RefsetGraphFactory {
 	
 	public OrientGraph getOrientGraph() {
 		
-        return getOgFactory().getTx();
+        OrientGraph og = getOgFactory().getTx();
         
+		LOGGER.info("################ {}", og.getThreadMode());
+
+        return og;
         
 	}
 	
 	
 	private static OrientGraphFactory getOgFactory() {
 		
-		return new OrientGraphFactory(gsConfig.getString(OG_URL), 
+		OrientGraphFactory f = new OrientGraphFactory(gsConfig.getString(OG_URL), 
 				gsConfig.getString(OG_USER), gsConfig.getString(OG_PASSWORD))
 				.setupPool(gsConfig.getInt(OG_CON_POOL_MIN), 
 						gsConfig.getInt(OG_CON_POOL_MAX));
+		
+		LOGGER.info("################ {}"   , f);
+
+		return f;
 	}
 
 }

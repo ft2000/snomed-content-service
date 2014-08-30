@@ -17,27 +17,18 @@ public class Member {
 	
 	private String referenceComponentId;
 	
-	private String effectiveTime;
-	
+	private DateTime effectiveTime;
+
 	/**
 	 * @return the effectiveTime
 	 */
-	public String getEffectiveTime() {
-		
-		if( !StringUtils.isEmpty(effectiveTime) 
-				&& effectiveTime.matches("\\d{4}\\d{2}\\d{2}")) {
-			
-			DateTime dt = formatter.parseDateTime(effectiveTime);
-
-			effectiveTime = dt.toString();
-		}
-		
+	public DateTime getEffectiveTime() {
 		return effectiveTime;
 	}
 	/**
 	 * @param effectiveTime the effectiveTime to set
 	 */
-	public void setEffectiveTime(String effectiveTime) {
+	public void setEffectiveTime(DateTime effectiveTime) {
 		this.effectiveTime = effectiveTime;
 	}
 	/**

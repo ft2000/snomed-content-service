@@ -47,7 +47,8 @@ public class RefsetGAO {
 	 */
 	public MetaData addRefset(Refset r) throws RefsetGraphAccessException {
 		
-	
+		LOGGER.debug("Adding refset {}", r);
+
 		OrientGraph g = null;
 		MetaData md = r.getMetaData();
 		
@@ -62,7 +63,7 @@ public class RefsetGAO {
 			
 			/*if members exist then add members*/
 			List<Member> members = r.getMembers();
-			
+			int i = 0;
 			if( !CollectionUtils.isEmpty(members) ) {
 				
 				for (Member m : members) {
@@ -71,7 +72,7 @@ public class RefsetGAO {
 					
 					Vertex mV = g.getVertex(mId);
 					
-					LOGGER.debug("Adding relationship member is part of refset as edge {}", mV.getId());
+					LOGGER.info("Adding relationship member is part of refset as edge {}, counter      ---------------  {}", mV.getId(), i++);
 
 					/*Add this member to refset*/
 					g.addEdge(null, mV, rV, "members");
@@ -87,27 +88,36 @@ public class RefsetGAO {
 
 			}
 			
+			LOGGER.info("Commiting");
+
 			g.commit();
 			
 			md = getMetaData(rV.getId());
 			
 		} catch (Exception e) {
 			
-			if (g != null) g.rollback();
-			
+			rollback(g);			
 			LOGGER.error("Error during graph ineraction", e);
 			
 			throw new RefsetGraphAccessException(e.getMessage(), e);
 			
 		} finally {
 			
-			if (g != null) g.shutdown();
+			shutdown(g);
 			
 		}
 		
 		return md;
 	}
 	
+	private void shutdown(OrientGraph g) {
+		
+		LOGGER.info("Shutting down graph {}", g);
+		
+		if (g != null) g.shutdown();
+		
+	}
+
 	/**
 	 * @param r {@link Refset}
 	 * @param g {@link OrientGraph}
@@ -128,12 +138,28 @@ public class RefsetGAO {
 		} catch (EntityNotFoundException e) {
 			
 			LOGGER.debug("Refset does not exist, adding  {}", r.toString());
+			OrientGraph ig = null;
+			
+			try {
+				
+				ig= factory.getOrientGraph();
+				final Vertex rV = ig.addVertex("class:Refset", RefsetConvertor.getRefsetProperties(r));
+				LOGGER.debug("Added Refset as vertex to graph {}", rV.getId());
 
-			final Vertex rV = g.addVertex("class:Refset", RefsetConvertor.getRefsetProperties(r));
+				rVId = rV.getId();
+				ig.commit();
+				
+			} catch (Exception ex) {
+				
+				rollback(ig);
+				throw new RefsetGraphAccessException(ex);
+			} finally {
+				
+				shutdown(ig);
+			}
 			
-			rVId = rV.getId();
 			
-			LOGGER.debug("Added Refset as vertex to graph {}", rV.getId());
+			
 		}
 		
 		LOGGER.debug("Refset  vertex id is {} ", rVId);
@@ -176,16 +202,12 @@ public class RefsetGAO {
 				g.removeVertex(vR);
 
 			}
+			
 			g.commit();
-
-		
-			
-			
 			
 		} catch (Exception e) {
 			
-			if (g != null) g.rollback();
-
+			rollback(g);
 			LOGGER.error("Error during graph ineraction", e);
 
 			throw new RefsetGraphAccessException(e.getMessage(), e);
@@ -193,7 +215,7 @@ public class RefsetGAO {
 			
 		} finally {
 			
-			if (g != null) g.shutdown();
+			shutdown(g);
 		}
 	}
 	
@@ -233,21 +255,22 @@ public class RefsetGAO {
 					}
 				}
 			}
-			
+			g.commit();
 			
 		} catch (NullPointerException e) {
 			//this will occur first time when there is no member class node
 			LOGGER.error("Member class does not exist {}", e);
+			rollback(g);
 			throw new EntityNotFoundException("Record does not exist");
 			
 		} catch (Exception e) {
 			
-			if (g != null) g.rollback();
+			rollback(g);
 			throw new RefsetGraphAccessException(e.getMessage(), e);
 
 		} finally {
 			
-			if (g != null) g.shutdown();
+			shutdown(g);
 		}
 		
 		if(result == null) 
@@ -257,6 +280,12 @@ public class RefsetGAO {
 
 	}
 	
+	private void rollback(OrientGraph g) {
+		
+		if (g != null) g.rollback();
+		
+	}
+
 	/**Retrieves a {@link Refset} node Id
 	 * @param id
 	 * @return
@@ -291,23 +320,23 @@ public class RefsetGAO {
 					break;
 				};
 			}
+			g.commit();
 			
 		} catch (NullPointerException e) {
 
 			LOGGER.error("Error during graph ineraction", e);
 			//carry on
-
+			rollback(g);
 		}
 		catch (Exception e) {
 			
-			if (g != null) g.rollback();
-			
+			rollback(g);			
 			LOGGER.error("Error during graph ineraction", e);
 			throw new RefsetGraphAccessException(e.getMessage(), e);
 
 		} finally {
 			
-			if (g != null) g.shutdown();
+			shutdown(g);
 		}
 		
 		if(rVId == null) 
@@ -324,7 +353,7 @@ public class RefsetGAO {
 	 */
 	private Object addMemberNode(Member m, OrientGraph g) throws RefsetGraphAccessException {
 		
-		Object id;
+		Object id = null;
 		try {
 			
 			id = getMemberNodeId(m.getReferenceComponentId());
@@ -334,12 +363,27 @@ public class RefsetGAO {
 		} catch (EntityNotFoundException e) {
 			
 			//ADD a new Entity
-			
-			Vertex mV = g.addVertex("class:Member", RefsetConvertor.getMemberProperties(m));
-			
-			LOGGER.debug("Added Member as vertex to graph", mV.getId());
-						
-			id = mV.getId();
+			OrientGraph ig = null;
+			try {
+				
+				ig = factory.getOrientGraph();
+				Vertex mV = ig.addVertex("class:Member", RefsetConvertor.getMemberProperties(m));
+				
+				LOGGER.debug("Added Member as vertex to graph", mV.getId());
+							
+				id = mV.getId();
+				ig.commit();
+				
+			} catch (Exception ex) {
+				
+				rollback(ig);
+				throw new RefsetGraphAccessException(ex);
+				
+			} finally {
+				
+				shutdown(ig);
+				
+			}
 		}
 		
 		
@@ -370,15 +414,17 @@ public class RefsetGAO {
 				r.setMetaData(getMetaData(v.getId()));
 				break;
 			}
+			g.commit();
 			
 		} catch (Exception e) {
-						
+			
+			rollback(g);			
 			LOGGER.error("Error during graph ineraction", e);
 			throw new RefsetGraphAccessException(e.getMessage(), e);
 
 		} finally {
 			
-			if (g != null) g.shutdown();
+			shutdown(g);
 		}
 		if(r == null)
 			throw new EntityNotFoundException("No Refset found for given id ");
@@ -415,16 +461,17 @@ public class RefsetGAO {
 			}
 			
 
-		
+			g.commit();
 			
 		} catch (Exception e) {
-						
+			
+			rollback(g);
 			LOGGER.error("Error during graph ineraction", e);
 			throw new RefsetGraphAccessException(e.getMessage(), e);
 
 		} finally {
 			
-			if (g != null) g.shutdown();
+			shutdown(g);
 		}
 		
 		if(r == null)
@@ -460,15 +507,15 @@ public class RefsetGAO {
 				LOGGER.debug("Refset is {} ", r);
 				refsets.add(r);
 			}
-			
+			g.commit();
 		} catch (Exception e) {
-						
+			rollback(g);			
 			LOGGER.error("Error during graph ineraction", e);
 			throw new RefsetGraphAccessException(e.getMessage(), e);
 
 		} finally {
 			
-			if (g != null) g.shutdown();
+			shutdown(g);
 		}
 		
 		return refsets;
@@ -501,15 +548,17 @@ public class RefsetGAO {
 				
 			}
 			
+			g.commit();
 			
 		} catch (Exception e) {
-						
+			
+			rollback(g);
 			LOGGER.error("Error during graph ineraction ", e);
 			throw new RefsetGraphAccessException(e.getMessage(), e);
 
 		} finally {
 			
-			if (g != null) g.shutdown();
+			shutdown(g);
 		}
 		
 		if( md == null ) 
@@ -569,21 +618,20 @@ public class RefsetGAO {
 			md = getMetaData(rV.getId());
 			
 		} catch(EntityNotFoundException e) {
-			
+			rollback(g);
 			throw e;
 		}
 		
 		catch (Exception e) {
 			
-			if (g != null) g.rollback();
-			
+			rollback(g);			
 			LOGGER.error("Error during graph ineraction", e);
 			
 			throw new RefsetGraphAccessException(e.getMessage(), e);
 			
 		} finally {
 			
-			if (g != null) g.shutdown();
+			shutdown(g);
 			
 		}
 		

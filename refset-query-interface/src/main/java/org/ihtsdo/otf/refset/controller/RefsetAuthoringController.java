@@ -16,6 +16,7 @@ import org.ihtsdo.otf.refset.common.Meta;
 import org.ihtsdo.otf.refset.common.Response;
 import org.ihtsdo.otf.refset.domain.Member;
 import org.ihtsdo.otf.refset.domain.Refset;
+import org.ihtsdo.otf.refset.domain.RefsetType;
 import org.ihtsdo.otf.refset.exception.EntityNotFoundException;
 import org.ihtsdo.otf.refset.exception.RefsetServiceException;
 import org.ihtsdo.otf.refset.service.RefsetAuthoringService;
@@ -25,6 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -101,9 +103,12 @@ public class RefsetAuthoringController {
 		// TODO Auto-generated method stub
 		String id = UUID.randomUUID().toString();
 		r.setId(id);
-		r.setCreated(new DateTime().toString());
+		r.setCreated(new DateTime());
 		r.setCreatedBy("Refset Author");
-		r.setModuleId("900000000000012000");
+		r.setType(RefsetType.simple);
+		
+		if(StringUtils.isEmpty(r.getModuleId()))
+			r.setModuleId("900000000000012000");
 	}
 
 	@RequestMapping( method = RequestMethod.POST, value = "/{refSetId}/add/member", produces = "application/json" )

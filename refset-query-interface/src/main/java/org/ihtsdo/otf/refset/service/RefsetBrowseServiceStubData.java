@@ -20,7 +20,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
 import org.supercsv.cellprocessor.ParseBool;
-import org.supercsv.cellprocessor.ParseLong;
 import org.supercsv.cellprocessor.constraint.NotNull;
 import org.supercsv.cellprocessor.ift.CellProcessor;
 import org.supercsv.io.dozer.CsvDozerBeanReader;
@@ -322,12 +321,12 @@ public class RefsetBrowseServiceStubData {
 		final CellProcessor[] processors = new CellProcessor[] { 
 				new NotNull(), // id
 				new NotNull(), // description
-				new NotNull(), // publishedDate
+				new NotNull(new ParseJodaTime("yyyyMMdd")), // publishedDate
 				new NotNull(), // createdBy
 				new NotNull(), // languageCode
 				new NotNull(), // type
-				new NotNull(), // publishedDate
-				new NotNull(), // publishedDate
+				new NotNull(new ParseJodaTime("yyyyMMdd")), // publishedDate
+				new NotNull(new ParseJodaTime("yyyyMMdd")), // publishedDate
 				new NotNull(), // moduleId
 				new NotNull(new ParseBool()), // published
 				
@@ -342,7 +341,7 @@ public class RefsetBrowseServiceStubData {
 		final CellProcessor[] processors = new CellProcessor[] { 
 				
 				new NotNull(), // referenceComponentId
-				new NotNull(new ParseLong()), // effectiveTime
+				new NotNull(new ParseJodaTime("yyyyMMdd")), // effectiveTime
 				new NotNull(new ParseBool()), // active
 				new NotNull(), // moduleId
 
