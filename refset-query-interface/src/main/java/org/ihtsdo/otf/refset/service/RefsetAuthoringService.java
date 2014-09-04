@@ -35,6 +35,12 @@ public interface RefsetAuthoringService {
 	 * @return a {@link Refset} object stored in graph with {@link MetaData}
 	 */
 	public String updateRefset(Refset r) throws RefsetServiceException, EntityNotFoundException ;
+	
+	/**Method to add a {@link Member} to given {@link Refset}.
+	 * @param refsetId
+	 * @throws RefsetServiceException
+	 */
+	public void remove(String refsetId) throws RefsetServiceException, EntityNotFoundException ;
 
 
 }

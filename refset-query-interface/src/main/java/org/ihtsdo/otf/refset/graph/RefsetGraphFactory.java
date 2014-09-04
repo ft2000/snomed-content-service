@@ -4,6 +4,7 @@
 package org.ihtsdo.otf.refset.graph;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
 
 import org.apache.commons.configuration.Configuration;
 import org.slf4j.Logger;
@@ -15,6 +16,7 @@ import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.GraphFactory;
 import com.tinkerpop.blueprints.impls.orient.OrientGraph;
 import com.tinkerpop.blueprints.impls.orient.OrientGraphFactory;
+import com.tinkerpop.blueprints.impls.orient.OrientGraphNoTx;
 
 
 /** Utility class to get graph server objects so that CRUD operation can be performed on data base
@@ -26,23 +28,20 @@ public class RefsetGraphFactory {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(RefsetGraphFactory.class);
 	
-	private static final String OG_URL = "blueprints.orientdb.url";
-	private static final String OG_USER = "blueprints.orientdb.username";
-	private static final String OG_PASSWORD = "blueprints.orientdb.password";
-	private static final String OG_CON_POOL_MIN = "blueprints.orientdb.pool.min";
-	private static final String OG_CON_POOL_MAX = "blueprints.orientdb.pool.max";
-
 	private static Configuration gsConfig;
 	
 	@Autowired
 	private Configuration config;
+	
+	@Resource(name = "refsetGraphOrientdbFactory")
+	private OrientGraphFactory f;
 	
 	@PostConstruct
 	public void init() {
 		
 		gsConfig = config;
 		
-		LOGGER.debug("Initializing Graph configuration");
+		LOGGER.info("Initializing Graph configuration {}", gsConfig);
 	}
 	
 	
@@ -53,27 +52,32 @@ public class RefsetGraphFactory {
          
 	}
 	
+	/** Returns a transactional {@link OrientGraph} 
+	 * @return
+	 */
 	public OrientGraph getOrientGraph() {
 		
-        OrientGraph og = getOgFactory().getTx();
+        OrientGraph og = f.getTx();
+        LOGGER.info("Returning Transactional Graph {}", og);
+
+        return og;
         
-		LOGGER.info("################ {}", og.getThreadMode());
+	}
+	
+	/** Returns a non transactional {@link OrientGraph} 
+	 * @return
+	 */
+	public Graph getNoTxOrientGraph() {
+		
+        OrientGraphNoTx og = f.getNoTx();
+        
+        LOGGER.info("Returning No Transaction Graph {}", og);
 
         return og;
         
 	}
 	
 	
-	private static OrientGraphFactory getOgFactory() {
-		
-		OrientGraphFactory f = new OrientGraphFactory(gsConfig.getString(OG_URL), 
-				gsConfig.getString(OG_USER), gsConfig.getString(OG_PASSWORD))
-				.setupPool(gsConfig.getInt(OG_CON_POOL_MIN), 
-						gsConfig.getInt(OG_CON_POOL_MAX));
-		
-		LOGGER.info("################ {}"   , f);
 
-		return f;
-	}
 
 }

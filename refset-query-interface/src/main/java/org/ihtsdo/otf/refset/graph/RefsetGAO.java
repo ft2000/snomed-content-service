@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
 
+import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.impls.orient.OrientElement;
 import com.tinkerpop.blueprints.impls.orient.OrientGraph;
@@ -72,7 +73,7 @@ public class RefsetGAO {
 					
 					Vertex mV = g.getVertex(mId);
 					
-					LOGGER.info("Adding relationship member is part of refset as edge {}, counter      ---------------  {}", mV.getId(), i++);
+					LOGGER.debug("Adding relationship member is part of refset as edge {}, member index {}", mV.getId(), i++);
 
 					/*Add this member to refset*/
 					g.addEdge(null, mV, rV, "members");
@@ -110,7 +111,7 @@ public class RefsetGAO {
 		return md;
 	}
 	
-	private void shutdown(OrientGraph g) {
+	private void shutdown(Graph g) {
 		
 		LOGGER.info("Shutting down graph {}", g);
 		
@@ -138,28 +139,11 @@ public class RefsetGAO {
 		} catch (EntityNotFoundException e) {
 			
 			LOGGER.debug("Refset does not exist, adding  {}", r.toString());
-			OrientGraph ig = null;
 			
-			try {
-				
-				ig= factory.getOrientGraph();
-				final Vertex rV = ig.addVertex("class:Refset", RefsetConvertor.getRefsetProperties(r));
-				LOGGER.debug("Added Refset as vertex to graph {}", rV.getId());
+			final Vertex rV = g.addVertex("class:Refset", RefsetConvertor.getRefsetProperties(r));
+			LOGGER.debug("Added Refset as vertex to graph {}", rV.getId());
 
-				rVId = rV.getId();
-				ig.commit();
-				
-			} catch (Exception ex) {
-				
-				rollback(ig);
-				throw new RefsetGraphAccessException(ex);
-			} finally {
-				
-				shutdown(ig);
-			}
-			
-			
-			
+			rVId = rV.getId();			
 		}
 		
 		LOGGER.debug("Refset  vertex id is {} ", rVId);
@@ -167,43 +151,47 @@ public class RefsetGAO {
 		return rVId;
 	}
 
-	/** Removes a {@link Refset} from graph
+	/** Removes a {@link Refset} if it is not yet published
+	 * or update as inactive in  graph
 	 * @param r {@link Refset}
 	 * @throws RefsetGraphAccessException
+	 * @throws EntityNotFoundException 
 	 */
-	public void removeRefset(Refset r) throws RefsetGraphAccessException {
+	public void removeRefset(String refsetId) throws RefsetGraphAccessException, EntityNotFoundException {
 		
+		LOGGER.debug("removeRefset  {} ", refsetId);
+
 		OrientGraph g = null;
 		
 		try {
 			
 			g = factory.getOrientGraph();
 			
-			//TODO upgrade this search with status and effective date
+			Object rVId = getRefsetNodeId(refsetId);
+			Vertex refset = g.getVertex(rVId);
 			
-			try {
-				//indirect check if that class exist
-				g.countVertices(REFSET_CLASS_NAME);
+			boolean published = refset.getProperty(RGC.PUBLISHED);
+			
+			if (published) {
+				
+				LOGGER.debug("Not removing only making it inactive  {} ", refsetId);
 
-			} catch (IllegalArgumentException e) {
+				refset.setProperty(RGC.ACTIVE, false);
 				
-				//This is when no node exist with that class name
-				LOGGER.error("Error during removal of refset -: {}", e.getMessage());
+			} else {
 				
-				return;
+				g.removeVertex(refset);
+
 			}
 
-			Iterable<Vertex> vRs = g.getVertices(  REFSET_CLASS_NAME + DOT + RGC.ID, r.getId());
-
-		
-			for (Vertex vR : vRs) {
-				
-				LOGGER.debug("Removing Refset vertex from graph {}", vR.getId());
-				g.removeVertex(vR);
-
-			}
 			
 			g.commit();
+			
+		} catch(EntityNotFoundException e) {
+			
+			g.rollback();
+			
+			throw e;
 			
 		} catch (Exception e) {
 			
@@ -235,11 +223,11 @@ public class RefsetGAO {
 		
 		Object result = null;
 		
-		OrientGraph g = null;
+		Graph g = null;
 		
 		try {
 			
-			g = factory.getOrientGraph();
+			g = factory.getNoTxOrientGraph();
 			
 			//TODO upgrade this search with status and effective date
 			Iterable<Vertex> vs = g.getVertices(MEMBER_CLASS_NAME + DOT + RGC.REFERENCE_COMPONENT_ID, rcId);
@@ -255,17 +243,14 @@ public class RefsetGAO {
 					}
 				}
 			}
-			g.commit();
 			
 		} catch (NullPointerException e) {
 			//this will occur first time when there is no member class node
 			LOGGER.error("Member class does not exist {}", e);
-			rollback(g);
 			throw new EntityNotFoundException("Record does not exist");
 			
 		} catch (Exception e) {
 			
-			rollback(g);
 			throw new RefsetGraphAccessException(e.getMessage(), e);
 
 		} finally {
@@ -298,11 +283,11 @@ public class RefsetGAO {
 
 		Object rVId = null;
 		
-		OrientGraph g = null;
+		Graph g = null;
 		
 		try {
 			
-			g = factory.getOrientGraph();
+			g = factory.getNoTxOrientGraph();
 
 			//TODO upgrade this search with status and effective date
 			Iterable<Vertex> vs = g.getVertices(REFSET_CLASS_NAME + DOT + RGC.ID, id);
@@ -320,17 +305,14 @@ public class RefsetGAO {
 					break;
 				};
 			}
-			g.commit();
 			
 		} catch (NullPointerException e) {
 
 			LOGGER.error("Error during graph ineraction", e);
 			//carry on
-			rollback(g);
 		}
 		catch (Exception e) {
 			
-			rollback(g);			
 			LOGGER.error("Error during graph ineraction", e);
 			throw new RefsetGraphAccessException(e.getMessage(), e);
 
@@ -362,28 +344,12 @@ public class RefsetGAO {
 
 		} catch (EntityNotFoundException e) {
 			
-			//ADD a new Entity
-			OrientGraph ig = null;
-			try {
-				
-				ig = factory.getOrientGraph();
-				Vertex mV = ig.addVertex("class:Member", RefsetConvertor.getMemberProperties(m));
-				
-				LOGGER.debug("Added Member as vertex to graph", mV.getId());
-							
-				id = mV.getId();
-				ig.commit();
-				
-			} catch (Exception ex) {
-				
-				rollback(ig);
-				throw new RefsetGraphAccessException(ex);
-				
-			} finally {
-				
-				shutdown(ig);
-				
-			}
+			Vertex mV = g.addVertex("class:Member", RefsetConvertor.getMemberProperties(m));
+			
+			LOGGER.debug("Added Member as vertex to graph", mV.getId());
+						
+			id = mV.getId();
+
 		}
 		
 		
@@ -489,24 +455,33 @@ public class RefsetGAO {
 		this.factory = f;
 	}
 
-	public List<Refset> getRefSets() throws RefsetGraphAccessException {
+	public List<Refset> getRefSets(boolean published) throws RefsetGraphAccessException {
 		
 		OrientGraph g = null;
-		
 		List<Refset> refsets = new ArrayList<Refset>();
+		
 		try {
 			
 			g = factory.getOrientGraph();
 
 			//TODO upgrade this search with status and effective date
-			Iterable<Vertex> vs = g.getVerticesOfClass(REFSET_CLASS_NAME);
 			
-			for (Vertex v : vs) {
+			final Iterable<Vertex> vs;
+			
+			if (published) {
 				
-				Refset r = RefsetConvertor.convert2Refset(v);
-				LOGGER.debug("Refset is {} ", r);
-				refsets.add(r);
+				String [] keys = {RGC.PUBLISHED};
+
+				vs = g.getVertices("Refset", keys, new Object[]{ published });
+				
+			} else {
+
+				vs = g.getVerticesOfClass(REFSET_CLASS_NAME, false);
+				
 			}
+			
+			refsets = RefsetConvertor.getRefsets(vs);
+			
 			g.commit();
 		} catch (Exception e) {
 			rollback(g);			

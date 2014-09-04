@@ -51,6 +51,8 @@ public class Refset {
 	
 	private String superRefsetTypeId;
 	
+	private boolean active;
+	
 	@JsonIgnore
 	private MetaData metaData;
 	
@@ -291,6 +293,20 @@ public class Refset {
 	 */
 	public void setMetaData(MetaData meta) {
 		this.metaData = meta;
+	}
+
+	/**
+	 * @return the active
+	 */
+	public boolean isActive() {
+		return active;
+	}
+
+	/**
+	 * @param active the active to set
+	 */
+	public void setActive(boolean active) {
+		this.active = active;
 	}
 
 }

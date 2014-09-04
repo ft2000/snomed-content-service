@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:sec="http://www.springframework.org/schema/security"
+	xmlns:c="http://www.springframework.org/schema/c"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.2.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.0.xsd">
+	
+	<sec:http create-session="stateless" auto-config="false" 
+				security-context-repository-ref="refset.securityContextRepository"
+				entry-point-ref="refset.authenticationEntryPoint" >
+		<sec:intercept-url pattern="/v1.0/**" access="ROLE_USER, ROLE_ANONYMOUS" />
+		<sec:custom-filter ref="refset.cors" position="FIRST"/>
+		<sec:access-denied-handler ref="refset.accessDeniedHandler" />
+	</sec:http>
+	
+	<bean id="refset.cors" class="org.ihtsdo.otf.refset.CorsFilter" />
+	<!-- bean id="refset.lb.reqResponseFilter" class="ch.qos.logback.access.servlet.TeeFilter"/-->
+
+	<sec:authentication-manager erase-credentials="false" alias="org.springframework.security.authenticationManager" >
+		<sec:authentication-provider ref="refset.authenticationProvider" />
+	</sec:authentication-manager>
+	
+	<bean id="refset.authenticationProvider" class="org.ihtsdo.otf.refset.security.RefsetAuthenticationProvider" 
+			p:otfServiceUrl="${refset.otf.service.url}"
+			p:rt-ref="refset.auth.RestTemplate" 
+		/>
+	
+ 	<sec:global-method-security authentication-manager-ref="org.springframework.security.authenticationManager" 
+ 		secured-annotations="enabled" pre-post-annotations="enabled"
+ 		/>
+ 	
+	<bean id="refset.securityContextRepository" class="org.ihtsdo.otf.refset.security.RefsetSecurityContextRepository" 
+			c:mgr-ref="org.springframework.security.authenticationManager" c:service-ref="refset.tokenService" 
+			p:preAuthTokenKey="${refset.pre.auth.token}" 
+			p:userKey="${refset.pre.auth.user}" 
+		/>
+	
+	<bean id="refset.tokenService" class="org.springframework.security.core.token.KeyBasedPersistenceTokenService" 
+			p:secureRandom-ref="refset.secureRandom" p:serverSecret="refset" p:serverInteger="1" 
+		/>
+		
+	<bean id="refset.authenticationEntryPoint" class="org.ihtsdo.otf.refset.security.RefsetAuthenticationEntryPoint" 
+			p:preAuthTokenKey="${refset.pre.auth.token}" p:userKey="${refset.pre.auth.user}"
+		/>
+	<bean id="refset.auth.RestTemplate" class="org.springframework.web.client.RestTemplate" 
+			p:messageConverters-ref="refset.auth.RestMessageConvertors" 
+		/>
+	
+	<util:list id="refset.auth.RestMessageConvertors">
+		<bean class="org.springframework.http.converter.support.AllEncompassingFormHttpMessageConverter" />
+		<bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter" />
+		<bean class="org.springframework.http.converter.StringHttpMessageConverter" /> 
+	</util:list>
+ 	<bean name="refset.secureRandom" class="java.security.SecureRandom" />
+ 	
+ 	<bean id="refset.accessDeniedHandler" class="org.ihtsdo.otf.refset.security.RefsetAccessDeniedHandler" />
+</beans>

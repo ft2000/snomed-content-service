@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 /**
  * @author Episteme Partners
@@ -59,6 +60,8 @@ public class RefsetAuthoringServiceImpl implements RefsetAuthoringService {
 	public void addMember(String refsetId, Member m)
 			throws RefsetServiceException {
 		
+		LOGGER.debug("Adding member {} to refset {}", m, refsetId);
+
 		try {
 			
 			Refset r = gao.getRefset(refsetId);
@@ -94,8 +97,10 @@ public class RefsetAuthoringServiceImpl implements RefsetAuthoringService {
 	@Override
 	public String updateRefset(Refset r) throws RefsetServiceException, EntityNotFoundException {
 		
+		LOGGER.debug("updateRefset member {} to refset {}", r);
+
 		 try {
-			 
+			r = obfuscate(r); 
 			gao.updateRefset(r);
 			
 		} catch (RefsetGraphAccessException e) {
@@ -106,6 +111,47 @@ public class RefsetAuthoringServiceImpl implements RefsetAuthoringService {
 		}
 		 
 		 return r.getId();
+	}
+
+	/**Does required update checks and removes fields which can not be updated
+	 * @param r
+	 * @return
+	 * @throws RefsetServiceException
+	 */
+	private Refset obfuscate(Refset r) throws RefsetServiceException {
+		// TODO Auto-generated method stub
+		if (r == null) {
+			
+			throw new RefsetServiceException("Invalid request, refset supplied can not be empty");
+			
+		} else if (StringUtils.isEmpty(r.getDescription())) {
+			
+			throw new RefsetServiceException("Invalid request, refset description is mandatory");
+
+		}
+		
+		r.setCreated(null);
+		r.setCreatedBy(null);
+		return r;
+	}
+
+	@Override
+	public void remove(String refsetId) throws RefsetServiceException,
+			EntityNotFoundException {
+		
+		LOGGER.debug("remove refset {}", refsetId);
+
+		try {
+			 
+			gao.removeRefset(refsetId);
+			
+		} catch (RefsetGraphAccessException e) {
+			
+			LOGGER.error("Error during service call", e);
+			throw new RefsetServiceException(e.getMessage());
+			
+		}
+		
 	}
 
 }

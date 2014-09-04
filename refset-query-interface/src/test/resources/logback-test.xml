@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration >
+
+	<!-- Appenders -->
+
+	  <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+	    <layout class="ch.qos.logback.classic.PatternLayout">
+	      <Pattern>%d{ISO8601} [%thread] %-5level %logger{36} - %msg%n</Pattern>
+	    </layout>
+	  </appender>		
+	  <appender name="file" class="ch.qos.logback.core.rolling.RollingFileAppender">
+	    <file>${user.dir}/logs/refset.log</file>
+	    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+	      <fileNamePattern>${user.dir}/logs/refset.%d{yyyy-MM-dd}.log.gz</fileNamePattern>
+	    </rollingPolicy>
+	 
+	    <encoder>
+		      <Pattern>%d{ISO8601} [%thread] %-5level %logger{36} - %msg%n</Pattern>
+	    </encoder>
+	  </appender>	  
+		
+	<!-- Application Loggers -->
+	<logger name="org.ihtsdo.refset" level="debug" />
+			
+	<logger name="com.tinkerpop.blueprints" level="debug" />
+		
+	<!-- 3rdparty Loggers -->
+	<logger name="org.springframework.core" level="info" />
+		
+	
+	<logger name="org.springframework.beans" level="info" />
+	
+	<logger name="org.springframework.context" level="info" />
+
+	<logger name="org.springframework.web" level="info" />	
+
+	<!-- Root Logger -->
+	<root level="info">
+		<appender-ref ref="file" />
+		<appender-ref ref="console" />
+		
+	</root>
+	
+</configuration>

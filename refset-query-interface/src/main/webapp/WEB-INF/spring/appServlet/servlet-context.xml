@@ -75,4 +75,5 @@
 	<beans:import resource="common-app-config.xml"/>
 	<beans:import resource="spring-refset-browse-service-stub-data.xml"/>
 	<beans:import resource="refset-graph-server-config.xml"/>	
+	
 </beans:beans>

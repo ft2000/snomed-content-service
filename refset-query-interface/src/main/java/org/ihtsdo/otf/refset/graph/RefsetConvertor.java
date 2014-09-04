@@ -36,7 +36,7 @@ public class RefsetConvertor {
 	 */
 	protected static Map<String, Object> getRefsetProperties(Refset r) {
 		
-		LOGGER.info("getRefsetProperties {}", r);
+		LOGGER.debug("getRefsetProperties {}", r);
 		
 		Map<String, Object> props = new HashMap<String, Object>();
 		
@@ -97,7 +97,7 @@ public class RefsetConvertor {
 	 */
 	protected static Map<String, Object> getMemberProperties(Member m) {
 		// TODO Auto-generated method stub
-		LOGGER.info("getMemberProperties {}", m);
+		LOGGER.debug("getMemberProperties {}", m);
 
 		Map<String, Object> props = new HashMap<String, Object>();
 		if(m == null) {
@@ -120,13 +120,15 @@ public class RefsetConvertor {
 		if(!StringUtils.isEmpty(m.getId()))
 			props.put(RGC.ID, m.getId());
 
-		LOGGER.info("getMemberProperties size {}", props.size());
+		LOGGER.debug("getMemberProperties size {}", props.size());
 
 		return props;
 	}
 	
 	protected static Refset convert2Refset(Vertex vR) {
 		
+		LOGGER.debug("convert2Refset {}", vR);
+
 		Refset r = new Refset();
 		Set<String> keys = vR.getPropertyKeys();
 		
@@ -279,22 +281,125 @@ public class RefsetConvertor {
 		}
 
 		
-		LOGGER.info("Returning Refset as {} ", r.toString());
+		LOGGER.debug("Returning Refset as {} ", r.toString());
 
 		return r;
 		
 	}
 	
-	/** TODO this need revisiting
-	 * @param date
-	 * @return
-	 */
-	private static DateTime getDateTime(DateTime date) {
-		
-		
-		
-		return date;
-		
-		
+	
+	protected static List<Refset> getRefsets(Iterable<Vertex> vXs) {
+
+		LOGGER.debug("getRefsets {}", vXs);
+
+		List<Refset> refsets = new ArrayList<Refset>();
+
+		for (Vertex vR : vXs) {
+			
+
+			
+			Refset r = new Refset();
+			Set<String> keys = vR.getPropertyKeys();
+			
+			if ( keys.contains(RGC.CREATED) ) {
+			
+				long created = vR.getProperty(RGC.CREATED);
+				r.setCreated(new DateTime(created));
+			}
+			
+			if ( keys.contains(RGC.CREATED_BY) ) {
+				
+				String createdBy = vR.getProperty(RGC.CREATED_BY);
+				r.setCreatedBy(createdBy);
+				
+			}
+			
+			
+			if ( keys.contains(RGC.DESC) ) {
+				
+				String description = vR.getProperty(RGC.DESC);
+				r.setDescription(description);
+				
+			}
+			
+			if ( keys.contains(RGC.EFFECTIVE_DATE) ) {
+				
+				long effectiveDate = vR.getProperty(RGC.EFFECTIVE_DATE);
+				r.setEffectiveTime(new DateTime(effectiveDate));
+				
+			}
+			
+			if ( keys.contains(RGC.ID) ) {
+				
+				String id = vR.getProperty(RGC.ID);
+				r.setId(id);
+			}
+			
+			if ( keys.contains(RGC.LANG_CODE) ) {
+				
+				String languageCode = vR.getProperty(RGC.LANG_CODE);
+				r.setLanguageCode(languageCode);
+				
+			}
+			
+			if ( keys.contains(RGC.MODULE_ID) ) {
+				
+				String moduleId = vR.getProperty(RGC.MODULE_ID);
+				r.setModuleId(moduleId);
+				
+			}
+			
+			if ( keys.contains(RGC.PUBLISHED) ) {
+				
+				boolean isPublished = vR.getProperty(RGC.PUBLISHED);
+				r.setPublished(isPublished);
+				
+			}
+			
+			
+			if ( keys.contains(RGC.PUBLISHED_DATE) ) {
+				
+				long publishedDate = vR.getProperty(RGC.PUBLISHED_DATE);
+				r.setPublishedDate(new DateTime(publishedDate));
+				
+			}
+			
+			
+			if ( keys.contains(RGC.SUPER_REFSET_TYPE_ID) ) {
+				
+				String superRefsetTypeId = vR.getProperty(RGC.SUPER_REFSET_TYPE_ID);
+				r.setSuperRefsetTypeId(superRefsetTypeId);
+				
+			}
+			
+			if ( keys.contains(RGC.TYPE) ) {
+				
+				String type = vR.getProperty(RGC.TYPE);
+				
+				r.setType(RefsetType.valueOf(type));
+				
+			}
+
+			if ( keys.contains(RGC.TYPE_ID) ) {
+				
+				String typeId = vR.getProperty(RGC.TYPE_ID);
+				r.setTypeId(typeId);
+				
+			}
+			
+			if ( keys.contains(RGC.ACTIVE) ) {
+				
+				boolean active = vR.getProperty(RGC.ACTIVE);
+				r.setActive(active);
+				
+			}
+			
+			LOGGER.debug("Adding Refset  {} in list ", r.toString());
+
+			refsets.add(r);
+		}
+		LOGGER.debug("No of refset rerieved {}", refsets.size());
+		return refsets;
 	}
+	
 }

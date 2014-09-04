@@ -29,9 +29,10 @@ public class RefsetGraphService implements RefsetBrowseService {
 
 	/* (non-Javadoc)
 	 * @see org.ihtsdo.otf.refset.service.RefsetBrowseService#getRefsets(java.lang.Integer, java.lang.Integer)
+	 * TODO change this to pass a map of query criteria decide by controller
 	 */
 	@Override
-	public List<Refset> getRefsets(Integer page, Integer size) throws RefsetServiceException {
+	public List<Refset> getRefsets(Integer page, Integer size, boolean published) throws RefsetServiceException {
 
 		LOGGER.debug("getRefsets");
 		
@@ -40,7 +41,7 @@ public class RefsetGraphService implements RefsetBrowseService {
 			
 			try {
 				
-				return gao.getRefSets();
+				return gao.getRefSets(published);
 				
 			} catch (RefsetGraphAccessException e) {
 				
@@ -51,7 +52,7 @@ public class RefsetGraphService implements RefsetBrowseService {
 		
 		List<Refset> refsets;
 		try {
-			refsets = gao.getRefSets();
+			refsets = gao.getRefSets(published);
 		} catch (RefsetGraphAccessException e) {
 			
 			throw new RefsetServiceException(e.getMessage());
