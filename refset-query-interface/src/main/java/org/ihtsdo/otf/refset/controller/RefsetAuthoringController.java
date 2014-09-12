@@ -34,6 +34,7 @@ import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -60,10 +61,12 @@ public class RefsetAuthoringController {
 	@Resource
 	private RefsetAuthoringService aService;
 
-	@RequestMapping( method = RequestMethod.POST, value = "/new",  produces = "application/json")
+	@RequestMapping( method = RequestMethod.POST, value = "/new",  produces = "application/json", consumes = "application/json")
 	@ApiOperation( value = "Add a Refset) " )
 	@PreAuthorize("hasRole('ROLE_USER')")
-    public ResponseEntity<Result< Map<String, Object>>> addRefset( @RequestBody Refset r) {
+    public ResponseEntity<Result< Map<String, Object>>> addRefset( @RequestBody Refset r, 
+    		@RequestHeader("X-REFSET-PRE-AUTH-TOKEN") String authToken, 
+    		@RequestHeader("X-REFSET-PRE-AUTH-USERNAME") String userName) {
 		
 		logger.debug("Adding refsets {}", r);
 
@@ -116,8 +119,14 @@ public class RefsetAuthoringController {
 			r.setType(RefsetType.simple);
 		
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		UserDetails user = (UserDetails) auth.getPrincipal();
-		r.setCreatedBy(user.getUsername());
+		
+		if (auth instanceof UserDetails) {
+			
+			UserDetails user = (UserDetails) auth.getPrincipal();
+			r.setCreatedBy(user.getUsername());
+			
+		}
+		
 		
 		r.setActive(r.isActive());
 		if(StringUtils.isEmpty(r.getModuleId()))
@@ -126,11 +135,13 @@ public class RefsetAuthoringController {
 		
 	}
 
-	@RequestMapping( method = RequestMethod.POST, value = "/{refSetId}/add/member", produces = "application/json" )
+	@RequestMapping( method = RequestMethod.POST, value = "/{refSetId}/add/member", produces = "application/json", consumes = "application/json" )
 	@ApiOperation( value = "Shortcut method to add a member to an existing refset." )
 	@PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<Result< Map<String, Object>>> addMember(@PathVariable(value = "refSetId") String refsetId, 
-    		@RequestBody( required = true) Member member) {
+    		@RequestBody( required = true) Member member, 
+    		@RequestHeader("X-REFSET-PRE-AUTH-TOKEN") String authToken, 
+    		@RequestHeader("X-REFSET-PRE-AUTH-USERNAME") String userName) {
 		
 		logger.debug("Adding member {} to refset {}", member, refsetId);
 
@@ -165,10 +176,12 @@ public class RefsetAuthoringController {
 		}       
     }
 	
-	@RequestMapping( method = RequestMethod.POST, value = "/update",  produces = "application/json")
+	@RequestMapping( method = RequestMethod.POST, value = "/update",  produces = "application/json", consumes = "application/json")
 	@ApiOperation( value = "Update a Refset" )
 	@PreAuthorize("hasRole('ROLE_USER')")
-    public ResponseEntity<Result< Map<String, Object>>> updateRefset( @RequestBody Refset r) {
+    public ResponseEntity<Result< Map<String, Object>>> updateRefset( @RequestBody Refset r, 
+    		@RequestHeader("X-REFSET-PRE-AUTH-TOKEN") String authToken, 
+    		@RequestHeader("X-REFSET-PRE-AUTH-USERNAME") String userName) {
 		
 		logger.debug("Updating an existing refsets {}", r);
 
@@ -215,10 +228,12 @@ public class RefsetAuthoringController {
     }
 	
 	
-	@RequestMapping( method = RequestMethod.GET, value = "/delete/{refsetId}",  produces = "application/json")
+	@RequestMapping( method = RequestMethod.GET, value = "/delete/{refsetId}",  produces = "application/json", consumes = "application/json")
 	@ApiOperation( value = "Remove a unpublished refset, it will delete refset as well as its members" )
 	@PreAuthorize("hasRole('ROLE_USER')")
-    public ResponseEntity<Result< Map<String, Object>>> removeRefset( @PathVariable String refsetId) {
+    public ResponseEntity<Result< Map<String, Object>>> removeRefset( @PathVariable String refsetId, 
+    		@RequestHeader("X-REFSET-PRE-AUTH-TOKEN") String authToken, 
+    		@RequestHeader("X-REFSET-PRE-AUTH-USERNAME") String userName) {
 		
 		logger.debug("Removing an existing refsets {}", refsetId);
 

@@ -59,7 +59,7 @@
 	<resources mapping="/webjars/**" location="classpath:/META-INF/resources/webjars/"/>
 	
 	<context:property-placeholder 
-         location="classpath:refset-${env}.properties" ignore-resource-not-found="false"/>	
+         location="classpath:refset-${env}.properties, classpath:titan-cassandra-es.properties" ignore-resource-not-found="false"/>	
 
 	<!-- Resolves views selected for rendering by @Controllers to .jsp resources in the /WEB-INF/views directory -->
 	<beans:bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
@@ -69,11 +69,13 @@
 	
 	
 	<context:component-scan base-package="org.ihtsdo.otf.refset" />
+	<context:component-scan base-package="org.ihtsdo.otf.snomed" />
 	
 	<beans:import resource="service-camel-route.xml"/>
 	<beans:import resource="sparql-queries.xml"/>
 	<beans:import resource="common-app-config.xml"/>
 	<beans:import resource="spring-refset-browse-service-stub-data.xml"/>
 	<beans:import resource="refset-graph-server-config.xml"/>	
+	<beans:import resource="refset-snomed-service-config.xml"/>
 	
 </beans:beans>

@@ -5,7 +5,7 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd">
 	<context:property-placeholder 
-         location="classpath:refset-${env}.properties" ignore-resource-not-found="false"/>
+         location="classpath:refset-${env}.properties, classpath:titan-cassandra-es.properties" ignore-resource-not-found="false"/>
 	<!-- Root Context: defines shared resources visible to all other web components -->
 	<import resource="appServlet/refset-app-security-config.xml"/>	
 	<import resource="appServlet/servlet-context.xml"/>	

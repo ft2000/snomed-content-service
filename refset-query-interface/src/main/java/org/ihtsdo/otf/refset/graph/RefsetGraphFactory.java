@@ -30,7 +30,7 @@ public class RefsetGraphFactory {
 	
 	private static Configuration gsConfig;
 	
-	@Autowired
+	@Resource(name = "refset.graph.orientdb.config")
 	private Configuration config;
 	
 	@Resource(name = "refsetGraphOrientdbFactory")

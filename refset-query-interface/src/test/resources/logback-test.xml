@@ -35,7 +35,7 @@
 	<logger name="org.springframework.web" level="info" />	
 
 	<!-- Root Logger -->
-	<root level="info">
+	<root level="error">
 		<appender-ref ref="file" />
 		<appender-ref ref="console" />
 		

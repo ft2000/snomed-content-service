@@ -95,18 +95,18 @@ public class RefsetAuthenticationProvider implements AuthenticationProvider {
 		try {
 			
 			Assert.notNull(rt, "Rest template can not be empty");
-			System.err.println(otfServiceUrl);
-			System.err.println(params);
+			
+			LOGGER.debug("Calling authentication service with URL {}, User {} and Parameters {} ", otfServiceUrl, userName);
 
 			JSONObject obj = rt.postForObject(otfServiceUrl, params, JSONObject.class);
-			
-			System.out.println(obj);
-			
+
+			LOGGER.debug("authentication service call successfully returned with {} ", obj);
+
 			JSONObject userJson = obj.getJSONObject("user");
 			String id = userJson.getString("name");
 			String status = userJson.getString("status");
-			Assert.notNull(status, "Status can not be empty");
-			boolean authenticated =  status.equalsIgnoreCase("enabled") ? true : false;
+
+			boolean authenticated = !StringUtils.isEmpty(status) && status.equalsIgnoreCase("enabled") ? true : false;
 			
 			user.setUsername(id);
 			user.setPassword(token);
@@ -115,9 +115,13 @@ public class RefsetAuthenticationProvider implements AuthenticationProvider {
 	        params.add("username", "pnema");
 	        params.add("queryName", "getUserApps");
 
+			LOGGER.debug("Calling authentication service with URL {}, User {} and Parameters {} ", otfServiceUrl, userName);
+
 	        JSONObject appJson = rt.postForObject(otfServiceUrl, params, JSONObject.class);
-					        
-	        JSONArray apps = appJson.getJSONArray("apps");
+
+			LOGGER.debug("authentication service call successfully returned with {} ", appJson);
+
+			JSONArray apps = appJson.getJSONArray("apps");
 
 	        for (Object object : apps) {
 	        	

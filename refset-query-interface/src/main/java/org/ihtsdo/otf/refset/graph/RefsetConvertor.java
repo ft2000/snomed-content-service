@@ -264,6 +264,21 @@ public class RefsetConvertor {
 					m.setEffectiveTime(new DateTime(effectivetime));
 					
 				}
+				
+				//this has to be edge effective date. //TODO remove above
+				Set<String> eKeys = eR.getPropertyKeys();
+				if (eKeys.contains(RGC.EFFECTIVE_DATE)) {
+					
+
+					long effectivetime = eR.getProperty(RGC.EFFECTIVE_DATE);
+					
+					LOGGER.debug("Actual effective date when this member tied to given refset is  {} ", effectivetime);
+
+					m.setEffectiveTime(new DateTime(effectivetime));
+					
+
+					
+				}
 
 				if ( mKeys.contains(RGC.REFERENCE_COMPONENT_ID) ) {
 					
@@ -272,7 +287,8 @@ public class RefsetConvertor {
 					
 				}
 
-				
+				LOGGER.debug("Adding member as {} ", m.toString());
+
 				members.add(m);
 			}
 			

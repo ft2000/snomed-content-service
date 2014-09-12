@@ -12,12 +12,14 @@ import org.ihtsdo.otf.refset.domain.Member;
 import org.ihtsdo.otf.refset.domain.MetaData;
 import org.ihtsdo.otf.refset.domain.Refset;
 import org.ihtsdo.otf.refset.exception.EntityNotFoundException;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
 
+import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.impls.orient.OrientElement;
@@ -76,9 +78,13 @@ public class RefsetGAO {
 					LOGGER.debug("Adding relationship member is part of refset as edge {}, member index {}", mV.getId(), i++);
 
 					/*Add this member to refset*/
-					g.addEdge(null, mV, rV, "members");
+					Edge e = g.addEdge(null, mV, rV, "members");
 
 					LOGGER.debug("Added relationship as edge from {} to {}", mV.getId(), rV.getId());
+					
+					//added effective date of relationship
+					e.setProperty(RGC.EFFECTIVE_DATE, new DateTime().getMillis());
+					
 
 				}
 

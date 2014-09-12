@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:c="http://www.springframework.org/schema/c"
+	xmlns:p="http://www.springframework.org/schema/p"
+	
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.0.xsd">
+
+
+	<bean id="conceptLookService" 
+			class="org.ihtsdo.otf.snomed.service.ConceptLookUpServiceImpl" 
+			p:repositoryConfig="${titan.config}" p:config-ref="refset.graph.titan.config" 
+		/>
+		
+	<bean id="refset.graph.titan.config" 
+			class="org.apache.commons.configuration.MapConfiguration" 
+			c:map-ref="refsetGraphTitandbProps" />
+
+	<!-- 
+	
+	
+	storage.backend=cassandrathrift
+	storage.hostname=127.0.0.1
+	cache.db-cache = true
+	cache.db-cache-clean-wait = 20
+	cache.db-cache-time = 180000
+	cache.db-cache-size = 0.25
+	
+	# Automatically start an ES node in Titan's JVM...
+	#index.search.backend=elasticsearch
+	#index.search.directory=../db/es
+	#index.search.elasticsearch.client-only=false
+	#index.search.elasticsearch.local-mode=true
+	
+	# ... or connect to an already-running ES process on localhost
+	index.search.backend=elasticsearch
+	index.search.hostname=127.0.0.1
+	index.search.elasticsearch.client-only=true
+
+	 -->
+	
+	<util:map id="refsetGraphTitandbProps">
+	
+         <entry key="storage.backend" value="${storage.backend}"/>
+         <entry key="storage.hostname" value="${storage.hostname}"/>
+         <entry key="cache.db-cache" value="${cache.db-cache}"/>
+         <entry key="cache.db-cache-clean-wait" value="${cache.db-cache-clean-wait}"/>
+         <entry key="cache.db-cache-time" value="${cache.db-cache-time}"/>
+         <entry key="cache.db-cache-size" value="${cache.db-cache-size}"/>
+         <entry key="index.search.backend" value="${index.search.backend}"/>
+         <entry key="index.search.hostname" value="${blueprints.orientdb.pool.min}"/>
+         <entry key="index.search.elasticsearch.client" value="${index.search.hostname}"/>
+         
+	</util:map>		
+		
+		
+
+</beans>

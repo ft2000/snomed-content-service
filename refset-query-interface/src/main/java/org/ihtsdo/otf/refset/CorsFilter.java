@@ -12,6 +12,9 @@ import javax.servlet.http.HttpServletResponse;
 
 public class CorsFilter implements Filter {
 	
+	private static final String ACCESS_CONTROL_ALLOW_HEADERS = "Access-Control-Allow-Headers";
+	
+	
 	@Override
 	public void destroy() {
 
@@ -20,12 +23,17 @@ public class CorsFilter implements Filter {
 	@Override
 	public void doFilter(ServletRequest req, ServletResponse res,
 			FilterChain chain) throws IOException, ServletException {
+		
 		HttpServletResponse response = (HttpServletResponse) res;
 		response.setHeader("Access-Control-Allow-Origin", "*");
 		response.setHeader("Access-Control-Allow-Methods",
 				"POST, GET, OPTIONS, DELETE");
 		response.setHeader("Access-Control-Max-Age", "3600");
-		response.setHeader("Access-Control-Allow-Headers", "x-requested-with");
+		response.addHeader(ACCESS_CONTROL_ALLOW_HEADERS, "x-requested-with");
+		response.addHeader(ACCESS_CONTROL_ALLOW_HEADERS, "X-REFSET-PRE-AUTH-USERNAME");
+		response.addHeader(ACCESS_CONTROL_ALLOW_HEADERS, "X-REFSET-PRE-AUTH-TOKEN");
+		response.addHeader(ACCESS_CONTROL_ALLOW_HEADERS, "Content-Type");
+
 		chain.doFilter(req, res);
 
 	}

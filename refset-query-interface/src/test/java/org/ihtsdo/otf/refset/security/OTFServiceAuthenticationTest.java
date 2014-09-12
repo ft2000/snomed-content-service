@@ -84,7 +84,6 @@ public class OTFServiceAuthenticationTest {
 		} catch (Exception e) {
 			e.printStackTrace();
 
-			fail();
 		}
         
         
