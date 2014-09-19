@@ -46,26 +46,30 @@ public class ConceptLookUpServiceImpl implements ConceptLookupService {
 	
 	private static final String BASE_URI = "http://sct.snomed.info/";
 	
+	private TitanGraph graph;
+	
 	private static final String Q_CONCEPT_ID = "prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>"
 			+ "prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>"
 			+ "prefix owl: <http://www.w3.org/2002/07/owl#>"
 			+ "prefix xsd: <http://www.w3.org/2001/XMLSchema#>"
-			+ "prefix sn: <http://sct.snomed.info>"
+			+ "prefix sn: <http://sct.snomed.info/#>"
 			+ "SELECT DISTINCT ?x "
 			+ " WHERE { "
-			+ "?x ?o ?y. "
-
+			+ "?x ?o ?y. \n"
+			+ "?x sn:description ?desc. \n"
+			+ "?desc ?do ?dy \n"
 			+ "} limit %d \n OFFSET %d ";
 	
 	private static final String Q_CONCEPT = "prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>"
 			+ "prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>"
 			+ "prefix owl: <http://www.w3.org/2002/07/owl#>"
 			+ "prefix xsd: <http://www.w3.org/2001/XMLSchema#>"
-			+ "prefix sn: <http://sct.snomed.info>"
+			+ "prefix sn: <http://sct.snomed.info/#>"
 			+ "SELECT ?x ?o ?y "
 			+ " WHERE { "
-			+ "?x ?o ?y. "
-
+			+ "?x ?o ?y. \n"
+			+ "?x sn:description ?desc.\n"
+			+ "?desc ?do ?dy \n"
 			+ "}";
 
 	private String repositoryConfig;
@@ -350,16 +354,27 @@ public class ConceptLookUpServiceImpl implements ConceptLookupService {
 	
 	private TitanGraph getGraph() {
 		
+		TitanGraph g = this.graph;
+		
+		if ( g != null && g.isOpen() ) {
+			
+			return g;
+			
+		}
 		
 		if( config != null) {
 			
-			return TitanFactory.open(config);
+			this.graph = TitanFactory.open(config);
 			
+			return this.graph;
 		}
 		
 		if (!StringUtils.isEmpty(repositoryConfig)) {
 			
-			return TitanFactory.open(repositoryConfig);
+			this.graph = TitanFactory.open(repositoryConfig);
+			
+			return this.graph;
+
 		}
 		
 		 throw new IllegalArgumentException("Repository configuration is required");

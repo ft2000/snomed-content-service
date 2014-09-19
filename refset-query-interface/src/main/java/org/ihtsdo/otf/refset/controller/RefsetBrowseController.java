@@ -38,7 +38,7 @@ import com.wordnik.swagger.annotations.ApiOperation;
  *
  */
 @RestController
-@Api(value="Refset retrieval", description="Service to retrieve existing refset and their member details")
+@Api(value="Refset retrieval", description="Service to retrieve existing refset and their member details" , position = 2)
 @RequestMapping("/v1.0/refsets")
 public class RefsetBrowseController {
 	

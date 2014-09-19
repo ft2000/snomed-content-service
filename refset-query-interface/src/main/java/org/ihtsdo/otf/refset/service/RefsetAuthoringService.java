@@ -3,6 +3,9 @@
  */
 package org.ihtsdo.otf.refset.service;
 
+import java.util.Map;
+import java.util.Set;
+
 import org.ihtsdo.otf.refset.domain.Member;
 import org.ihtsdo.otf.refset.domain.MetaData;
 import org.ihtsdo.otf.refset.domain.Refset;
@@ -25,8 +28,9 @@ public interface RefsetAuthoringService {
 	/**Method to add a {@link Member} to given {@link Refset}.
 	 * @param refsetId
 	 * @throws RefsetServiceException
+	 * @throws EntityNotFoundException 
 	 */
-	public void addMember(String refsetId, Member m) throws RefsetServiceException ;
+	public void addMember(String refsetId, Member m) throws RefsetServiceException, EntityNotFoundException ;
 	
 	
 	/**Method to add a {@link Refset}
@@ -41,6 +45,15 @@ public interface RefsetAuthoringService {
 	 * @throws RefsetServiceException
 	 */
 	public void remove(String refsetId) throws RefsetServiceException, EntityNotFoundException ;
+	
+	
+	/**Method to add a {@link Member} to given {@link Refset}.
+	 * @param refsetId
+	 * @return 
+	 * @throws RefsetServiceException
+	 * @throws EntityNotFoundException 
+	 */
+	public Map<String, String> addMembers(String refsetId,Set<String> conceptIds) throws RefsetServiceException, EntityNotFoundException ;
 
 
 }

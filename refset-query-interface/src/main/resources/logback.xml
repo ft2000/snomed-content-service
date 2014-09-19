@@ -1,12 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
 
+  <statusListener class="ch.qos.logback.core.status.OnConsoleStatusListener" />  
 	<!-- Appenders -->
+	  
 	  <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
 	    <layout class="ch.qos.logback.classic.PatternLayout">
 	      <Pattern>%d{ISO8601} [%thread] %-5level %logger{36} - %msg%n</Pattern>
 	    </layout>
-	  </appender>
+	    <filter class="ch.qos.logback.classic.filter.LevelFilter">
+	      <level>INFO</level>
+	      <onMatch>ACCEPT</onMatch>
+	      <onMismatch>DENY</onMismatch>
+	    </filter>
+    
+      </appender>
+	  
+	  
+	  
 	  <appender name="file" class="ch.qos.logback.core.rolling.RollingFileAppender">
 	    <file>${catalina.base}/logs/refset.log</file>
 	    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
@@ -16,40 +27,49 @@
 	    <encoder>
 		      <Pattern>%d{ISO8601} [%thread] %-5level %logger{36} - %msg%n</Pattern>
 	    </encoder>
-	  </appender>	  
-	  		
+	    <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+	      <level>DEBUG</level>
+	    </filter>
+	    
+	  </appender>
+
+			    <!-- read for access log - http://logback.qos.ch/manual/layouts.html#AccessPatternLayout -->
 		
 	<!-- Application Loggers -->
-	<logger name="org.ihtsdo.refset" level="debug" >
-		<appender-ref ref="file" />
-	</logger>
+	<logger name="org.ihtsdo.refset" level="debug" />
+		
 			
-	<logger name="com.tinkerpop.blueprints" level="info" >
-		<appender-ref ref="file" />
-	</logger>
+	<logger name="com.tinkerpop.blueprints" level="debug" />
+		
+	<logger name="com.thinkaurelius.titan.diskstorage.es" level="info" />
 		
 	<!-- 3rdparty Loggers -->
-	<logger name="org.springframework.core" level="info" >
-		<appender-ref ref="file" />
-	</logger>
+	<logger name="org.springframework.core" level="info" />
+		
 	
-	<logger name="org.springframework.beans" level="info" >
-		<appender-ref ref="file" />
-	</logger>
 	
-	<logger name="org.springframework.context" level="info" >
-		<appender-ref ref="file" />
+	<logger name="org.springframework.beans" level="info" />
+		
+	
+	
+	<logger name="org.springframework.context" level="info" />
+		
+	
+	<logger name="org.springframework.web" level="info" />
+		
+		
+	<logger name="org.springframework.security" level="info" />
+
+
+	<logger name="com.mangofactory" level="trace" >
+			<appender-ref ref="file" />
 	</logger>
-	<logger name="org.springframework.web" level="debug" >
-		<appender-ref ref="file" />
-	</logger>	
-	<logger name="org.springframework.security" level="info" >
-		<appender-ref ref="file" />
-	</logger>	
+		
 
 	<!-- Root Logger -->
-	<root level="error">
+	<root level="debug">
 		<appender-ref ref="file" />
+		<appender-ref ref="console" />
 	</root>
 	
 </configuration>

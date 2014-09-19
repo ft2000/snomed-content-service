@@ -4,26 +4,32 @@
 package org.ihtsdo.otf.refset.graph;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.ihtsdo.otf.refset.domain.Member;
 import org.ihtsdo.otf.refset.domain.MetaData;
 import org.ihtsdo.otf.refset.domain.Refset;
 import org.ihtsdo.otf.refset.exception.EntityNotFoundException;
+import org.ihtsdo.otf.refset.graph.schema.GMember;
+import org.ihtsdo.otf.refset.graph.schema.GRefset;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
+import com.google.common.collect.Iterables;
+import com.thinkaurelius.titan.core.TitanGraph;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.Vertex;
-import com.tinkerpop.blueprints.impls.orient.OrientElement;
-import com.tinkerpop.blueprints.impls.orient.OrientGraph;
+import com.tinkerpop.frames.FramedGraph;
+import com.tinkerpop.frames.FramedGraphFactory;
+import com.tinkerpop.frames.FramedTransactionalGraph;
 
 /**Graph Access component to do CRUD operation on underlying Refset graph
  * @author Episteme Partners
@@ -34,14 +40,14 @@ public class RefsetGAO {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(RefsetGAO.class);
 	
-	private static final String REFSET_CLASS_NAME = "Refset";
-	private static final String MEMBER_CLASS_NAME = "Member";
-
-	private static final String DOT = ".";
-
+	//need this for unit testing hence this initialization
 	
-	@Autowired
 	private RefsetGraphFactory factory;
+	
+
+
+	private static FramedGraphFactory fgf = new FramedGraphFactory();
+
 
 	/**
 	 * @param r a {@link Refset} with or without members
@@ -52,14 +58,16 @@ public class RefsetGAO {
 		
 		LOGGER.debug("Adding refset {}", r);
 
-		OrientGraph g = null;
+		TitanGraph g = null;
 		MetaData md = r.getMetaData();
 		
 		try {
 			
-			g = factory.getOrientGraph();
+			g = factory.getTitanGraph();
+			
+			FramedTransactionalGraph<TitanGraph> tg = fgf.create(g);
 
-			Object rId = addRefsetNode(r, g);	
+			Object rId = addRefsetNode(r, tg);	
 			
 			final Vertex rV = g.getVertex(rId);
 
@@ -71,7 +79,7 @@ public class RefsetGAO {
 				
 				for (Member m : members) {
 					
-					Object mId = addMemberNode(m, g);
+					Object mId = addMemberNode(m, tg);
 					
 					Vertex mV = g.getVertex(mId);
 					
@@ -97,6 +105,7 @@ public class RefsetGAO {
 			
 			LOGGER.info("Commiting");
 
+			tg.commit();
 			g.commit();
 			
 			md = getMetaData(rV.getId());
@@ -121,18 +130,18 @@ public class RefsetGAO {
 		
 		LOGGER.info("Shutting down graph {}", g);
 		
-		if (g != null) g.shutdown();
+		//if (g != null) g.shutdown();//shutdown is not required for titan.Commit should clear resources
 		
 	}
 
 	/**
 	 * @param r {@link Refset}
-	 * @param g {@link OrientGraph}
+	 * @param tg {@link FramedTransactionalGraph}
 	 * @return id of {@link Refset} node
 	 * @throws RefsetGraphAccessException
 	 * @throws EntityNotFoundException 
 	 */
-	private Object addRefsetNode(Refset r, OrientGraph g) throws RefsetGraphAccessException {
+	private Object addRefsetNode(Refset r, FramedTransactionalGraph<TitanGraph> tg) throws RefsetGraphAccessException {
 		// TODO Auto-generated method stub
 		
 		Object rVId;
@@ -146,10 +155,42 @@ public class RefsetGAO {
 			
 			LOGGER.debug("Refset does not exist, adding  {}", r.toString());
 			
-			final Vertex rV = g.addVertex("class:Refset", RefsetConvertor.getRefsetProperties(r));
-			LOGGER.debug("Added Refset as vertex to graph {}", rV.getId());
+			GRefset gr = tg.addVertex("GRefset", GRefset.class);
+			gr.setCreated(r.getCreated().getMillis());
+			gr.setCreatedBy(r.getCreatedBy());
+			gr.setDescription(r.getDescription());
+			
+			if (r.getEffectiveTime() != null) {
+				
+				gr.setEffectiveTime(r.getEffectiveTime().getMillis());
 
-			rVId = rV.getId();			
+			}
+			gr.setId(r.getId());
+			gr.setLanguageCode(r.getLanguageCode());
+			gr.setModuleId(r.getModuleId());
+			gr.setPublished(r.isPublished());
+			
+			if (r.getPublishedDate() != null) {
+				
+				 gr.setPublishedDate(r.getPublishedDate().getMillis());
+
+			}
+			
+			gr.setSuperRefsetTypeId(r.getSuperRefsetTypeId());
+			
+			if (r.getType() != null) {
+				
+				gr.setType(r.getType().getName());
+
+			} 
+			
+			gr.setTypeId(r.getTypeId());
+			
+			gr.setActive(r.isActive());
+			
+			LOGGER.debug("Added Refset as vertex to graph {}", gr.getId());
+
+			rVId = gr.asVertex().getId();			
 		}
 		
 		LOGGER.debug("Refset  vertex id is {} ", rVId);
@@ -166,12 +207,18 @@ public class RefsetGAO {
 	public void removeRefset(String refsetId) throws RefsetGraphAccessException, EntityNotFoundException {
 		
 		LOGGER.debug("removeRefset  {} ", refsetId);
+		
+		if (StringUtils.isEmpty(refsetId)) {
+			
+			throw new EntityNotFoundException();
+			
+		}
 
-		OrientGraph g = null;
+		TitanGraph g = null;
 		
 		try {
 			
-			g = factory.getOrientGraph();
+			g = factory.getTitanGraph();
 			
 			Object rVId = getRefsetNodeId(refsetId);
 			Vertex refset = g.getVertex(rVId);
@@ -221,47 +268,35 @@ public class RefsetGAO {
 	
 	/**Retrieves a {@link Member} node id for given {@link Member#getReferenceComponentId()}
 	 * @param rcId
+	 * @param tg 
 	 * @return
 	 * @throws RefsetGraphAccessException
 	 * @throws EntityNotFoundException 
 	 */
-	private Object getMemberNodeId(String rcId) throws RefsetGraphAccessException, EntityNotFoundException {
+	private Object getMemberNodeId(String rcId, TitanGraph tg) throws RefsetGraphAccessException, EntityNotFoundException {
 		
 		Object result = null;
 		
-		Graph g = null;
-		
+		if (StringUtils.isEmpty(rcId)) {
+			
+			throw new EntityNotFoundException("Member does not exist for given reference component id");
+		}
 		try {
-			
-			g = factory.getNoTxOrientGraph();
-			
+
 			//TODO upgrade this search with status and effective date
-			Iterable<Vertex> vs = g.getVertices(MEMBER_CLASS_NAME + DOT + RGC.REFERENCE_COMPONENT_ID, rcId);
-			if( vs != null) {
-				
-				for (Vertex v : vs) {
-					
-					Boolean isActive = v.getProperty(RGC.ACTIVE);
-					if(isActive) {
-						LOGGER.debug("Member {} already exist", v.getProperty(RGC.ID));
-						result = v.getId();
-						break;
-					}
-				}
-			}
+			Iterable<Vertex> vr = tg.getVertices(RGC.REFERENCE_COMPONENT_ID, rcId);
 			
-		} catch (NullPointerException e) {
-			//this will occur first time when there is no member class node
-			LOGGER.error("Member class does not exist {}", e);
-			throw new EntityNotFoundException("Record does not exist");
+			for (Vertex v : vr) {
+				
+				result = v.getId();
+				break;
+			}
+		
 			
 		} catch (Exception e) {
 			
 			throw new RefsetGraphAccessException(e.getMessage(), e);
 
-		} finally {
-			
-			shutdown(g);
 		}
 		
 		if(result == null) 
@@ -271,7 +306,7 @@ public class RefsetGAO {
 
 	}
 	
-	private void rollback(OrientGraph g) {
+	private void rollback(TitanGraph g) {
 		
 		if (g != null) g.rollback();
 		
@@ -287,37 +322,37 @@ public class RefsetGAO {
 		
 		LOGGER.debug("Getting record id for given refset id {}", id);
 
+		if (StringUtils.isEmpty(id)) {
+			
+			throw new EntityNotFoundException();
+			
+		}
+
 		Object rVId = null;
 		
-		Graph g = null;
+		TitanGraph g = null;
 		
 		try {
 			
-			g = factory.getNoTxOrientGraph();
-
+			g = factory.getTitanGraph();
 			//TODO upgrade this search with status and effective date
-			Iterable<Vertex> vs = g.getVertices(REFSET_CLASS_NAME + DOT + RGC.ID, id);
 			
-			for (Vertex v : vs) {
+			Iterable<Vertex> vr = g.getVertices(RGC.ID, id);
+			
+			if (vr != null ) {
 				
-				String result = v.getProperty(RGC.ID);
-				LOGGER.debug("Refset is {} ", v);
-
-				if(id.equalsIgnoreCase(result)) {
+				for (Vertex v : vr) {
 					
-					LOGGER.debug("Refset {} already exist", v.getProperty(RGC.ID));
-
 					rVId = v.getId();
+					LOGGER.debug("Refset is {} and id is {}", v, rVId);
 					break;
-				};
+				}
 			}
 			
-		} catch (NullPointerException e) {
-
-			LOGGER.error("Error during graph ineraction", e);
-			//carry on
-		}
-		catch (Exception e) {
+			
+			g.commit();
+			
+		} catch (Exception e) {
 			
 			LOGGER.error("Error during graph ineraction", e);
 			throw new RefsetGraphAccessException(e.getMessage(), e);
@@ -339,22 +374,29 @@ public class RefsetGAO {
 	 * @param m
 	 * @throws RefsetGraphAccessException 
 	 */
-	private Object addMemberNode(Member m, OrientGraph g) throws RefsetGraphAccessException {
+	private Object addMemberNode(Member m, FramedTransactionalGraph<TitanGraph> tg) throws RefsetGraphAccessException {
 		
 		Object id = null;
 		try {
 			
-			id = getMemberNodeId(m.getReferenceComponentId());
+			id = getMemberNodeId(m.getReferenceComponentId(), tg.getBaseGraph());
 
 			LOGGER.debug("Member already exist as vertex to graph {}", id);
 
 		} catch (EntityNotFoundException e) {
 			
-			Vertex mV = g.addVertex("class:Member", RefsetConvertor.getMemberProperties(m));
+			
+			GMember mV = tg.addVertex("GMember", GMember.class);
+			
+			mV.setActive(m.isActive());
+			mV.setId(m.getId());
+			mV.setModuleId(m.getModuleId());
+			mV.setReferenceComponentId(m.getReferenceComponentId());
+			mV.setEffectiveTime(m.getEffectiveTime().getMillis());
 			
 			LOGGER.debug("Added Member as vertex to graph", mV.getId());
 						
-			id = mV.getId();
+			id = mV.asVertex().getId();
 
 		}
 		
@@ -370,20 +412,21 @@ public class RefsetGAO {
 	 */
 	public Refset getRefset(String id) throws RefsetGraphAccessException, EntityNotFoundException {
 				
-		OrientGraph g = null;
+		TitanGraph g = null;
 		Refset r = null;
 		try {
 			
-			g = factory.getOrientGraph();
+			g = factory.getTitanGraph();
 
+			FramedGraph<TitanGraph> tg = fgf.create(g);
 			//TODO upgrade this search with status and effective date
-			Iterable<Vertex> vs = g.getVertices(REFSET_CLASS_NAME + DOT + RGC.ID, id);
+			Iterable<GRefset> vs = tg.getVertices(RGC.ID, id, GRefset.class);//.has(RGC.ID, Compare.EQUAL, id).limit(1).vertices(GRefset.class);
 			
-			for (Vertex v : vs) {
+			for (GRefset v : vs) {
 				
-				r = RefsetConvertor.convert2Refset(v);
+				r = RefsetConvertor.convert2Refsets(v);
 				LOGGER.debug("Refset is {} ", r);
-				r.setMetaData(getMetaData(v.getId()));
+				r.setMetaData(getMetaData(v.asVertex().getId()));
 				break;
 			}
 			g.commit();
@@ -412,24 +455,21 @@ public class RefsetGAO {
 	 */
 	public Refset getRefsetFromNodeId(Object nodeId) throws RefsetGraphAccessException, EntityNotFoundException {
 				
-		OrientGraph g = null;
+		TitanGraph g = null;
 		Refset r = null;
 		try {
 			
-			g = factory.getOrientGraph();
+			g = factory.getTitanGraph();
 
-			Vertex v = g.getVertex(nodeId);
+			FramedGraph<TitanGraph> tg = fgf.create(g);
+			GRefset v = tg.getVertex(nodeId, GRefset.class);
 
 			if(v != null) {
 				
-				r = RefsetConvertor.convert2Refset(v);
+				r = RefsetConvertor.convert2Refsets(v);
+				
 				LOGGER.debug("Refset is {} ", r);
-				MetaData md = new MetaData();
-				md.setId(v.getId());
-				md.setType("vertex");
-				Integer version = v.getProperty("@Version");
-				md.setVersion(version);
-				r.setMetaData(md);
+				
 			}
 			
 
@@ -452,44 +492,48 @@ public class RefsetGAO {
 			return r;
 	}
 	
-	
-
-	/**
-	 * @param f the f to set
-	 */
-	public void setF(RefsetGraphFactory f) {
-		this.factory = f;
-	}
 
 	public List<Refset> getRefSets(boolean published) throws RefsetGraphAccessException {
 		
-		OrientGraph g = null;
+		TitanGraph g = null;
 		List<Refset> refsets = new ArrayList<Refset>();
 		
 		try {
 			
-			g = factory.getOrientGraph();
-
+			g = factory.getTitanGraph();
+			FramedGraph<TitanGraph> fg = fgf.create(g);
 			//TODO upgrade this search with status and effective date
 			
-			final Iterable<Vertex> vs;
+			Iterable<GRefset> vs;
 			
 			if (published) {
 				
-				String [] keys = {RGC.PUBLISHED};
-
-				vs = g.getVertices("Refset", keys, new Object[]{ published });
-				
+				vs = fg.getVertices(RGC.PUBLISHED, true, GRefset.class);
+								
 			} else {
 
-				vs = g.getVerticesOfClass(REFSET_CLASS_NAME, false);
+				//Iterable<Result<Vertex>> publishedRefset = g.indexQuery("CPublishedGRefset", "v.published:true").limit(10).offset(1).vertices();
+				//Iterable<Result<Vertex>> unPublishedRefset = g.indexQuery("CPublishedGRefset", "v.published:false").limit(10).offset(1).vertices();
+
+				Iterable<GRefset> publishedRefset = fg.getVertices(RGC.PUBLISHED, true, GRefset.class); //fg.query().has(RGC.PUBLISHED, Compare.EQUAL, true).limit(20).vertices(GRefset.class);//fg.getVertices(RGC.PUBLISHED, true, GRefset.class);//g.getRelationType(name); (GRefset.class, new Object[]{ published });
+				Iterable<GRefset> unPublishedRefset = fg.getVertices(RGC.PUBLISHED, false, GRefset.class); //fg.query().has(RGC.PUBLISHED, Compare.EQUAL, false).limit(20).vertices(GRefset.class);// fg.getVertices(RGC.PUBLISHED, false, GRefset.class);//g.getRelationType(name); (GRefset.class, new Object[]{ published });
+				
+				vs = Iterables.concat(publishedRefset, unPublishedRefset);
 				
 			}
+			/*List<GRefset> grs = new ArrayList<GRefset>();
 			
-			refsets = RefsetConvertor.getRefsets(vs);
+			for (Result<Vertex> v : vs) {
+				
+				GRefset r = fg.frame(v.getElement(), GRefset.class);
+				grs.add(r);
+			}*/
 			
-			g.commit();
+			
+			refsets = RefsetConvertor.getRefsetss(vs);
+			
 		} catch (Exception e) {
+			
 			rollback(g);			
 			LOGGER.error("Error during graph ineraction", e);
 			throw new RefsetGraphAccessException(e.getMessage(), e);
@@ -511,21 +555,21 @@ public class RefsetGAO {
 	 */
 	public MetaData getMetaData(Object rId) throws RefsetGraphAccessException, EntityNotFoundException {
 		
-		OrientGraph g = null;
+		TitanGraph g = null;
 		MetaData md = null;
 		
 		try {
 			
-			g = factory.getOrientGraph();
+			g = factory.getTitanGraph();
 
-			OrientElement e = g.getElement(rId);
+			Vertex e = g.getVertex(rId);
 			if( e != null) {
 				
 				md = new MetaData();
 				md.setId(e.getId());
-				md.setType(e.getElementType());
-				Integer version = e.getProperty("@Version");
-				md.setVersion(version);
+				md.setType(e.getClass().getSimpleName());
+				//Integer version = e.getProperty("@Version");
+				//md.setVersion(version);
 				
 			}
 			
@@ -540,6 +584,7 @@ public class RefsetGAO {
 		} finally {
 			
 			shutdown(g);
+			
 		}
 		
 		if( md == null ) 
@@ -557,14 +602,16 @@ public class RefsetGAO {
 	public MetaData updateRefset(Refset r) throws RefsetGraphAccessException, EntityNotFoundException {
 		
 	
-		OrientGraph g = null;
+		TitanGraph g = null;
 		MetaData md = r.getMetaData();
 		
 		try {
 			
-			g = factory.getOrientGraph();
+			g = factory.getTitanGraph();
+			
+			FramedTransactionalGraph<TitanGraph> tg = fgf.create(g);
 
-			final Vertex rV = updateRefsetNode(r, g);	
+			final Vertex rV = updateRefsetNode(r, tg);	
 			
 			
 			/*if members exist then add members*/
@@ -574,7 +621,7 @@ public class RefsetGAO {
 				
 				for (Member m : members) {
 					
-					Object mId = addMemberNode(m, g);
+					Object mId = addMemberNode(m, tg);
 					
 					Vertex mV = g.getVertex(mId);
 					
@@ -593,7 +640,7 @@ public class RefsetGAO {
 				LOGGER.debug("No member available for this refset to add");
 
 			}
-			
+			tg.commit();
 			g.commit();
 			
 			md = getMetaData(rV.getId());
@@ -621,17 +668,17 @@ public class RefsetGAO {
 	
 	/**Update an existing {@link Refset} node. But does not commit yet
 	 * @param r {@link Refset}
-	 * @param g {@link OrientGraph}
+	 * @param tg {@link TitanGraph}
 	 * @return id of {@link Refset} node
 	 * @throws RefsetGraphAccessException
 	 * @throws EntityNotFoundException 
 	 */
-	private Vertex updateRefsetNode(Refset r, OrientGraph g) throws RefsetGraphAccessException, EntityNotFoundException {
+	private Vertex updateRefsetNode(Refset r, FramedTransactionalGraph<TitanGraph> tg) throws RefsetGraphAccessException, EntityNotFoundException {
 		// TODO Auto-generated method stub
 		
 		Object rVId = getRefsetNodeId(r.getId());
 		
-		Vertex rV = g.getVertex(rVId);
+		GRefset rV = tg.getVertex(rVId, GRefset.class);
 		
 		if(rV == null) {
 			
@@ -639,21 +686,95 @@ public class RefsetGAO {
 			
 		} 
 		
-		Map<String, Object> fields = RefsetConvertor.getRefsetProperties(r);
+		rV.setDescription(r.getDescription());
 		
-		if( !CollectionUtils.isEmpty(fields) ) {
+		if (r.getEffectiveTime() != null) {
 			
-			Set<String> keys = fields.keySet();
-			for (String k : keys) {
-				
-				rV.setProperty(k, fields.get(k));
+			rV.setEffectiveTime(r.getEffectiveTime().getMillis());
 
-			}
-			
 		}
 
-		return rV;
+		rV.setLanguageCode(r.getLanguageCode());
+		rV.setModuleId(r.getModuleId());
+		rV.setPublished(r.isPublished());
+		
+		if (r.getPublishedDate() != null) {
+			
+			 rV.setPublishedDate(r.getPublishedDate().getMillis());
+
+		}
+		
+		rV.setSuperRefsetTypeId(r.getSuperRefsetTypeId());
+		if (r.getType() != null) {
+			
+			rV.setType(r.getType().getName());
+
+		} 
+		
+		rV.setActive(r.isActive());
+		
+		rV.setTypeId(r.getTypeId());
+
+		return rV.asVertex();
 	}
 	
+	
+	/**
+	 * @param factory the factory to set
+	 */
+	@Autowired
+	public  void setFactory(RefsetGraphFactory factory) {
+		
+		this.factory = factory;
+	}
+
+	/**
+	 * @param refsetId
+	 * @param members
+	 * @throws EntityNotFoundException 
+	 * @throws RefsetGraphAccessException 
+	 */
+	public Map<String, String> addMembers(String refsetId, List<Member> members) throws RefsetGraphAccessException, EntityNotFoundException {
+		
+		Map<String, String> outcomeMap = new HashMap<String, String>(); //needed at fron end
+		
+		//try adding all members and accumulate error/success
+		
+		Object rVId = getRefsetNodeId(refsetId);
+		
+		FramedTransactionalGraph<TitanGraph> tg = fgf.create(factory.getTitanGraph());
+		
+		for (Member m : members) {
+			
+			Object mVId;
+			
+			try {
+				
+				mVId = getMemberNodeId(m.getReferenceComponentId(), tg.getBaseGraph());
+
+			} catch(EntityNotFoundException e) {
+				
+				//add member and its relationship
+				mVId = addMemberNode(m, tg);
+			}
+			
+			//add relationship
+			
+			Edge e = tg.addEdge(null, tg.getVertex(mVId), tg.getVertex(rVId), "members");
+
+			LOGGER.debug("Added relationship as edge from {} to {}", mVId, rVId);
+			
+			//added effective date of relationship
+			e.setProperty(RGC.EFFECTIVE_DATE, new DateTime().getMillis());
+
+			outcomeMap.put(m.getReferenceComponentId(), "Success");
+		}
+		
+		tg.commit();
+		
+		
+		return outcomeMap;
+		
+	}
 
 }

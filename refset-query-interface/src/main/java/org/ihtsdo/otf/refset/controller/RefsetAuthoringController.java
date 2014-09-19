@@ -8,6 +8,7 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import javax.annotation.Resource;
@@ -47,7 +48,7 @@ import com.wordnik.swagger.annotations.ApiOperation;
  *
  */
 @RestController
-@Api(value="RefsetAuthoring", description="Service to author refset and their member details")
+@Api(value="RefsetAuthoring", description="Service to author refset and their member details", position = 1)
 @RequestMapping("/v1.0/refsets")
 public class RefsetAuthoringController {
 	
@@ -173,6 +174,15 @@ public class RefsetAuthoringController {
 
 			return new ResponseEntity<Result<Map<String,Object>>>(result, HttpStatus.OK);
 	    	
+		} catch (EntityNotFoundException e) {
+			
+			String message = String.format("Error occurred during service call : %s", e.getMessage());
+			logger.error(message);
+			m.setMessage(message); 
+			m.setStatus(HttpStatus.NOT_FOUND);
+
+			return new ResponseEntity<Result<Map<String,Object>>>(result, HttpStatus.NOT_FOUND);
+
 		}       
     }
 	
@@ -228,7 +238,7 @@ public class RefsetAuthoringController {
     }
 	
 	
-	@RequestMapping( method = RequestMethod.GET, value = "/delete/{refsetId}",  produces = "application/json", consumes = "application/json")
+	@RequestMapping( method = RequestMethod.DELETE, value = "/delete/{refsetId}",  produces = "application/json", consumes = "application/json")
 	@ApiOperation( value = "Remove a unpublished refset, it will delete refset as well as its members" )
 	@PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<Result< Map<String, Object>>> removeRefset( @PathVariable String refsetId, 
@@ -276,6 +286,58 @@ public class RefsetAuthoringController {
 		}         
     }
 	
+	
+	
+	@RequestMapping( method = RequestMethod.POST, value = "/{refSetId}/add/members", produces = "application/json", consumes = "application/json" )
+	@ApiOperation( value = "Add no of members in one call by providing valid conceptIds to an existing refset. "
+			+ "System will find member details for given member id i.e. concept id" )
+	@PreAuthorize("hasRole('ROLE_USER')")
+    public ResponseEntity<Result< Map<String, Object>>> addMembers(@PathVariable(value = "refSetId") String refsetId, 
+    		@RequestBody( required = true) Set<String> memberIds, 
+    		@RequestHeader("X-REFSET-PRE-AUTH-TOKEN") String authToken, 
+    		@RequestHeader("X-REFSET-PRE-AUTH-USERNAME") String userName) {
+		
+		logger.debug("Adding member {} to refset {}", memberIds, refsetId);
+
+		Result<Map<String, Object>> result = new Result<Map<String, Object>>();
+		
+		Meta m = new Meta();
+
+    	try {
+    		
+			Map<String, String> outcome = aService.addMembers(refsetId, memberIds);
+			
+			Map<String, Object> data = new HashMap<String, Object>();
+			data.put("outcome", outcome);
+    		m.add( linkTo( methodOn( RefsetBrowseController.class ).getRefsetDetails(refsetId)).withRel("Refset"));
+
+			result.setData(data);
+			
+			m.setMessage(SUCESS);
+			m.setStatus(HttpStatus.OK);
+			
+			return new ResponseEntity<Result<Map<String,Object>>>(result, HttpStatus.OK);
+			
+		} catch (RefsetServiceException e) {
+			
+			String message = String.format("Error occurred during service call : %s", e.getMessage());
+			logger.error(message);
+			m.setMessage(message); 
+			m.setStatus(HttpStatus.OK);
+
+			return new ResponseEntity<Result<Map<String,Object>>>(result, HttpStatus.OK);
+	    	
+		} catch (EntityNotFoundException e) {
+
+			String message = String.format("Error occurred during service call : %s", e.getMessage());
+			logger.error(message);
+			m.setMessage(message); 
+			m.setStatus(HttpStatus.NOT_FOUND);
+
+			return new ResponseEntity<Result<Map<String,Object>>>(result, HttpStatus.NOT_FOUND);
+
+		}       
+    }	
 	
 
 }

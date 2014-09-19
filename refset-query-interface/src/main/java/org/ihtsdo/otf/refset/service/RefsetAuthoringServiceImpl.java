@@ -4,7 +4,11 @@
 package org.ihtsdo.otf.refset.service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 
 import org.ihtsdo.otf.refset.domain.Member;
 import org.ihtsdo.otf.refset.domain.Refset;
@@ -12,6 +16,9 @@ import org.ihtsdo.otf.refset.exception.EntityNotFoundException;
 import org.ihtsdo.otf.refset.exception.RefsetServiceException;
 import org.ihtsdo.otf.refset.graph.RefsetGAO;
 import org.ihtsdo.otf.refset.graph.RefsetGraphAccessException;
+import org.ihtsdo.otf.snomed.domain.Concept;
+import org.ihtsdo.otf.snomed.exception.ConceptServiceException;
+import org.ihtsdo.otf.snomed.service.ConceptLookupService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +36,9 @@ public class RefsetAuthoringServiceImpl implements RefsetAuthoringService {
 	
 	@Autowired
 	private RefsetGAO gao;
+	
+	@Autowired
+	private ConceptLookupService lService;
 
 
 	/* (non-Javadoc)
@@ -58,16 +68,22 @@ public class RefsetAuthoringServiceImpl implements RefsetAuthoringService {
 	 */
 	@Override
 	public void addMember(String refsetId, Member m)
-			throws RefsetServiceException {
+			throws RefsetServiceException, EntityNotFoundException {
 		
 		LOGGER.debug("Adding member {} to refset {}", m, refsetId);
 
+		if (m == null || StringUtils.isEmpty(m.getReferenceComponentId())) {
+			
+			throw new EntityNotFoundException("Invalid member details. Member must have reference component id");
+		}
 		try {
 			
 			Refset r = gao.getRefset(refsetId);
 			
 			List<Member> members = new ArrayList<Member>();
+			m.setId(UUID.randomUUID().toString());
 			members.add(m);
+			
 			
 			r.setMembers(members);
 
@@ -82,7 +98,7 @@ public class RefsetAuthoringServiceImpl implements RefsetAuthoringService {
 
 			LOGGER.error("Error during service call", e);
 
-			throw new RefsetServiceException(e.getMessage());
+			throw e;
 			
 		} catch (RefsetGraphAccessException e) {
 			// TODO Auto-generated catch block
@@ -151,6 +167,82 @@ public class RefsetAuthoringServiceImpl implements RefsetAuthoringService {
 			throw new RefsetServiceException(e.getMessage());
 			
 		}
+		
+	}
+
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.otf.refset.service.RefsetAuthoringService#addMembers(java.lang.String, java.util.Set)
+	 */
+	@Override
+	public Map<String, String> addMembers(String refsetId, Set<String> conceptIds)
+			throws RefsetServiceException, EntityNotFoundException {
+		
+
+		Map<String, String> tOutcome = new HashMap<String, String>();
+		
+		LOGGER.debug("Adding member {} to refset {}", conceptIds, refsetId);
+
+		try {
+			
+			Map<String, Concept> concepts = lService.getConcepts(conceptIds);
+			
+			
+			List<Member> members = new ArrayList<Member>();
+			
+			for (String id : conceptIds) {
+				
+				Concept c = concepts.get(id);
+				
+				if (c != null) {
+					
+					Member m = new Member();
+					m.setId(UUID.randomUUID().toString());
+					m.setActive(c.isActive());
+					m.setEffectiveTime(c.getEffectiveTime());
+					m.setModuleId(c.getModule());
+					m.setReferenceComponentId(c.getId());
+					
+					LOGGER.debug("Adding member {} to member list for id {}", m, id);
+
+					members.add(m);
+
+				} else {
+					
+					LOGGER.debug("Adding member details are not available for id {}", id);
+					tOutcome.put(id, "Member details not available");
+
+				}
+				
+			}
+			
+			LOGGER.debug("Adding member {} to refset {}", members, refsetId);
+
+			Map<String, String> outcome = gao.addMembers(refsetId, members);
+			tOutcome.putAll(outcome);
+
+			LOGGER.debug("Added member {} to refset {}");
+
+			
+		} catch (EntityNotFoundException e) {
+
+			LOGGER.error("Error during service call", e);
+
+			throw new EntityNotFoundException(e.getMessage());
+			
+		} catch (RefsetGraphAccessException e) {
+
+			LOGGER.error("Error during service call", e);
+			throw new RefsetServiceException(e.getMessage());
+
+		} catch (ConceptServiceException e) {
+
+			LOGGER.error("Error during service call", e);
+
+			throw new RefsetServiceException(e.getMessage());
+		}
+		
+
+		return tOutcome;
 		
 	}
 
