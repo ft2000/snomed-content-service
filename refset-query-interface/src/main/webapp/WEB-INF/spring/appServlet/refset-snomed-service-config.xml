@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:c="http://www.springframework.org/schema/c"
+	xmlns:p="http://www.springframework.org/schema/p"
+	
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.0.xsd">
+
+
+	<bean id="conceptLookService" 
+			class="org.ihtsdo.otf.snomed.service.ConceptLookUpServiceImpl" 
+			p:repositoryConfig="${titan.config}" p:config-ref="refset.graph.titan.config" 
+		/>
+		
+	<bean id="refset.graph.titan.config" 
+			class="org.apache.commons.configuration.PropertiesConfiguration" 
+			c:fileName="titan-graph-es-${env}.properties" />
+	
+	
+
+
+	<bean class="org.ihtsdo.otf.refset.graph.RefsetGraphFactory" c:config-ref="refset.graph.titan.config" />
+			
+		
+		
+
+</beans>

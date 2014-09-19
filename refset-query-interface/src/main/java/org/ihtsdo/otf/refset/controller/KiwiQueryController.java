@@ -18,10 +18,13 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.mangofactory.swagger.annotations.ApiIgnore;
+
 /**
  * Controller for endpoint calls .
  */
 @Controller
+@ApiIgnore
 public class KiwiQueryController {
 	
 	private static final Logger logger = LoggerFactory .getLogger(KiwiQueryController.class);

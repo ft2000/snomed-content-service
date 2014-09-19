@@ -1,0 +1,7 @@
+language: java
+notifications:
+email:
+- info@epistemepartners.com
+jdk:
+- oraclejdk7
+

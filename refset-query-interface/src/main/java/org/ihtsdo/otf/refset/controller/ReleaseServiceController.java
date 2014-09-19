@@ -19,11 +19,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
+import com.mangofactory.swagger.annotations.ApiIgnore;
+
 /**
  * @author Episteme Partners
  *
  */
 @Controller
+@ApiIgnore
 public class ReleaseServiceController {
 	
 	private static final Logger logger = LoggerFactory.getLogger(ReleaseServiceController.class);

@@ -21,7 +21,7 @@ public interface RefsetBrowseService {
 	 * @return
 	 * @throws RefsetServiceException
 	 */
-	public List<Refset> getRefsets(Integer page, Integer size) throws RefsetServiceException ;
+	public List<Refset> getRefsets(Integer page, Integer size, boolean published) throws RefsetServiceException ;
 	
 	/**Method to retrieve {@link Refset} details for given refset id.
 	 * @param refsetId

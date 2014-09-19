@@ -9,7 +9,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * @author Episteme Partners
  *
  */
-public class Response<T> {
+public class Result<T> {
 	
 	private T data;
 	private Meta meta;

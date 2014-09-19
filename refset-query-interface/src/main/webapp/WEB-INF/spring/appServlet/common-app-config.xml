@@ -44,7 +44,6 @@
 			<property name="formats" ref="uri.formats" />
 		</bean>	
 		
-		<bean id="documentationConfig" class="com.mangofactory.swagger.configuration.DocumentationConfig"/>	
 		
 		
 		<bean id="conversionService" class="org.springframework.format.support.FormattingConversionServiceFactoryBean">

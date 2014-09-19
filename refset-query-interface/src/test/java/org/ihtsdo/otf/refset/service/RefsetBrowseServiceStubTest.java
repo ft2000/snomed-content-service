@@ -87,7 +87,7 @@ public class RefsetBrowseServiceStubTest {
 	public void testGetRefsetsException() throws RefsetServiceException {
 				
 		doThrow(new RefsetServiceException("Junit Test Exception")).when(dataService).getRefSets();
-		service.getRefsets(1, 10);
+		service.getRefsets(1, 10, false);
 		
 	}
 
@@ -100,7 +100,7 @@ public class RefsetBrowseServiceStubTest {
 		
 		when(dataService.getRefSets()).thenReturn(refsets);
 
-		List<Refset> rs = service.getRefsets(1, 10);
+		List<Refset> rs = service.getRefsets(1, 10, false);
 		
 		assertEquals(false, rs.isEmpty());
 		assertEquals(1, rs.size());

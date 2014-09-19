@@ -61,6 +61,7 @@ public class RefsetAuthoringServiceImplTest {
 
 		when(refset.getCreatedBy()).thenReturn("Junit");
 		when(gao.getRefset(anyString())).thenReturn(refset);
+		when(refset.getDescription()).thenReturn("junit test refset");
 		
 
 	}
@@ -158,8 +159,8 @@ public class RefsetAuthoringServiceImplTest {
 	@Test
 	public void testUpdateRefset() throws RefsetServiceException, RefsetGraphAccessException, EntityNotFoundException {
 
-		Refset r = new Refset();
-		service.updateRefset(r);
+		
+		service.updateRefset(refset);
 		
 		verify(gao).updateRefset(any(Refset.class));
 	}
@@ -175,8 +176,7 @@ public class RefsetAuthoringServiceImplTest {
 
 		doThrow(new RefsetGraphAccessException("Junit refset graph exception")).when(gao).updateRefset(any(Refset.class));
 
-		Refset r = new Refset();
-		service.updateRefset(r);
+		service.updateRefset(refset);
 		
 	}
 	
@@ -191,8 +191,7 @@ public class RefsetAuthoringServiceImplTest {
 
 		doThrow(new EntityNotFoundException("Junit refset not found")).when(gao).updateRefset(any(Refset.class));
 
-		Refset r = new Refset();
-		service.updateRefset(r);
+		service.updateRefset(refset);
 		
 	}
 

@@ -70,7 +70,7 @@ public class RefsetBrowseControllerTest {
 	    ctxa = new FileSystemXmlApplicationContext("src/main/webapp/WEB-INF/spring/appServlet/spring-refset-browse-service-stub-data.xml");
 	    RefsetBrowseServiceStubData data = ctxa.getBean("refsetBrosweServiceStubData", RefsetBrowseServiceStubData.class);
 	    refsets = data.getRefSets();
-		when(service.getRefsets(1, 10)).thenReturn(refsets.subList(0, 10));
+		when(service.getRefsets(1, 10, false)).thenReturn(refsets.subList(0, 10));
 		
 		when(refset.getId()).thenReturn("Junit_1");
 		when(refset.getDescription()).thenReturn("Junit Refset"); 
@@ -114,7 +114,7 @@ public class RefsetBrowseControllerTest {
 	@Test
 	public void testGetRefsetsError() throws Exception {
 		
-		doThrow(new RefsetServiceException()).when(service).getRefsets(anyInt(), anyInt());
+		doThrow(new RefsetServiceException()).when(service).getRefsets(anyInt(), anyInt(), anyBoolean());
 
 		
 		this.mockMvc.perform(get("/v1.0/refsets").accept(MediaType.APPLICATION_JSON))
@@ -131,7 +131,7 @@ public class RefsetBrowseControllerTest {
 	@Test
 	public void testGetRefsetsMetaDataOnError() throws Exception {
 		
-		doThrow(new RefsetServiceException("Junit Error Checking")).when(service).getRefsets(anyInt(), anyInt());
+		doThrow(new RefsetServiceException("Junit Error Checking")).when(service).getRefsets(anyInt(), anyInt(), anyBoolean());
 
 		
 		this.mockMvc.perform(get("/v1.0/refsets").accept(MediaType.APPLICATION_JSON))

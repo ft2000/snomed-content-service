@@ -11,10 +11,13 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import com.mangofactory.swagger.annotations.ApiIgnore;
+
 /**
  * Controller for endpoint calls .
  */
 @Controller
+@ApiIgnore
 public class SparqlQueryController {
 		
 	private static final Logger logger = LoggerFactory.getLogger(SparqlQueryController.class);

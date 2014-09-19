@@ -28,7 +28,7 @@ public class RefsetBrowseServiceStub implements RefsetBrowseService {
 	 * @see org.ihtsdo.otf.refset.service.RefsetBrowseService#getRefsets(java.lang.Integer, java.lang.Integer)
 	 */
 	@Override
-	public List<Refset> getRefsets(Integer page, Integer size) throws RefsetServiceException {
+	public List<Refset> getRefsets(Integer page, Integer size, boolean published) throws RefsetServiceException {
 
 		LOGGER.debug("getRefsets");
 		if( page == 1 && size == 10) { return dataService.getRefSets();}

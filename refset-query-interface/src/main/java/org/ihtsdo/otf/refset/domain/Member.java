@@ -1,19 +1,14 @@
 package org.ihtsdo.otf.refset.domain;
 
 import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
-import org.springframework.util.StringUtils;
 
 public class Member {
 	
-	private static final DateTimeFormatter formatter = DateTimeFormat.forPattern("yyyyMMdd");
-
 	private String id;
 	
 	private String moduleId;
 	
-	private boolean isActive;
+	private boolean active;
 	
 	private String referenceComponentId;
 	
@@ -60,14 +55,16 @@ public class Member {
 	 * @return the isActive
 	 */
 	public boolean isActive() {
-		return isActive;
+		
+		return active;
+		
 	}
 	/**
 	 * @param isActive the isActive to set
 	 */
 	public void setActive(boolean isActive) {
 		
-		this.isActive = isActive;
+		this.active = isActive;
 	}
 	/**
 	 * @return the referenceComponentId
@@ -100,7 +97,7 @@ public class Member {
    public String toString() {
 	   
 	   return String.format( "Member [id - %s, referenceComponentId - %s, moduleId - %s, isActive - %s "
-	   		+ "effectiveTime - %s]", this.id, this.referenceComponentId, this.moduleId, this.isActive, this.effectiveTime);
+	   		+ "effectiveTime - %s]", this.id, this.referenceComponentId, this.moduleId, this.active, this.effectiveTime);
 	   
    }   
 }

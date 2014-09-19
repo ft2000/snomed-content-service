@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.mangofactory.swagger.annotations.ApiIgnore;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
@@ -29,6 +30,7 @@ import com.wordnik.swagger.annotations.ApiParam;
  *
  */
 @RestController
+@ApiIgnore
 @Api(value="SNOMED Data Service", description="Service to read SNOMED data to create refset")
 @RequestMapping("/module/{moduleid}/release/{releaseid}")
 public class RestServiceController {

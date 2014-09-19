@@ -41,7 +41,7 @@ public class Refset {
 	
 	private List<Member> members;
 		
-	private boolean isPublished;
+	private boolean published;
 	
 	private DateTime publishedDate;
 	
@@ -50,6 +50,8 @@ public class Refset {
 	private String typeId;
 	
 	private String superRefsetTypeId;
+	
+	private boolean active;
 	
 	@JsonIgnore
 	private MetaData metaData;
@@ -236,14 +238,14 @@ public class Refset {
 	 * @return the isPublished
 	 */
 	public boolean isPublished() {
-		return isPublished;
+		return published;
 	}
 
 	/**
 	 * @param isPublished the isPublished to set
 	 */
 	public void setPublished(boolean isPublished) {
-		this.isPublished = isPublished;
+		this.published = isPublished;
 	}
 
 
@@ -274,7 +276,7 @@ public class Refset {
 	   return String.format( "Refset [id - %s, created - %s, createdBy - %s, description - %s, "
 	   		+ "effectiveTime - %s,  isPublished - %s, languageCode - %s, members - %s, moduleId - %s, publishedDate - %s "
 	   		+ "superRefsetTypeId - %s, type - %s, typeId - %s]", this.id, this.created, this.createdBy, this.description,
-	   		this.effectiveTime, this.isPublished, this.languageCode, this.members, this.moduleId, this.publishedDate,
+	   		this.effectiveTime, this.published, this.languageCode, this.members, this.moduleId, this.publishedDate,
 	   		this.superRefsetTypeId, this.type, this.typeId );
    }
 
@@ -291,6 +293,20 @@ public class Refset {
 	 */
 	public void setMetaData(MetaData meta) {
 		this.metaData = meta;
+	}
+
+	/**
+	 * @return the active
+	 */
+	public boolean isActive() {
+		return active;
+	}
+
+	/**
+	 * @param active the active to set
+	 */
+	public void setActive(boolean active) {
+		this.active = active;
 	}
 
 }

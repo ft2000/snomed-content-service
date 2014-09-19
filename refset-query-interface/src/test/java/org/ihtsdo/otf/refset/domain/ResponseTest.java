@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.ihtsdo.otf.refset.common.Meta;
-import org.ihtsdo.otf.refset.common.Response;
+import org.ihtsdo.otf.refset.common.Result;
 import org.joda.time.DateTime;
 import org.junit.After;
 import org.junit.Before;
@@ -43,7 +43,7 @@ public class ResponseTest {
 	}
 
 	/**
-	 * Test method for {@link org.ihtsdo.otf.refset.common.Response#getData()}.
+	 * Test method for {@link org.ihtsdo.otf.refset.common.Result#getData()}.
 	 * @throws IOException 
 	 * @throws JsonMappingException 
 	 * @throws JsonGenerationException 
@@ -69,7 +69,7 @@ public class ResponseTest {
 		Map<String , Object> data = new HashMap<String, Object>();
 		data.put("refsets", rs);
 		
-		Response<Map<String , Object>> response = new Response<Map<String , Object>>();
+		Result<Map<String , Object>> response = new Result<Map<String , Object>>();
 		response.setData(data);
 		Meta m = new Meta();
 		//response.add(linkTo(methodOn(RefsetBrowseController.class).getRefsets(1, 10)).withSelfRel());
