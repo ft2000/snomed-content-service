@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration >
+
+	<!-- Appenders -->
+
+	  <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+	    <layout class="ch.qos.logback.classic.PatternLayout">
+	      <Pattern>%d{ISO8601} [%thread] %-5level %logger{36} - %msg%n</Pattern>
+	    </layout>
+   	    <encoder>
+		      <Pattern>%d{ISO8601} [%thread] %-5level %logger{36} - %msg%n</Pattern>
+	    </encoder>
+	  </appender>		  
+		
+	<!-- Application Loggers -->
+	<logger name="org.ihtsdo.refset" level="debug" />
+			
+	<logger name="com.tinkerpop.blueprints" level="trace" />
+		
+	<!-- 3rdparty Loggers -->
+	<logger name="org.springframework.core" level="info" />
+		
+	
+	<logger name="org.springframework.beans" level="info" />
+	
+	<logger name="org.springframework.context" level="info" />
+
+	<logger name="org.springframework.web" level="info" />	
+
+	<!-- Root Logger -->
+	<root level="trace">
+		<appender-ref ref="console" />
+		
+	</root>
+	
+</configuration>
