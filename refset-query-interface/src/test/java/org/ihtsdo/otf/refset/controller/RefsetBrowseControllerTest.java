@@ -177,5 +177,26 @@ public class RefsetBrowseControllerTest {
         .andExpect(jsonPath("$.meta.message").value("Error occurred during service call : junit Error Checking"));
 
 	}
+	
+	/**
+	 * Test method for {@link org.ihtsdo.otf.refset.controller.RefsetBrowseController#getComponentTypes()}.
+	 * @throws Exception 
+	 */
+	@Test
+	public void testGetComponentTypes() throws Exception {
+		
+		this.mockMvc.perform(
+				get("/v1.0/refsets/componentTypes", "0")
+				.accept(MediaType.APPLICATION_JSON))
+        .andDo(print())
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.meta.message").value("Success"))
+        .andExpect(jsonPath("$.meta.status").value("OK"))
+        .andExpect(jsonPath("$.content.types.900000000000464001").value("Reference set member type component (foundation metadata concept)"))
+        .andExpect(jsonPath("$.content.types.900000000000462002").value("Description type component (foundation metadata concept)"))
+        .andExpect(jsonPath("$.content.types.900000000000463007").value("Relationship type component (foundation metadata concept)"))
+        .andExpect(jsonPath("$.content.types.900000000000461009").value("Concept type component (foundation metadata concept)"));
+;
+	}
 
 }
