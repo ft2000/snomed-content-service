@@ -7,16 +7,6 @@
 	    <layout class="ch.qos.logback.classic.PatternLayout">
 	      <Pattern>%d{ISO8601} [%thread] %-5level %logger{36} - %msg%n</Pattern>
 	    </layout>
-	  </appender>		
-	  <appender name="file" class="ch.qos.logback.core.rolling.RollingFileAppender">
-	    <file>${user.dir}/logs/refset.log</file>
-	    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-	      <fileNamePattern>${user.dir}/logs/refset.%d{yyyy-MM-dd}.log.gz</fileNamePattern>
-	    </rollingPolicy>
-	 
-	    <encoder>
-		      <Pattern>%d{ISO8601} [%thread] %-5level %logger{36} - %msg%n</Pattern>
-	    </encoder>
 	  </appender>	  
 		
 	<!-- Application Loggers -->
@@ -33,9 +23,12 @@
 	<logger name="org.springframework.context" level="info" />
 
 	<logger name="org.springframework.web" level="info" />	
+	<logger name="com.thinkaurelius.titan.diskstorage.berkeleyje.BerkeleyJEStoreManager" level="error" />	
+	<logger name="org.dozer" level="error" />
+	<logger name="org.apache.commons.beanutils" level="error" />
 
 	<!-- Root Logger -->
-	<root level="debug">
+	<root level="error">
 		<appender-ref ref="file" />
 		<appender-ref ref="console" />
 		

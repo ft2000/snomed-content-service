@@ -1,4 +1,4 @@
-package org.ihtsdo.otf.refset.graph;
+package org.ihtsdo.otf.refset.graph.gao;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -15,6 +15,9 @@ import org.ihtsdo.otf.refset.domain.MetaData;
 import org.ihtsdo.otf.refset.domain.Refset;
 import org.ihtsdo.otf.refset.exception.EntityNotFoundException;
 import org.ihtsdo.otf.refset.exception.RefsetServiceException;
+import org.ihtsdo.otf.refset.graph.RefsetGraphAccessException;
+import org.ihtsdo.otf.refset.graph.RefsetGraphFactory;
+import org.ihtsdo.otf.refset.graph.gao.RefsetGAO;
 import org.ihtsdo.otf.refset.graph.schema.RefsetSchemaCreator;
 import org.ihtsdo.otf.refset.service.RefsetBrowseServiceStubData;
 import org.junit.After;
@@ -31,13 +34,15 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = { 
 		"file:src/main/webapp/WEB-INF/spring/appServlet/spring-refset-browse-service-stub-data.xml"})
-public class RefsetGAOTest {
+public class RefsetAdminGAOTest {
 	
 	static {
 		System.setProperty("env", "junit");
 	}
 	
 	private RefsetGAO gao;
+	
+	private RefsetAdminGAO aGao;
 	
 	@Autowired
 	private RefsetBrowseServiceStubData data;
@@ -66,12 +71,22 @@ public class RefsetGAOTest {
 		
 		sg.createRefsetSchema();
 		
-		
-		
-		
 		gao = new RefsetGAO();
 		f = new RefsetGraphFactory(config);
 		gao.setFactory(f);
+		
+		MemberGAO mGao = new MemberGAO();
+		mGao.setFactory(f);
+		mGao.setRefsetGao(gao);
+		
+		
+		aGao = new RefsetAdminGAO();
+		aGao.setFactory(f);
+		aGao.setMemberGao(mGao);
+		aGao.setRefsetGao(gao);
+		
+		
+		
 
 		
 		
@@ -79,14 +94,7 @@ public class RefsetGAOTest {
 		
 		rs = data.getRefSets();
 		assertNotNull(rs);
-		assertTrue(!rs.isEmpty());
-		//f.getTitanGraph().dropKeyIndex("Refset", Vertex.class);
-		//f.getTitanGraph().dropKeyIndex("Member", Vertex.class);
-
-		
-
-		//setup refset db
-				
+		assertTrue(!rs.isEmpty());				
 
 	}
 	
@@ -133,7 +141,7 @@ public class RefsetGAOTest {
 	@Test
 	public void testAddRefset() throws RefsetServiceException, RefsetGraphAccessException, EntityNotFoundException {
 		
-		gao.addRefset(rs.get(0));
+		aGao.addRefset(rs.get(0));
 		
 		List<Refset> rs = gao.getRefSets(false);
 		
@@ -144,8 +152,8 @@ public class RefsetGAOTest {
 	@Test
 	public void testAddRefsetAlreadyExist() throws RefsetServiceException, RefsetGraphAccessException, EntityNotFoundException {
 
-		gao.addRefset(rs.get(0));
-		gao.addRefset(rs.get(0));
+		aGao.addRefset(rs.get(0));
+		aGao.addRefset(rs.get(0));
 		
 		List<Refset> rs = gao.getRefSets(false);
 		
@@ -155,18 +163,18 @@ public class RefsetGAOTest {
 	@Test(expected = EntityNotFoundException.class)
 	public void testRemoveRefsetWhenNotExist() throws RefsetServiceException, RefsetGraphAccessException, EntityNotFoundException {
 
-		gao.addRefset(rs.get(0));
+		aGao.addRefset(rs.get(0));
 
-		gao.removeRefset(new Refset().getId());
+		aGao.removeRefset(new Refset().getId());
 
 	}
 	
 	@Test
 	public void testAddRefsetWithMember() throws RefsetServiceException, RefsetGraphAccessException, EntityNotFoundException {
 		
-		gao.addRefset(data.getRefSet("450973005"));
+		aGao.addRefset(data.getRefSet("450973005"));
 
-		assertEquals(true, gao.getRefsetNodeId("450973005") != null);
+		assertEquals(true, gao.getRefset("450973005") != null);
 	}
 	
 	@Test
@@ -174,8 +182,10 @@ public class RefsetGAOTest {
 		
 		int i = 0;
 		for (Refset r : rs.subList(0, 2)) {
-			gao.addRefset(data.getRefSet(r.getId()));
-			assertEquals(true, gao.getRefsetNodeId(r.getId()) != null);
+			
+			aGao.addRefset(data.getRefSet(r.getId()));
+			
+			assertEquals(true, gao.getRefset(r.getId()) != null);
 			i++;
 		}
 
@@ -190,125 +200,21 @@ public class RefsetGAOTest {
 		
 		assertEquals(300, r.getMembers().size());
 		
-		
-		for (Refset remove : rs.subList(0, 2)) {
-			gao.removeRefset(remove.getId());
-
-		}
 	}
-	
-	
-	@Test
-	public void testGetReftest() throws RefsetServiceException, RefsetGraphAccessException, EntityNotFoundException {
-		Refset i = rs.get(0);
-		gao.removeRefset(i.getId());
-		gao.addRefset(data.getRefSet(i.getId()));
 
-		Refset r = gao.getRefset(i.getId());
-
-		assertNotNull(r);
-		assertEquals(i.getCreated().getMillis(), r.getCreated().getMillis(), 1000);
-		
-		assertEquals(i.getDescription(), r.getDescription());
-		assertEquals(i.getModuleId(), r.getModuleId());
-		assertEquals(i.getPublishedDate().getMillis(), r.getPublishedDate().getMillis(), 100);
-		assertEquals(i.isPublished(), r.isPublished());
-		assertEquals(i.getType(), r.getType());
-		assertEquals(i.getEffectiveTime().getMillis(), r.getEffectiveTime().getMillis(), 100);
-
-		
-	}
-	
-	@Test(expected = EntityNotFoundException.class)
-	public void testGetReftestInvalidRefsetId() throws RefsetServiceException, RefsetGraphAccessException, EntityNotFoundException {		
-				
-		gao.getRefset("junitId");
-		
-	}
-	
-	@Test
-	public void testGetMetaDataAfterAddingRefset() throws RefsetServiceException, RefsetGraphAccessException, EntityNotFoundException {		
-		
-		Refset input = rs.get(0);
-		
-		MetaData m = gao.addRefset(data.getRefSet(input.getId()));
-		
-		assertNotNull(m);
-		assertNotNull(m.getId());
-		
-	}
-	
-	@Test
-	public void testGetMetaDataAfterGetttingRefset() throws RefsetServiceException, RefsetGraphAccessException, EntityNotFoundException {		
-		
-		Refset i = rs.get(0);
-		
-		Refset rInput = data.getRefSet(i.getId());
-		
-		gao.addRefset(rInput);
-
-		Refset r = gao.getRefset(rInput.getId());
-		
-		assertNotNull(r);
-		
-		MetaData rm = r.getMetaData();
-		
-		assertNotNull(rm);
-		assertNotNull(rm.getId());
-		
-	}
-	
-	@Test(expected = EntityNotFoundException.class)
-	public void testGetMetaDataInvalidId() throws RefsetServiceException, RefsetGraphAccessException, EntityNotFoundException {		
-		
-		//make sure atleast one Refset exist in database to avoid schema exception
-		Refset input = rs.get(0);
-		
-		gao.addRefset(data.getRefSet(input.getId()));
-
-		gao.getMetaData("someID");
-		
-	}
-	
-	
-	@Test(expected = EntityNotFoundException.class)
-	public void testGetReftestInvalidNodeId() throws RefsetServiceException, RefsetGraphAccessException, EntityNotFoundException {		
-		Refset input = rs.get(0);
-		
-		gao.addRefset(data.getRefSet(input.getId()));//to avoid NPE when there is no class available of type Refset
-
-		gao.getRefset("junitId");
-		
-	}
-	
-	@Test
-	public void testGetReftestForaNodeId() throws RefsetServiceException, RefsetGraphAccessException, EntityNotFoundException {		
-		Refset input = rs.get(0);
-		
-		MetaData m = gao.addRefset(data.getRefSet(input.getId()));
-
-		Refset r = gao.getRefsetFromNodeId(m.getId());
-		
-		assertNotNull(r);
-		
-		assertEquals(input.getDescription(), r.getDescription());
-		
-	}
-	
-	
 	@Test
 	public void testUpdateRefset() throws RefsetServiceException, RefsetGraphAccessException, EntityNotFoundException {		
 		
 		Refset input = rs.get(0);
 
-		gao.addRefset(data.getRefSet(input.getId()));
+		aGao.addRefset(data.getRefSet(input.getId()));
 
 		Refset r = gao.getRefset(input.getId());
 		
 		assertNotNull(r);
 		
 		r.setDescription("Junit Update");
-		gao.updateRefset(r);
+		aGao.updateRefset(r);
 		
 		Refset rUpdated = gao.getRefset(input.getId());
 
@@ -321,17 +227,14 @@ public class RefsetGAOTest {
 		
 		assertEquals("Junit Update", rUpdated.getDescription());
 		
+		assertEquals(r.getMembers().size(), rUpdated.getMembers().size());
+		
 	}
 	
 	@Test(expected = EntityNotFoundException.class)
 	public void testUpdateRefsetInvalidRefset() throws RefsetServiceException, RefsetGraphAccessException, EntityNotFoundException {		
 		
-		//make sure atleast one Refset exist in database to avoid schema exception
-		Refset input = rs.get(0);
-
-		gao.addRefset(data.getRefSet(input.getId()));
-
-		gao.updateRefset(new Refset());
+		aGao.updateRefset(new Refset());
 		
 
 		

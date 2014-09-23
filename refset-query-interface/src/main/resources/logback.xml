@@ -42,6 +42,7 @@
 	<logger name="com.tinkerpop.blueprints" level="debug" />
 		
 	<logger name="com.thinkaurelius.titan.diskstorage.es" level="info" />
+	<logger name="com.thinkaurelius.titan.diskstorage.cassandra" level="error" />
 		
 	<!-- 3rdparty Loggers -->
 	<logger name="org.springframework.core" level="info" />
@@ -61,9 +62,11 @@
 	<logger name="org.springframework.security" level="info" />
 
 
-	<logger name="com.mangofactory" level="trace" >
+	<logger name="com.mangofactory" level="error" >
 			<appender-ref ref="file" />
 	</logger>
+	
+	<logger name="org.apache.camel" level="error" />
 		
 
 	<!-- Root Logger -->

@@ -13,6 +13,8 @@ public class Member {
 	private String referenceComponentId;
 	
 	private DateTime effectiveTime;
+	
+	private boolean published;
 
 	/**
 	 * @return the effectiveTime
@@ -79,7 +81,19 @@ public class Member {
 		this.referenceComponentId = referenceComponentId;
 	}
 	
-   @Override 
+   /**
+	 * @return the published
+	 */
+	public boolean isPublished() {
+		return published;
+	}
+	/**
+	 * @param published the published to set
+	 */
+	public void setPublished(boolean published) {
+		this.published = published;
+	}
+@Override 
    public boolean equals(Object input) {
 		   
 	   if ( this == input ) return true;

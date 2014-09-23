@@ -70,6 +70,18 @@ public interface GMember extends VertexFrame {
 	@Property(value = "referenceComponentId")
 	public void setReferenceComponentId(String referenceComponentId);
 	
+	/**
+	 * @return the published
+	 */
+	@Property(value = "published")
+	public boolean isPublished();
+	
+	/**
+	 * @param published the published to set
+	 */
+	@Property(value = "published")
+	public void setPublished(boolean isPublished);
+	
 
    
 }

@@ -54,6 +54,12 @@ public interface RefsetAuthoringService {
 	 * @throws EntityNotFoundException 
 	 */
 	public Map<String, String> addMembers(String refsetId,Set<String> conceptIds) throws RefsetServiceException, EntityNotFoundException ;
+	
+	/** removes a {@link Member} from {@link Refset}
+	 * @param refsetId
+	 * @param rcId
+	 */
+	public void removeMemberFromRefset(String refsetId, String rcId) throws RefsetServiceException, EntityNotFoundException ;
 
 
 }

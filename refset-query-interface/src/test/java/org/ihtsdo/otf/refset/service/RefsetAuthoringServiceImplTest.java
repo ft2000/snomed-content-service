@@ -15,8 +15,9 @@ import org.ihtsdo.otf.refset.domain.MetaData;
 import org.ihtsdo.otf.refset.domain.Refset;
 import org.ihtsdo.otf.refset.exception.EntityNotFoundException;
 import org.ihtsdo.otf.refset.exception.RefsetServiceException;
-import org.ihtsdo.otf.refset.graph.RefsetGAO;
 import org.ihtsdo.otf.refset.graph.RefsetGraphAccessException;
+import org.ihtsdo.otf.refset.graph.gao.RefsetAdminGAO;
+import org.ihtsdo.otf.refset.graph.gao.RefsetGAO;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -36,7 +37,10 @@ public class RefsetAuthoringServiceImplTest {
 	private RefsetAuthoringServiceImpl service;
 	
 	@Mock
-	private RefsetGAO gao;
+	private RefsetAdminGAO gao;
+	
+	@Mock
+	private RefsetGAO rGao;
 	
 	@Mock
 	Refset refset;
@@ -60,7 +64,7 @@ public class RefsetAuthoringServiceImplTest {
 		when(gao.updateRefset(any(Refset.class))).thenReturn(md);
 
 		when(refset.getCreatedBy()).thenReturn("Junit");
-		when(gao.getRefset(anyString())).thenReturn(refset);
+		when(rGao.getRefset(anyString())).thenReturn(refset);
 		when(refset.getDescription()).thenReturn("junit test refset");
 		
 
@@ -97,10 +101,11 @@ public class RefsetAuthoringServiceImplTest {
 	 */
 	@Test
 	public void testAddMember() throws RefsetServiceException, EntityNotFoundException, RefsetGraphAccessException {
-		
-		service.addMember("someRefSetId", new Member());
+		Member m  = new Member();
+		m.setReferenceComponentId("someid");
+		service.addMember("someRefSetId", m);
 		verify(gao).addRefset(any(Refset.class));
-		verify(gao).getRefset(anyString());
+		verify(rGao).getRefset(anyString());
 		
 	}
 	
@@ -110,13 +115,15 @@ public class RefsetAuthoringServiceImplTest {
 	 * @throws RefsetGraphAccessException 
 	 * @throws EntityNotFoundException 
 	 */
-	@Test(expected = RefsetServiceException.class)
+	@Test(expected = EntityNotFoundException.class)
 	public void testAddMemberWhenGivenRefsetIdNotAvailable() throws RefsetServiceException, EntityNotFoundException, RefsetGraphAccessException {
 
-		doThrow(new EntityNotFoundException("Junit refset id does not exist")).when(gao).getRefset(anyString());
+		doThrow(new EntityNotFoundException("Junit refset id does not exist")).when(rGao).getRefset(anyString());
+		Member m  = new Member();
+		m.setReferenceComponentId("someid");
 
-		service.addMember("someRefSetId", new Member());
-		verify(gao).getRefset(anyString());
+		service.addMember("someRefSetId", m);
+		verify(rGao).getRefset(anyString());
 
 	}
 	
@@ -129,9 +136,11 @@ public class RefsetAuthoringServiceImplTest {
 	@Test(expected = RefsetServiceException.class)
 	public void testAddMemberRefsetGraphAccessException() throws RefsetServiceException, EntityNotFoundException, RefsetGraphAccessException {
 
-		doThrow(new RefsetGraphAccessException("Junit refset graph exception")).when(gao).getRefset(anyString());
+		doThrow(new RefsetGraphAccessException("Junit refset graph exception")).when(rGao).getRefset(anyString());
+		Member m  = new Member();
+		m.setReferenceComponentId("someid");
 
-		service.addMember("someRefSetId", new Member());
+		service.addMember("someRefSetId", m);
 
 	}
 	
@@ -145,8 +154,10 @@ public class RefsetAuthoringServiceImplTest {
 	public void testAddMemberRefsetGraphAccessExceptionDuringAddRefsetCall() throws RefsetServiceException, EntityNotFoundException, RefsetGraphAccessException {
 
 		doThrow(new RefsetGraphAccessException("Junit refset graph exception")).when(gao).addRefset(any(Refset.class));
+		Member m  = new Member();
+		m.setReferenceComponentId("someid");
 
-		service.addMember("someRefSetId", new Member());
+		service.addMember("someRefSetId", m);
 
 	}
 	

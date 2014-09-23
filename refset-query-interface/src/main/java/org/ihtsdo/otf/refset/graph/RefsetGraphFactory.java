@@ -52,6 +52,23 @@ public class RefsetGraphFactory {
         
 	}
 	
+	public static void shutdown(Graph g) {
+		
+		LOGGER.info("Shutting down graph {}", g);
+		
+		if (g != null) g.shutdown();//shutdown is not required for titan.Commit should clear resources
+		
+	}
+
+	
+	public static void rollback(TitanGraph g) {
+		
+		LOGGER.info("rollback {}", g);
+
+		if (g != null) g.rollback();
+		
+	}
+	
 
 
 }

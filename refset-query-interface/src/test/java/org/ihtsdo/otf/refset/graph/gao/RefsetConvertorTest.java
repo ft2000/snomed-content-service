@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.ihtsdo.otf.refset.graph;
+package org.ihtsdo.otf.refset.graph.gao;
 
 import static org.junit.Assert.*;
 
@@ -10,6 +10,7 @@ import java.util.UUID;
 
 import org.ihtsdo.otf.refset.domain.Member;
 import org.ihtsdo.otf.refset.domain.Refset;
+import org.ihtsdo.otf.refset.graph.gao.RefsetConvertor;
 import org.joda.time.DateTime;
 import org.junit.After;
 import org.junit.Before;
@@ -48,7 +49,7 @@ public class RefsetConvertorTest {
 	}
 
 	/**
-	 * Test method for {@link org.ihtsdo.otf.refset.graph.RefsetConvertor#getRefsetProperties(org.ihtsdo.otf.refset.domain.Refset)}.
+	 * Test method for {@link org.ihtsdo.otf.refset.graph.gao.RefsetConvertor#getRefsetProperties(org.ihtsdo.otf.refset.domain.Refset)}.
 	 */
 	@Test
 	public void testGetRefsetPropertiesOnlyId() {
@@ -62,7 +63,7 @@ public class RefsetConvertorTest {
 	}
 	
 	/**
-	 * Test method for {@link org.ihtsdo.otf.refset.graph.RefsetConvertor#getRefsetProperties(org.ihtsdo.otf.refset.domain.Refset)}.
+	 * Test method for {@link org.ihtsdo.otf.refset.graph.gao.RefsetConvertor#getRefsetProperties(org.ihtsdo.otf.refset.domain.Refset)}.
 	 */
 	@Test
 	public void testGetRefsetPropertiesWithCreated() {
@@ -77,7 +78,7 @@ public class RefsetConvertorTest {
 	}
 	
 	/**
-	 * Test method for {@link org.ihtsdo.otf.refset.graph.RefsetConvertor#getRefsetProperties(org.ihtsdo.otf.refset.domain.Refset)}.
+	 * Test method for {@link org.ihtsdo.otf.refset.graph.gao.RefsetConvertor#getRefsetProperties(org.ihtsdo.otf.refset.domain.Refset)}.
 	 */
 	@Test
 	public void testGetRefsetPropertiesWithEffectiveDate() {
@@ -92,7 +93,7 @@ public class RefsetConvertorTest {
 	}
 	
 	/**
-	 * Test method for {@link org.ihtsdo.otf.refset.graph.RefsetConvertor#getRefsetProperties(org.ihtsdo.otf.refset.domain.Refset)}.
+	 * Test method for {@link org.ihtsdo.otf.refset.graph.gao.RefsetConvertor#getRefsetProperties(org.ihtsdo.otf.refset.domain.Refset)}.
 	 */
 	@Test
 	public void testGetRefsetPropertiesWithDescription() {
@@ -108,7 +109,7 @@ public class RefsetConvertorTest {
 	}
 	
 	/**
-	 * Test method for {@link org.ihtsdo.otf.refset.graph.RefsetConvertor#getMemberProperties(org.ihtsdo.otf.refset.domain.Member)}.
+	 * Test method for {@link org.ihtsdo.otf.refset.graph.gao.RefsetConvertor#getMemberProperties(org.ihtsdo.otf.refset.domain.Member)}.
 	 */
 	@Test
 	public void testGetMemberProperties() {
@@ -121,7 +122,7 @@ public class RefsetConvertorTest {
 	}
 
 	/**
-	 * Test method for {@link org.ihtsdo.otf.refset.graph.RefsetConvertor#getMemberProperties(org.ihtsdo.otf.refset.domain.Member)}.
+	 * Test method for {@link org.ihtsdo.otf.refset.graph.gao.RefsetConvertor#getMemberProperties(org.ihtsdo.otf.refset.domain.Member)}.
 	 */
 	@Test
 	public void testGetMemberPropertiesWithEffectiveDate() {
