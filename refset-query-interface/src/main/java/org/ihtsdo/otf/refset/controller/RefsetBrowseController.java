@@ -149,6 +149,39 @@ public class RefsetBrowseController {
 		}       
     }
 	
+	@RequestMapping( method = RequestMethod.GET, value = "/componentTypes", produces = "application/json" )
+	@ApiOperation( value = "Api to get details of a refset for given refset id." )
+    public ResponseEntity<Result< Map<String, Object>>> getComponentTypes() {
+		
+		logger.debug("Getting getComponentTypes");
+
+		Result<Map<String, Object>> response = new Result<Map<String, Object>>();
+		
+		Meta m = new Meta();
+
+		m.add( linkTo( methodOn( RefsetBrowseController.class).getComponentTypes() ).withSelfRel() );
+		response.setMeta(m);
+
+		Map<String, String> types = new HashMap<String, String>();
+		//TODO Need to decide where to store these. For now hardcode
+		
+		types.put("900000000000461009", "Concept type component (foundation metadata concept)");
+		types.put("900000000000462002", "Description type component (foundation metadata concept)");
+		types.put("900000000000464001", "Reference set member type component (foundation metadata concept)");
+		types.put("900000000000463007", "Relationship type component (foundation metadata concept)");
+		
+		Map<String, Object> data = new HashMap<String, Object>();
+		data.put("types", types);
+		
+		response.setData(data);
+		m.setMessage(SUCESS);
+		m.setStatus(HttpStatus.OK);
+		m.setNoOfRecords(types.size());
+		
+		return new ResponseEntity<Result<Map<String,Object>>>(response, HttpStatus.OK);
+      
+    }
+	
 	
 
 }
