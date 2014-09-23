@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.ihtsdo.otf.refset.graph;
+package org.ihtsdo.otf.refset.graph.gao;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -11,8 +11,10 @@ import java.util.Map;
 import java.util.Set;
 
 import org.ihtsdo.otf.refset.domain.Member;
+import org.ihtsdo.otf.refset.domain.MetaData;
 import org.ihtsdo.otf.refset.domain.Refset;
 import org.ihtsdo.otf.refset.domain.RefsetType;
+import org.ihtsdo.otf.refset.graph.RGC;
 import org.ihtsdo.otf.refset.graph.schema.GMember;
 import org.ihtsdo.otf.refset.graph.schema.GRefset;
 import org.joda.time.DateTime;
@@ -20,7 +22,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 
-import com.thinkaurelius.titan.core.TitanIndexQuery.Result;
 import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Vertex;
@@ -257,22 +258,7 @@ public class RefsetConvertor {
 					m.setModuleId(mModuleId);
 					
 				}
-				
-				
-				if ( mKeys.contains(RGC.ACTIVE) ) {
-					
-					boolean isActive = vM.getProperty(RGC.ACTIVE);
-					m.setActive(isActive);
-					
-				}
-				
-				
-				if ( mKeys.contains(RGC.EFFECTIVE_DATE) ) {
-					
-					long effectivetime = vM.getProperty(RGC.EFFECTIVE_DATE);
-					m.setEffectiveTime(new DateTime(effectivetime));
-					
-				}
+			
 				
 				//this has to be edge effective date. //TODO remove above
 				Set<String> eKeys = eR.getPropertyKeys();
@@ -285,14 +271,29 @@ public class RefsetConvertor {
 
 					m.setEffectiveTime(new DateTime(effectivetime));
 					
+				}
+				
+				if (eKeys.contains(RGC.PUBLISHED)) {
+					
 
+					boolean published = eR.getProperty(RGC.PUBLISHED);
+					
+					m.setPublished(published);;
 					
 				}
 
-				if ( mKeys.contains(RGC.REFERENCE_COMPONENT_ID) ) {
+				if ( eKeys.contains(RGC.REFERENCE_COMPONENT_ID) ) {
 					
-					String referenceComponentId = vM.getProperty(RGC.REFERENCE_COMPONENT_ID);
+					String referenceComponentId = eR.getProperty(RGC.REFERENCE_COMPONENT_ID);
 					m.setReferenceComponentId(referenceComponentId);
+					
+				}
+				
+				
+				if ( eKeys.contains(RGC.ACTIVE) ) {
+					
+					boolean isActive = eR.getProperty(RGC.ACTIVE);
+					m.setActive(isActive);
 					
 				}
 
@@ -657,20 +658,7 @@ public class RefsetConvertor {
 				}
 				
 				
-				if ( mKeys.contains(RGC.ACTIVE) ) {
-					
-					boolean isActive = vM.getProperty(RGC.ACTIVE);
-					m.setActive(isActive);
-					
-				}
 				
-				
-				if ( mKeys.contains(RGC.EFFECTIVE_DATE) ) {
-					
-					long effectivetime = vM.getProperty(RGC.EFFECTIVE_DATE);
-					m.setEffectiveTime(new DateTime(effectivetime));
-					
-				}
 				
 				//this has to be edge effective date. //TODO remove above
 				Set<String> eKeys = eR.getPropertyKeys();
@@ -679,22 +667,45 @@ public class RefsetConvertor {
 
 					long effectivetime = eR.getProperty(RGC.EFFECTIVE_DATE);
 					
-					LOGGER.debug("Actual effective date when this member tied to given refset is  {} ", effectivetime);
+					LOGGER.trace("Actual effective date when this member tied to given refset is  {} ", effectivetime);
 
 					m.setEffectiveTime(new DateTime(effectivetime));
 					
+				}
+				
+				if (eKeys.contains(RGC.PUBLISHED)) {
+					
 
+					boolean published = eR.getProperty(RGC.PUBLISHED);
+					
+					m.setPublished(published);;
 					
 				}
 
-				if ( mKeys.contains(RGC.REFERENCE_COMPONENT_ID) ) {
+
+				if ( eKeys.contains(RGC.REFERENCE_COMPONENT_ID) ) {
 					
-					String referenceComponentId = vM.getProperty(RGC.REFERENCE_COMPONENT_ID);
+					String referenceComponentId = eR.getProperty(RGC.REFERENCE_COMPONENT_ID);
 					m.setReferenceComponentId(referenceComponentId);
 					
 				}
+				
+				if ( eKeys.contains(RGC.ACTIVE) ) {
+					
+					boolean isActive = eR.getProperty(RGC.ACTIVE);
+					m.setActive(isActive);
+					
+				}
+				
+				
+				if ( eKeys.contains(RGC.EFFECTIVE_DATE) ) {
+					
+					long effectivetime = eR.getProperty(RGC.EFFECTIVE_DATE);
+					m.setEffectiveTime(new DateTime(effectivetime));
+					
+				}
 
-				LOGGER.debug("Adding member as {} ", m.toString());
+				LOGGER.trace("Adding member as {} ", m.toString());
 
 				members.add(m);
 			}
@@ -712,4 +723,25 @@ public class RefsetConvertor {
 	
 	}
 	
+	
+	/** Utility method to create {@link MetaData} object from {@link Vertex} 
+	 * @param vertex
+	 * @return
+	 */
+	protected static MetaData getMetaData(Vertex v) {
+		
+		MetaData md = null;
+		
+		if( v != null) {
+			
+			md = new MetaData();
+			md.setId(v.getId());
+			md.setType(v.getClass().getSimpleName());
+			//Integer version = e.getProperty("@Version");
+			//md.setVersion(version);
+			
+		}
+		
+		return md;
+	}
 }

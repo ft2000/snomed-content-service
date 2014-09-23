@@ -337,7 +337,57 @@ public class RefsetAuthoringController {
 			return new ResponseEntity<Result<Map<String,Object>>>(result, HttpStatus.NOT_FOUND);
 
 		}       
-    }	
+    }
+	
+	@RequestMapping( method = RequestMethod.DELETE, value = "/delete/{refsetId}/member/{referenceComponentId}",  produces = "application/json", consumes = "application/json")
+	@ApiOperation( value = "Removes a member from refset" )
+	@PreAuthorize("hasRole('ROLE_USER')")
+    public ResponseEntity<Result< Map<String, Object>>> removeMember( @PathVariable String refsetId,
+    		@PathVariable String referenceComponentId,
+    		@RequestHeader("X-REFSET-PRE-AUTH-TOKEN") String authToken, 
+    		@RequestHeader("X-REFSET-PRE-AUTH-USERNAME") String userName) {
+		
+		logger.debug("Removing an existing refsets {}", refsetId);
+
+		Result<Map<String, Object>> response = new Result<Map<String, Object>>();
+		Meta m = new Meta();
+		
+		response.setMeta(m);
+
+    	try {
+
+    		Assert.notNull(refsetId, "Required refset id is not available in request");
+    		
+    		aService.removeMemberFromRefset(refsetId, referenceComponentId);
+
+    		m.add( linkTo( methodOn( RefsetBrowseController.class ).getRefsets(1, 10)).withRel("Refset"));
+
+			m.setMessage(SUCESS);
+			m.setStatus(HttpStatus.OK);
+
+			return new ResponseEntity<Result<Map<String,Object>>>(response, HttpStatus.OK);
+			
+		} catch (RefsetServiceException e) {
+			
+			// TODO Filter error. Only Pass what is required
+			String message = String.format("Error occurred during service call : %s", e.getMessage());
+			logger.error(message);
+			m.setMessage(message); 
+			m.setStatus(HttpStatus.OK);
+
+			return new ResponseEntity<Result<Map<String,Object>>>(response, HttpStatus.OK);
+	    	
+		} catch (EntityNotFoundException e) {
+			
+			String message = String.format("Error occurred during service call : %s", e.getMessage());
+			logger.error(message);
+			m.setMessage(message); 
+			m.setStatus(HttpStatus.NOT_FOUND);
+
+			return new ResponseEntity<Result<Map<String,Object>>>(response, HttpStatus.NOT_FOUND);
+		}         
+    }
+
 	
 
 }

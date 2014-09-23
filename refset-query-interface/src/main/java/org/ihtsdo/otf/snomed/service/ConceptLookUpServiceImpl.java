@@ -42,7 +42,7 @@ import com.tinkerpop.blueprints.oupls.sail.GraphSail;
  */
 public class ConceptLookUpServiceImpl implements ConceptLookupService {
 	
-	private static final Logger LOGGER = LoggerFactory.getLogger(ConceptLookupService.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(ConceptLookUpServiceImpl.class);
 	
 	private static final String BASE_URI = "http://sct.snomed.info/";
 	
@@ -83,6 +83,8 @@ public class ConceptLookUpServiceImpl implements ConceptLookupService {
 	public Map<String, Concept> getConcepts(Set<String> conceptIds)
 			throws ConceptServiceException {
 
+		LOGGER.debug("getting concepts details for {}", conceptIds);
+		
 		Map<String, Concept> concepts = new HashMap<String, Concept>();
 		
 		TitanGraph g = null;
@@ -111,6 +113,8 @@ public class ConceptLookUpServiceImpl implements ConceptLookupService {
 				if (StringUtils.isEmpty(id)) {
 					
 					//ignore all null keys or empty keys
+					LOGGER.debug("ingoring {} for concepts details as invalid", id);
+
 					continue;
 				}
 				
@@ -130,7 +134,7 @@ public class ConceptLookUpServiceImpl implements ConceptLookupService {
 			}
 		} catch (Exception e) {
 			
-			LOGGER.error("Error duing concept ids fetch {}", e);
+			LOGGER.error("Error duing concept details for concept map fetch", e);
 			
 			throw new ConceptServiceException(e);
 			
@@ -142,7 +146,8 @@ public class ConceptLookUpServiceImpl implements ConceptLookupService {
 			
 		}
 		
-		
+		LOGGER.debug("returning total {} concepts ", concepts.size());
+
 		return Collections.unmodifiableMap(concepts);
 	}
 
@@ -153,6 +158,8 @@ public class ConceptLookUpServiceImpl implements ConceptLookupService {
 	public Concept getConcept(String conceptId) throws ConceptServiceException,
 			EntityNotFoundException {
 		
+		LOGGER.debug("getting concept details for {} ", conceptId);
+
 		if (StringUtils.isEmpty(conceptId)) {
 			
 			throw new EntityNotFoundException(String.format("Invalid concept id", conceptId));
@@ -192,7 +199,7 @@ public class ConceptLookUpServiceImpl implements ConceptLookupService {
 				
 		} catch (Exception e) {
 			
-			LOGGER.error("Error duing concept ids fetch {}", e);
+			LOGGER.error("Error duing concept details fetch", e);
 			
 			throw new ConceptServiceException(e);
 			
@@ -211,7 +218,8 @@ public class ConceptLookUpServiceImpl implements ConceptLookupService {
 	@Override
 	public Set<String> getConceptIds(int offset, int limit)
 			throws ConceptServiceException {
-		
+		LOGGER.debug("getting concept ids with offset {} and limit {} ", offset, limit);
+
 		TreeSet<String> conceptIds = new TreeSet<String>();
 		
 		TitanGraph g = null;
@@ -244,17 +252,27 @@ public class ConceptLookUpServiceImpl implements ConceptLookupService {
 				while (sparqlResults.hasNext()) {
 					
 					BindingSet binding = sparqlResults.next();
-					Value v = binding.getValue("x");
 					
-					if (v != null && v.stringValue().contains(BASE_URI)) {
+					if (binding.hasBinding("x")) {
 						
-						String conceptId = StringUtils.delete(v.stringValue(), BASE_URI);
-						LOGGER.debug("Adding  concept ids  {} to list", conceptId);
-
-						conceptIds.add(conceptId);
-
+						Value v = binding.getValue("x");
 						
+						if (v != null && v.stringValue().contains(BASE_URI)) {
+							
+							String conceptId = StringUtils.delete(v.stringValue(), BASE_URI);
+							LOGGER.debug("Adding  concept ids  {} to list", conceptId);
+
+							conceptIds.add(conceptId);
+
+							
+						}
+
+					} else {
+						
+						LOGGER.debug("Binding not available"); //TODO remove later
+
 					}
+					
 					
 				}
 				
@@ -262,7 +280,7 @@ public class ConceptLookUpServiceImpl implements ConceptLookupService {
 				
 		} catch (Exception e) {
 			
-			LOGGER.error("Error duing concept ids fetch {}", e);
+			LOGGER.error("Error duing concept ids fetch ", e);
 			
 			throw new ConceptServiceException(e);
 			
@@ -273,6 +291,7 @@ public class ConceptLookUpServiceImpl implements ConceptLookupService {
 			close(g);
 			
 		}
+		LOGGER.debug("returning total {} concept ids ", conceptIds.size());
 
 		return Collections.unmodifiableSortedSet(conceptIds);
 	}
@@ -291,7 +310,7 @@ public class ConceptLookUpServiceImpl implements ConceptLookupService {
 				
 			} catch (SailException e) {
 				// TODO Auto-generated catch block
-				LOGGER.error("Error in sail shutdown {}", e);
+				LOGGER.error("Error in sail shutdown", e);
 
 			}
 			
@@ -314,7 +333,7 @@ public class ConceptLookUpServiceImpl implements ConceptLookupService {
 				
 			} catch (SailException e) {
 				// TODO Auto-generated catch block
-				LOGGER.error("Error in saill connection closing {}", e);
+				LOGGER.error("Error in saill connection closing", e);
 
 			}
 			
@@ -389,7 +408,7 @@ public class ConceptLookUpServiceImpl implements ConceptLookupService {
 			
 			BindingSet bSet = sparqlResults.next();
 						
-			LOGGER.debug("Binding set {}", bSet);
+			LOGGER.trace("Binding set {}", bSet);
 		    Binding o = bSet.getBinding("o");
 		    Binding y = bSet.getBinding("y");
 	
@@ -400,7 +419,13 @@ public class ConceptLookUpServiceImpl implements ConceptLookupService {
 				concept.setId(id);
 				
 			}
-			concept.addProperties(o.getValue(), y.getValue());
+			LOGGER.trace("Value for o {} and y {} ", o, y);
+
+			if (o != null && y != null) {
+				
+				concept.addProperties(o.getValue(), y.getValue());
+
+			}
 		    
 		}
 		concept = StringUtils.isEmpty(concept.getId()) ? null : concept;

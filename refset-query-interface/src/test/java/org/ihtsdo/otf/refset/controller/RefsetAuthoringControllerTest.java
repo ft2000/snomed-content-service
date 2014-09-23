@@ -48,7 +48,6 @@ import org.springframework.web.context.WebApplicationContext;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {
-		"file:src/main/webapp/WEB-INF/spring/appServlet/servlet-context.xml",
 		"file:src/main/webapp/WEB-INF/spring/appServlet/refset-app-security-config.xml"})
 @TestExecutionListeners(listeners={ServletTestExecutionListener.class,
         DependencyInjectionTestExecutionListener.class,
@@ -69,6 +68,10 @@ public class RefsetAuthoringControllerTest {
 
 	   			 + "      \"description\": \"Junit Test\""                  
 		   + "}";
+	 
+	 static {
+			System.setProperty("env", "junit");
+		}
 	
 	@Autowired
     private WebApplicationContext ctx;

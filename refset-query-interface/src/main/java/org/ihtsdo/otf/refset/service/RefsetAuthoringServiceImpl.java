@@ -14,8 +14,10 @@ import org.ihtsdo.otf.refset.domain.Member;
 import org.ihtsdo.otf.refset.domain.Refset;
 import org.ihtsdo.otf.refset.exception.EntityNotFoundException;
 import org.ihtsdo.otf.refset.exception.RefsetServiceException;
-import org.ihtsdo.otf.refset.graph.RefsetGAO;
 import org.ihtsdo.otf.refset.graph.RefsetGraphAccessException;
+import org.ihtsdo.otf.refset.graph.gao.MemberGAO;
+import org.ihtsdo.otf.refset.graph.gao.RefsetAdminGAO;
+import org.ihtsdo.otf.refset.graph.gao.RefsetGAO;
 import org.ihtsdo.otf.snomed.domain.Concept;
 import org.ihtsdo.otf.snomed.exception.ConceptServiceException;
 import org.ihtsdo.otf.snomed.service.ConceptLookupService;
@@ -38,6 +40,12 @@ public class RefsetAuthoringServiceImpl implements RefsetAuthoringService {
 	private RefsetGAO gao;
 	
 	@Autowired
+	private RefsetAdminGAO adminGao;
+	
+	@Autowired
+	private MemberGAO mGao;
+	
+	@Autowired
 	private ConceptLookupService lService;
 
 
@@ -51,7 +59,7 @@ public class RefsetAuthoringServiceImpl implements RefsetAuthoringService {
 		
 		try {
 			
-			gao.addRefset(r);
+			adminGao.addRefset(r);
 			return r.getId();
 			
 		} catch (RefsetGraphAccessException e) {
@@ -89,7 +97,7 @@ public class RefsetAuthoringServiceImpl implements RefsetAuthoringService {
 
 			LOGGER.debug("Adding member {} to refset {}", m, r);
 
-			gao.addRefset(r);
+			adminGao.addRefset(r);
 
 			LOGGER.debug("Added member {} to refset {}", m, r);
 
@@ -117,7 +125,7 @@ public class RefsetAuthoringServiceImpl implements RefsetAuthoringService {
 
 		 try {
 			r = obfuscate(r); 
-			gao.updateRefset(r);
+			adminGao.updateRefset(r);
 			
 		} catch (RefsetGraphAccessException e) {
 			
@@ -159,7 +167,7 @@ public class RefsetAuthoringServiceImpl implements RefsetAuthoringService {
 
 		try {
 			 
-			gao.removeRefset(refsetId);
+			adminGao.removeRefset(refsetId);
 			
 		} catch (RefsetGraphAccessException e) {
 			
@@ -208,7 +216,7 @@ public class RefsetAuthoringServiceImpl implements RefsetAuthoringService {
 
 				} else {
 					
-					LOGGER.debug("Adding member details are not available for id {}", id);
+					LOGGER.debug("Not adding member details as no concept details available for id {}", id);
 					tOutcome.put(id, "Member details not available");
 
 				}
@@ -217,7 +225,7 @@ public class RefsetAuthoringServiceImpl implements RefsetAuthoringService {
 			
 			LOGGER.debug("Adding member {} to refset {}", members, refsetId);
 
-			Map<String, String> outcome = gao.addMembers(refsetId, members);
+			Map<String, String> outcome = mGao.addMembers(refsetId, members);
 			tOutcome.putAll(outcome);
 
 			LOGGER.debug("Added member {} to refset {}");
@@ -227,7 +235,7 @@ public class RefsetAuthoringServiceImpl implements RefsetAuthoringService {
 
 			LOGGER.error("Error during service call", e);
 
-			throw new EntityNotFoundException(e.getMessage());
+			throw e;
 			
 		} catch (RefsetGraphAccessException e) {
 
@@ -244,6 +252,41 @@ public class RefsetAuthoringServiceImpl implements RefsetAuthoringService {
 
 		return tOutcome;
 		
+	}
+
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.otf.refset.service.RefsetAuthoringService#removeMemberFromRefset(java.lang.String, java.lang.String)
+	 */
+	@Override
+	public void removeMemberFromRefset(String refsetId, String rcId)
+			throws RefsetServiceException, EntityNotFoundException {
+
+		LOGGER.debug("removeMemberFromRefset member {} from refset {}", rcId, refsetId);
+
+		if (StringUtils.isEmpty(refsetId) || StringUtils.isEmpty(rcId)) {
+			
+			throw new EntityNotFoundException("Invalid request check refset id and member's reference component id. Both are required");
+		}
+		
+		
+		try {
+			
+			mGao.removeMember(refsetId, rcId);
+
+		} catch (EntityNotFoundException e) {
+
+			LOGGER.error("Error during service call", e);
+
+			throw e;
+			
+		} catch (RefsetGraphAccessException e) {
+
+			LOGGER.error("Error during service call", e);
+			throw new RefsetServiceException(e.getMessage());
+
+		}
+		
+
 	}
 
 }

@@ -33,7 +33,7 @@ public class ConceptLookUpServiceImplTest {
 		
 		service = new ConceptLookUpServiceImpl();
 		
-		service.setRepositoryConfig("src/test/resources/titan-cassandra-es.properties");
+		service.setRepositoryConfig("src/test/resources/titan-graph-es-junit.properties");
 	}
 
 	/**
