@@ -24,4 +24,5 @@ public final class RGC {
 	public static final String MODULE_ID = "moduleId";
 	public static final String REFERENCE_COMPONENT_ID = "referenceComponentId";
 	public static final String ACTIVE = "active";
+	public static final String MEMBER_TYPE_ID = "componentTypeId";
 }

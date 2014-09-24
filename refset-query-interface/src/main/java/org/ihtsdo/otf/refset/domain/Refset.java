@@ -37,7 +37,7 @@ public class Refset {
 
 	private String languageCode;
 	
-	private RefsetType type;
+	private String type;
 	
 	private List<Member> members;
 		
@@ -52,6 +52,8 @@ public class Refset {
 	private String superRefsetTypeId;
 	
 	private boolean active;
+	
+	private String componentTypeId;
 	
 	@JsonIgnore
 	private MetaData metaData;
@@ -202,14 +204,14 @@ public class Refset {
 	/**
 	 * @return the type
 	 */
-	public RefsetType getType() {
+	public String getType() {
 		return type;
 	}
 
 	/**
 	 * @param type the type to set
 	 */
-	public void setType(RefsetType type) {
+	public void setType(String type) {
 		this.type = type;
 	}
 
@@ -308,5 +310,20 @@ public class Refset {
 	public void setActive(boolean active) {
 		this.active = active;
 	}
+
+	/**
+	 * @return the componentTypeId
+	 */
+	public String getComponentTypeId() {
+		return componentTypeId;
+	}
+
+	/**
+	 * @param componentTypeId the componentTypeId to set
+	 */
+	public void setComponentTypeId(String componentTypeId) {
+		this.componentTypeId = componentTypeId;
+	}
+
 
 }

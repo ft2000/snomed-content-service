@@ -13,7 +13,6 @@ import java.util.Set;
 import org.ihtsdo.otf.refset.domain.Member;
 import org.ihtsdo.otf.refset.domain.MetaData;
 import org.ihtsdo.otf.refset.domain.Refset;
-import org.ihtsdo.otf.refset.domain.RefsetType;
 import org.ihtsdo.otf.refset.graph.RGC;
 import org.ihtsdo.otf.refset.graph.schema.GMember;
 import org.ihtsdo.otf.refset.graph.schema.GRefset;
@@ -80,12 +79,12 @@ public class RefsetConvertor {
 		if(!StringUtils.isEmpty(r.getModuleId()))
 			props.put(RGC.MODULE_ID, r.getModuleId());
 		
-		RefsetType type = r.getType();
-		if(type != null && !StringUtils.isEmpty(type.getName()))
-			props.put(RGC.TYPE, r.getType().getName());
 
 		if(!StringUtils.isEmpty(r.getTypeId()))
 			props.put(RGC.TYPE_ID, r.getTypeId());
+		
+		if(!StringUtils.isEmpty(r.getComponentTypeId()))
+			props.put(RGC.MEMBER_TYPE_ID, r.getComponentTypeId());
 		
 		props.put(RGC.PUBLISHED, r.isPublished());
 
@@ -213,18 +212,18 @@ public class RefsetConvertor {
 			
 		}
 		
-		if ( keys.contains(RGC.TYPE) ) {
-			
-			String type = vR.getProperty(RGC.TYPE);
-			
-			r.setType(RefsetType.valueOf(type));
-			
-		}
 
 		if ( keys.contains(RGC.TYPE_ID) ) {
 			
 			String typeId = vR.getProperty(RGC.TYPE_ID);
 			r.setTypeId(typeId);
+			
+		}
+		
+		if ( keys.contains(RGC.MEMBER_TYPE_ID) ) {
+			
+			String typeId = vR.getProperty(RGC.MEMBER_TYPE_ID);
+			r.setComponentTypeId(typeId);
 			
 		}
 
@@ -398,13 +397,6 @@ public class RefsetConvertor {
 				
 			}
 			
-			if ( keys.contains(RGC.TYPE) ) {
-				
-				String type = vR.getProperty(RGC.TYPE);
-				
-				r.setType(RefsetType.valueOf(type));
-				
-			}
 
 			if ( keys.contains(RGC.TYPE_ID) ) {
 				
@@ -419,6 +411,14 @@ public class RefsetConvertor {
 				r.setActive(active);
 				
 			}
+			
+			if ( keys.contains(RGC.MEMBER_TYPE_ID) ) {
+				
+				String typeId = vR.getProperty(RGC.MEMBER_TYPE_ID);
+				r.setComponentTypeId(typeId);
+				
+			}
+
 			
 			LOGGER.debug("Adding Refset  {} in list ", r.toString());
 
@@ -510,12 +510,9 @@ public class RefsetConvertor {
 					
 				}
 				
-				if ( keys.contains(RGC.TYPE) ) {
-					if (!StringUtils.isEmpty(gr.getType())) {
-						
-						r.setType(RefsetType.valueOf(gr.getType()));
-
-					}
+				if ( keys.contains(RGC.MEMBER_TYPE_ID) ) {
+					
+					r.setComponentTypeId(gr.getComponentTypeId());
 					
 				}
 
@@ -614,11 +611,6 @@ public class RefsetConvertor {
 			
 		}
 		
-		if ( keys.contains(RGC.TYPE) ) {
-						
-			r.setType(RefsetType.valueOf(vR.getType()));
-			
-		}
 
 		if ( keys.contains(RGC.TYPE_ID) ) {
 			
@@ -626,6 +618,11 @@ public class RefsetConvertor {
 			
 		}
 
+		if ( keys.contains(RGC.MEMBER_TYPE_ID) ) {
+			
+			r.setComponentTypeId(vR.getComponentTypeId());
+			
+		}
 
 		Iterable<Edge> eRs = vR.asVertex().getEdges(Direction.IN, "members");
 		

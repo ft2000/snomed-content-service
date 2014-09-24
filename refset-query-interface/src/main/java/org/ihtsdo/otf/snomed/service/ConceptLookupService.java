@@ -39,5 +39,14 @@ public interface ConceptLookupService {
 	 * @throws ConceptServiceException
 	 */
 	public Set<String> getConceptIds(int offset, int limit) throws ConceptServiceException ;
+	
+	
+	/**Gets first 100 child name and their ids in SNOMED database
+	 * @param parentId
+	 * @return
+	 * @throws ConceptServiceException
+	 */
+	public Map<String, String> getTypes(String parentId) throws ConceptServiceException ;
+
 
 }

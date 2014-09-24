@@ -17,7 +17,6 @@ import org.ihtsdo.otf.refset.common.Meta;
 import org.ihtsdo.otf.refset.common.Result;
 import org.ihtsdo.otf.refset.domain.Member;
 import org.ihtsdo.otf.refset.domain.Refset;
-import org.ihtsdo.otf.refset.domain.RefsetType;
 import org.ihtsdo.otf.refset.exception.EntityNotFoundException;
 import org.ihtsdo.otf.refset.exception.RefsetServiceException;
 import org.ihtsdo.otf.refset.service.RefsetAuthoringService;
@@ -115,10 +114,7 @@ public class RefsetAuthoringController {
 		String id = UUID.randomUUID().toString();
 		r.setId(id);
 		r.setCreated(new DateTime());
-		
-		if(StringUtils.isEmpty(r.getType()))
-			r.setType(RefsetType.simple);
-		
+				
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		
 		if (auth instanceof UserDetails) {
