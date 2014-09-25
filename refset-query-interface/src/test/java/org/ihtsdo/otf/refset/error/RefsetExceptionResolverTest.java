@@ -1,7 +1,7 @@
 package org.ihtsdo.otf.refset.error;
 
-import static org.junit.Assert.*;
-import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetup;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import java.util.Map;
 
@@ -11,7 +11,6 @@ import org.ihtsdo.otf.refset.exception.EntityNotFoundException;
 import org.ihtsdo.otf.refset.exception.ExportServiceException;
 import org.ihtsdo.otf.refset.exception.InvalidServiceException;
 import org.ihtsdo.otf.refset.exception.RefsetServiceException;
-import org.ihtsdo.otf.snomed.controller.TypeLookupController;
 import org.ihtsdo.otf.snomed.exception.ConceptServiceException;
 import org.junit.After;
 import org.junit.Before;
@@ -20,7 +19,6 @@ import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.context.WebApplicationContext;
 
 public class RefsetExceptionResolverTest {
@@ -32,14 +30,11 @@ public class RefsetExceptionResolverTest {
 	@InjectMocks
 	private RefsetExceptionResolver advice;
 
-    private MockMvc mockMvc;
     
 	@Before
 	public void setUp() throws Exception {
 		
 		MockitoAnnotations.initMocks(this);
-
-	    this.mockMvc = standaloneSetup(advice).build();
 
 	}
 
