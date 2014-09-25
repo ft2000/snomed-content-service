@@ -113,7 +113,8 @@ public class RefsetBrowseController {
 		response.setData(data);
 		m.setMessage(SUCESS);
 		m.setStatus(HttpStatus.OK);
-		
+		m.setNoOfRecords(1);
+
 		return new ResponseEntity<Result<Map<String,Object>>>(response, HttpStatus.OK);
 		
 	       

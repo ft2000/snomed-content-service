@@ -14,6 +14,7 @@ import javax.annotation.Resource;
 
 import org.ihtsdo.otf.refset.common.Meta;
 import org.ihtsdo.otf.refset.common.Result;
+import org.ihtsdo.otf.refset.exception.EntityNotFoundException;
 import org.ihtsdo.otf.snomed.domain.Concept;
 import org.ihtsdo.otf.snomed.service.ConceptLookupService;
 import org.slf4j.Logger;
@@ -97,13 +98,19 @@ public class ConceptLookupController {
 		
 		Concept c =  cService.getConcept(conceptId);
 
+		if (c == null) {
+			
+			throw new EntityNotFoundException("No data available for given id " + conceptId);
+			
+		}
 		Map<String, Object> data = new HashMap<String, Object>();
 		data.put("concept", c);
 		
 		response.setData(data);
 		m.setMessage(SUCESS);
 		m.setStatus(HttpStatus.OK);
-		
+		m.setNoOfRecords(1);
+
 		return new ResponseEntity<Result<Map<String,Object>>>(response, HttpStatus.OK);
 		
 	     
@@ -134,7 +141,8 @@ public class ConceptLookupController {
 		response.setData(data);
 		m.setMessage(SUCESS);
 		m.setStatus(HttpStatus.OK);
-		
+		m.setNoOfRecords(ids.size());
+
 		return new ResponseEntity<Result<Map<String,Object>>>(response, HttpStatus.OK);
 		
 	      
