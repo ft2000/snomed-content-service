@@ -12,6 +12,11 @@ public class ExportServiceException extends Exception {
 	/**
 	 * 
 	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
+	 * 
+	 */
 	public ExportServiceException() {
 		// TODO Auto-generated constructor stub
 	}

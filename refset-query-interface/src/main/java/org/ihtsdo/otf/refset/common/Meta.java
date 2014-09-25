@@ -1,5 +1,6 @@
 package org.ihtsdo.otf.refset.common;
 
+import org.ihtsdo.otf.refset.error.ErrorInfo;
 import org.springframework.hateoas.ResourceSupport;
 import org.springframework.http.HttpStatus;
 
@@ -10,6 +11,8 @@ public class Meta extends ResourceSupport {
 	private String message;
 	
 	private int noOfRecords;
+	
+	private ErrorInfo errorInfo;
 	
 
 	/**
@@ -52,6 +55,20 @@ public class Meta extends ResourceSupport {
 	 */
 	public void setMessage(String message) {
 		this.message = message;
+	}
+
+	/**
+	 * @return the errorInfo
+	 */
+	public ErrorInfo getErrorInfo() {
+		return errorInfo;
+	}
+
+	/**
+	 * @param errorInfo the errorInfo to set
+	 */
+	public void setErrorInfo(ErrorInfo errorInfo) {
+		this.errorInfo = errorInfo;
 	}
 
 }

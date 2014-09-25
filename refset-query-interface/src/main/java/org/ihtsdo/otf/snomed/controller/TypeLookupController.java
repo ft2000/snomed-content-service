@@ -31,7 +31,7 @@ import com.wordnik.swagger.annotations.ApiOperation;
  *
  */
 @RestController
-@Api(value="Type  look up service", description="Service to lookup type name and id", position = 4)
+@Api(value="Type look up service", description="Service to lookup type name and id", position = 4)
 @RequestMapping("/v1.0/snomed")
 public class TypeLookupController {
 	
@@ -45,7 +45,7 @@ public class TypeLookupController {
 	
 	@RequestMapping( method = RequestMethod.GET, value = "/componentTypes", produces = "application/json" )
 	@ApiOperation( value = "Api to get allowed component types - a collection of ids and names." )
-    public ResponseEntity<Result< Map<String, Object>>> getComponentTypes() {
+    public ResponseEntity<Result< Map<String, Object>>> getComponentTypes() throws Exception {
 		
 		logger.debug("Getting getComponentTypes");
 
@@ -56,33 +56,19 @@ public class TypeLookupController {
 		m.add( linkTo( methodOn( TypeLookupController.class).getComponentTypes() ).withSelfRel() );
 		response.setMeta(m);
 
-		//try {
-			
-			Map<String, String> types = new TreeMap<String, String>(); //cService.getTypes("900000000000460005");
-			types.put("900000000000461009", "Concept type component (foundation metadata concept)");
-			types.put("900000000000462002", "Description type component (foundation metadata concept)");
-			types.put("900000000000464001", "Reference set member type component (foundation metadata concept)");
-			types.put("900000000000463007", "Relationship type component (foundation metadata concept)");
+		Map<String, String> types = new TreeMap<String, String>(); //cService.getTypes("900000000000460005");
+		types.put("900000000000461009", "Concept type component (foundation metadata concept)");
+		types.put("900000000000462002", "Description type component (foundation metadata concept)");
+		types.put("900000000000464001", "Reference set member type component (foundation metadata concept)");
+		types.put("900000000000463007", "Relationship type component (foundation metadata concept)");
 
-			Map<String, Object> data = new HashMap<String, Object>();
-			data.put("componentTypes", types);
-			
-			response.setData(data);
-			m.setMessage(SUCESS);
-			m.setStatus(HttpStatus.OK);
-			m.setNoOfRecords(types.size());
-
-		/*} catch (ConceptServiceException e) {
-
-			
-			String message = String.format("Error occurred during service call : could not get component types");
-			logger.error(message, e);
-			m.setMessage(message); 
-			m.setStatus(HttpStatus.OK);
-
-			return new ResponseEntity<Result<Map<String,Object>>>(response, HttpStatus.OK);
-	    	
-		}*/
+		Map<String, Object> data = new HashMap<String, Object>();
+		data.put("componentTypes", types);
+		
+		response.setData(data);
+		m.setMessage(SUCESS);
+		m.setStatus(HttpStatus.OK);
+		m.setNoOfRecords(types.size());
 
 		return new ResponseEntity<Result<Map<String,Object>>>(response, HttpStatus.OK);
       
@@ -90,7 +76,7 @@ public class TypeLookupController {
 	
 	@RequestMapping( method = RequestMethod.GET, value = "/refsetTypes", produces = "application/json" )
 	@ApiOperation( value = "Api to get allowed refset types - a collection of ids and names." )
-    public ResponseEntity<Result< Map<String, Object>>> getRefseTypes() {
+    public ResponseEntity<Result< Map<String, Object>>> getRefseTypes() throws Exception {
 		
 		logger.debug("Getting getRefseTypes");
 
@@ -101,43 +87,29 @@ public class TypeLookupController {
 		m.add( linkTo( methodOn( TypeLookupController.class).getRefseTypes() ).withSelfRel() );
 		response.setMeta(m);
 
-		Map<String, String> types;
-		//try {
-			
-			types = new TreeMap<String, String>();//cService.getTypes("900000000000455006");
-			types.put("900000000000516008", "Annotation type reference set (foundation metadata concept)");
-			types.put("900000000000521006", "Association type reference set (foundation metadata concept)");
-			types.put("900000000000480006", "Attribute value type reference set (foundation metadata concept)");
-			types.put("447250001", "Complex map type reference set (foundation metadata concept)");
-			types.put("609430003", "Concept model reference set (foundation metadata concept)");
-			types.put("900000000000538005", "Description format reference set (foundation metadata concept)");
-			types.put("609331003", "Extended map type reference set (foundation metadata concept)");
-			types.put("900000000000506000", "Language type reference set (foundation metadata concept)");
-			types.put("900000000000534007", "Module dependency reference set (foundation metadata concept)");
-			types.put("447258008", "Ordered type reference set (foundation metadata concept)");
-			types.put("900000000000512005", "Query specification type reference set (foundation metadata concept)");
-			types.put("900000000000456007", "Reference set descriptor reference set (foundation metadata concept)");
-			types.put("900000000000496009", "Simple map type reference set (foundation metadata concept)");
-			types.put("446609009", "Simple type reference set (foundation metadata concept)");
-			Map<String, Object> data = new HashMap<String, Object>();
-			data.put("refsetTypes", types);
-			
-			response.setData(data);
-			m.setMessage(SUCESS);
-			m.setStatus(HttpStatus.OK);
-			m.setNoOfRecords(types.size());
-
-			/*} catch (ConceptServiceException e) {
-
-			
-			String message = String.format("Error occurred during service call : could not get refset types");
-			logger.error(message, e);
-			m.setMessage(message); 
-			m.setStatus(HttpStatus.OK);
-
-			return new ResponseEntity<Result<Map<String,Object>>>(response, HttpStatus.OK);
-	    	
-		}*/
+		Map<String, String> types = new TreeMap<String, String>();//cService.getTypes("900000000000455006");
+		types.put("900000000000516008", "Annotation type reference set (foundation metadata concept)");
+		types.put("900000000000521006", "Association type reference set (foundation metadata concept)");
+		types.put("900000000000480006", "Attribute value type reference set (foundation metadata concept)");
+		types.put("447250001", "Complex map type reference set (foundation metadata concept)");
+		types.put("609430003", "Concept model reference set (foundation metadata concept)");
+		types.put("900000000000538005", "Description format reference set (foundation metadata concept)");
+		types.put("609331003", "Extended map type reference set (foundation metadata concept)");
+		types.put("900000000000506000", "Language type reference set (foundation metadata concept)");
+		types.put("900000000000534007", "Module dependency reference set (foundation metadata concept)");
+		types.put("447258008", "Ordered type reference set (foundation metadata concept)");
+		types.put("900000000000512005", "Query specification type reference set (foundation metadata concept)");
+		types.put("900000000000456007", "Reference set descriptor reference set (foundation metadata concept)");
+		types.put("900000000000496009", "Simple map type reference set (foundation metadata concept)");
+		types.put("446609009", "Simple type reference set (foundation metadata concept)");
+		Map<String, Object> data = new HashMap<String, Object>();
+		data.put("refsetTypes", types);
+		
+		response.setData(data);
+		m.setMessage(SUCESS);
+		m.setStatus(HttpStatus.OK);
+		m.setNoOfRecords(types.size());
+		
 		
 		return new ResponseEntity<Result<Map<String,Object>>>(response, HttpStatus.OK);
       

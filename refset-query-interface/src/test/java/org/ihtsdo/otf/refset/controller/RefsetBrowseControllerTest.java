@@ -109,35 +109,28 @@ public class RefsetBrowseControllerTest {
 	 * Test method for {@link org.ihtsdo.otf.refset.controller.RefsetBrowseController#getRefsets(int, int)}.
 	 * @throws Exception 
 	 */
-	@Test
+	@Test(expected = Exception.class)
 	public void testGetRefsetsError() throws Exception {
 		
 		doThrow(new RefsetServiceException()).when(service).getRefsets(anyInt(), anyInt(), anyBoolean());
 
 		
 		this.mockMvc.perform(get("/v1.0/refsets").accept(MediaType.APPLICATION_JSON))
-        .andDo(print())
-        .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-        .andExpect(jsonPath("$.content").doesNotExist());
+        .andDo(print());
 	}
 	
 	/**
 	 * Test method for {@link org.ihtsdo.otf.refset.controller.RefsetBrowseController#getRefsets(int, int)}.
 	 * @throws Exception 
 	 */
-	@Test
+	@Test(expected = Exception.class)
 	public void testGetRefsetsMetaDataOnError() throws Exception {
 		
 		doThrow(new RefsetServiceException("Junit Error Checking")).when(service).getRefsets(anyInt(), anyInt(), anyBoolean());
 
 		
 		this.mockMvc.perform(get("/v1.0/refsets").accept(MediaType.APPLICATION_JSON))
-        .andDo(print())
-        .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-        .andExpect(jsonPath("$.meta.status").value("OK"))
-        .andExpect(jsonPath("$.meta.message").value("Error occurred during service call : Junit Error Checking"));
+        .andDo(print());
 		
 	}
 	
@@ -162,7 +155,7 @@ public class RefsetBrowseControllerTest {
 	 * Test method for {@link org.ihtsdo.otf.refset.controller.RefsetBrowseController#getRefsetDetails(java.lang.String)}.
 	 * @throws Exception 
 	 */
-	@Test
+	@Test(expected = Exception.class)
 	public void testGetRefsetDetailsError() throws Exception {
 		
 	    doThrow(new RefsetServiceException("junit Error Checking")).when(service).getRefset(anyString());
@@ -170,9 +163,7 @@ public class RefsetBrowseControllerTest {
 		this.mockMvc.perform(
 				get("/v1.0/refsets/{refSetId}", "0")
 				.accept(MediaType.APPLICATION_JSON))
-        .andDo(print())
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$.meta.message").value("Error occurred during service call : junit Error Checking"));
+        .andDo(print());
 
 	}
 	
