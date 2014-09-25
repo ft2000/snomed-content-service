@@ -122,9 +122,7 @@ public class RefsetJsonConversionTest {
 		members.add(m);
 		
 		r.setMembers(members);
-		
-		r.setType(RefsetType.simple);
-		
+				
 		r.setModuleId("900000000000207008");
 		
 		r.setLanguageCode("en-GB");

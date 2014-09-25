@@ -51,7 +51,6 @@ public class RefsetBrowseServiceStubTest {
 		when(refset.getMembers()).thenReturn(null);
 		when(refset.getCreated()).thenReturn(new DateTime());
 		when(refset.getCreatedBy()).thenReturn("Junit author");
-		when(refset.getType()).thenReturn(RefsetType.simple);
 
 		dataService.setCsv(csvs);
 

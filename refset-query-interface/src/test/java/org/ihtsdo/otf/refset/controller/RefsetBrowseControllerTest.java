@@ -14,7 +14,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.util.List;
 
 import org.ihtsdo.otf.refset.domain.Refset;
-import org.ihtsdo.otf.refset.domain.RefsetType;
 import org.ihtsdo.otf.refset.exception.RefsetServiceException;
 import org.ihtsdo.otf.refset.service.RefsetBrowseService;
 import org.ihtsdo.otf.refset.service.RefsetBrowseServiceStubData;
@@ -78,7 +77,6 @@ public class RefsetBrowseControllerTest {
 		when(refset.getMembers()).thenReturn(null);
 		when(refset.getCreated()).thenReturn(new DateTime());
 		when(refset.getCreatedBy()).thenReturn("Junit author");
-		when(refset.getType()).thenReturn(RefsetType.simple);
 	}
 
 	/**
@@ -178,25 +176,5 @@ public class RefsetBrowseControllerTest {
 
 	}
 	
-	/**
-	 * Test method for {@link org.ihtsdo.otf.refset.controller.RefsetBrowseController#getComponentTypes()}.
-	 * @throws Exception 
-	 */
-	@Test
-	public void testGetComponentTypes() throws Exception {
-		
-		this.mockMvc.perform(
-				get("/v1.0/refsets/componentTypes", "0")
-				.accept(MediaType.APPLICATION_JSON))
-        .andDo(print())
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$.meta.message").value("Success"))
-        .andExpect(jsonPath("$.meta.status").value("OK"))
-        .andExpect(jsonPath("$.content.types.900000000000464001").value("Reference set member type component (foundation metadata concept)"))
-        .andExpect(jsonPath("$.content.types.900000000000462002").value("Description type component (foundation metadata concept)"))
-        .andExpect(jsonPath("$.content.types.900000000000463007").value("Relationship type component (foundation metadata concept)"))
-        .andExpect(jsonPath("$.content.types.900000000000461009").value("Concept type component (foundation metadata concept)"));
-;
-	}
 
 }

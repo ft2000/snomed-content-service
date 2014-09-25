@@ -12,7 +12,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.ihtsdo.otf.refset.domain.Refset;
-import org.ihtsdo.otf.refset.domain.RefsetType;
 import org.ihtsdo.otf.refset.exception.EntityNotFoundException;
 import org.ihtsdo.otf.refset.exception.RefsetServiceException;
 import org.ihtsdo.otf.refset.security.MockRefsetUser;
@@ -109,7 +108,6 @@ public class RefsetAuthoringControllerTest {
 		when(refset.getMembers()).thenReturn(null);
 		when(refset.getCreated()).thenReturn( new DateTime() );
 		when(refset.getCreatedBy()).thenReturn("Junit author");
-		when(refset.getType()).thenReturn(RefsetType.simple);
 
 	    
 		when(aService.addRefset(any(Refset.class))).thenReturn("1000003");

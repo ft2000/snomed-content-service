@@ -186,5 +186,18 @@ public interface GRefset extends VertexFrame {
 	 */
 	@Property( value = "active")
 	public void setActive(boolean active);
+	
+	/**
+	 * @return the componentTypeId
+	 */
+	@Property( value = "componentTypeId")
+	public String getComponentTypeId();
+
+	/**
+	 * @param componentTypeId the componentTypeId to set
+	 */
+	@Property( value = "componentTypeId")
+	public void setComponentTypeId(String componentTypeId);
+
 
 }

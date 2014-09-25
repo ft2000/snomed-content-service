@@ -71,6 +71,14 @@ public class ConceptLookUpServiceImpl implements ConceptLookupService {
 			+ "?x sn:description ?desc.\n"
 			+ "?desc ?do ?dy \n"
 			+ "}";
+	
+	private static final String Q_TYPES = "prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n"
+			+ "prefix sn: <http://sct.snomed.info/#>\n"
+			+"select ?SubTypeName ?SubTypeId ?id where {"
+			+"?SubTypeId rdfs:subClassOf ?id.\n"
+			+"?SubTypeId rdfs:label ?SubTypeName.\n"
+			+"} limit 100";
+
 
 	private String repositoryConfig;
 	
@@ -433,6 +441,86 @@ public class ConceptLookUpServiceImpl implements ConceptLookupService {
 		LOGGER.debug("Returning {}", concept);
 
 		return concept;
+	}
+	
+	
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.otf.snomed.service.ConceptLookupService#getTypes(String)
+	 */
+	@Override
+	public Map<String, String> getTypes(String id)
+			throws ConceptServiceException {
+
+		LOGGER.debug("getting types for given id {}", id);
+		
+		Map<String, String> types = new HashMap<String, String>();
+		
+		TitanGraph g = null;
+		Sail sail = null;
+		SailConnection sc = null;
+		try {
+			g = getGraph();
+			
+			sail = getSail(g);
+			
+			sail.initialize();
+			
+			sc = sail.getConnection();
+			
+			SPARQLParser parser = new SPARQLParser();
+			CloseableIteration<? extends BindingSet, QueryEvaluationException> sparqlResults;
+			
+			
+			ParsedQuery sparql = parser.parseQuery(Q_TYPES, "http://sct.snomed.info");
+			
+			ValueFactory vf = sail.getValueFactory();
+			
+			URI uri = vf.createURI(BASE_URI + id);
+			
+			MapBindingSet bindings = new MapBindingSet();
+			
+			bindings.addBinding("id", uri);
+			
+
+			sparqlResults = sc.evaluate(sparql.getTupleExpr(), sparql.getDataset(), bindings, true);
+			
+			while (sparqlResults.hasNext()) {
+				
+				BindingSet bSet = sparqlResults.next();
+							
+				LOGGER.trace("Binding set {}", bSet);
+			    Binding typeName = bSet.getBinding("SubTypeName");
+			    Binding typeId = bSet.getBinding("SubTypeId");
+				LOGGER.trace("Value for o {} and y {} ", typeName, typeId);
+
+				if ( typeName != null && typeId != null) {
+					
+					types.put(StringUtils.delete(typeId.getValue().stringValue(), BASE_URI) , typeName.getValue().stringValue());
+					
+				}
+
+			    
+			}
+					
+			
+		
+		} catch (Exception e) {
+			
+			LOGGER.error("Error duing concept details for concept map fetch", e);
+			
+			throw new ConceptServiceException(e);
+			
+		} finally {
+			
+			close(sc);
+			close(sail);
+			close(g);
+			
+		}
+		
+		LOGGER.debug("returning total {} types ", types.size());
+
+		return Collections.unmodifiableMap(types);
 	}
 
 	/**

@@ -175,12 +175,7 @@ public class RefsetAdminGAO {
 			
 			gr.setSuperRefsetTypeId(r.getSuperRefsetTypeId());
 			
-			if (r.getType() != null) {
-				
-				gr.setType(r.getType().getName());
-
-			} 
-			
+			gr.setComponentTypeId(r.getComponentTypeId());
 			gr.setTypeId(r.getTypeId());
 			
 			gr.setActive(r.isActive());
@@ -403,11 +398,8 @@ public class RefsetAdminGAO {
 		}
 		
 		rV.setSuperRefsetTypeId(r.getSuperRefsetTypeId());
-		if (r.getType() != null) {
-			
-			rV.setType(r.getType().getName());
-
-		} 
+		
+		rV.setComponentTypeId(r.getComponentTypeId());
 		
 		rV.setActive(r.isActive());
 		
