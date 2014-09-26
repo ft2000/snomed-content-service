@@ -150,7 +150,7 @@ public class RefsetGAOTest {
 		assertEquals(i.getModuleId(), r.getModuleId());
 		assertEquals(i.getPublishedDate().getMillis(), r.getPublishedDate().getMillis(), 100);
 		assertEquals(i.isPublished(), r.isPublished());
-		assertEquals(i.getType(), r.getType());
+		assertEquals(null, r.getType());//test that type is not coming anymore
 		assertEquals(i.getEffectiveTime().getMillis(), r.getEffectiveTime().getMillis(), 100);
 
 		

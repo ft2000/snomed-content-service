@@ -3,13 +3,11 @@
  */
 package org.ihtsdo.otf.refset.api.export;
 
-import java.io.IOException;
-
 import javax.servlet.http.HttpServletResponse;
 
-import org.ihtsdo.otf.refset.exception.EntityNotFoundException;
-import org.ihtsdo.otf.refset.exception.ExportServiceException;
+import org.ihtsdo.otf.refset.common.Utility;
 import org.ihtsdo.otf.refset.service.export.ExportService;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,49 +39,22 @@ public class RefsetExportController {
 	@Autowired
 	private ExportService eService;
 
-	@RequestMapping( method = RequestMethod.GET, value = "/{refsetId}/export",  produces = {MediaType.APPLICATION_OCTET_STREAM_VALUE})
+	@RequestMapping( method = RequestMethod.GET, value = "/{refsetId}/export", produces = {MediaType.APPLICATION_OCTET_STREAM_VALUE})
 	@ApiOperation( value = "Export a Refset in RF2 format" )
 	@PreAuthorize("hasRole('ROLE_USER')")
-    public @ResponseBody void exportRF2( @PathVariable String refsetId, HttpServletResponse resp) {
+    public @ResponseBody void exportRF2( @PathVariable String refsetId, HttpServletResponse resp) throws Exception {
 		
 		logger.debug("Exporting an existing refset {} in rf2 format", refsetId);
-
-
-		try {
-		    resp.setHeader("Content-Disposition", "attachment; filename=\"refset_" + refsetId + ".rf2\"");
+	    resp.setHeader("Content-Disposition", "attachment; filename=\"rel2_Refset_SimpleDelta_INT_" + Utility.getDate(new DateTime()) + ".rf2\"");
+	    
+        ICsvListWriter csvWriter = new CsvListWriter(resp.getWriter(),
+                CsvPreference.TAB_PREFERENCE);
  
-            ICsvListWriter csvWriter = new CsvListWriter(resp.getWriter(),
-                    CsvPreference.TAB_PREFERENCE);
+        eService.getRF2Payload(csvWriter, refsetId);
+        
+        csvWriter.close();
      
-            eService.getRF2Payload(csvWriter, refsetId);
-            
-            csvWriter.close();
-            
-
-			
-		} catch (ExportServiceException e) {
-			
-			// TODO Filter error. Only Pass what is required
-			String message = String.format("Error occurred during service call : %s", e.getMessage());
-			logger.error(message);
-			//m.setMessage(message); 
-			//m.setStatus(HttpStatus.OK);
-	    	
-		} catch (EntityNotFoundException e) {
-			// TODO Auto-generated catch block
-			String message = String.format("Error occurred during service call : %s", e.getMessage());
-			logger.error(message);
-			//m.setMessage(message); 
-			//m.setStatus(HttpStatus.NOT_FOUND);
-
-			//return new ResponseEntity<Result<Map<String,Object>>>(response, HttpStatus.OK);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			logger.error("Error downloading {}" , e);
-		}
-
-
-     
+        return;
     }
 	
 

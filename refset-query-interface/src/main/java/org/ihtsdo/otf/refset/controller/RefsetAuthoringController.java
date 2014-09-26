@@ -17,8 +17,6 @@ import org.ihtsdo.otf.refset.common.Meta;
 import org.ihtsdo.otf.refset.common.Result;
 import org.ihtsdo.otf.refset.domain.Member;
 import org.ihtsdo.otf.refset.domain.Refset;
-import org.ihtsdo.otf.refset.exception.EntityNotFoundException;
-import org.ihtsdo.otf.refset.exception.RefsetServiceException;
 import org.ihtsdo.otf.refset.service.RefsetAuthoringService;
 import org.ihtsdo.otf.refset.service.RefsetBrowseService;
 import org.joda.time.DateTime;
@@ -66,43 +64,30 @@ public class RefsetAuthoringController {
 	@PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<Result< Map<String, Object>>> addRefset( @RequestBody Refset r, 
     		@RequestHeader("X-REFSET-PRE-AUTH-TOKEN") String authToken, 
-    		@RequestHeader("X-REFSET-PRE-AUTH-USERNAME") String userName) {
+    		@RequestHeader("X-REFSET-PRE-AUTH-USERNAME") String userName) throws Exception {
 		
 		logger.debug("Adding refsets {}", r);
 
 		Result<Map<String, Object>> result = new Result<Map<String, Object>>();
 		Meta m = new Meta();
-		
 		result.setMeta(m);
 
-    	try {
-    		
-    		addMetaDetails(r);
-    		aService.addRefset(r);
-			
+		addMetaDetails(r);
+		aService.addRefset(r);
+		
 
-			Map<String, Object> data = new HashMap<String, Object>();
-			data.put("id", r.getId());
-    		m.add( linkTo( methodOn( RefsetBrowseController.class ).getRefsetDetails(r.getId())).withRel("Refset"));
+		Map<String, Object> data = new HashMap<String, Object>();
+		data.put("id", r.getId());
+		m.add( linkTo( methodOn( RefsetBrowseController.class ).getRefsetDetails(r.getId())).withRel("Refset"));
 
-			result.setData(data);
+		result.setData(data);
 
-			m.setMessage(SUCESS);
-			m.setStatus(HttpStatus.CREATED);
+		m.setMessage(SUCESS);
+		m.setStatus(HttpStatus.CREATED);
 
-			return new ResponseEntity<Result<Map<String,Object>>>(result, HttpStatus.CREATED);
-			
-		} catch (RefsetServiceException e) {
-			
-			// TODO Filter error. Only Pass what is required
-			String message = String.format("Error occurred during service call : %s", e.getMessage());
-			logger.error(message);
-			m.setMessage(message); 
-			m.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
-
-			return new ResponseEntity<Result<Map<String,Object>>>(result, HttpStatus.INTERNAL_SERVER_ERROR);
-	    	
-		}         
+		return new ResponseEntity<Result<Map<String,Object>>>(result, HttpStatus.CREATED);
+		
+	
     }
 	
 	/**Adds meta details in new {@link Refset}
@@ -138,7 +123,7 @@ public class RefsetAuthoringController {
     public ResponseEntity<Result< Map<String, Object>>> addMember(@PathVariable(value = "refSetId") String refsetId, 
     		@RequestBody( required = true) Member member, 
     		@RequestHeader("X-REFSET-PRE-AUTH-TOKEN") String authToken, 
-    		@RequestHeader("X-REFSET-PRE-AUTH-USERNAME") String userName) {
+    		@RequestHeader("X-REFSET-PRE-AUTH-USERNAME") String userName) throws Exception {
 		
 		logger.debug("Adding member {} to refset {}", member, refsetId);
 
@@ -146,40 +131,20 @@ public class RefsetAuthoringController {
 		
 		Meta m = new Meta();
 
-    	try {
-    		
-			aService.addMember(refsetId, member);
-			
-			Map<String, Object> data = new HashMap<String, Object>();
-			data.put("id", refsetId);
-    		m.add( linkTo( methodOn( RefsetBrowseController.class ).getRefsetDetails(refsetId)).withRel("Refset"));
+		aService.addMember(refsetId, member);
+		
+		Map<String, Object> data = new HashMap<String, Object>();
+		data.put("id", refsetId);
+		m.add( linkTo( methodOn( RefsetBrowseController.class ).getRefsetDetails(refsetId)).withRel("Refset"));
 
-			result.setData(data);
-			
-			m.setMessage(SUCESS);
-			m.setStatus(HttpStatus.OK);
-			
-			return new ResponseEntity<Result<Map<String,Object>>>(result, HttpStatus.OK);
-			
-		} catch (RefsetServiceException e) {
-			
-			String message = String.format("Error occurred during service call : %s", e.getMessage());
-			logger.error(message);
-			m.setMessage(message); 
-			m.setStatus(HttpStatus.OK);
-
-			return new ResponseEntity<Result<Map<String,Object>>>(result, HttpStatus.OK);
-	    	
-		} catch (EntityNotFoundException e) {
-			
-			String message = String.format("Error occurred during service call : %s", e.getMessage());
-			logger.error(message);
-			m.setMessage(message); 
-			m.setStatus(HttpStatus.NOT_FOUND);
-
-			return new ResponseEntity<Result<Map<String,Object>>>(result, HttpStatus.NOT_FOUND);
-
-		}       
+		result.setData(data);
+		
+		m.setMessage(SUCESS);
+		m.setStatus(HttpStatus.OK);
+		
+		return new ResponseEntity<Result<Map<String,Object>>>(result, HttpStatus.OK);
+		
+	       
     }
 	
 	@RequestMapping( method = RequestMethod.POST, value = "/update",  produces = "application/json", consumes = "application/json")
@@ -187,7 +152,7 @@ public class RefsetAuthoringController {
 	@PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<Result< Map<String, Object>>> updateRefset( @RequestBody Refset r, 
     		@RequestHeader("X-REFSET-PRE-AUTH-TOKEN") String authToken, 
-    		@RequestHeader("X-REFSET-PRE-AUTH-USERNAME") String userName) {
+    		@RequestHeader("X-REFSET-PRE-AUTH-USERNAME") String userName) throws Exception {
 		
 		logger.debug("Updating an existing refsets {}", r);
 
@@ -196,41 +161,21 @@ public class RefsetAuthoringController {
 		
 		response.setMeta(m);
 
-    	try {
+		aService.updateRefset(r);
+		
 
-    		aService.updateRefset(r);
-			
+		Map<String, Object> data = new HashMap<String, Object>();
+		data.put("id", r.getId());
+		m.add( linkTo( methodOn( RefsetBrowseController.class ).getRefsetDetails(r.getId())).withRel("Refset"));
 
-			Map<String, Object> data = new HashMap<String, Object>();
-			data.put("id", r.getId());
-    		m.add( linkTo( methodOn( RefsetBrowseController.class ).getRefsetDetails(r.getId())).withRel("Refset"));
+		response.setData(data);
 
-			response.setData(data);
+		m.setMessage(SUCESS);
+		m.setStatus(HttpStatus.OK);
 
-			m.setMessage(SUCESS);
-			m.setStatus(HttpStatus.OK);
-
-			return new ResponseEntity<Result<Map<String,Object>>>(response, HttpStatus.OK);
-			
-		} catch (RefsetServiceException e) {
-			
-			// TODO Filter error. Only Pass what is required
-			String message = String.format("Error occurred during service call : %s", e.getMessage());
-			logger.error(message);
-			m.setMessage(message); 
-			m.setStatus(HttpStatus.OK);
-
-			return new ResponseEntity<Result<Map<String,Object>>>(response, HttpStatus.OK);
-	    	
-		} catch (EntityNotFoundException e) {
-			
-			String message = String.format("Error occurred during service call : %s", e.getMessage());
-			logger.error(message);
-			m.setMessage(message); 
-			m.setStatus(HttpStatus.NOT_FOUND);
-
-			return new ResponseEntity<Result<Map<String,Object>>>(response, HttpStatus.NOT_FOUND);
-		}         
+		return new ResponseEntity<Result<Map<String,Object>>>(response, HttpStatus.OK);
+		
+	         
     }
 	
 	
@@ -239,7 +184,7 @@ public class RefsetAuthoringController {
 	@PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<Result< Map<String, Object>>> removeRefset( @PathVariable String refsetId, 
     		@RequestHeader("X-REFSET-PRE-AUTH-TOKEN") String authToken, 
-    		@RequestHeader("X-REFSET-PRE-AUTH-USERNAME") String userName) {
+    		@RequestHeader("X-REFSET-PRE-AUTH-USERNAME") String userName) throws Exception {
 		
 		logger.debug("Removing an existing refsets {}", refsetId);
 
@@ -248,38 +193,18 @@ public class RefsetAuthoringController {
 		
 		response.setMeta(m);
 
-    	try {
+		Assert.notNull(refsetId, "Required refset id is not available in request");
+		
+		aService.remove(refsetId);
 
-    		Assert.notNull(refsetId, "Required refset id is not available in request");
-    		
-    		aService.remove(refsetId);
+		m.add( linkTo( methodOn( RefsetBrowseController.class ).getRefsets(1, 10)).withRel("Refset"));
 
-    		m.add( linkTo( methodOn( RefsetBrowseController.class ).getRefsets(1, 10)).withRel("Refset"));
+		m.setMessage(SUCESS);
+		m.setStatus(HttpStatus.OK);
 
-			m.setMessage(SUCESS);
-			m.setStatus(HttpStatus.OK);
-
-			return new ResponseEntity<Result<Map<String,Object>>>(response, HttpStatus.OK);
-			
-		} catch (RefsetServiceException e) {
-			
-			// TODO Filter error. Only Pass what is required
-			String message = String.format("Error occurred during service call : %s", e.getMessage());
-			logger.error(message);
-			m.setMessage(message); 
-			m.setStatus(HttpStatus.OK);
-
-			return new ResponseEntity<Result<Map<String,Object>>>(response, HttpStatus.OK);
-	    	
-		} catch (EntityNotFoundException e) {
-			
-			String message = String.format("Error occurred during service call : %s", e.getMessage());
-			logger.error(message);
-			m.setMessage(message); 
-			m.setStatus(HttpStatus.NOT_FOUND);
-
-			return new ResponseEntity<Result<Map<String,Object>>>(response, HttpStatus.NOT_FOUND);
-		}         
+		return new ResponseEntity<Result<Map<String,Object>>>(response, HttpStatus.OK);
+		
+	         
     }
 	
 	
@@ -291,7 +216,7 @@ public class RefsetAuthoringController {
     public ResponseEntity<Result< Map<String, Object>>> addMembers(@PathVariable(value = "refSetId") String refsetId, 
     		@RequestBody( required = true) Set<String> memberIds, 
     		@RequestHeader("X-REFSET-PRE-AUTH-TOKEN") String authToken, 
-    		@RequestHeader("X-REFSET-PRE-AUTH-USERNAME") String userName) {
+    		@RequestHeader("X-REFSET-PRE-AUTH-USERNAME") String userName) throws Exception {
 		
 		logger.debug("Adding member {} to refset {}", memberIds, refsetId);
 
@@ -299,40 +224,22 @@ public class RefsetAuthoringController {
 		
 		Meta m = new Meta();
 
-    	try {
-    		
-			Map<String, String> outcome = aService.addMembers(refsetId, memberIds);
-			
-			Map<String, Object> data = new HashMap<String, Object>();
-			data.put("outcome", outcome);
-    		m.add( linkTo( methodOn( RefsetBrowseController.class ).getRefsetDetails(refsetId)).withRel("Refset"));
+		
+		Map<String, String> outcome = aService.addMembers(refsetId, memberIds);
+		
+		Map<String, Object> data = new HashMap<String, Object>();
+		data.put("outcome", outcome);
+		m.add( linkTo( methodOn( RefsetBrowseController.class ).getRefsetDetails(refsetId)).withRel("Refset"));
 
-			result.setData(data);
-			
-			m.setMessage(SUCESS);
-			m.setStatus(HttpStatus.OK);
-			
-			return new ResponseEntity<Result<Map<String,Object>>>(result, HttpStatus.OK);
-			
-		} catch (RefsetServiceException e) {
-			
-			String message = String.format("Error occurred during service call : %s", e.getMessage());
-			logger.error(message);
-			m.setMessage(message); 
-			m.setStatus(HttpStatus.OK);
-
-			return new ResponseEntity<Result<Map<String,Object>>>(result, HttpStatus.OK);
-	    	
-		} catch (EntityNotFoundException e) {
-
-			String message = String.format("Error occurred during service call : %s", e.getMessage());
-			logger.error(message);
-			m.setMessage(message); 
-			m.setStatus(HttpStatus.NOT_FOUND);
-
-			return new ResponseEntity<Result<Map<String,Object>>>(result, HttpStatus.NOT_FOUND);
-
-		}       
+		result.setData(data);
+		
+		m.setMessage(SUCESS);
+		m.setStatus(HttpStatus.OK);
+		
+		return new ResponseEntity<Result<Map<String,Object>>>(result, HttpStatus.OK);
+		
+	
+    	       
     }
 	
 	@RequestMapping( method = RequestMethod.DELETE, value = "/delete/{refsetId}/member/{referenceComponentId}",  produces = "application/json", consumes = "application/json")
@@ -341,7 +248,7 @@ public class RefsetAuthoringController {
     public ResponseEntity<Result< Map<String, Object>>> removeMember( @PathVariable String refsetId,
     		@PathVariable String referenceComponentId,
     		@RequestHeader("X-REFSET-PRE-AUTH-TOKEN") String authToken, 
-    		@RequestHeader("X-REFSET-PRE-AUTH-USERNAME") String userName) {
+    		@RequestHeader("X-REFSET-PRE-AUTH-USERNAME") String userName) throws Exception {
 		
 		logger.debug("Removing an existing refsets {}", refsetId);
 
@@ -350,38 +257,18 @@ public class RefsetAuthoringController {
 		
 		response.setMeta(m);
 
-    	try {
+		Assert.notNull(refsetId, "Required refset id is not available in request");
+		
+		aService.removeMemberFromRefset(refsetId, referenceComponentId);
 
-    		Assert.notNull(refsetId, "Required refset id is not available in request");
-    		
-    		aService.removeMemberFromRefset(refsetId, referenceComponentId);
+		m.add( linkTo( methodOn( RefsetBrowseController.class ).getRefsets(1, 10)).withRel("Refset"));
 
-    		m.add( linkTo( methodOn( RefsetBrowseController.class ).getRefsets(1, 10)).withRel("Refset"));
+		m.setMessage(SUCESS);
+		m.setStatus(HttpStatus.OK);
 
-			m.setMessage(SUCESS);
-			m.setStatus(HttpStatus.OK);
-
-			return new ResponseEntity<Result<Map<String,Object>>>(response, HttpStatus.OK);
-			
-		} catch (RefsetServiceException e) {
-			
-			// TODO Filter error. Only Pass what is required
-			String message = String.format("Error occurred during service call : %s", e.getMessage());
-			logger.error(message);
-			m.setMessage(message); 
-			m.setStatus(HttpStatus.OK);
-
-			return new ResponseEntity<Result<Map<String,Object>>>(response, HttpStatus.OK);
-	    	
-		} catch (EntityNotFoundException e) {
-			
-			String message = String.format("Error occurred during service call : %s", e.getMessage());
-			logger.error(message);
-			m.setMessage(message); 
-			m.setStatus(HttpStatus.NOT_FOUND);
-
-			return new ResponseEntity<Result<Map<String,Object>>>(response, HttpStatus.NOT_FOUND);
-		}         
+		return new ResponseEntity<Result<Map<String,Object>>>(response, HttpStatus.OK);
+		
+	         
     }
 
 	
