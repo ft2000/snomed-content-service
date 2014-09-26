@@ -20,6 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -74,7 +75,6 @@ public class RefsetBrowseController {
 
 		Map<String, Object> data = new HashMap<String, Object>();
 		data.put("refsets", refSets);
-		m.setNoOfRecords(refSets.size());
 		response.setData(data);
 		
 		m.setMessage(SUCESS);
@@ -104,8 +104,8 @@ public class RefsetBrowseController {
 
 		if (SecurityContextHolder.getContext().getAuthentication() instanceof AnonymousAuthenticationToken && !refSet.isPublished()) {
 			
-			return new ResponseEntity<Result<Map<String,Object>>>(response, HttpStatus.FORBIDDEN);
-
+			throw new AccessDeniedException("Please login to see work in progress refsets");
+			
 		}
 		Map<String, Object> data = new HashMap<String, Object>();
 		data.put("refset", refSet);
@@ -113,7 +113,6 @@ public class RefsetBrowseController {
 		response.setData(data);
 		m.setMessage(SUCESS);
 		m.setStatus(HttpStatus.OK);
-		m.setNoOfRecords(1);
 
 		return new ResponseEntity<Result<Map<String,Object>>>(response, HttpStatus.OK);
 		

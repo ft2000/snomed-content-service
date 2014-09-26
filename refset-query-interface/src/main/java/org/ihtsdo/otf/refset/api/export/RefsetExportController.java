@@ -5,7 +5,9 @@ package org.ihtsdo.otf.refset.api.export;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.ihtsdo.otf.refset.common.Utility;
 import org.ihtsdo.otf.refset.service.export.ExportService;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,13 +39,13 @@ public class RefsetExportController {
 	@Autowired
 	private ExportService eService;
 
-	@RequestMapping( method = RequestMethod.GET, value = "/{refsetId}/export",  produces = {MediaType.APPLICATION_OCTET_STREAM_VALUE})
+	@RequestMapping( method = RequestMethod.GET, value = "/{refsetId}/export", produces = {MediaType.APPLICATION_OCTET_STREAM_VALUE})
 	@ApiOperation( value = "Export a Refset in RF2 format" )
 	@PreAuthorize("hasRole('ROLE_USER')")
     public @ResponseBody void exportRF2( @PathVariable String refsetId, HttpServletResponse resp) throws Exception {
 		
 		logger.debug("Exporting an existing refset {} in rf2 format", refsetId);
-	    resp.setHeader("Content-Disposition", "attachment; filename=\"refset_" + refsetId + ".rf2\"");
+	    resp.setHeader("Content-Disposition", "attachment; filename=\"rel2_Refset_SimpleDelta_INT_" + Utility.getDate(new DateTime()) + ".rf2\"");
 	    
         ICsvListWriter csvWriter = new CsvListWriter(resp.getWriter(),
                 CsvPreference.TAB_PREFERENCE);
@@ -52,6 +54,7 @@ public class RefsetExportController {
         
         csvWriter.close();
      
+        return;
     }
 	
 

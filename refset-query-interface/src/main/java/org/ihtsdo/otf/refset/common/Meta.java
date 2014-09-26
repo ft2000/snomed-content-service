@@ -9,25 +9,8 @@ public class Meta extends ResourceSupport {
 	private HttpStatus status;
 	
 	private String message;
-	
-	private int noOfRecords;
-	
+		
 	private ErrorInfo errorInfo;
-	
-
-	/**
-	 * @return the noOfRecords
-	 */
-	public int getNoOfRecords() {
-		return noOfRecords;
-	}
-
-	/**
-	 * @param noOfRecords the noOfRecords to set
-	 */
-	public void setNoOfRecords(int noOfRecords) {
-		this.noOfRecords = noOfRecords;
-	}
 
 	/**
 	 * @return the status

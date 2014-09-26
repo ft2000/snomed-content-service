@@ -19,7 +19,7 @@ public class DefaultController {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(DefaultController.class);
 	
-	@RequestMapping(value = "/**")
+	@RequestMapping(value = "/v1.0/**")
 	public String handleUnknownRequest(HttpServletRequest req) {
 		
 		String message = String.format("There is no service available for request "

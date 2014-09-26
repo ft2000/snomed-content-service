@@ -69,7 +69,6 @@ public class ConceptLookupController {
 
 		Map<String, Object> data = new HashMap<String, Object>();
 		data.put("concepts", cs);
-		m.setNoOfRecords(cs.size());
 		response.setData(data);
 		
 		m.setMessage(SUCESS);
@@ -109,7 +108,6 @@ public class ConceptLookupController {
 		response.setData(data);
 		m.setMessage(SUCESS);
 		m.setStatus(HttpStatus.OK);
-		m.setNoOfRecords(1);
 
 		return new ResponseEntity<Result<Map<String,Object>>>(response, HttpStatus.OK);
 		
@@ -141,7 +139,6 @@ public class ConceptLookupController {
 		response.setData(data);
 		m.setMessage(SUCESS);
 		m.setStatus(HttpStatus.OK);
-		m.setNoOfRecords(ids.size());
 
 		return new ResponseEntity<Result<Map<String,Object>>>(response, HttpStatus.OK);
 		

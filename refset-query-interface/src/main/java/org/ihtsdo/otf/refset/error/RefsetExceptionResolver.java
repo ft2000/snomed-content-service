@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -136,7 +137,9 @@ public class RefsetExceptionResolver {
 		
 		LOGGER.error("Exception details \n {}", e);
 
-		ErrorInfo errorInfo = new ErrorInfo("You are not authorized to call this service with provided credentials", Integer.toString(org.apache.commons.httpclient.HttpStatus.SC_UNAUTHORIZED));
+		String message = StringUtils.isEmpty(e.getMessage()) ? "Unauthorized access, please check provided credentials in service call"  : e.getMessage();
+		
+		ErrorInfo errorInfo = new ErrorInfo(message, Integer.toString(org.apache.commons.httpclient.HttpStatus.SC_UNAUTHORIZED));
 	    
 		Meta m = new Meta();
 		m.setStatus(HttpStatus.UNAUTHORIZED);

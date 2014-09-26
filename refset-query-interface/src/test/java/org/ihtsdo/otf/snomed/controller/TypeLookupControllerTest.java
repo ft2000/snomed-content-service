@@ -86,7 +86,24 @@ public class TypeLookupControllerTest {
         .andExpect(jsonPath("$.meta.status").value("OK"))
         .andExpect(jsonPath("$.content.refsetTypes.900000000000496009").value("Simple map type reference set (foundation metadata concept)"))
         .andExpect(jsonPath("$.content.refsetTypes.446609009").value("Simple type reference set (foundation metadata concept)"));
-;
+
+
+	}
+	/*
+	* @throws Exception
+	 */
+	@Test
+	public void testGetModules() throws Exception {
+		
+		this.mockMvc.perform(
+				get("/v1.0/snomed/modules")
+				.accept(MediaType.APPLICATION_JSON))
+       .andDo(print())
+       .andExpect(status().isOk())
+       .andExpect(jsonPath("$.meta.message").value("Success"))
+       .andExpect(jsonPath("$.meta.status").value("OK"))
+       .andExpect(jsonPath("$.content.modules.900000000000207008").value("SNOMED CT core module (core metadata concept)"))
+       .andExpect(jsonPath("$.content.modules.900000000000012004").value("SNOMED CT model component module (core metadata concept)"));
 
 
 	}

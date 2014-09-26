@@ -68,8 +68,7 @@ public class TypeLookupController {
 		response.setData(data);
 		m.setMessage(SUCESS);
 		m.setStatus(HttpStatus.OK);
-		m.setNoOfRecords(types.size());
-
+		
 		return new ResponseEntity<Result<Map<String,Object>>>(response, HttpStatus.OK);
       
     }
@@ -107,12 +106,43 @@ public class TypeLookupController {
 		
 		response.setData(data);
 		m.setMessage(SUCESS);
+		m.setStatus(HttpStatus.OK);		
+		
+		return new ResponseEntity<Result<Map<String,Object>>>(response, HttpStatus.OK);
+      
+    }
+	
+	@RequestMapping( method = RequestMethod.GET, value = "/modules", produces = "application/json" )
+	@ApiOperation( value = "Api to get allowed modules - a collection of module ids and names." )
+    public ResponseEntity<Result< Map<String, Object>>> getModules() throws Exception {
+		
+		logger.debug("Getting getModules");
+
+		Result<Map<String, Object>> response = new Result<Map<String, Object>>();
+		
+		Meta m = new Meta();
+
+		m.add( linkTo( methodOn( TypeLookupController.class).getModules() ).withSelfRel() );
+		response.setMeta(m);
+
+		Map<String, String> modules = new TreeMap<String, String>();//cService.getTypes("900000000000455006");
+		modules.put("900000000000207008", "SNOMED CT core module (core metadata concept)");
+		modules.put("900000000000012004", "SNOMED CT model component module (core metadata concept)");
+		modules.put("449081005", "SNOMED CT Spanish edition module (core metadata concept)");
+		modules.put("449080006", "SNOMED CT to ICD-10 rule-based mapping module (core metadata concept)");
+		modules.put("449079008", "SNOMED CT to ICD-9CM equivalency mapping module (core metadata concept)");
+
+		Map<String, Object> data = new HashMap<String, Object>();
+		data.put("modules", modules);
+		
+		response.setData(data);
+		m.setMessage(SUCESS);
 		m.setStatus(HttpStatus.OK);
-		m.setNoOfRecords(types.size());
 		
 		
 		return new ResponseEntity<Result<Map<String,Object>>>(response, HttpStatus.OK);
       
     }
+
 	
 }
