@@ -18,8 +18,6 @@ import org.ihtsdo.otf.refset.graph.RefsetGraphAccessException;
 import org.ihtsdo.otf.refset.graph.gao.MemberGAO;
 import org.ihtsdo.otf.refset.graph.gao.RefsetAdminGAO;
 import org.ihtsdo.otf.refset.graph.gao.RefsetGAO;
-import org.ihtsdo.otf.snomed.domain.Concept;
-import org.ihtsdo.otf.snomed.exception.ConceptServiceException;
 import org.ihtsdo.otf.snomed.service.ConceptLookupService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -80,7 +78,7 @@ public class RefsetAuthoringServiceImpl implements RefsetAuthoringService {
 		
 		LOGGER.debug("Adding member {} to refset {}", m, refsetId);
 
-		if (m == null || StringUtils.isEmpty(m.getReferenceComponentId())) {
+		if (m == null || StringUtils.isEmpty(m.getReferencedComponentId())) {
 			
 			throw new EntityNotFoundException("Invalid member details. Member must have reference component id");
 		}
@@ -178,81 +176,6 @@ public class RefsetAuthoringServiceImpl implements RefsetAuthoringService {
 		
 	}
 
-	/* (non-Javadoc)
-	 * @see org.ihtsdo.otf.refset.service.RefsetAuthoringService#addMembers(java.lang.String, java.util.Set)
-	 */
-	@Override
-	public Map<String, String> addMembers(String refsetId, Set<String> conceptIds)
-			throws RefsetServiceException, EntityNotFoundException {
-		
-
-		Map<String, String> tOutcome = new HashMap<String, String>();
-		
-		LOGGER.debug("Adding member {} to refset {}", conceptIds, refsetId);
-
-		try {
-			
-			Map<String, Concept> concepts = lService.getConcepts(conceptIds);
-			
-			
-			List<Member> members = new ArrayList<Member>();
-			
-			for (String id : conceptIds) {
-				
-				Concept c = concepts.get(id);
-				
-				if (c != null) {
-					
-					Member m = new Member();
-					m.setId(UUID.randomUUID().toString());
-					m.setActive(c.isActive());
-					m.setEffectiveTime(c.getEffectiveTime());
-					m.setModuleId(c.getModule());
-					m.setReferenceComponentId(c.getId());
-					
-					LOGGER.debug("Adding member {} to member list for id {}", m, id);
-
-					members.add(m);
-
-				} else {
-					
-					LOGGER.debug("Not adding member details as no concept details available for id {}", id);
-					tOutcome.put(id, "Member details not available");
-
-				}
-				
-			}
-			
-			LOGGER.debug("Adding member {} to refset {}", members, refsetId);
-
-			Map<String, String> outcome = mGao.addMembers(refsetId, members);
-			tOutcome.putAll(outcome);
-
-			LOGGER.debug("Added member {} to refset {}");
-
-			
-		} catch (EntityNotFoundException e) {
-
-			LOGGER.error("Error during service call", e);
-
-			throw e;
-			
-		} catch (RefsetGraphAccessException e) {
-
-			LOGGER.error("Error during service call", e);
-			throw new RefsetServiceException(e.getMessage());
-
-		} catch (ConceptServiceException e) {
-
-			LOGGER.error("Error during service call", e);
-
-			throw new RefsetServiceException(e.getMessage());
-		}
-		
-
-		return tOutcome;
-		
-	}
 
 	/* (non-Javadoc)
 	 * @see org.ihtsdo.otf.refset.service.RefsetAuthoringService#removeMemberFromRefset(java.lang.String, java.lang.String)
@@ -287,6 +210,85 @@ public class RefsetAuthoringServiceImpl implements RefsetAuthoringService {
 		}
 		
 
+	}
+	
+	
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.otf.refset.service.RefsetAuthoringService#addMembers(java.lang.String, java.util.Set)
+	 */
+	@Override
+	public Map<String, String> removeMembers(String refsetId, Set<String> conceptIds)
+			throws RefsetServiceException, EntityNotFoundException {
+		
+
+		Map<String, String> tOutcome = new HashMap<String, String>();
+		
+		LOGGER.debug("Removing members {} from refset {}", conceptIds, refsetId);
+
+		try {
+			
+			Map<String, String> outcome = mGao.removeMembers(refsetId, conceptIds);
+			
+			tOutcome.putAll(outcome);
+
+
+			
+		} catch (EntityNotFoundException e) {
+
+			LOGGER.error("Error during service call", e);
+
+			throw e;
+			
+		} catch (RefsetGraphAccessException e) {
+
+			LOGGER.error("Error during service call", e);
+			throw new RefsetServiceException(e.getMessage());
+
+		}
+		
+
+		return tOutcome;
+		
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.otf.refset.service.RefsetAuthoringService#addMembers(java.lang.String, java.util.Set)
+	 */
+	@Override
+	public Map<String, String> addMembers(String refsetId, Set<Member> members)
+			throws RefsetServiceException, EntityNotFoundException {
+		
+
+		Map<String, String> tOutcome = new HashMap<String, String>();
+		
+		LOGGER.debug("Adding members {} to refset {}", members, refsetId);
+
+		try {			
+			
+			LOGGER.debug("Adding member {} to refset {}", members, refsetId);
+
+			Map<String, String> outcome = mGao.addMembers(refsetId, members);
+			tOutcome.putAll(outcome);
+
+			LOGGER.debug("Added member {} to refset {}");
+
+			
+		} catch (EntityNotFoundException e) {
+
+			LOGGER.error("Error during service call", e);
+
+			throw e;
+			
+		} catch (RefsetGraphAccessException e) {
+
+			LOGGER.error("Error during service call", e);
+			throw new RefsetServiceException(e.getMessage());
+
+		} 
+		
+
+		return tOutcome;
+		
 	}
 
 }

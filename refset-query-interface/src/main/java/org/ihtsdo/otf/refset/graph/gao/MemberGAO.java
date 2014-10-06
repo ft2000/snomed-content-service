@@ -4,8 +4,8 @@
 package org.ihtsdo.otf.refset.graph.gao;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import org.ihtsdo.otf.refset.domain.Member;
@@ -107,13 +107,13 @@ public class MemberGAO {
 	protected Vertex addMemberNode(Member m, FramedTransactionalGraph<TitanGraph> tg) throws RefsetGraphAccessException, EntityNotFoundException {
 		
 		Vertex mV = null;
-		if (m == null || StringUtils.isEmpty(m.getReferenceComponentId())) {
+		if (m == null || StringUtils.isEmpty(m.getReferencedComponentId())) {
 			
 			throw new EntityNotFoundException("Invalid member details. refset component id is mandatory in member details");
 		}
 		try {
 			
-			mV = getMemberVertex(m.getReferenceComponentId(), tg.getBaseGraph());
+			mV = getMemberVertex(m.getReferencedComponentId(), tg.getBaseGraph());
 
 			LOGGER.debug("Member already exist as vertex to graph {}", mV);
 
@@ -135,7 +135,7 @@ public class MemberGAO {
 
 			}
 			mg.setModuleId(m.getModuleId());
-			mg.setReferenceComponentId(m.getReferenceComponentId());
+			mg.setReferencedComponentId(m.getReferencedComponentId());
 			
 			DateTime dt = m.getEffectiveTime();
 			if (dt != null) {
@@ -176,7 +176,7 @@ public class MemberGAO {
 	 * @throws EntityNotFoundException 
 	 * @throws RefsetGraphAccessException 
 	 */
-	public Map<String, String> addMembers(String refsetId, List<Member> members) throws RefsetGraphAccessException, EntityNotFoundException {
+	public Map<String, String> addMembers(String refsetId, Set<Member> members) throws RefsetGraphAccessException, EntityNotFoundException {
 		
 		Map<String, String> outcomeMap = new HashMap<String, String>(); //needed at front end
 		
@@ -199,7 +199,7 @@ public class MemberGAO {
 				
 				try {
 					
-					mV = getMemberVertex(m.getReferenceComponentId(), tg.getBaseGraph());
+					mV = getMemberVertex(m.getReferencedComponentId(), tg.getBaseGraph());
 
 				} catch(EntityNotFoundException e) {
 					
@@ -209,7 +209,7 @@ public class MemberGAO {
 				
 				//only add relationship if does not exist already
 				
-				Iterable<Edge> eR = tg.getEdges(RGC.REFERENCE_COMPONENT_ID, m.getReferenceComponentId());
+				Iterable<Edge> eR = tg.getEdges(RGC.REFERENCE_COMPONENT_ID, m.getReferencedComponentId());
 				
 				boolean existingMember = false;
 				
@@ -222,6 +222,9 @@ public class MemberGAO {
 
 						e.setProperty(RGC.PUBLISHED, m.isPublished());
 						e.setProperty(RGC.ACTIVE, m.isActive());
+						e.setProperty(RGC.MODIFIED_DATE, new DateTime().getMillis());
+						e.setProperty(RGC.MODIFIED_BY, m.getModifiedBy());
+
 						existingMember = true;
 						break;
 					}
@@ -236,20 +239,34 @@ public class MemberGAO {
 					
 					//added effective date of relationship
 					e.setProperty(RGC.EFFECTIVE_DATE, new DateTime().getMillis());
-					e.setProperty(RGC.REFERENCE_COMPONENT_ID, m.getReferenceComponentId());
+					e.setProperty(RGC.REFERENCE_COMPONENT_ID, m.getReferencedComponentId());
 					e.setProperty(RGC.PUBLISHED, m.isPublished());
 					e.setProperty(RGC.ACTIVE, m.isActive());
+					e.setProperty(RGC.MODIFIED_DATE, new DateTime().getMillis());
+					e.setProperty(RGC.MODIFIED_BY, m.getModifiedBy());
+
+					e.setProperty(RGC.CREATED, new DateTime().getMillis());
+					e.setProperty(RGC.CREATED_BY, m.getCreatedBy());
+
 
 				}
 				
 				
 
-				outcomeMap.put(m.getReferenceComponentId(), "Success");
+				outcomeMap.put(m.getReferencedComponentId(), "Success");
 			}
 			
 			tg.commit();
 
-		} catch (Exception e) {
+		} catch (EntityNotFoundException e) {
+			
+			LOGGER.error("Error during bulk member upload", e);
+
+			if (tg != null) { tg.rollback(); }
+			
+			throw e;
+			
+		}catch (Exception e) {
 			
 			LOGGER.error("Error during bulk member upload", e);
 
@@ -326,8 +343,68 @@ public class MemberGAO {
 			
 			RefsetGraphFactory.shutdown(tg);
 		}
+	}
+		
+		/**This is a transaction so we can not individually send error/success for a conceptId!! 
+		 * @param refsetId
+		 * @param rcId
+		 * @throws EntityNotFoundException 
+		 * @throws RefsetGraphAccessException 
+		 */
+		public Map<String, String> removeMembers(String refsetId, Set<String> rcIds) throws EntityNotFoundException, RefsetGraphAccessException {
 
+			LOGGER.debug("removing members {} from refset {}", rcIds, refsetId);
+			TitanGraph tg = null;
+			Map<String, String> outcome = new HashMap<String, String>();
+			
+			try {
+				
+				tg = factory.getTitanGraph();
+				
+				Vertex rV = rGao.getRefsetVertex(refsetId, fgf.create(tg));
 
+				Iterable<Edge> eR = rV.getEdges(Direction.IN, "members");
+				
+				for (Edge e : eR) {
+					
+					String referencedComponentId = e.getProperty(RGC.REFERENCE_COMPONENT_ID);
+					
+					if (!StringUtils.isEmpty(referencedComponentId) 
+							&& rcIds.contains(referencedComponentId)) {
+						
+						LOGGER.debug("Removing member {} relationship from refset {}", e, rV);
+						e.remove();
+						
+						outcome.put(referencedComponentId, "Success");
+
+					}
+				}
+
+				tg.commit();
+
+			} catch (EntityNotFoundException e) {
+				
+				LOGGER.error("Error while removing member", e);
+
+				if (tg != null) { tg.rollback(); }
+				
+				throw e;
+				
+			} catch (Exception e) {
+				
+				LOGGER.error("Error while removing member", e);
+
+				if (tg != null) { tg.rollback(); }
+				
+				throw new RefsetGraphAccessException("Error while removing members");
+				
+			} finally {
+				
+				RefsetGraphFactory.shutdown(tg);
+			}
+
+			
+			return outcome;
 		
 	}
 

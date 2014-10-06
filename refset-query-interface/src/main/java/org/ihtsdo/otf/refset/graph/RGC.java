@@ -22,7 +22,11 @@ public final class RGC {
 	public static final String LANG_CODE = "languageCode";
 	public static final String CREATED_BY = "createdBy";
 	public static final String MODULE_ID = "moduleId";
-	public static final String REFERENCE_COMPONENT_ID = "referenceComponentId";
+	public static final String REFERENCE_COMPONENT_ID = "referencedComponentId";
 	public static final String ACTIVE = "active";
 	public static final String MEMBER_TYPE_ID = "componentTypeId";
+	public static final String MODIFIED_DATE = "modifiedDate";
+	public static final String MODIFIED_BY = "modifiedBy";
+
+
 }

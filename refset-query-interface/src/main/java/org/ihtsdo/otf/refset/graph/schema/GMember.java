@@ -62,13 +62,13 @@ public interface GMember extends VertexFrame {
 	/**
 	 * @return the referenceComponentId
 	 */
-	@Property(value = "referenceComponentId")
-	public String getReferenceComponentId();
+	@Property(value = "referencedComponentId")
+	public String getReferencedComponentId();
 	/**
 	 * @param referenceComponentId the referenceComponentId to set
 	 */
-	@Property(value = "referenceComponentId")
-	public void setReferenceComponentId(String referenceComponentId);
+	@Property(value = "referencedComponentId")
+	public void setReferencedComponentId(String referenceComponentId);
 	
 	/**
 	 * @return the published
@@ -82,6 +82,29 @@ public interface GMember extends VertexFrame {
 	@Property(value = "published")
 	public void setPublished(boolean isPublished);
 	
+	/**
+	 * @return the modifiedDate
+	 */
+	@Property( value = "modifiedDate")
+	public long getModifiedDate();
+
+	/**
+	 * @param modifiedDate the modifiedDate to set
+	 */
+	@Property( value = "modifiedDate")
+	public void setModifiedDate(long modifiedDate);
+	
+	/**
+	 * @return the modifiedBy
+	 */
+	@Property( value = "modifiedBy")
+	public String getModifiedBy();
+
+	/**
+	 * @param modifiedBy the modifiedBy to set
+	 */
+	@Property( value = "modifiedBy")
+	public void setModifiedBy(String modifiedBy);
 
    
 }
