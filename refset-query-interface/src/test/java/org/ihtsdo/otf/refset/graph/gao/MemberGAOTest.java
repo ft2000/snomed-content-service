@@ -184,10 +184,10 @@ public class MemberGAOTest {
 		r.setDescription("Junit");
 		
 		Member m = new Member();
-		m.setReferenceComponentId("101");
+		m.setReferencedComponentId("101");
 
 		Member m_1 = new Member();
-		m_1.setReferenceComponentId("102");
+		m_1.setReferencedComponentId("102");
 
 		List<Member> members = new ArrayList<Member>();
 		members.add(m);

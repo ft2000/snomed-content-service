@@ -94,14 +94,14 @@ public class RefsetJsonConversionTest {
 		Member m = new Member();
 		m.setId("450451007");
 		m.setActive(true);
-		m.setReferenceComponentId("4504511107");
+		m.setReferencedComponentId("4504511107");
 		m.setModuleId("900000000000207002");
 
 		members.add(m);
 		
 		m = new Member();
 		m.setActive(true);
-		m.setReferenceComponentId("4504511107");
+		m.setReferencedComponentId("4504511107");
 		m.setModuleId("900000000000207002");
 		
 		m.setId("450451006");
@@ -109,14 +109,14 @@ public class RefsetJsonConversionTest {
 		
 		m = new Member();
 		m.setActive(true);
-		m.setReferenceComponentId("4504511107");
+		m.setReferencedComponentId("4504511107");
 		m.setModuleId("900000000000207008");
 		m.setId("450451005");
 		members.add(m);
 		
 		m = new Member();
 		m.setActive(true);
-		m.setReferenceComponentId("4504511107");
+		m.setReferencedComponentId("4504511107");
 		m.setModuleId("900000000000207008");
 		m.setId("450451017");
 		members.add(m);

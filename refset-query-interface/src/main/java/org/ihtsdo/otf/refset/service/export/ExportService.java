@@ -17,15 +17,11 @@ import org.ihtsdo.otf.refset.exception.ExportServiceException;
 import org.ihtsdo.otf.refset.exception.RefsetServiceException;
 import org.ihtsdo.otf.refset.service.RefsetBrowseService;
 import org.ihtsdo.otf.snomed.service.ConceptLookupService;
-import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
-import org.supercsv.cellprocessor.FmtBool;
 import org.supercsv.cellprocessor.Optional;
 import org.supercsv.cellprocessor.constraint.UniqueHashCode;
 import org.supercsv.cellprocessor.ift.CellProcessor;
@@ -72,7 +68,7 @@ public class ExportService {
              * id	effectiveTime	active	moduleId	refSetId	referencedComponentId
              */
 			final String[] header = new String[] { "id", "effectiveTime", "active"
-            		, "moduleId", "refSetId", "referenceComponentId"};
+            		, "moduleId", "refSetId", "referencedComponentId"};
 			            
 
             lWriter.writeHeader(header);
@@ -89,7 +85,7 @@ public class ExportService {
 								
 				String active = m.isActive() ? "1" : "0";
 				List<Object> concept = Arrays.asList(new Object[] { m.getId(), Utility.getDate(m.getEffectiveTime()), active
-                		, r.getModuleId(), r.getId(), m.getReferenceComponentId()});
+                		, r.getModuleId(), r.getId(), m.getReferencedComponentId()});
 
 				lWriter.write(concept, processors);
 				

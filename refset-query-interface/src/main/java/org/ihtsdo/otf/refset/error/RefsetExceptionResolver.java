@@ -1,6 +1,10 @@
 package org.ihtsdo.otf.refset.error;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.ihtsdo.otf.refset.common.Meta;
 import org.ihtsdo.otf.refset.common.Result;
@@ -8,16 +12,22 @@ import org.ihtsdo.otf.refset.exception.EntityNotFoundException;
 import org.ihtsdo.otf.refset.exception.ExportServiceException;
 import org.ihtsdo.otf.refset.exception.InvalidServiceException;
 import org.ihtsdo.otf.refset.exception.RefsetServiceException;
+import org.ihtsdo.otf.refset.exception.ValidationException;
 import org.ihtsdo.otf.snomed.exception.ConceptServiceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.util.StringUtils;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
+
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 
 @ControllerAdvice
 public class RefsetExceptionResolver {
@@ -143,6 +153,65 @@ public class RefsetExceptionResolver {
 	    
 		Meta m = new Meta();
 		m.setStatus(HttpStatus.UNAUTHORIZED);
+		m.setErrorInfo(errorInfo);
+		response.setMeta(m);
+
+		return response;
+
+	}
+	
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	@ExceptionHandler(ValidationException.class)
+	@ResponseBody Result<Map<String, Object>> handleValidationException(ValidationException e) {
+		
+		LOGGER.error("Exception details \n {}", e);
+
+		String message = StringUtils.isEmpty(e.getMessage()) ? "Request does not conform to expected input. Please see error details and try again"  : e.getMessage();
+		
+		Map<Object,List<FieldError>> failures = e.getFailures();
+		
+		Set<Object> keys = failures.keySet();
+		
+		Map<Object,List<ErrorInfo>> vFailures = new HashMap<Object, List<ErrorInfo>>();
+		
+		for (Object key : keys) {
+			
+			List<FieldError> fErrors = failures.get(key);
+			
+			List<ErrorInfo> errors = new ArrayList<ErrorInfo>();
+
+			for (FieldError fieldError : fErrors) {
+				
+				ErrorInfo info = new ErrorInfo(fieldError.getCode(), fieldError.getField());
+				errors.add(info);
+			}
+			
+			vFailures.put(key, errors);
+		}
+		
+		ErrorInfo errorInfo = new ErrorInfo(message, Integer.toString(org.apache.commons.httpclient.HttpStatus.SC_BAD_REQUEST), vFailures );
+	    
+		Meta m = new Meta();
+		m.setStatus(HttpStatus.BAD_REQUEST);
+		m.setErrorInfo(errorInfo);
+		response.setMeta(m);
+
+		return response;
+
+	}
+	
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	@ExceptionHandler(HttpMessageNotReadableException.class)
+	@ResponseBody Result<Map<String, Object>> handleValidationException(HttpMessageNotReadableException e) {
+		
+		LOGGER.error("Exception details \n {}", e);
+
+		String message = StringUtils.isEmpty(e.getMessage()) ? "Request does not conform to expected input. Please error details and try again"  : e.getMessage();
+		
+		ErrorInfo errorInfo = new ErrorInfo(message, Integer.toString(org.apache.commons.httpclient.HttpStatus.SC_BAD_REQUEST));
+	    
+		Meta m = new Meta();
+		m.setStatus(HttpStatus.BAD_REQUEST);
 		m.setErrorInfo(errorInfo);
 		response.setMeta(m);
 

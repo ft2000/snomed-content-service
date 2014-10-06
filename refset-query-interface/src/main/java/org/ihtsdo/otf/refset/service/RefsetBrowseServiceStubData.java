@@ -38,7 +38,7 @@ public class RefsetBrowseServiceStubData {
 	private static Map<String, Integer> refsetIdsAndMembers = new HashMap<String, Integer>() ;
 	private static final String[] REFSET_MAPPING = new String[] {"id", "description", "created", "createdBy", "languageCode", 
 			"type", "publishedDate", "effectiveTime", "moduleId", "published"};
-	private static String[] MEMBER_MAPPING = new String[] {"referenceComponentId", "effectiveTime", "active", "moduleId"}; 
+	private static String[] MEMBER_MAPPING = new String[] {"referencedComponentId", "effectiveTime", "active", "moduleId"}; 
 
 	static 
 	{

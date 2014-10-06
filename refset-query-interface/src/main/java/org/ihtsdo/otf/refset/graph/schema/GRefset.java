@@ -198,6 +198,30 @@ public interface GRefset extends VertexFrame {
 	 */
 	@Property( value = "componentTypeId")
 	public void setComponentTypeId(String componentTypeId);
+	
+	/**
+	 * @return the modifiedDate
+	 */
+	@Property( value = "modifiedDate")
+	public long getModifiedDate();
+
+	/**
+	 * @param modifiedDate the modifiedDate to set
+	 */
+	@Property( value = "modifiedDate")
+	public void setModifiedDate(long modifiedDate);
+	
+	/**
+	 * @return the modifiedBy
+	 */
+	@Property( value = "modifiedBy")
+	public String getModifiedBy();
+
+	/**
+	 * @param modifiedBy the modifiedBy to set
+	 */
+	@Property( value = "modifiedBy")
+	public void setModifiedBy(String modifiedBy);
 
 
 }

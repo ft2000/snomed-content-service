@@ -16,92 +16,26 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  * @author Episteme Partners
  *
  */
-public class Refset {
+public class Refset extends BaseObj {
 
-	
-	@NotNull
-	private String id;
-	
 
-	@NotNull
-	private String moduleId;
 	
 	@NotNull
 	private String description;
-	
-	@NotNull
-	private String createdBy;
-	
-	@NotNull
-	private DateTime created;
 
 	private String languageCode;
 	
 	private String type;
 	
 	private List<Member> members;
-		
-	private boolean published;
-	
-	private DateTime publishedDate;
-	
-	private DateTime effectiveTime;
 	
 	private String typeId;
 	
 	private String superRefsetTypeId;
 	
-	private boolean active;
-	
 	private String componentTypeId;
 	
-	@JsonIgnore
-	private MetaData metaData;
 	
-
-
-	/**
-	 * @return the created
-	 */
-	public DateTime getCreated() {
-		return created;
-	}
-
-	/**
-	 * @param created the created to set
-	 */
-	public void setCreated(DateTime created) {
-		this.created = created;
-	}
-
-	/**
-	 * @return the publishedDate
-	 */
-	public DateTime getPublishedDate() {
-		return publishedDate;
-	}
-
-	/**
-	 * @param publishedDate the publishedDate to set
-	 */
-	public void setPublishedDate(DateTime publishedDate) {
-		this.publishedDate = publishedDate;
-	}
-
-	/**
-	 * @return the effectiveTime
-	 */
-	public DateTime getEffectiveTime() {
-		return effectiveTime;
-	}
-
-	/**
-	 * @param effectiveTime the effectiveTime to set
-	 */
-	public void setEffectiveTime(DateTime effectiveTime) {
-		this.effectiveTime = effectiveTime;
-	}
-
 	/**
 	 * @return the typeId
 	 */
@@ -130,33 +64,6 @@ public class Refset {
 		this.superRefsetTypeId = superRefsetTypeId;
 	}
 
-	/**
-	 * @return the id
-	 */
-	public String getId() {
-		return id;
-	}
-
-	/**
-	 * @param id the id to set
-	 */
-	public void setId(String id) {
-		this.id = id;
-	}
-
-	/**
-	 * @return the moduleId
-	 */
-	public String getModuleId() {
-		return moduleId;
-	}
-
-	/**
-	 * @param moduleId the moduleId to set
-	 */
-	public void setModuleId(String moduleId) {
-		this.moduleId = moduleId;
-	}
 
 	/**
 	 * @return the description
@@ -172,19 +79,7 @@ public class Refset {
 		this.description = description;
 	}
 
-	/**
-	 * @return the createdBy
-	 */
-	public String getCreatedBy() {
-		return createdBy;
-	}
 
-	/**
-	 * @param createdBy the createdBy to set
-	 */
-	public void setCreatedBy(String createdBy) {
-		this.createdBy = createdBy;
-	}
 
 
 	/**
@@ -235,28 +130,6 @@ public class Refset {
 		this.members = members;
 	}
 
-
-	/**
-	 * @return the isPublished
-	 */
-	public boolean isPublished() {
-		return published;
-	}
-
-	/**
-	 * @param isPublished the isPublished to set
-	 */
-	public void setPublished(boolean isPublished) {
-		this.published = isPublished;
-	}
-
-
-
-
-
-
-
-
 	
    @Override 
    public boolean equals(Object input) {
@@ -270,8 +143,6 @@ public class Refset {
 	   
    }
    
-   
-   
    @Override
    public String toString() {
 	   
@@ -282,34 +153,6 @@ public class Refset {
 	   		this.superRefsetTypeId, this.type, this.typeId );
    }
 
-	/**
-	 * @return the meta
-	 */
-	public MetaData getMetaData() {
-		
-		return metaData == null ? new MetaData() : metaData;
-	}
-	
-	/**
-	 * @param meta the meta to set
-	 */
-	public void setMetaData(MetaData meta) {
-		this.metaData = meta;
-	}
-
-	/**
-	 * @return the active
-	 */
-	public boolean isActive() {
-		return active;
-	}
-
-	/**
-	 * @param active the active to set
-	 */
-	public void setActive(boolean active) {
-		this.active = active;
-	}
 
 	/**
 	 * @return the componentTypeId
