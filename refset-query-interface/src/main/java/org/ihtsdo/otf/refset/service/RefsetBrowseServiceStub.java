@@ -58,4 +58,14 @@ public class RefsetBrowseServiceStub implements RefsetBrowseService {
 		return dataService.getRefSet(refsetId);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.otf.refset.service.RefsetBrowseService#isDescriptionExist(java.lang.String)
+	 */
+	@Override
+	public boolean isDescriptionExist(String descrition)
+			throws RefsetServiceException {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
 }

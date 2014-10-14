@@ -119,4 +119,29 @@ public class RefsetBrowseController {
 	       
     }
 	
+	@RequestMapping( method = RequestMethod.GET, value = "checkDescription/{description}", produces = "application/json" )
+	@ApiOperation( value = "Api to check if provided description already exist in the system" )
+    public ResponseEntity<Result< Map<String, Object>>> isDescriptionExist( @PathVariable( value = "description" ) String description ) throws Exception {
+		
+		logger.debug("validating description {}", description);
+
+		Result<Map<String, Object>> response = new Result<Map<String, Object>>();
+
+		Meta m = new Meta();
+		
+		boolean isExist = bService.isDescriptionExist(description);
+
+		Map<String, Object> data = new HashMap<String, Object>();
+		data.put("exist", isExist);
+		
+		response.setData(data);
+		m.setMessage(SUCESS);
+		m.setStatus(HttpStatus.OK);
+
+		return new ResponseEntity<Result<Map<String,Object>>>(response, HttpStatus.OK);
+		
+	       
+    }
+
+	
 }

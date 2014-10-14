@@ -88,5 +88,21 @@ public class RefsetGraphService implements RefsetBrowseService {
 			
 		}
 	}
+	
+	public boolean isDescriptionExist(String descrition) throws  RefsetServiceException{
+		
+		LOGGER.debug("checking description name {}", descrition);
+
+		try {
+			
+			return gao.isDescriptionExist(descrition);
+			
+		} catch (RefsetGraphAccessException e) {
+
+			throw new RefsetServiceException(e.getMessage());
+			
+		}
+	}
+
 
 }

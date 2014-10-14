@@ -38,7 +38,7 @@ public class MemberValidator implements Validator {
 	public void validate(Object m, Errors e) {
 		
         ValidationUtils.rejectIfEmpty(e, "referencedComponentId", "Referenced component id is mandatory");
-        ValidationUtils.rejectIfEmpty(e, "effectiveTime", "Effective time can not be empty");
+        //ValidationUtils.rejectIfEmpty(e, "effectiveTime", "Effective time can not be empty");
         ValidationUtils.rejectIfEmpty(e, "moduleId", "Module Id is Mandatory");
         ValidationUtils.rejectIfEmpty(e, "published", "Published flag is mandatory");
         ValidationUtils.rejectIfEmpty(e, "active", "Active Flag is mandatory");

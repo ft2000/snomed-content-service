@@ -36,7 +36,7 @@
 			    <!-- read for access log - http://logback.qos.ch/manual/layouts.html#AccessPatternLayout -->
 		
 	<!-- Application Loggers -->
-	<logger name="org.ihtsdo.refset" level="debug" />
+	<logger name="org.ihtsdo.otf" level="debug" />
 		
 			
 	<logger name="com.tinkerpop.blueprints" level="debug" />
@@ -70,7 +70,7 @@
 		
 
 	<!-- Root Logger -->
-	<root level="debug">
+	<root level="error">
 		<appender-ref ref="file" />
 		<appender-ref ref="console" />
 	</root>

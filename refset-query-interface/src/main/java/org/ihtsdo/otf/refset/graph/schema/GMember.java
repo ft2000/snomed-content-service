@@ -3,7 +3,6 @@
  */
 package org.ihtsdo.otf.refset.graph.schema;
 
-import com.tinkerpop.frames.Incidence;
 import com.tinkerpop.frames.Property;
 import com.tinkerpop.frames.VertexFrame;
 
@@ -16,13 +15,13 @@ public interface GMember extends VertexFrame {
 	/**
 	 * @return the effectiveTime
 	 */
-	@Incidence( label = "effectiveTime")
+	@Property( value = "effectiveTime")
 	public long getEffectiveTime();
 	
 	/**
 	 * @param effectiveTime the effectiveTime to set
 	 */
-	@Incidence( label = "effectiveTime")
+	@Property( value = "effectiveTime")
 	public void setEffectiveTime(long effectiveTime);
 	
 	/**
@@ -94,6 +93,19 @@ public interface GMember extends VertexFrame {
 	@Property( value = "modifiedDate")
 	public void setModifiedDate(long modifiedDate);
 	
+
+	/**
+	 * @return the created
+	 */
+	@Property( value = "created")
+	public long getCreated();
+
+	/**
+	 * @param modifiedDate the created to set
+	 */
+	@Property( value = "created")
+	public void setCreated(long created);
+
 	/**
 	 * @return the modifiedBy
 	 */
@@ -106,5 +118,16 @@ public interface GMember extends VertexFrame {
 	@Property( value = "modifiedBy")
 	public void setModifiedBy(String modifiedBy);
 
+	/**
+	 * @return the createdBy
+	 */
+	@Property( value = "createdBy")
+	public String getCreateBy();
+
+	/**
+	 * @param createdBy the createdBy to set
+	 */
+	@Property( value = "createdBy")
+	public void setCreateBy(String createdBy);
    
 }
