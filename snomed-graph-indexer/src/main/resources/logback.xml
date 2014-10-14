@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+  <statusListener class="ch.qos.logback.core.status.OnConsoleStatusListener" />  
+	<!-- Appenders -->
+	  
+	  <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+	    <layout class="ch.qos.logback.classic.PatternLayout">
+	      <Pattern>%d{ISO8601} [%thread] %-5level %logger{36} - %msg%n</Pattern>
+	    </layout>
+    
+      </appender>
+	 
+
+			    <!-- read for access log - http://logback.qos.ch/manual/layouts.html#AccessPatternLayout -->
+		
+	<!-- Application Loggers -->
+	<logger name="org.ihtsdo.otf" level="debug" />
+		
+			
+	<logger name="com.tinkerpop.blueprints" level="debug" />
+		
+	<logger name="com.thinkaurelius.titan.diskstorage.es" level="info" />
+	<logger name="com.thinkaurelius.titan.diskstorage.cassandra" level="error" />
+
+	<!-- Root Logger -->
+	<root level="debug">
+		<appender-ref ref="console" />
+	</root>
+	
+</configuration>
