@@ -3,13 +3,14 @@
  */
 package org.ihtsdo.otf.refset.graph.gao;
 
+import static org.ihtsdo.otf.refset.domain.RGC.*;
+
 import java.util.List;
 
 import org.ihtsdo.otf.refset.domain.Member;
 import org.ihtsdo.otf.refset.domain.MetaData;
 import org.ihtsdo.otf.refset.domain.Refset;
 import org.ihtsdo.otf.refset.exception.EntityNotFoundException;
-import org.ihtsdo.otf.refset.graph.RGC;
 import org.ihtsdo.otf.refset.graph.RefsetGraphAccessException;
 import org.ihtsdo.otf.refset.graph.RefsetGraphFactory;
 import org.ihtsdo.otf.refset.graph.schema.GRefset;
@@ -22,7 +23,6 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import com.thinkaurelius.titan.core.TitanGraph;
-import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.frames.FramedGraphFactory;
@@ -84,24 +84,9 @@ public class RefsetAdminGAO {
 
 					/*Add this member to refset*/
 					Edge e = tg.addEdge(null, mV, rV, "members");
+					e.setProperty(REFERENCE_COMPONENT_ID, m.getReferencedComponentId());
 
 					LOGGER.debug("Added relationship as edge from {} to {}", mV.getId(), rV.getId());
-					
-					//added effective date of relationship
-					if (m.getEffectiveTime() != null) {
-						
-						e.setProperty(RGC.EFFECTIVE_DATE, m.getEffectiveTime().getMillis());
-
-					}
-					e.setProperty(RGC.REFERENCE_COMPONENT_ID, m.getReferencedComponentId());
-					e.setProperty(RGC.PUBLISHED, m.isPublished());
-					e.setProperty(RGC.ACTIVE, m.isActive());
-					e.setProperty(RGC.MODIFIED_BY, m.getModifiedBy());
-					e.setProperty(RGC.MODIFIED_DATE, new DateTime().getMillis());
-					e.setProperty(RGC.CREATED_BY, m.getCreatedBy());
-					e.setProperty(RGC.CREATED, new DateTime().getMillis());
-
-
 				}
 
 				
@@ -190,6 +175,17 @@ public class RefsetAdminGAO {
 			gr.setModifiedBy(r.getModifiedBy());
 			gr.setModifiedDate(new DateTime().getMillis());
 			
+			DateTime ert = r.getExpectedReleaseDate();
+		
+			if( ert != null) {
+				
+				gr.setExpectedReleaseDate(ert.getMillis());
+			}
+			if (!StringUtils.isEmpty(r.getSctId())) {
+				
+				gr.setSctdId(r.getSctId());
+
+			}
 			LOGGER.debug("Added Refset as vertex to graph {}", gr.getId());
 
 			rV = gr.asVertex();			
@@ -224,13 +220,13 @@ public class RefsetAdminGAO {
 			
 			Vertex refset = rGao.getRefsetVertex(refsetId, g);
 			
-			boolean published = refset.getProperty(RGC.PUBLISHED);
+			boolean published = refset.getProperty(PUBLISHED);
 			
 			if (published) {
 				
 				LOGGER.debug("Not removing only making it inactive  {} ", refsetId);
 
-				refset.setProperty(RGC.ACTIVE, false);
+				refset.setProperty(ACTIVE, false);
 				
 			} else {
 				
@@ -290,56 +286,10 @@ public class RefsetAdminGAO {
 				
 				for (Member m : members) {
 					
-					LOGGER.debug("Adding member {}", m);
+					LOGGER.debug("Updating member {}", m);
 
-					Vertex mV = mGao.addMemberNode(m, tg);
+					mGao.updateMemberNode(m, tg);
 						
-					
-					LOGGER.debug("Updating relationship {}", m);
-
-					Iterable<Edge> eR = g.getEdges(RGC.REFERENCE_COMPONENT_ID, m.getReferencedComponentId());
-					boolean existingMember = false;
-					
-					for (Edge e : eR) {
-						
-						Vertex vIn = e.getVertex(Direction.IN);
-						if (vIn != null && vIn.equals(rV)) {
-							
-							LOGGER.debug("Updating relationship member with published flag for edge {}", e);
-
-							e.setProperty(RGC.PUBLISHED, m.isPublished());
-							e.setProperty(RGC.ACTIVE, m.isActive());
-							e.setProperty(RGC.MODIFIED_DATE, new DateTime().getMillis());
-							e.setProperty(RGC.MODIFIED_BY, m.getModifiedBy());
-
-							existingMember = true;
-							break;
-						}
-
-					}
-
-					LOGGER.debug("is existing member? {}", existingMember);
-
-					
-					if (!existingMember) {
-						
-						/*Add this member to refset*/
-						Edge e = tg.addEdge("memberOf", mV, rV, "members");
-						e.setProperty(RGC.EFFECTIVE_DATE, m.getEffectiveTime().getMillis());
-						e.setProperty(RGC.REFERENCE_COMPONENT_ID, m.getReferencedComponentId());
-						e.setProperty(RGC.PUBLISHED, m.isPublished());
-						e.setProperty(RGC.ACTIVE, m.isActive());
-						e.setProperty(RGC.MODIFIED_DATE, new DateTime().getMillis());
-						e.setProperty(RGC.MODIFIED_BY, m.getModifiedBy());
-
-						e.setProperty(RGC.CREATED, new DateTime().getMillis());
-						e.setProperty(RGC.CREATED_BY, m.getCreatedBy());
-
-						LOGGER.debug("Added relationship as edge from {} to {}", mV.getId(), rV.getId());
-
-					}
-					
-
 				}
 
 				
@@ -425,6 +375,20 @@ public class RefsetAdminGAO {
 		rV.setModifiedBy(r.getModifiedBy());
 		rV.setModifiedDate(new DateTime().getMillis());
 
+		DateTime ert = r.getExpectedReleaseDate();
+		if (ert != null) {
+			
+			rV.setExpectedReleaseDate(ert.getMillis());
+
+		}
+		
+		if (StringUtils.isEmpty(r.getSctId())) {
+			
+			rV.setSctdId(r.getSctId());
+
+		}
+
+		
 		LOGGER.debug("updateRefsetNode {} finished", rV);
 
 		return rV.asVertex();

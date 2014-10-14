@@ -19,6 +19,18 @@ public interface GRefset extends VertexFrame {
 	/**
 	 * @return the created
 	 */
+	@Property( value = "expectedReleaseDate")
+	public long getExpectedReleaseDate();
+
+	/**
+	 * @param expectedReleaseDate the expectedReleaseDate to set
+	 */
+	@Property( value = "expectedReleaseDate")
+	public void setExpectedReleaseDate(long expectedReleaseDate);
+	
+	/**
+	 * @return the releasedDate
+	 */
 	@Property( value = "created")
 	public long getCreated();
 
@@ -223,5 +235,16 @@ public interface GRefset extends VertexFrame {
 	@Property( value = "modifiedBy")
 	public void setModifiedBy(String modifiedBy);
 
+	/**
+	 * @return the id
+	 */
+	@Property( value = "sctdId")
+	public String getSctdId();
+
+	/**
+	 * @param id the id to set
+	 */
+	@Property( value = "sctdId")
+	public void setSctdId(String id);
 
 }

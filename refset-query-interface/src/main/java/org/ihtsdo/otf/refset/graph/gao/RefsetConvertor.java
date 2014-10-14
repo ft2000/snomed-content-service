@@ -3,6 +3,7 @@
  */
 package org.ihtsdo.otf.refset.graph.gao;
 
+import static org.ihtsdo.otf.refset.domain.RGC.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -13,7 +14,6 @@ import java.util.Set;
 import org.ihtsdo.otf.refset.domain.Member;
 import org.ihtsdo.otf.refset.domain.MetaData;
 import org.ihtsdo.otf.refset.domain.Refset;
-import org.ihtsdo.otf.refset.graph.RGC;
 import org.ihtsdo.otf.refset.graph.schema.GMember;
 import org.ihtsdo.otf.refset.graph.schema.GRefset;
 import org.joda.time.DateTime;
@@ -53,43 +53,43 @@ public class RefsetConvertor {
 		DateTime effDate = r.getEffectiveTime();
 		
 		if( effDate != null )
-			props.put(RGC.EFFECTIVE_DATE, effDate.getMillis());
+			props.put(EFFECTIVE_DATE, effDate.getMillis());
 		
 		DateTime created = r.getCreated();
 		if( created != null )
-			props.put(RGC.CREATED, created.getMillis());
+			props.put(CREATED, created.getMillis());
 		
 		DateTime publishedDate = r.getPublishedDate();
 		
 		if( publishedDate != null)
-			props.put(RGC.PUBLISHED_DATE, publishedDate.getMillis());
+			props.put(PUBLISHED_DATE, publishedDate.getMillis());
 		
 		if(!StringUtils.isEmpty(r.getDescription()))
-				props.put(RGC.DESC, r.getDescription());
+				props.put(DESC, r.getDescription());
 		
 		if(!StringUtils.isEmpty(r.getCreatedBy()))
-			props.put(RGC.CREATED_BY, r.getCreatedBy());
+			props.put(CREATED_BY, r.getCreatedBy());
 		
 		if(!StringUtils.isEmpty(r.getSuperRefsetTypeId()))
-			props.put(RGC.SUPER_REFSET_TYPE_ID, r.getSuperRefsetTypeId());
+			props.put(SUPER_REFSET_TYPE_ID, r.getSuperRefsetTypeId());
 
 		if(!StringUtils.isEmpty(r.getLanguageCode()))
-			props.put(RGC.LANG_CODE, r.getLanguageCode());
+			props.put(LANG_CODE, r.getLanguageCode());
 		
 		if(!StringUtils.isEmpty(r.getModuleId()))
-			props.put(RGC.MODULE_ID, r.getModuleId());
+			props.put(MODULE_ID, r.getModuleId());
 		
 
 		if(!StringUtils.isEmpty(r.getTypeId()))
-			props.put(RGC.TYPE_ID, r.getTypeId());
+			props.put(TYPE_ID, r.getTypeId());
 		
 		if(!StringUtils.isEmpty(r.getComponentTypeId()))
-			props.put(RGC.MEMBER_TYPE_ID, r.getComponentTypeId());
+			props.put(MEMBER_TYPE_ID, r.getComponentTypeId());
 		
-		props.put(RGC.PUBLISHED, r.isPublished());
+		props.put(PUBLISHED, r.isPublished());
 
 		if(!StringUtils.isEmpty(r.getId()))
-			props.put(RGC.ID, r.getId());//This has to be updated by real refsetId after publishing
+			props.put(ID, r.getId());//This has to be updated by real refsetId after publishing
 		
 		LOGGER.info("getRefsetProperties property map size {}", props.size());
 
@@ -116,18 +116,18 @@ public class RefsetConvertor {
 		
 		DateTime effDate = m.getEffectiveTime();
 		if(effDate != null)
-			props.put(RGC.EFFECTIVE_DATE, effDate.getMillis());
+			props.put(EFFECTIVE_DATE, effDate.getMillis());
 		
 		if(!StringUtils.isEmpty(m.getModuleId()))
-			props.put(RGC.MODULE_ID, m.getModuleId());
+			props.put(MODULE_ID, m.getModuleId());
 	
 		if(!StringUtils.isEmpty(m.getReferencedComponentId()))
-			props.put(RGC.REFERENCE_COMPONENT_ID, m.getReferencedComponentId());
+			props.put(REFERENCE_COMPONENT_ID, m.getReferencedComponentId());
 
-		props.put(RGC.ACTIVE, m.isActive());
+		props.put(ACTIVE, m.isActive());
 
 		if(!StringUtils.isEmpty(m.getId()))
-			props.put(RGC.ID, m.getId());
+			props.put(ID, m.getId());
 
 		LOGGER.debug("getMemberProperties size {}", props.size());
 
@@ -148,108 +148,108 @@ public class RefsetConvertor {
 			Refset r = new Refset();
 			Set<String> keys = vR.getPropertyKeys();
 			
-			if ( keys.contains(RGC.CREATED) ) {
+			if ( keys.contains(CREATED) ) {
 			
-				long created = vR.getProperty(RGC.CREATED);
+				long created = vR.getProperty(CREATED);
 				r.setCreated(new DateTime(created));
 			}
 			
-			if ( keys.contains(RGC.CREATED_BY) ) {
+			if ( keys.contains(CREATED_BY) ) {
 				
-				String createdBy = vR.getProperty(RGC.CREATED_BY);
+				String createdBy = vR.getProperty(CREATED_BY);
 				r.setCreatedBy(createdBy);
 				
 			}
 			
 			
-			if ( keys.contains(RGC.DESC) ) {
+			if ( keys.contains(DESC) ) {
 				
-				String description = vR.getProperty(RGC.DESC);
+				String description = vR.getProperty(DESC);
 				r.setDescription(description);
 				
 			}
 			
-			if ( keys.contains(RGC.EFFECTIVE_DATE) ) {
+			if ( keys.contains(EFFECTIVE_DATE) ) {
 				
-				long effectiveDate = vR.getProperty(RGC.EFFECTIVE_DATE);
+				long effectiveDate = vR.getProperty(EFFECTIVE_DATE);
 				r.setEffectiveTime(new DateTime(effectiveDate));
 				
 			}
 			
-			if ( keys.contains(RGC.ID) ) {
+			if ( keys.contains(ID) ) {
 				
-				String id = vR.getProperty(RGC.ID);
+				String id = vR.getProperty(ID);
 				r.setId(id);
 			}
 			
-			if ( keys.contains(RGC.LANG_CODE) ) {
+			if ( keys.contains(LANG_CODE) ) {
 				
-				String languageCode = vR.getProperty(RGC.LANG_CODE);
+				String languageCode = vR.getProperty(LANG_CODE);
 				r.setLanguageCode(languageCode);
 				
 			}
 			
-			if ( keys.contains(RGC.MODULE_ID) ) {
+			if ( keys.contains(MODULE_ID) ) {
 				
-				String moduleId = vR.getProperty(RGC.MODULE_ID);
+				String moduleId = vR.getProperty(MODULE_ID);
 				r.setModuleId(moduleId);
 				
 			}
 			
-			if ( keys.contains(RGC.PUBLISHED) ) {
+			if ( keys.contains(PUBLISHED) ) {
 				
-				boolean isPublished = vR.getProperty(RGC.PUBLISHED);
+				boolean isPublished = vR.getProperty(PUBLISHED);
 				r.setPublished(isPublished);
 				
 			}
 			
 			
-			if ( keys.contains(RGC.PUBLISHED_DATE) ) {
+			if ( keys.contains(PUBLISHED_DATE) ) {
 				
-				long publishedDate = vR.getProperty(RGC.PUBLISHED_DATE);
+				long publishedDate = vR.getProperty(PUBLISHED_DATE);
 				r.setPublishedDate(new DateTime(publishedDate));
 				
 			}
 			
 			
-			if ( keys.contains(RGC.SUPER_REFSET_TYPE_ID) ) {
+			if ( keys.contains(SUPER_REFSET_TYPE_ID) ) {
 				
-				String superRefsetTypeId = vR.getProperty(RGC.SUPER_REFSET_TYPE_ID);
+				String superRefsetTypeId = vR.getProperty(SUPER_REFSET_TYPE_ID);
 				r.setSuperRefsetTypeId(superRefsetTypeId);
 				
 			}
 			
 
-			if ( keys.contains(RGC.TYPE_ID) ) {
+			if ( keys.contains(TYPE_ID) ) {
 				
-				String typeId = vR.getProperty(RGC.TYPE_ID);
+				String typeId = vR.getProperty(TYPE_ID);
 				r.setTypeId(typeId);
 				
 			}
 			
-			if ( keys.contains(RGC.ACTIVE) ) {
+			if ( keys.contains(ACTIVE) ) {
 				
-				boolean active = vR.getProperty(RGC.ACTIVE);
+				boolean active = vR.getProperty(ACTIVE);
 				r.setActive(active);
 				
 			}
 			
-			if ( keys.contains(RGC.MEMBER_TYPE_ID) ) {
+			if ( keys.contains(MEMBER_TYPE_ID) ) {
 				
-				String typeId = vR.getProperty(RGC.MEMBER_TYPE_ID);
+				String typeId = vR.getProperty(MEMBER_TYPE_ID);
 				r.setComponentTypeId(typeId);
 				
 			}
 			
-			if ( keys.contains(RGC.MODIFIED_DATE) ) {
+			if ( keys.contains(MODIFIED_DATE) ) {
 				
-				long modified = vR.getProperty(RGC.MODIFIED_DATE);
+				long modified = vR.getProperty(MODIFIED_DATE);
 				r.setModifiedDate(new DateTime(modified));
 			}
 			
-			if ( keys.contains(RGC.MODIFIED_BY) ) {
+			if ( keys.contains(MODIFIED_BY) ) {
 				
-				String modifiedby = vR.getProperty(RGC.MODIFIED_BY);
+				String modifiedby = vR.getProperty(MODIFIED_BY);
 				r.setModifiedBy(modifiedby);
 				
 			}
@@ -276,62 +276,69 @@ public class RefsetConvertor {
 			
 			Set<String> keys = gr.asVertex().getPropertyKeys();
 			
-			if (!StringUtils.isEmpty(gr.getId())) {
+			if (!StringUtils.isEmpty(gr.getId()) && keys.contains(DESC) ) {
+				
 				
 				Refset r = new Refset();
 				
 				
-				if ( keys.contains(RGC.CREATED) ) {
+				if ( keys.contains(CREATED) ) {
 				
 					r.setCreated(new DateTime(gr.getCreated()));
 				}
 				
-				if ( keys.contains(RGC.CREATED_BY) ) {
+				if ( keys.contains(CREATED_BY) ) {
 					
 					r.setCreatedBy(gr.getCreatedBy());
 					
 				}
 				
 				
-				if ( keys.contains(RGC.DESC) ) {
+				if ( keys.contains(DESC) ) {
 					
 					r.setDescription(gr.getDescription());
 					
 				}
 				
-				if ( keys.contains(RGC.EFFECTIVE_DATE) ) {
+				if ( keys.contains(EFFECTIVE_DATE) ) {
 					
 					r.setEffectiveTime(new DateTime(gr.getEffectiveTime()));
 
 				}
 				
-				if ( keys.contains(RGC.ID) ) {
+				if ( keys.contains(ID) ) {
 					
 					r.setId(gr.getId());
 
 				}
 				
-				if ( keys.contains(RGC.LANG_CODE) ) {
+				if ( keys.contains(SCTDID) ) {
+					
+					r.setId(gr.getSctdId());
+
+				}
+				
+				if ( keys.contains(LANG_CODE) ) {
 					
 					r.setLanguageCode(gr.getLanguageCode());
 
 					
 				}
 				
-				if ( keys.contains(RGC.MODULE_ID) ) {
+				if ( keys.contains(MODULE_ID) ) {
 					
 					r.setModuleId(gr.getModuleId());
 					
 				}
 				
-				if ( keys.contains(RGC.PUBLISHED) ) {
+				if ( keys.contains(PUBLISHED) ) {
 					
 					r.setPublished(gr.isPublished());
 					
 				}
 				
 				
-				if ( keys.contains(RGC.PUBLISHED_DATE) ) {
+				if ( keys.contains(PUBLISHED_DATE) ) {
 					
 					r.setPublishedDate(new DateTime(gr.getPublishedDate()));
 
@@ -339,40 +346,47 @@ public class RefsetConvertor {
 				}
 				
 				
-				if ( keys.contains(RGC.SUPER_REFSET_TYPE_ID) ) {
+				if ( keys.contains(SUPER_REFSET_TYPE_ID) ) {
 					
 					r.setSuperRefsetTypeId(gr.getSuperRefsetTypeId());
 					
 				}
 				
-				if ( keys.contains(RGC.MEMBER_TYPE_ID) ) {
+				if ( keys.contains(MEMBER_TYPE_ID) ) {
 					
 					r.setComponentTypeId(gr.getComponentTypeId());
 					
 				}
 
-				if ( keys.contains(RGC.TYPE_ID) ) {
+				if ( keys.contains(TYPE_ID) ) {
 					
 					r.setTypeId(gr.getTypeId());
 					
 				}
 				
-				if ( keys.contains(RGC.ACTIVE) ) {
+				if ( keys.contains(ACTIVE) ) {
 					
 					r.setActive(gr.isActive());
 					
 				}
 				
-				if ( keys.contains(RGC.MODIFIED_DATE) ) {
+				if ( keys.contains(MODIFIED_DATE) ) {
 					
 					r.setModifiedDate(new DateTime(gr.getModifiedDate()));
 				}
 				
-				if ( keys.contains(RGC.MODIFIED_BY) ) {
+				if ( keys.contains(MODIFIED_BY) ) {
 					
 					r.setModifiedBy(gr.getModifiedBy());
 					
 				}
+				
+				if ( keys.contains(EXPECTED_RLS_DT) ) {
+					
+					r.setExpectedReleaseDate(new DateTime(gr.getExpectedReleaseDate()));
+
+				}
+
 				
 				refsets.add(r);
 				
@@ -396,90 +410,104 @@ public class RefsetConvertor {
 		Refset r = new Refset();
 		Set<String> keys = vR.asVertex().getPropertyKeys();
 		
-		if ( keys.contains(RGC.CREATED) ) {
+		if ( keys.contains(CREATED) ) {
 		
 			r.setCreated(new DateTime(vR.getCreated()));
 		}
 		
-		if ( keys.contains(RGC.CREATED_BY) ) {
+		if ( keys.contains(CREATED_BY) ) {
 			
 			r.setCreatedBy(vR.getCreatedBy());
 			
 		}
 		
 		
-		if ( keys.contains(RGC.DESC) ) {
+		if ( keys.contains(DESC) ) {
 			
 			r.setDescription(vR.getDescription());
 			
 		}
 		
-		if ( keys.contains(RGC.EFFECTIVE_DATE) ) {
+		if ( keys.contains(EFFECTIVE_DATE) ) {
 			
 			r.setEffectiveTime(new DateTime(vR.getEffectiveTime()));
 			
 		}
 		
-		if ( keys.contains(RGC.ID) ) {
+		if ( keys.contains(ID) ) {
 			
 			r.setId(vR.getId());
 		}
 		
-		if ( keys.contains(RGC.LANG_CODE) ) {
+		if ( keys.contains(LANG_CODE) ) {
 			
 			r.setLanguageCode(vR.getLanguageCode());
 			
 		}
 		
-		if ( keys.contains(RGC.MODULE_ID) ) {
+		if ( keys.contains(MODULE_ID) ) {
 			
 			r.setModuleId(vR.getModuleId());
 			
 		}
 		
-		if ( keys.contains(RGC.PUBLISHED) ) {
+		if ( keys.contains(PUBLISHED) ) {
 			
 			r.setPublished(vR.isPublished());
 			
 		}
 		
 		
-		if ( keys.contains(RGC.PUBLISHED_DATE) ) {
+		if ( keys.contains(PUBLISHED_DATE) ) {
 			
 			r.setPublishedDate(new DateTime(vR.getPublishedDate()));
 			
 		}
 		
 		
-		if ( keys.contains(RGC.SUPER_REFSET_TYPE_ID) ) {
+		if ( keys.contains(SUPER_REFSET_TYPE_ID) ) {
 			
 			r.setSuperRefsetTypeId(vR.getSuperRefsetTypeId());
 			
 		}
 		
 
-		if ( keys.contains(RGC.TYPE_ID) ) {
+		if ( keys.contains(TYPE_ID) ) {
 			
 			r.setTypeId(vR.getTypeId());
 			
 		}
 
-		if ( keys.contains(RGC.MEMBER_TYPE_ID) ) {
+		if ( keys.contains(MEMBER_TYPE_ID) ) {
 			
 			r.setComponentTypeId(vR.getComponentTypeId());
 			
 		}
 		
-		if ( keys.contains(RGC.MODIFIED_DATE) ) {
+		if ( keys.contains(MODIFIED_DATE) ) {
 			
 			r.setModifiedDate(new DateTime(vR.getModifiedDate()));
 		}
 		
-		if ( keys.contains(RGC.MODIFIED_BY) ) {
+		if ( keys.contains(MODIFIED_BY) ) {
 			
 			r.setModifiedBy(vR.getModifiedBy());
 			
 		}
+		
+		if ( keys.contains(EXPECTED_RLS_DT) ) {
+			
+			r.setExpectedReleaseDate(new DateTime(vR.getExpectedReleaseDate()));
+
+		}
+		
+		if ( keys.contains(SCTDID) ) {
+			
+			r.setId(vR.getSctdId());
+
+		}
+
+
 		
 		
 
@@ -497,19 +525,82 @@ public class RefsetConvertor {
 				
 				Member m = new Member();
 				
-				if ( mKeys.contains(RGC.ID) ) {
+				if ( mKeys.contains(ID) ) {
 					
-					String lId = vM.getProperty(RGC.ID);
+					String lId = vM.getProperty(ID);
 
 					m.setId(lId);
 					
 				}
 				
-				if ( mKeys.contains(RGC.MODULE_ID) ) {
+				if ( mKeys.contains(MODULE_ID) ) {
 					
 					
-					String mModuleId = vM.getProperty(RGC.MODULE_ID);
+					String mModuleId = vM.getProperty(MODULE_ID);
 					m.setModuleId(mModuleId);
+					
+				}
+				
+				if (mKeys.contains(EFFECTIVE_DATE)) {
+					
+
+					long effectivetime = vM.getProperty(EFFECTIVE_DATE);
+					
+					LOGGER.trace("Actual effective date when this member tied to given refset is  {} ", effectivetime);
+
+					m.setEffectiveTime(new DateTime(effectivetime));
+					
+				}
+				
+				if (mKeys.contains(PUBLISHED)) {
+					
+
+					boolean published = vM.getProperty(PUBLISHED);
+					
+					m.setPublished(published);;
+					
+				}
+
+
+				
+				
+				if ( mKeys.contains(ACTIVE) ) {
+					
+					boolean isActive = vM.getProperty(ACTIVE);
+					m.setActive(isActive);
+					
+				}
+				
+				
+				if ( mKeys.contains(EFFECTIVE_DATE) ) {
+					
+					long effectivetime = vM.getProperty(EFFECTIVE_DATE);
+					m.setEffectiveTime(new DateTime(effectivetime));
+					
+				}
+				
+				if ( mKeys.contains(MODIFIED_DATE) ) {
+					
+					long modified = vM.getProperty(MODIFIED_DATE);
+					m.setModifiedDate(new DateTime(modified));
+				}
+				
+				if ( mKeys.contains(MODIFIED_BY) ) {
+					
+					String modifiedby = vM.getProperty(MODIFIED_BY);
+					m.setModifiedBy(modifiedby);
+					
+				}
+				
+				if ( mKeys.contains(CREATED) ) {
+					
+					m.setCreated(new DateTime(vM.getProperty(CREATED)));
+				}
+				
+				if ( mKeys.contains(CREATED_BY) ) {
+					
+					String createdBy = vM.getProperty(CREATED_BY);
+					m.setCreatedBy(createdBy);
 					
 				}
 				
@@ -518,73 +609,14 @@ public class RefsetConvertor {
 				
 				//this has to be edge effective date. //TODO remove above
 				Set<String> eKeys = eR.getPropertyKeys();
-				if (eKeys.contains(RGC.EFFECTIVE_DATE)) {
+				if ( eKeys.contains(REFERENCE_COMPONENT_ID) ) {
 					
-
-					long effectivetime = eR.getProperty(RGC.EFFECTIVE_DATE);
-					
-					LOGGER.trace("Actual effective date when this member tied to given refset is  {} ", effectivetime);
-
-					m.setEffectiveTime(new DateTime(effectivetime));
-					
-				}
-				
-				if (eKeys.contains(RGC.PUBLISHED)) {
-					
-
-					boolean published = eR.getProperty(RGC.PUBLISHED);
-					
-					m.setPublished(published);;
-					
-				}
-
-
-				if ( eKeys.contains(RGC.REFERENCE_COMPONENT_ID) ) {
-					
-					String referenceComponentId = eR.getProperty(RGC.REFERENCE_COMPONENT_ID);
+					String referenceComponentId = eR.getProperty(REFERENCE_COMPONENT_ID);
 					m.setReferencedComponentId(referenceComponentId);
 					
 				}
+
 				
-				if ( eKeys.contains(RGC.ACTIVE) ) {
-					
-					boolean isActive = eR.getProperty(RGC.ACTIVE);
-					m.setActive(isActive);
-					
-				}
-				
-				
-				if ( eKeys.contains(RGC.EFFECTIVE_DATE) ) {
-					
-					long effectivetime = eR.getProperty(RGC.EFFECTIVE_DATE);
-					m.setEffectiveTime(new DateTime(effectivetime));
-					
-				}
-				
-				if ( eKeys.contains(RGC.MODIFIED_DATE) ) {
-					
-					long modified = eR.getProperty(RGC.MODIFIED_DATE);
-					m.setModifiedDate(new DateTime(modified));
-				}
-				
-				if ( eKeys.contains(RGC.MODIFIED_BY) ) {
-					
-					String modifiedby = eR.getProperty(RGC.MODIFIED_BY);
-					m.setModifiedBy(modifiedby);
-					
-				}
-				
-				if ( eKeys.contains(RGC.CREATED) ) {
-					
-					m.setCreated(new DateTime(eR.getProperty(RGC.CREATED)));
-				}
-				
-				if ( eKeys.contains(RGC.CREATED_BY) ) {
-					
-					String createdBy = eR.getProperty(RGC.CREATED_BY);
-					m.setCreatedBy(createdBy);
-					
-				}
 
 
 				LOGGER.trace("Adding member as {} ", m.toString());

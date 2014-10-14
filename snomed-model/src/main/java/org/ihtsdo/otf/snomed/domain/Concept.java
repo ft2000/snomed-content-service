@@ -9,20 +9,15 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.ihtsdo.otf.refset.domain;
+package org.ihtsdo.otf.snomed.domain;
 
 import org.joda.time.DateTime;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 /**
  *
  */
-public class BaseObj {
+public class Concept {
 	
-	
-
-	protected DateTime modifiedDate;
+	protected DateTime modified;
 	
 	protected String modifiedBy;
 	
@@ -31,8 +26,6 @@ public class BaseObj {
 	protected String createdBy;
 	
 	protected DateTime effectiveTime;
-		
-	protected DateTime publishedDate;
 	
 	protected String version;
 	
@@ -41,11 +34,11 @@ public class BaseObj {
 	protected boolean active;
 
 	protected String id;
+	
+	protected String caseSignificanceId;
+	
+	
 
-	protected boolean published;
-
-	@JsonIgnore
-	private MetaData metaData;
 
 	
 	/**
@@ -61,19 +54,6 @@ public class BaseObj {
 		this.effectiveTime = effectiveTime;
 	}
 	
-	/**
-	 * @return the publishedDate
-	 */
-	public DateTime getPublishedDate() {
-		return publishedDate;
-	}
-
-	/**
-	 * @param publishedDate the publishedDate to set
-	 */
-	public void setPublishedDate(DateTime publishedDate) {
-		this.publishedDate = publishedDate;
-	}
 	
 	/**
 	 * @return the moduleId
@@ -116,19 +96,6 @@ public class BaseObj {
 		this.id = id;
 	}
 	
-   /**
-	 * @return the published
-	 */
-	public boolean isPublished() {
-		return published;
-	}
-	/**
-	 * @param published the published to set
-	 */
-	public void setPublished(boolean published) {
-		this.published = published;
-	}
-	
 	/**
 	 * @return the created
 	 */
@@ -157,34 +124,18 @@ public class BaseObj {
 		this.createdBy = createdBy;
 	}
 
-
-
-	/**
-	 * @return the meta
-	 */
-	public MetaData getMetaData() {
-		
-		return metaData == null ? new MetaData() : metaData;
-	}
-	
-	/**
-	 * @param meta the meta to set
-	 */
-	public void setMetaData(MetaData meta) {
-		this.metaData = meta;
-	}
 	
 	/**
 	 * @return the modified
 	 */
-	public DateTime getModifiedDate() {
-		return modifiedDate;
+	public DateTime getModified() {
+		return modified;
 	}
 	/**
 	 * @param modified the modified to set
 	 */
-	public void setModifiedDate(DateTime modified) {
-		this.modifiedDate = modified;
+	public void setModified(DateTime modified) {
+		this.modified = modified;
 	}
 	/**
 	 * @return the modifiedBy

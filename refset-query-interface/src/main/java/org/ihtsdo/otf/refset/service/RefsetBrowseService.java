@@ -29,6 +29,14 @@ public interface RefsetBrowseService {
 	 * @throws RefsetServiceException
 	 */
 	public Refset getRefset(String refsetId) throws RefsetServiceException, EntityNotFoundException ;
+	
+	/**Validates if given description exist in the system or not
+	 * @param descrition
+	 * @return
+	 * @throws RefsetServiceException
+	 */
+	public boolean isDescriptionExist(String descrition) throws RefsetServiceException;
+
 
 
 }

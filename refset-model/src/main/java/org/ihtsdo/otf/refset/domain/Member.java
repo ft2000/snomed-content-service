@@ -39,7 +39,8 @@ public class Member extends BaseObj {
    public String toString() {
 	   
 	   return String.format( "Member [id - %s, referencedComponentId - %s, moduleId - %s, isActive - %s "
-	   		+ "effectiveTime - %s]", this.id, this.referencedComponentId, this.moduleId, this.active, this.effectiveTime);
+	   		+ "effectiveTime - %s, description - %s]", this.id, this.referencedComponentId, this.moduleId, 
+	   		this.active, this.effectiveTime, this.description);
 	   
    }   
 }

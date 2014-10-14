@@ -18,7 +18,7 @@ import org.ihtsdo.otf.refset.exception.RefsetServiceException;
 import org.ihtsdo.otf.refset.graph.RefsetGraphAccessException;
 import org.ihtsdo.otf.refset.graph.RefsetGraphFactory;
 import org.ihtsdo.otf.refset.graph.gao.RefsetGAO;
-import org.ihtsdo.otf.refset.graph.schema.RefsetSchemaCreator;
+import org.ihtsdo.otf.refset.schema.RefsetSchema;
 import org.ihtsdo.otf.refset.service.RefsetBrowseServiceStubData;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -67,10 +67,9 @@ public class RefsetGAOTest {
 		
 		/*create schema*/
 		
-		RefsetSchemaCreator sg = new RefsetSchemaCreator();
-		sg.setConfig(config);
+		RefsetSchema sg = new RefsetSchema("src/test/resources/titan-graph-es-junit.properties");
 		
-		sg.createRefsetSchema();
+		sg.createSchema();
 		
 		
 		

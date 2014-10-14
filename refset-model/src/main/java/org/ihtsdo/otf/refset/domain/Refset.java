@@ -6,12 +6,7 @@ package org.ihtsdo.otf.refset.domain;
 import java.util.Collections;
 import java.util.List;
 
-import javax.validation.constraints.NotNull;
-
 import org.joda.time.DateTime;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 /**
  * @author Episteme Partners
  *
@@ -19,12 +14,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 public class Refset extends BaseObj {
 
 
-	
-	@NotNull
-	private String description;
-
-	private String languageCode;
-	
+		
 	private String type;
 	
 	private List<Member> members;
@@ -34,6 +24,8 @@ public class Refset extends BaseObj {
 	private String superRefsetTypeId;
 	
 	private String componentTypeId;
+	
+	private DateTime expectedReleaseDate;
 	
 	
 	/**
@@ -65,36 +57,6 @@ public class Refset extends BaseObj {
 	}
 
 
-	/**
-	 * @return the description
-	 */
-	public String getDescription() {
-		return description;
-	}
-
-	/**
-	 * @param description the description to set
-	 */
-	public void setDescription(String description) {
-		this.description = description;
-	}
-
-
-
-
-	/**
-	 * @return the languageCode
-	 */
-	public String getLanguageCode() {
-		return languageCode;
-	}
-
-	/**
-	 * @param languageCode the languageCode to set
-	 */
-	public void setLanguageCode(String languageCode) {
-		this.languageCode = languageCode;
-	}
 
 	/**
 	 * @return the type
@@ -148,9 +110,9 @@ public class Refset extends BaseObj {
 	   
 	   return String.format( "Refset [id - %s, created - %s, createdBy - %s, description - %s, "
 	   		+ "effectiveTime - %s,  isPublished - %s, languageCode - %s, members - %s, moduleId - %s, publishedDate - %s "
-	   		+ "superRefsetTypeId - %s, type - %s, typeId - %s]", this.id, this.created, this.createdBy, this.description,
+	   		+ "superRefsetTypeId - %s, type - %s, typeId - %s, description - %s]", this.id, this.created, this.createdBy, this.description,
 	   		this.effectiveTime, this.published, this.languageCode, this.members, this.moduleId, this.publishedDate,
-	   		this.superRefsetTypeId, this.type, this.typeId );
+	   		this.superRefsetTypeId, this.type, this.typeId, this.description );
    }
 
 
@@ -166,6 +128,20 @@ public class Refset extends BaseObj {
 	 */
 	public void setComponentTypeId(String componentTypeId) {
 		this.componentTypeId = componentTypeId;
+	}
+
+	/**
+	 * @return the expectedReleaseDate
+	 */
+	public DateTime getExpectedReleaseDate() {
+		return expectedReleaseDate;
+	}
+
+	/**
+	 * @param expectedReleaseDate the expectedReleaseDate to set
+	 */
+	public void setExpectedReleaseDate(DateTime expectedReleaseDate) {
+		this.expectedReleaseDate = expectedReleaseDate;
 	}
 
 

@@ -9,9 +9,14 @@
 		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.0.xsd">
 
 
-	<bean id="conceptLookService" 
+	<!-- bean id="conceptLookService" 
 			class="org.ihtsdo.otf.snomed.service.ConceptLookUpServiceImpl" 
 			p:repositoryConfig="${titan.config}" p:config-ref="refset.graph.titan.config" 
+		/-->
+		
+	<bean id="conceptLookService" 
+			class="org.ihtsdo.otf.snomed.service.ConceptLookUpServiceImplv1_0" 
+			p:config-ref="refset.graph.titan.config" 
 		/>
 		
 	<bean id="refset.graph.titan.config" 
