@@ -34,7 +34,6 @@ import org.supercsv.prefs.CsvPreference;
 
 import com.thinkaurelius.titan.core.TitanException;
 import com.thinkaurelius.titan.core.TitanGraph;
-import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Vertex;
 
@@ -200,6 +199,8 @@ public class Rf2SnapshotLoader {
     		LOGGER.error("Transaction rolledback");
 			g.rollback();
 			e.printStackTrace();
+			throw new RuntimeException("Can not process file", e);
+ 
 		}
         finally {
         	
@@ -231,7 +232,7 @@ public class Rf2SnapshotLoader {
             try {
                 g.commit();
                 beginTx();                
-                LOGGER.info("Total concept procesed {}", rowNumber);
+                LOGGER.info("Total concept processed {}", rowNumber);
                
             } catch (TitanException e) {
             	
@@ -239,7 +240,7 @@ public class Rf2SnapshotLoader {
 					
                 	g.commit();//retry
                     beginTx();                
-                    LOGGER.info("Total concept procesed {}", rowNumber);
+                    LOGGER.info("Total concept processed {}", rowNumber);
 
 				} catch (TitanException e2) {
 					
@@ -255,7 +256,15 @@ public class Rf2SnapshotLoader {
 	private void beginTx() {
         
 		LOGGER.info("Starting a new transaction");
-
+		
+		try {
+			
+			Thread.sleep(2000);
+			
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
         g.buildTransaction().enableBatchLoading();
         g.newTransaction();
         vMap = new HashMap<String, Vertex>();//refresh map as vertex are stale after commit
