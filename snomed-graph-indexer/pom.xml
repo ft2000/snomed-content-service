@@ -2,7 +2,6 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>org.ihtsdo.otf</groupId>
   <artifactId>snomed-graph-indexer</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <packaging>jar</packaging>
@@ -10,6 +9,12 @@
   <name>snomed-graph-indexer</name>
   <url>http://maven.apache.org</url>
 
+  <parent>
+	<groupId>org.ihtsdo.otf</groupId>
+	<artifactId>snomed-content-service</artifactId>
+   	<version>1.0.0-BUILD-SNAPSHOT</version>
+   	<relativePath>../pom.xml</relativePath>
+  </parent>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	<junit-version>4.11</junit-version>
