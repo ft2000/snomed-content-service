@@ -168,6 +168,15 @@ public class SnomedConceptSchema {
 				
 			}
 			
+			String modifierId = Properties.modifierId.toString();
+			if(!mgmt.containsRelationType(modifierId)) {
+				
+				LOGGER.debug("Creating property key {}" , modifierId);
+			
+				mgmt.makePropertyKey(modifierId).dataType(String.class).make();
+				
+			}
+			
 			//make necessary labels
 			String concept = Types.concept.toString();
 			if(!mgmt.containsVertexLabel(concept)) {
@@ -408,6 +417,8 @@ public class SnomedConceptSchema {
 			e.printStackTrace();
 			mgmt.rollback();
 			// TODO: handle exception
+			throw new RuntimeException(e);
+			
 		} finally {
 			
 			g.shutdown();
@@ -633,9 +644,10 @@ public class SnomedConceptSchema {
 			LOGGER.error("Management Transaction Rolledback");
 
 			e.printStackTrace();
-
 			mgmt.rollback();
 			// TODO: handle exception
+			throw new RuntimeException(e);
+
 		} finally {
 			
 			g.shutdown();
@@ -679,6 +691,8 @@ public class SnomedConceptSchema {
 			e.printStackTrace();
 			mgmt.rollback();
 			// TODO: handle exception
+			throw new RuntimeException(e);
+
 		} finally {
 			
 			g.shutdown();
@@ -727,6 +741,8 @@ public class SnomedConceptSchema {
 			e.printStackTrace();
 			mgmt.rollback();
 			// TODO: handle exception
+			throw new RuntimeException(e);
+
 		} finally {
 			
 			g.shutdown();

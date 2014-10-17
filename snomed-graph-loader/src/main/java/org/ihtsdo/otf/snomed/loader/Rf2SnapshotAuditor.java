@@ -207,14 +207,13 @@ public class Rf2SnapshotAuditor {
                 	
                 	commit(beanReader.getRowNumber());
                 	
-				
-                	
                 }
         		LOGGER.info("Commiting remaining data");
                 g.commit();//remaining operation commit
             	totalRow = beanReader.getRowNumber();
 
         } catch (IOException e) {
+        	g.rollback();
 			// TODO Auto-generated catch block
         	e.printStackTrace();
 			throw new RuntimeException("Can not process file", e);
@@ -222,6 +221,7 @@ public class Rf2SnapshotAuditor {
     		LOGGER.error("Transaction rolledback");
 			g.rollback();
 			e.printStackTrace();
+			throw new RuntimeException(e);
 		}
         finally {
         	
@@ -254,19 +254,22 @@ public class Rf2SnapshotAuditor {
             try {
                 g.commit();
                 beginTx();                
-                LOGGER.info("Total concept procesed {}", rowNumber);
-               
+                LOGGER.info("Total concept processed {}", rowNumber);
+
             } catch (TitanException e) {
             	
+                LOGGER.error("Error commiting transaction, retrying {}, {}", rowNumber, e);
+
+            	e.printStackTrace();
             	try {
 					
                 	g.commit();//retry
                     beginTx();                
-                    LOGGER.info("Total concept procesed {}", rowNumber);
+                    LOGGER.info("Total concept processed {}", rowNumber);
 
 				} catch (TitanException e2) {
-					
-                    LOGGER.error("Error commiting transaction {}", rowNumber);
+					e2.printStackTrace();
+                    LOGGER.error("Error commiting transaction during retry {}, {}", e, rowNumber);
 
 					throw e2;
 				}
@@ -278,7 +281,14 @@ public class Rf2SnapshotAuditor {
 	private void beginTx() {
         
 		LOGGER.info("Starting a new transaction");
+		try {
+			Thread.sleep(2000);
+			LOGGER.info("Sleep done");
 
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
         g.buildTransaction().enableBatchLoading();
         g.newTransaction();
         vMap = new HashMap<String, Vertex>();//refresh map as vertex are stale after commit
@@ -576,14 +586,14 @@ public class Rf2SnapshotAuditor {
 		
 		if (existingVD == null) {
 			
-			LOGGER.debug("auditDescription description {} does not exist adding", desc.getId());
+			LOGGER.debug("description {} does not exist adding", desc.getId());
 
 			//add this description
 			processDescription(desc);
 			
 		} else {
 			
-			LOGGER.debug("auditDescription description {} exist auditing further", desc.getId());
+			LOGGER.debug("description {} exist auditing further", desc.getId());
 
 			boolean hasModule = existingVD.getEdges(Direction.OUT, Relationship.hasModule.toString()).iterator().hasNext();
 			boolean hasCaseSignificance = existingVD.getEdges(Direction.OUT, Relationship.hasCaseSignificance.toString()).iterator().hasNext();
@@ -592,7 +602,7 @@ public class Rf2SnapshotAuditor {
 			
 			if (!(hasModule && hasCaseSignificance && hasType && fsnOrSynnonym)) {
 				
-				LOGGER.debug("auditDescription description {} does not have full data. "
+				LOGGER.debug("Description {} does not have full data. "
 						+ "Reprocessing", desc.getId());
 
 				//remove this description from db and add again
@@ -614,14 +624,14 @@ public class Rf2SnapshotAuditor {
 					
 					if (StringUtils.isBlank(title) && DescriptionType.fsn.equals(descMap.get(desc.getTypeId()))) {
 						
-						LOGGER.debug("auditDescription concept {} title does not exist adding it ", desc.getConceptId());
+						LOGGER.debug("concept {} title does not exist adding it ", desc.getConceptId());
 						
 						vC.addEdge(descMap.get(desc.getTypeId()).toString(), existingVD);
 						vC.setProperty(Properties.title.toString(), desc.getTerm());
 						
 					} else {
 						
-						LOGGER.debug("auditDescription concept {} title exist  or it is a {} ", desc.getConceptId(), descMap.get(desc.getTypeId()).toString());
+						LOGGER.debug("concept {} title exist  or it is a {} ", desc.getConceptId(), descMap.get(desc.getTypeId()).toString());
 
 					}
 				}
@@ -635,6 +645,7 @@ public class Rf2SnapshotAuditor {
 	
 	
 	private boolean isConceptTitleExist(Rf2Description desc) {
+		LOGGER.trace("isConceptTitleExist {}", desc.getConceptId());
 
 		boolean isExist = false;
 
@@ -654,12 +665,12 @@ public class Rf2SnapshotAuditor {
 					
 				} else {
 					
-					LOGGER.debug("auditDescription concept {} title {} exist", desc.getConceptId(), title);
+					LOGGER.debug("Concept {} title {} exist", desc.getConceptId(), title);
 					isExist = true;
 
 				}
 				
-				LOGGER.debug("Tital for concept {} exist? - {}", desc.getConceptId(), isExist);
+				LOGGER.debug("Title for concept {} exist? - {}", desc.getConceptId(), isExist);
 
 			}
 
@@ -671,7 +682,7 @@ public class Rf2SnapshotAuditor {
 
 		}
 
-		LOGGER.trace("auditDescription total time {} sec ", (System.currentTimeMillis() - start)/1000);
+		LOGGER.trace("isConceptTitleExist total time {} sec ", (System.currentTimeMillis() - start)/1000);
 
 		return isExist;
 	
@@ -705,7 +716,7 @@ public class Rf2SnapshotAuditor {
 		
 			
 			isExist = true;
-			LOGGER.debug("is a fsn skip hence retrun  {} ", isExist);//fsn is being processed as part of concept title. So skip
+			LOGGER.debug("is a fsn skip, return  {} ", isExist);//fsn is being processed as part of concept title. So skip
 
 		}
 		LOGGER.debug("description id {} exist ? = {} ", desc.getId(), isExist);
