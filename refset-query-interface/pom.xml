@@ -40,7 +40,7 @@
 		<com.thinkaurelius.titan-version>0.5.0</com.thinkaurelius.titan-version>
 		<commons.configuration-version>1.9</commons.configuration-version>
 		<org.openrdf.sesame-version>2.7.10</org.openrdf.sesame-version>		
-
+		<com.hazelcast-version>3.3.1</com.hazelcast-version>
 		<!-- meta -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -75,6 +75,23 @@
 		  <version>${org.ihtsdo.otf-version}</version>
 		  <scope>test</scope>
 		</dependency>
+		
+		<!-- enable post demo dependency>
+			<groupId>com.hazelcast</groupId>
+			<artifactId>hazelcast</artifactId>
+			<version>${com.hazelcast-version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.hazelcast</groupId>
+			<artifactId>hazelcast-spring</artifactId>
+			<version>${com.hazelcast-version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.hazelcast</groupId>
+			<artifactId>hazelcast-client</artifactId>
+			<version>${com.hazelcast-version}</version>
+		</dependency -->
+		
 		<!-- Spring -->
 		<dependency>
 			<groupId>org.springframework</groupId>

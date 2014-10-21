@@ -3,7 +3,9 @@
  */
 package org.ihtsdo.otf.refset.graph.gao;
 
-import static org.ihtsdo.otf.refset.domain.RGC.*;
+import static org.ihtsdo.otf.refset.domain.RGC.DESC;
+import static org.ihtsdo.otf.refset.domain.RGC.ID;
+import static org.ihtsdo.otf.refset.domain.RGC.PUBLISHED;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,10 +17,7 @@ import org.ihtsdo.otf.refset.exception.EntityNotFoundException;
 import org.ihtsdo.otf.refset.graph.RefsetGraphAccessException;
 import org.ihtsdo.otf.refset.graph.RefsetGraphFactory;
 import org.ihtsdo.otf.refset.graph.schema.GRefset;
-import org.ihtsdo.otf.snomed.domain.Concept;
 import org.ihtsdo.otf.snomed.domain.Properties;
-import org.ihtsdo.otf.snomed.exception.ConceptServiceException;
-import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,12 +27,12 @@ import org.springframework.util.StringUtils;
 import com.google.common.collect.Iterables;
 import com.thinkaurelius.titan.core.TitanGraph;
 import com.thinkaurelius.titan.core.TitanIndexQuery.Result;
-import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.frames.FramedGraph;
 import com.tinkerpop.frames.FramedGraphFactory;
 import com.tinkerpop.frames.FramedTransactionalGraph;
+import com.tinkerpop.gremlin.java.GremlinPipeline;
 
 /**Refset Graph Access component to retrieve refsets 
  * @author Episteme Partners
@@ -116,7 +115,7 @@ public class RefsetGAO {
 		Refset r = null;
 		try {
 			
-			g = factory.getTitanGraph();
+			g = factory.getReadOnlyGraph();
 
 			FramedGraph<TitanGraph> tg = fgf.create(g);
 			//TODO upgrade this search with status and effective date
@@ -129,7 +128,7 @@ public class RefsetGAO {
 				r.setMetaData(RefsetConvertor.getMetaData(v.asVertex()));
 				break;
 			}
-			g.commit();
+			RefsetGraphFactory.commit(tg);
 			
 			List<Member> ms = r.getMembers();
 			for (Member m : ms) {
@@ -161,7 +160,7 @@ public class RefsetGAO {
 		
 		try {
 			
-			g = factory.getTitanGraph();
+			g = factory.getReadOnlyGraph();
 			FramedGraph<TitanGraph> fg = fgf.create(g);
 			//TODO upgrade this search with status and effective date
 			
@@ -173,26 +172,16 @@ public class RefsetGAO {
 								
 			} else {
 
-				//Iterable<Result<Vertex>> publishedRefset = g.indexQuery("CPublishedGRefset", "v.published:true").limit(10).offset(1).vertices();
-				//Iterable<Result<Vertex>> unPublishedRefset = g.indexQuery("CPublishedGRefset", "v.published:false").limit(10).offset(1).vertices();
-
 				Iterable<GRefset> publishedRefset = fg.getVertices(PUBLISHED, true, GRefset.class); //fg.query().has(PUBLISHED, Compare.EQUAL, true).limit(20).vertices(GRefset.class);//fg.getVertices(PUBLISHED, true, GRefset.class);//g.getRelationType(name); (GRefset.class, new Object[]{ published });
 				Iterable<GRefset> unPublishedRefset = fg.getVertices(PUBLISHED, false, GRefset.class); //fg.query().has(PUBLISHED, Compare.EQUAL, false).limit(20).vertices(GRefset.class);// fg.getVertices(PUBLISHED, false, GRefset.class);//g.getRelationType(name); (GRefset.class, new Object[]{ published });
 				
 				vs = Iterables.concat(publishedRefset, unPublishedRefset);
 				
-			}
-			/*List<GRefset> grs = new ArrayList<GRefset>();
-			
-			for (Result<Vertex> v : vs) {
-				
-				GRefset r = fg.frame(v.getElement(), GRefset.class);
-				grs.add(r);
-			}*/
-			
+			}			
 			
 			refsets = RefsetConvertor.getRefsetss(vs);
-			
+			RefsetGraphFactory.commit(g);
+
 		} catch (Exception e) {
 			
 			RefsetGraphFactory.rollback(g);			
@@ -221,7 +210,7 @@ public class RefsetGAO {
 		
 		try {
 			
-			g = factory.getTitanGraph();
+			g = factory.getReadOnlyGraph();
 
 			Vertex e = g.getVertex(rId);
 			if( e != null) {
@@ -234,7 +223,7 @@ public class RefsetGAO {
 				
 			}
 			
-			g.commit();
+			RefsetGraphFactory.commit(g);
 			
 		} catch (Exception e) {
 			
@@ -267,8 +256,10 @@ public class RefsetGAO {
 
 		TitanGraph g = null;
 		try {
+			
+			
 				
-				g = factory.getTitanGraph();
+				g = factory.getReadOnlyGraph();
 
 				Iterable<Result<Vertex>> vs = g.indexQuery("concept","v.sctid:" + referenceComponentId).vertices();
 				for (Result<Vertex> r : vs) {
@@ -280,9 +271,12 @@ public class RefsetGAO {
 				}
 
 				
-				
+				RefsetGraphFactory.commit(g);
+		
 		} catch (Exception e) {
 			
+			RefsetGraphFactory.rollback(g);
+
 			LOGGER.error("Error duing concept details fetch", e);
 			
 			throw new RefsetGraphAccessException(e.getMessage(), e);
@@ -307,7 +301,7 @@ public class RefsetGAO {
 		boolean isExist = false;
 		try {
 			
-			g = factory.getTitanGraph();
+			g = factory.getReadOnlyGraph();
 
 			//TODO upgrade this search with status and effective date
 			Iterable<Vertex> vs = g.query().has(DESC, descrition).limit(1).vertices();
@@ -324,7 +318,8 @@ public class RefsetGAO {
 					}
 				}
 			}
-			g.commit();
+			
+			RefsetGraphFactory.commit(g);
 			
 			
 			
@@ -352,6 +347,141 @@ public class RefsetGAO {
 	public  void setFactory(RefsetGraphFactory factory) {
 		
 		this.factory = factory;
+	}
+
+
+
+	/**
+	 * @param refsetId
+	 * @param page
+	 * @param size
+	 * @return
+	 * @throws RefsetGraphAccessException 
+	 * @throws EntityNotFoundException 
+	 */
+	public Refset getRefset(String refsetId, Integer from, Integer to) throws RefsetGraphAccessException, EntityNotFoundException {
+		
+		LOGGER.debug("Getting refset members from {}, to {}", from, to);
+		
+		TitanGraph g = null;
+		Refset r = null;
+		try {
+			
+			g = factory.getReadOnlyGraph();
+
+			FramedGraph<TitanGraph> tg = fgf.create(g);
+			
+			Iterable<GRefset> vRs = tg.getVertices(ID, refsetId, GRefset.class);
+			
+			
+			if (!vRs.iterator().hasNext()) {
+				
+				throw new EntityNotFoundException("Refset does not exist for given refset id " + refsetId);
+			} 
+			
+			GRefset vR = vRs.iterator().next();
+
+			r = RefsetConvertor.getRefset(vR);
+			
+			//get required members as per range
+			GremlinPipeline<Vertex, Edge> pipe = new GremlinPipeline<Vertex, Edge>();			
+			pipe.start(vR.asVertex()).inE("members").range(from, to);
+			List<Edge> ls = pipe.toList();
+
+			if (r != null) {
+				
+				r.setMembers(RefsetConvertor.getMembers(ls));
+
+			} else {
+				
+				throw new EntityNotFoundException("Refset does not exist for given refset id " + refsetId);
+
+			}
+			
+			RefsetGraphFactory.commit(g);
+			
+			//populate descriptions
+			List<Member> ms = r.getMembers();
+			for (Member m : ms) {
+			
+				m.setDescription(getDescription(m.getReferencedComponentId()));
+			}
+			
+			LOGGER.debug("Returning refset {} ", r);
+
+			
+		} catch (Exception e) {
+			
+			RefsetGraphFactory.rollback(g);			
+			LOGGER.error("Error getting refset for {}", refsetId, e);
+			throw new RefsetGraphAccessException(e.getMessage(), e);
+
+		} finally {
+			
+			RefsetGraphFactory.shutdown(g);
+		}
+		
+		return r;
+
+	}
+
+
+
+	/**
+	 * @param refSetId
+	 * @return
+	 * @throws RefsetGraphAccessException 
+	 */
+	public Refset getRefsetHeader(String refSetId) throws RefsetGraphAccessException {
+
+		
+		LOGGER.debug("getRefsetHeader for {}", refSetId);
+		
+		TitanGraph g = null;
+		Refset r = null;
+		try {
+			
+			g = factory.getReadOnlyGraph();
+
+			FramedGraph<TitanGraph> tg = fgf.create(g);
+			
+			Iterable<GRefset> vRs = tg.getVertices(ID, refSetId, GRefset.class);
+			
+			
+			if (!vRs.iterator().hasNext()) {
+				
+				throw new EntityNotFoundException("Refset does not exist for given refset id " + refSetId);
+			} 
+			
+			GRefset vR = vRs.iterator().next();
+
+			GremlinPipeline<Vertex, Long> pipe = new GremlinPipeline<Vertex, Long>();
+			long totalNoOfMembers = pipe.start(vR.asVertex()).inE("members").count();
+			
+			LOGGER.debug("total members {}", totalNoOfMembers);
+			
+			r = RefsetConvertor.getRefset(vR);
+			r.setTotalNoOfMembers(totalNoOfMembers);
+			
+			LOGGER.debug("Returning refset {} ", r);
+
+			RefsetGraphFactory.commit(g);			
+
+			
+		} catch (Exception e) {
+			
+			RefsetGraphFactory.rollback(g);			
+			LOGGER.error("Error getting refset for {}", refSetId, e);
+			throw new RefsetGraphAccessException(e.getMessage(), e);
+
+		} finally {
+			
+			RefsetGraphFactory.shutdown(g);
+		}
+		
+		return r;
+
+	
 	}
 
 }

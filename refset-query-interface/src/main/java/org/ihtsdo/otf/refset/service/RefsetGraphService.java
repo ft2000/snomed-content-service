@@ -45,6 +45,7 @@ public class RefsetGraphService implements RefsetBrowseService {
 				
 			} catch (RefsetGraphAccessException e) {
 				
+				LOGGER.error("Error in graph db call", e);
 				throw new RefsetServiceException(e.getMessage());
 			}
 		}
@@ -52,9 +53,12 @@ public class RefsetGraphService implements RefsetBrowseService {
 		
 		List<Refset> refsets;
 		try {
+			
 			refsets = gao.getRefSets(published);
+			
 		} catch (RefsetGraphAccessException e) {
 			
+			LOGGER.error("Error in graph db call", e);
 			throw new RefsetServiceException(e.getMessage());
 		}
 		
@@ -84,6 +88,7 @@ public class RefsetGraphService implements RefsetBrowseService {
 			
 		} catch (RefsetGraphAccessException e) {
 
+			LOGGER.error("Error in graph db call", e);
 			throw new RefsetServiceException(e.getMessage());
 			
 		}
@@ -99,10 +104,58 @@ public class RefsetGraphService implements RefsetBrowseService {
 			
 		} catch (RefsetGraphAccessException e) {
 
+			LOGGER.error("Error in graph db call", e);
 			throw new RefsetServiceException(e.getMessage());
 			
 		}
 	}
+
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.otf.refset.service.RefsetBrowseService#getRefset(java.lang.String, java.lang.Integer, java.lang.Integer)
+	 */
+	@Override
+	public Refset getRefset(String refsetId, Integer from, Integer to)
+			throws RefsetServiceException, EntityNotFoundException {
+
+		LOGGER.debug("getRefset for range from {}, to {}", from, to);
+
+		if (from < 0 | to < 0 | (from == 0 && to == 0) | from > to) {
+			
+			String msg = String.format("No data available for, Invalid range from - %s to - %s", from, to);
+			
+			throw new EntityNotFoundException(msg);
+		}
+		try {
+			
+			return gao.getRefset(refsetId, from, to);
+			
+		} catch (RefsetGraphAccessException e) {
+			
+			LOGGER.error("Error in graph db call", e);
+			throw new RefsetServiceException(e.getMessage());
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.otf.refset.service.RefsetBrowseService#getRefsetHeader(java.lang.String)
+	 */
+	@Override
+	public Refset getRefsetHeader(String refSetId)
+			throws RefsetServiceException, EntityNotFoundException {
+
+		LOGGER.debug("getRefsetHeader for refSetId {}", refSetId);
+
+		try {
+			
+			return gao.getRefsetHeader(refSetId);
+			
+		} catch (RefsetGraphAccessException e) {
+			
+			LOGGER.error("Error in graph db call", e);
+			throw new RefsetServiceException(e.getMessage());
+		}
+	}
+
 
 
 }

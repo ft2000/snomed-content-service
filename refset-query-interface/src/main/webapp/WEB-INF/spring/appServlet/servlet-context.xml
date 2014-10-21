@@ -34,6 +34,13 @@
  	        
 	    </message-converters>		
 	</annotation-driven>
+	
+    <interceptors>
+        <interceptor>
+            <mapping path="/v1.0/**" />
+            <beans:ref bean="refset.Profiler"/>
+        </interceptor>
+    </interceptors>
 		
 	<beans:bean id="pObjectMapper"
 	    class="org.springframework.http.converter.json.Jackson2ObjectMapperFactoryBean"
@@ -63,6 +70,10 @@
 		<beans:property name="suffix" value=".jsp" />
 	</beans:bean>
 	
+	<beans:bean id="refset.Profiler" class="org.ihtsdo.otf.refset.interceptor.RequestProcessingTimeInterceptor">
+		<beans:property name="enabled" value="${time_profile}" />
+	</beans:bean>
+	
 	
 	<context:component-scan base-package="org.ihtsdo.otf.refset" />
 	<context:component-scan base-package="org.ihtsdo.otf.snomed" />
@@ -73,5 +84,6 @@
 	<beans:import resource="common-app-config.xml"/>
 	<beans:import resource="spring-refset-browse-service-stub-data.xml"/>
 	<beans:import resource="refset-snomed-service-config.xml"/>
+	<!-- beans:import resource="refset-cache-config.xml"/ -->
 	
 </beans:beans>

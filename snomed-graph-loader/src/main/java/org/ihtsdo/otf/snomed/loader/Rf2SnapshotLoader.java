@@ -108,7 +108,9 @@ public class Rf2SnapshotLoader {
         		
         		LOGGER.debug("Starting to load file {}", file);
 
-                beanReader = new CsvBeanReader(reader, CsvPreference.TAB_PREFERENCE);
+        	    final CsvPreference RF2_PREF = new CsvPreference.Builder('"', '\t', "\r\n").build();
+
+                beanReader = new CsvBeanReader(reader, RF2_PREF);
                 
                 final String[] header = beanReader.getHeader(true);
                 

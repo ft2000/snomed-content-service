@@ -11,6 +11,7 @@
 */
 package org.ihtsdo.otf.snomed.loader;
 
+import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
@@ -25,12 +26,10 @@ import org.ihtsdo.otf.snomed.domain.Properties;
 import org.ihtsdo.otf.snomed.domain.Relationship;
 import org.ihtsdo.otf.snomed.domain.Types;
 import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.supercsv.cellprocessor.ift.CellProcessor;
-import org.supercsv.io.CsvBeanReader;
-import org.supercsv.io.ICsvBeanReader;
-import org.supercsv.prefs.CsvPreference;
 
 import com.thinkaurelius.titan.core.TitanException;
 import com.thinkaurelius.titan.core.TitanGraph;
@@ -100,8 +99,9 @@ public class Rf2SnapshotAuditor {
 		LOGGER.debug("Starting to audit file {}", file);
         long start = System.currentTimeMillis();
         long totalRow = 0;
-		ICsvBeanReader beanReader = null;
-		InputStreamReader reader = null;
+
+        //need to change implementation from super csv to java io as RF2 description has buggy quotes
+        BufferedReader reader = null;
 
         try {
         	
@@ -111,107 +111,82 @@ public class Rf2SnapshotAuditor {
         			
 				} else if(file.endsWith(".gz")) {
 					
-			        reader = new InputStreamReader(new GZIPInputStream(new FileInputStream(file)));
+			        reader = new BufferedReader(new InputStreamReader(new GZIPInputStream(new FileInputStream(file)), "utf-8"));
 			        
 				} else {
 					
-					reader = new FileReader(file);
+					reader = new BufferedReader(new FileReader(file));
 				}
         		
         		LOGGER.debug("Starting to load file {}", file);
-
-                beanReader = new CsvBeanReader(reader, CsvPreference.TAB_PREFERENCE);
                 
-                final String[] header = beanReader.getHeader(true);
-                
-                int noOfColumns = 0;
-                if (header != null) {
-					
-                	noOfColumns = header.length;
-                	
-				}
-                CellProcessor[] processors = null;
-                @SuppressWarnings("rawtypes")
-				Class rf2Base = null;
-
-                LOGGER.debug("noOfColumns {} in the file", noOfColumns);
-
-                switch (noOfColumns) {
-                
-
-				case 9:
-					
-                	LOGGER.debug("Processing description file");
-
-					processors = RF2CellProcessor.getDescriptionCellProcessor();
-					rf2Base = Rf2Description.class;
-					
-					break;
-					
-				case 10:
-					
-                	LOGGER.debug("Processing relationship file");
-
-					processors = RF2CellProcessor.getRelationshipCellProcessor();
-					rf2Base = Rf2Relationship.class;
-
-					break;
-					
-				case 5:
-
-					LOGGER.debug("Processing concept file");
-
-					processors = RF2CellProcessor.getConceptCellProcessor();
-					rf2Base = Rf2Concept.class;
-
-					break;
-
-				default:
-					LOGGER.debug("Nothing to load");
-					break;
-				}
-                Rf2Base bean;
+                String line;
 
                 beginTx();
-                while( (bean = (Rf2Base)beanReader.read(rf2Base, header, processors)) != null ) {
-                  
-                	int row = beanReader.getRowNumber();
-                	LOGGER.debug("Processing lineNo={}, rowNo={} ", beanReader.getLineNumber(), row);
-                
+                int row = -1;
+        		DateTimeFormatter fmt = DateTimeFormat.forPattern("yyyyMMdd");
 
-                	switch (noOfColumns) {
-					case 9:
-						//process description
-						Rf2Description desc = (Rf2Description) bean;
-						if (!isConceptTitleExist(desc)) {
-							
-							auditDescription(desc);
+                while( (line = reader.readLine()) != null ) {
 
-						} else if (!StringUtils.isEmpty(subType) 
-								&& subType.equalsIgnoreCase(descMap.get(desc.getTypeId()).toString()) 
-								&& !isSubTypeRelationExist(desc)) {
+                	row++;
 
-							LOGGER.debug("Processing row {} of subType {}", row, subType);
+                	LOGGER.debug("Processing rowNo={} ", row);
+                	if (StringUtils.isEmpty(line)) {
+                    	
+                		LOGGER.debug("rowNo={} , {} is empty skipping", row, line);
 
-							processDescription(desc);
-
-						} else {
-							
-			        		LOGGER.debug("Not processing row {} of description id {}", row, desc.getId());
-
-						}
-						break;
-					default:
-						break;
+                		continue;
 					}
                 	
-                	commit(beanReader.getRowNumber());
+                	String[] columns = StringUtils.splitByWholeSeparator(line, "\t");
                 	
+                	if (columns != null && columns.length == 9 && row != 0) {
+
+                		LOGGER.debug("Processing rowNo={} , {}", row, line);
+
+    					Rf2Description desc = new Rf2Description();
+    					//id	effectiveTime	active	moduleId	conceptId	languageCode	typeId	term	caseSignificanceId
+
+    					desc.setId(columns[0]);
+    					desc.setEffectiveTime(fmt.parseDateTime(columns[1]));
+    					desc.setActive(columns[2]);
+    					desc.setModuleId(columns[3]);
+    					desc.setConceptId(columns[4]);
+    					desc.setLanguageCode(columns[5]);
+    					desc.setTypeId(columns[6]);
+    					desc.setTerm(columns[7]);
+    					desc.setCaseSignificanceId(columns[8]);
+
+    					if (!isConceptTitleExist(desc)) {
+    						
+    						auditDescription(desc);
+
+    					} else if (!StringUtils.isEmpty(subType) 
+    							&& subType.equalsIgnoreCase(descMap.get(desc.getTypeId()).toString()) 
+    							&& !isSubTypeRelationExist(desc)) {
+
+    						LOGGER.debug("Processing row {} of subType {}", row, subType);
+
+    						processDescription(desc);
+
+    					} else {
+    						
+    		        		LOGGER.debug("Not processing row {} of description id {}", row, desc.getId());
+
+    					}
+					} else {
+						
+                		LOGGER.debug("rowNo={}, {}  does not have required columns, skipping", row, line);
+                		continue;
+
+					}
+                	
+                	commit(row);
+
                 }
         		LOGGER.info("Commiting remaining data");
                 g.commit();//remaining operation commit
-            	totalRow = beanReader.getRowNumber();
-
+                totalRow = row;
         } catch (IOException e) {
         	g.rollback();
 			// TODO Auto-generated catch block
@@ -225,11 +200,10 @@ public class Rf2SnapshotAuditor {
 		}
         finally {
         	
-            if( beanReader != null ) {
+            if( reader != null ) {
             	
                 try {
 					LOGGER.info("Closing IO resources");
-					beanReader.close();	
 					reader.close();
 				} catch (IOException e) {
 		    		

@@ -225,13 +225,13 @@ public class MemberGAO {
 				outcomeMap.put(m.getReferencedComponentId(), "Success");
 			}
 			
-			tg.commit();
+			RefsetGraphFactory.commit(tg);;
 
 		} catch (EntityNotFoundException e) {
 			
 			LOGGER.error("Error during bulk member upload", e);
 
-			if (tg != null) { tg.rollback(); }
+			RefsetGraphFactory.rollback(tg);
 			
 			throw e;
 			
@@ -239,8 +239,7 @@ public class MemberGAO {
 			
 			LOGGER.error("Error during bulk member upload", e);
 
-			if (tg != null) { tg.rollback(); }
-			
+			RefsetGraphFactory.rollback(tg);
 			throw new RefsetGraphAccessException("Error while adding members");
 			
 		} finally {
@@ -290,13 +289,13 @@ public class MemberGAO {
 			}
 			
 
-			tg.commit();
+			RefsetGraphFactory.commit(tg);
 
 		} catch (EntityNotFoundException e) {
 			
 			LOGGER.error("Error while removing member", e);
 
-			if (tg != null) { tg.rollback(); }
+			RefsetGraphFactory.rollback(tg);
 			
 			throw e;
 			
@@ -304,7 +303,7 @@ public class MemberGAO {
 			
 			LOGGER.error("Error while removing member", e);
 
-			if (tg != null) { tg.rollback(); }
+			RefsetGraphFactory.rollback(tg);
 			
 			throw new RefsetGraphAccessException("Error while removing members");
 			
@@ -349,13 +348,13 @@ public class MemberGAO {
 					}
 				}
 
-				tg.commit();
+				RefsetGraphFactory.commit(tg);
 
 			} catch (EntityNotFoundException e) {
 				
 				LOGGER.error("Error while removing member", e);
 
-				if (tg != null) { tg.rollback(); }
+				RefsetGraphFactory.rollback(tg);
 				
 				throw e;
 				
@@ -363,7 +362,7 @@ public class MemberGAO {
 				
 				LOGGER.error("Error while removing member", e);
 
-				if (tg != null) { tg.rollback(); }
+				RefsetGraphFactory.rollback(tg);
 				
 				throw new RefsetGraphAccessException("Error while removing members");
 				
@@ -406,7 +405,12 @@ public class MemberGAO {
 				
 				mg.setModifiedBy(m.getModifiedBy());
 				mg.setModifiedDate(new DateTime().getMillis());
-				mg.setModuleId(m.getModuleId());
+				if (!StringUtils.isEmpty(m.getModuleId())) {
+					
+					mg.setModuleId(m.getModuleId());
+
+				}
+
 				mg.setPublished(m.isPublished());
 				
 				mV = mg.asVertex();

@@ -117,7 +117,7 @@ public class ConceptLookupController {
 	
 	@RequestMapping( method = RequestMethod.GET, value = "/concepts", produces = "application/json" )
 	@ApiOperation( value = "Api to get paged list of concept ids available in the systems." )
-    public ResponseEntity<Result< Map<String, Object>>> getConceptIds( @RequestParam( value = "page", defaultValue = "1", required = false) int page, 
+    public ResponseEntity<Result< Map<String, Object>>> getConceptIds( @RequestParam( value = "page", defaultValue = "0", required = false) int page, 
     		@RequestParam( value = "size", defaultValue = "10", required = false) int size) throws Exception {
 		
 		logger.debug("Getting concept id list with offset as {} and limit as {}", page, size);
