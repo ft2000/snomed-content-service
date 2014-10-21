@@ -48,8 +48,9 @@ public class RefsetExportController {
 		resp.setHeader("content-type", "application/csv;charset=UTF-8");
 	    resp.setHeader("Content-Disposition", "attachment; filename=\"rel2_Refset_SimpleDelta_INT_" + Utility.getDate(new DateTime()) + ".rf2\"");
 	    
-        ICsvListWriter csvWriter = new CsvListWriter(resp.getWriter(),
-                CsvPreference.TAB_PREFERENCE);
+	    final CsvPreference RF2_PREF = new CsvPreference.Builder('"', '\t', "\r\n").build();
+
+	    final ICsvListWriter csvWriter = new CsvListWriter(resp.getWriter(), RF2_PREF);
  
         eService.getRF2Payload(csvWriter, refsetId);
         

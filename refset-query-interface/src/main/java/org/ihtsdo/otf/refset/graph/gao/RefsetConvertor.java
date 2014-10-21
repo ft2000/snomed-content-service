@@ -407,6 +407,24 @@ public class RefsetConvertor {
 		
 		LOGGER.debug("convert2Refsets {}", vR);
 
+		Refset r = getRefset(vR);
+
+		Iterable<Edge> eRs = vR.asVertex().getEdges(Direction.IN, "members");
+		r.setMembers(getMembers(eRs));
+		
+		LOGGER.debug("Returning Refset as {} ", r.toString());
+
+		return r;
+		
+	
+	}
+
+	/**
+	 * @param asVertex
+	 * @return
+	 */
+	protected static Refset getRefset(GRefset vR) {
+		
 		Refset r = new Refset();
 		Set<String> keys = vR.asVertex().getPropertyKeys();
 		
@@ -506,16 +524,17 @@ public class RefsetConvertor {
 			r.setId(vR.getSctdId());
 
 		}
+		
+		return r;
+	}
 
 
+	protected static List<Member> getMembers(Iterable<Edge> eRs ) {
 		
-		
+		List<Member> members = new ArrayList<Member>();
 
-		Iterable<Edge> eRs = vR.asVertex().getEdges(Direction.IN, "members");
-		
 		if(eRs != null) {
 			
-			List<Member> members = new ArrayList<Member>();
 			
 			for (Edge eR : eRs) {
 				
@@ -623,19 +642,11 @@ public class RefsetConvertor {
 
 				members.add(m);
 			}
-			
-			r.setMembers(members);
-
-
 		}
-
 		
-		LOGGER.debug("Returning Refset as {} ", r.toString());
-
-		return r;
-		
-	
+		return members;
 	}
+			
 	
 	
 	/** Utility method to create {@link MetaData} object from {@link Vertex} 

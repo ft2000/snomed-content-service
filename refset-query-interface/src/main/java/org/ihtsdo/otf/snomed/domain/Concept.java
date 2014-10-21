@@ -3,6 +3,8 @@
  */
 package org.ihtsdo.otf.snomed.domain;
 
+import java.io.Serializable;
+
 import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.ihtsdo.otf.snomed.service.RdfEnums;
@@ -15,8 +17,12 @@ import org.springframework.util.StringUtils;
  * @author Episteme Partners
  *
  */
-public class Concept {
+public class Concept implements Serializable {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private static final String BASE_URI = "http://sct.snomed.info/";
 	private static final String SCT_NS = "http://sct.snomed.info/#";
 	//private static final String RDF_NS = "http://www.w3.org/1999/02/22-rdf-syntax-ns#";

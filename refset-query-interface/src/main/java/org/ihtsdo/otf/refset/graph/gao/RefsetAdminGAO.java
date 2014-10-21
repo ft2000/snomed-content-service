@@ -100,11 +100,11 @@ public class RefsetAdminGAO {
 
 			md = RefsetConvertor.getMetaData(rV);
 			
-			tg.commit();
+			RefsetGraphFactory.commit(tg);
 						
 		} catch (Exception e) {
 			
-			if (tg != null) tg.rollback();
+			RefsetGraphFactory.rollback(tg);
 
 			LOGGER.error("Error during graph ineraction", e);
 			
@@ -235,16 +235,17 @@ public class RefsetAdminGAO {
 			}
 
 			
-			g.commit();
+			RefsetGraphFactory.commit(g);
 			
 		} catch(EntityNotFoundException e) {
 			
-			if ( g != null) { g.rollback(); }
+			LOGGER.error("Error during graph interaction", e);
+			RefsetGraphFactory.rollback(g);
 			throw e;
 			
 		} catch (Exception e) {
 			
-			if ( g != null) { g.rollback(); }
+			RefsetGraphFactory.rollback(g);
 			LOGGER.error("Error during graph interaction", e);
 
 			throw new RefsetGraphAccessException(e.getMessage(), e);
@@ -302,11 +303,14 @@ public class RefsetAdminGAO {
 			
 			LOGGER.debug("Commiting updated refset");
 
-			tg.commit();
-			g.commit();
+			RefsetGraphFactory.commit(tg);
+			RefsetGraphFactory.commit(g);
 						
 		} catch(EntityNotFoundException e) {
+			
+			LOGGER.error("Error during graph ineraction", e);
 			RefsetGraphFactory.rollback(g);
+			
 			throw e;
 		}
 		
@@ -354,9 +358,23 @@ public class RefsetAdminGAO {
 			rV.setEffectiveTime(r.getEffectiveTime().getMillis());
 
 		}
+		
+		String lang = r.getLanguageCode();
 
-		rV.setLanguageCode(r.getLanguageCode());
-		rV.setModuleId(r.getModuleId());
+		if (!StringUtils.isEmpty(lang)) {
+			
+			rV.setLanguageCode(lang);
+
+		}
+		
+		String moduleId = r.getModuleId();
+
+		if (!StringUtils.isEmpty(moduleId)) {
+			
+			rV.setModuleId(moduleId);
+
+		}
+		
 		rV.setPublished(r.isPublished());
 		
 		if (r.getPublishedDate() != null) {
@@ -365,13 +383,33 @@ public class RefsetAdminGAO {
 
 		}
 		
-		rV.setSuperRefsetTypeId(r.getSuperRefsetTypeId());
+		String superRefsetTypeId = r.getSuperRefsetTypeId();
+
+		if (!StringUtils.isEmpty(superRefsetTypeId)) {
+			
+			rV.setSuperRefsetTypeId(superRefsetTypeId);
+
+		}
+
+		String compTypeId = r.getComponentTypeId();
+
+		if (!StringUtils.isEmpty(compTypeId)) {
+			
+			rV.setComponentTypeId(compTypeId);
+
+		}
 		
-		rV.setComponentTypeId(r.getComponentTypeId());
 		
 		rV.setActive(r.isActive());
 		
-		rV.setTypeId(r.getTypeId());
+		String typeId = r.getTypeId();
+
+		if (!StringUtils.isEmpty(typeId)) {
+			
+			rV.setTypeId(typeId);
+
+		}
+
 		rV.setModifiedBy(r.getModifiedBy());
 		rV.setModifiedDate(new DateTime().getMillis());
 
@@ -382,7 +420,7 @@ public class RefsetAdminGAO {
 
 		}
 		
-		if (StringUtils.isEmpty(r.getSctId())) {
+		if (!StringUtils.isEmpty(r.getSctId())) {
 			
 			rV.setSctdId(r.getSctId());
 

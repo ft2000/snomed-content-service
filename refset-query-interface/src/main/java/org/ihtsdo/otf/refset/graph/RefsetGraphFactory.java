@@ -11,6 +11,7 @@ import com.thinkaurelius.titan.core.TitanFactory;
 import com.thinkaurelius.titan.core.TitanGraph;
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.GraphFactory;
+import com.tinkerpop.frames.FramedTransactionalGraph;
 
 
 /** Utility class to get graph server objects so that CRUD operation can be performed on data base
@@ -24,6 +25,8 @@ public class RefsetGraphFactory {
 	private static Configuration gsConfig;
 	
 	private Configuration config;
+
+	private TitanGraph tg;
 	
 	
 	public RefsetGraphFactory(Configuration config) {
@@ -45,27 +48,95 @@ public class RefsetGraphFactory {
 	 */
 	public TitanGraph getTitanGraph() {
 		
-		TitanGraph og = TitanFactory.open(config);
-        LOGGER.info("Returning Transactional Graph {}", og);
+		if (this.tg == null) {
+			
+	        LOGGER.info("Create new instance of graph");
 
-        return og;
+			this.tg = TitanFactory.open(config);
+		}
+		
+		if (this.tg == null) {
+			
+			throw new IllegalArgumentException("Graph not initialized, please check provide confiuration");
+		}
+		TitanGraph tg =  this.tg;
+        LOGGER.debug("Returning Transactional Graph {}", tg);
+
+        return tg;
+        
+	}
+	
+	/** Returns a readonly {@link TitanGraph} 
+	 * @return
+	 */
+	public TitanGraph getReadOnlyGraph() {
+		
+		TitanGraph tg = getTitanGraph();
+		tg.buildTransaction().readOnly();
+		
+        LOGGER.debug("Returning readonly Graph {}", tg);
+
+		return tg;
         
 	}
 	
 	public static void shutdown(Graph g) {
 		
-		LOGGER.info("Shutting down graph {}", g);
+		//LOGGER.info("Shutting down graph {}", g);
 		
-		if (g != null) g.shutdown();//shutdown is not required for titan.Commit should clear resources
+		//if (g != null) g.shutdown();//shutdown is not required for titan.Commit or rollback should clear resources
 		
 	}
 
 	
-	public static void rollback(TitanGraph g) {
+	public static void rollback(Graph g) {
 		
 		LOGGER.info("rollback {}", g);
 
-		if (g != null) g.rollback();
+		if (g instanceof TitanGraph) {
+			
+			if (g != null) ((TitanGraph)g).rollback();
+
+		} else if (g instanceof FramedTransactionalGraph) {
+			
+			if (g != null) {
+				
+				@SuppressWarnings("unchecked")
+				FramedTransactionalGraph<TitanGraph> framedTransactionalGraph = (FramedTransactionalGraph<TitanGraph>)g;
+				framedTransactionalGraph.rollback();
+			}
+
+		} else {
+			
+			LOGGER.info("No rollback unknown graph {}", g);
+
+		}
+		
+	}
+	
+	public static void commit(Graph g) {
+		
+		LOGGER.info("commit {}", g);
+		if (g instanceof TitanGraph) {
+			
+			if (g != null) ((TitanGraph)g).commit();
+
+		} else if (g instanceof FramedTransactionalGraph) {
+			
+			if (g != null) {
+				
+				@SuppressWarnings("unchecked")
+				FramedTransactionalGraph<TitanGraph> framedTransactionalGraph = (FramedTransactionalGraph<TitanGraph>)g;
+				framedTransactionalGraph.commit();
+			}
+
+		} else {
+			
+			LOGGER.info("Not committing unknown graph {}", g);
+
+		}
+  
+
 		
 	}
 	

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:cache="http://www.springframework.org/schema/cache"
+	xmlns:hz="http://www.hazelcast.com/schema/spring"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/cache http://www.springframework.org/schema/cache/spring-cache.xsd
+		 http://www.hazelcast.com/schema/spring http://www.hazelcast.com/schema/spring/hazelcast-spring-3.3.xsd">
+ 	
+ 	<!-- cache:annotation-driven cache-manager="cacheManager" mode="proxy" proxy-target-class="true" />
+ 	
+ 	<bean id="cacheManager" class="com.hazelcast.spring.cache.HazelcastCacheManager" >
+		<constructor-arg ref="instance"/>
+	</bean>
+	
+ 	<hz:hazelcast id="instance">
+		<hz:config>
+		
+			<hz:group name="refset" password="refset"/>
+     		<hz:management-center enabled="true" update-interval="60" url="http://localhost:8082" />
+			<hz:properties>
+				<hz:property name="hazelcast.merge.first.run.delay.seconds">5</hz:property>
+				<hz:property name="hazelcast.merge.next.run.delay.seconds">5</hz:property>
+			</hz:properties>
+			<hz:network port="57000" port-auto-increment="false">
+				<hz:join>
+					<hz:multicast enabled="true" />
+				</hz:join>
+				<hz:interfaces enabled="true">
+                 <hz:interface>127.0.0.1</hz:interface>
+             </hz:interfaces>
+			</hz:network>
+            <hz:map name="default" backup-count="3" async-backup-count="1"
+                time-to-live-seconds="10000" max-size="5000" eviction-percentage="50"
+                 eviction-policy="LRU" merge-policy="hz.LATEST_UPDATE" />
+                 
+		</hz:config>
+	</hz:hazelcast -->	
+</beans>

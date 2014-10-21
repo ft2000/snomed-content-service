@@ -19,6 +19,7 @@ import java.util.TreeSet;
 
 import org.apache.commons.configuration.Configuration;
 import org.ihtsdo.otf.refset.exception.EntityNotFoundException;
+import org.ihtsdo.otf.refset.graph.RefsetGraphFactory;
 import org.ihtsdo.otf.snomed.domain.Concept;
 import org.ihtsdo.otf.snomed.domain.Properties;
 import org.ihtsdo.otf.snomed.domain.Relationship;
@@ -26,9 +27,10 @@ import org.ihtsdo.otf.snomed.exception.ConceptServiceException;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.util.StringUtils;
 
-import com.thinkaurelius.titan.core.TitanFactory;
 import com.thinkaurelius.titan.core.TitanGraph;
 import com.thinkaurelius.titan.core.TitanIndexQuery.Result;
 import com.tinkerpop.blueprints.Direction;
@@ -42,15 +44,17 @@ import com.tinkerpop.blueprints.Vertex;
 public class ConceptLookUpServiceImplv1_0 implements ConceptLookupService {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(ConceptLookUpServiceImplv1_0.class);
-		
-	private TitanGraph graph;
-		
+	
 	private Configuration config;
+	
+	private RefsetGraphFactory factory;
+
 
 	/* (non-Javadoc)
 	 * @see org.ihtsdo.otf.snomed.service.ConceptLookupService#getConcepts(java.util.List)
 	 */
 	@Override
+	@Cacheable(value = { "concepts" })
 	public Map<String, Concept> getConcepts(Set<String> conceptIds)
 			throws ConceptServiceException {
 
@@ -60,34 +64,37 @@ public class ConceptLookUpServiceImplv1_0 implements ConceptLookupService {
 		
 		TitanGraph g = null;
 		try {
-			g = getGraph();
 			
-				for (String id : conceptIds) {
+			
+			g = factory.getReadOnlyGraph();
+			
+			for (String id : conceptIds) {
+				
+				try {
 					
-					try {
-						
-						Concept c = getConcept(id);
-						concepts.put(id, c);
-						
-					} catch (EntityNotFoundException e) {
+					Concept c = getConcept(id);
+					concepts.put(id, c);
+					
+				} catch (EntityNotFoundException e) {
 
-						concepts.put(id, null);
-
-					}
+					concepts.put(id, null);
 
 				}
-						
-				
+
+			}
+			
+			RefsetGraphFactory.commit(g);
 			
 		} catch (Exception e) {
 			
 			LOGGER.error("Error duing concept details for concept map fetch", e);
-			
+			RefsetGraphFactory.rollback(g);
+
 			throw new ConceptServiceException(e);
 			
 		} finally {
 			
-			close(g);
+			RefsetGraphFactory.shutdown(g);
 			
 		}
 		
@@ -100,6 +107,7 @@ public class ConceptLookUpServiceImplv1_0 implements ConceptLookupService {
 	 * @see org.ihtsdo.otf.snomed.service.ConceptLookupService#getConcept(java.lang.String)
 	 */
 	@Override
+	@Cacheable(value = { "concept" })
 	public Concept getConcept(String conceptId) throws ConceptServiceException,
 			EntityNotFoundException {
 		
@@ -111,65 +119,73 @@ public class ConceptLookUpServiceImplv1_0 implements ConceptLookupService {
 		}
 		
 		TitanGraph g = null;
+		
 		try {
 			
-				g = getGraph();
-				Iterable<Vertex> vs = g.getVertices(Properties.sctid.toString(), conceptId);
-				for (Vertex r : vs) {
-					
-					Concept c = new Concept();
-					
-					Vertex v = r;
-					
-					String sctId = v.getProperty(Properties.sctid.toString());
-					c.setId(sctId);
-					
-					Long effectiveTime = v.getProperty(Properties.effectiveTime.toString());
-					
-					if (effectiveTime != null) {
-						
-						c.setEffectiveTime(new DateTime(effectiveTime));
+			g = factory.getReadOnlyGraph();
+			
+			Iterable<Vertex> vs = g.getVertices(Properties.sctid.toString(), conceptId);
 
-					}
-					
-					String status = v.getProperty(Properties.status.toString());
-					boolean active = "1".equals(status) ? true : false;
-					c.setActive(active);
-					
-					String label = v.getProperty(Properties.title.toString());
-					c.setLabel(label);
-					
-					Iterable<Edge> es = v.getEdges(Direction.OUT, Relationship.hasModule.toString());
-					
-					for (Edge edge : es) {
-
-						Vertex vE = edge.getVertex(Direction.IN);
-						
-						if (vE != null) {
-							
-							String moduleId = vE.getProperty(Properties.sctid.toString());
-							c.setModule(moduleId);
-							break;
-
-						}
-
-					}
-					return c;
-				}
-
+			for (Vertex r : vs) {
 				
+				Concept c = new Concept();
+
+				Vertex v = r;
+				
+				String sctId = v.getProperty(Properties.sctid.toString());
+				c.setId(sctId);
+				
+				Long effectiveTime = v.getProperty(Properties.effectiveTime.toString());
+				
+				if (effectiveTime != null) {
+					
+					c.setEffectiveTime(new DateTime(effectiveTime));
+
+				}
+				
+				String status = v.getProperty(Properties.status.toString());
+				boolean active = "1".equals(status) ? true : false;
+				c.setActive(active);
+				
+				String label = v.getProperty(Properties.title.toString());
+				c.setLabel(label);
+				
+				Iterable<Edge> es = v.getEdges(Direction.OUT, Relationship.hasModule.toString());
+				
+				for (Edge edge : es) {
+
+					Vertex vE = edge.getVertex(Direction.IN);
+					
+					if (vE != null) {
+						
+						String moduleId = vE.getProperty(Properties.sctid.toString());
+						c.setModule(moduleId);
+						break;
+
+					}
+
+				}
+				
+				RefsetGraphFactory.commit(g);
+
+				return c;
+
+			}
+
+			RefsetGraphFactory.commit(g);
 				
 		} catch (Exception e) {
 			
 			LOGGER.error("Error duing concept details fetch", e);
-			
+			RefsetGraphFactory.rollback(g);
+
 			throw new ConceptServiceException(e);
 			
 		} finally {
 			
-			close(g);
+			RefsetGraphFactory.shutdown(g);
 		}
-		
+
 		throw new EntityNotFoundException(String.format("Invalid concept id", conceptId));
 
 	}
@@ -178,6 +194,7 @@ public class ConceptLookUpServiceImplv1_0 implements ConceptLookupService {
 	 * @see org.ihtsdo.otf.snomed.service.ConceptLookupService#getConceptIds(int, int)
 	 */
 	@Override
+	@Cacheable(value = { "conceptIds" })
 	public Set<String> getConceptIds(int offset, int limit)
 			throws ConceptServiceException {
 		LOGGER.debug("getting concept ids with offset {} and limit {} ", offset, limit);
@@ -187,76 +204,42 @@ public class ConceptLookUpServiceImplv1_0 implements ConceptLookupService {
 		TitanGraph g = null;
 		try {
 			
-				g = getGraph();
-				Iterable<Result<Vertex>> vs = g.indexQuery("concept","v.sctid:*").offset(offset).limit(limit).vertices();
-				//Iterable<Vertex> vs = g.query().has("v.title").orderBy(Properties.sctid.toString(), Order.DESC).limit(limit).vertices();
+			g = factory.getReadOnlyGraph();
 
-				//Iterable<Vertex> vs = g.query().has(g.getVertexLabel( Types.concept.name()).getName()).limit(limit).vertices();
-				for (Result<Vertex> v : vs) {
+			Iterable<Result<Vertex>> vs = g.indexQuery("concept","v.sctid:*").offset(offset).limit(limit).vertices();
+
+			for (Result<Vertex> v : vs) {
+				
+				String sctid = v.getElement().getProperty(Properties.sctid.toString());
+
+				if (!StringUtils.isEmpty(sctid)) {
 					
-					String sctid = v.getElement().getProperty(Properties.sctid.toString());
+					LOGGER.trace("Adding sctid {} to concept id list ", sctid);
 
-					if (!StringUtils.isEmpty(sctid)) {
-						
-						LOGGER.trace("Adding sctid {} to concept id list ", sctid);
-
-						conceptIds.add(sctid);
-
-					}
+					conceptIds.add(sctid);
 
 				}
+
+			}
+			
+			RefsetGraphFactory.commit(g);
 									
 		} catch (Exception e) {
 			
 			LOGGER.error("Error duing concept ids fetch ", e);
-			
+			RefsetGraphFactory.rollback(g);
+
 			throw new ConceptServiceException(e);
 			
 		} finally {
 			
-			close(g);
+			RefsetGraphFactory.shutdown(g);
 			
 		}
 		LOGGER.debug("returning total {} concept ids ", conceptIds.size());
 
 		return Collections.unmodifiableSortedSet(conceptIds);
-	}
-
-	/**
-	 * @param g
-	 */
-	private void close(TitanGraph g) {
-		
-		if (g != null) {
-			
-			LOGGER.debug("Shutting down graph storage");
-			g.shutdown();
-			
-		}
-		
-	}
-	
-	private TitanGraph getGraph() {
-		
-		TitanGraph g = this.graph;
-		
-		if ( g != null && g.isOpen() ) {
-			
-			return g;
-			
-		}
-		
-		if( config != null) {
-			
-			this.graph = TitanFactory.open(config);
-			
-			return this.graph;
-		}
-		
-		 throw new IllegalArgumentException("Repository configuration is required");
-
-	}
-	
+	}	
 	
 	/* (non-Javadoc)
 	 * @see org.ihtsdo.otf.snomed.service.ConceptLookupService#getTypes(String)
@@ -271,7 +254,8 @@ public class ConceptLookUpServiceImplv1_0 implements ConceptLookupService {
 		
 		TitanGraph g = null;
 		try {
-			g = getGraph();
+			
+			g = factory.getReadOnlyGraph();
 
 			    
 			
@@ -286,7 +270,7 @@ public class ConceptLookUpServiceImplv1_0 implements ConceptLookupService {
 			
 		} finally {
 			
-			close(g);
+			RefsetGraphFactory.shutdown(g);
 			
 		}
 		
@@ -300,6 +284,15 @@ public class ConceptLookUpServiceImplv1_0 implements ConceptLookupService {
 	 */
 	public void setConfig(Configuration config) {
 		this.config = config;
+	}
+	
+	/**
+	 * @param factory the factory to set
+	 */
+	@Autowired
+	public  void setFactory(RefsetGraphFactory factory) {
+		
+		this.factory = factory;
 	}
 
 }

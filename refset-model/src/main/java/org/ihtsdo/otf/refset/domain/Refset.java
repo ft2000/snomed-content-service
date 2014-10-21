@@ -27,6 +27,8 @@ public class Refset extends BaseObj {
 	
 	private DateTime expectedReleaseDate;
 	
+	private long totalNoOfMembers;
+	
 	
 	/**
 	 * @return the typeId
@@ -142,6 +144,20 @@ public class Refset extends BaseObj {
 	 */
 	public void setExpectedReleaseDate(DateTime expectedReleaseDate) {
 		this.expectedReleaseDate = expectedReleaseDate;
+	}
+
+	/**
+	 * @return the totalNoOfMembers
+	 */
+	public long getTotalNoOfMembers() {
+		return totalNoOfMembers;
+	}
+
+	/**
+	 * @param totalNoOfMembers the totalNoOfMembers to set
+	 */
+	public void setTotalNoOfMembers(long totalNoOfMembers) {
+		this.totalNoOfMembers = totalNoOfMembers;
 	}
 
 

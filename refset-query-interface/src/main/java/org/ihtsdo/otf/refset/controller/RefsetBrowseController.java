@@ -14,6 +14,7 @@ import javax.annotation.Resource;
 
 import org.ihtsdo.otf.refset.common.Meta;
 import org.ihtsdo.otf.refset.common.Result;
+import org.ihtsdo.otf.refset.domain.Member;
 import org.ihtsdo.otf.refset.domain.Refset;
 import org.ihtsdo.otf.refset.service.RefsetBrowseService;
 import org.slf4j.Logger;
@@ -133,6 +134,84 @@ public class RefsetBrowseController {
 
 		Map<String, Object> data = new HashMap<String, Object>();
 		data.put("exist", isExist);
+		
+		response.setData(data);
+		m.setMessage(SUCESS);
+		m.setStatus(HttpStatus.OK);
+
+		return new ResponseEntity<Result<Map<String,Object>>>(response, HttpStatus.OK);
+		
+	       
+    }
+	
+	
+	@RequestMapping( method = RequestMethod.GET, produces = "application/json", value = "/{refsetId}/members")
+	@ApiOperation( value = "Retrieves members of an existing refsets based on given range" )
+    public ResponseEntity<Result< Map<String, Object>>> getRefsetMembers( @RequestParam( value = "from", defaultValue = "0" ) int from, 
+    		@RequestParam( value = "to", defaultValue = "15" ) int to,  
+    		@PathVariable( value = "refsetId" ) String refsetId) throws Exception {
+		
+		logger.debug("Getting members of {} ", refsetId);
+
+		Result<Map<String, Object>> response = new Result<Map<String, Object>>();
+		Meta m = new Meta();
+		m.add( linkTo( methodOn( RefsetBrowseController.class ).getRefsetMembers( from, to, refsetId ) ).withSelfRel() );
+		
+		response.setMeta(m);
+		
+		bService.getRefset(refsetId, from, to);
+
+		
+		Refset refSet =  bService.getRefset(refsetId, from, to);
+
+		if (SecurityContextHolder.getContext().getAuthentication() instanceof AnonymousAuthenticationToken && !refSet.isPublished()) {
+			
+			throw new AccessDeniedException("Please login to see work in progress refsets members");
+			
+		}
+
+		List<Member> ms = refSet.getMembers();
+		
+		logger.debug("returning {} members", ms.size());
+
+		Map<String, Object> data = new HashMap<String, Object>();
+		data.put("members", ms);
+		response.setData(data);
+		
+		
+		m.setMessage(SUCESS);
+		m.setStatus(HttpStatus.OK);
+
+		return new ResponseEntity<Result<Map<String,Object>>>(response, HttpStatus.OK);
+		
+	         
+    }
+	
+	
+	@RequestMapping( method = RequestMethod.GET, value = "/{refSetId}/header", produces = "application/json")
+	@ApiOperation( value = "Api to get details of a refset excluding members for given refset id." )
+    public ResponseEntity<Result< Map<String, Object>>> getRefsetHeader( @PathVariable( value = "refSetId" ) String refSetId ) throws Exception {
+		
+		logger.debug("Getting refset details");
+
+		Result<Map<String, Object>> response = new Result<Map<String, Object>>();
+		
+		Meta m = new Meta();
+
+		m.add( linkTo( methodOn( RefsetBrowseController.class, refSetId).getRefsetDetails(refSetId) ).withSelfRel() );
+		response.setMeta(m);
+
+
+		
+		Refset refSet =  bService.getRefsetHeader(refSetId);
+
+		if (SecurityContextHolder.getContext().getAuthentication() instanceof AnonymousAuthenticationToken && !refSet.isPublished()) {
+			
+			throw new AccessDeniedException("Please login to see work in progress refsets");
+			
+		}
+		Map<String, Object> data = new HashMap<String, Object>();
+		data.put("refset", refSet);
 		
 		response.setData(data);
 		m.setMessage(SUCESS);

@@ -6,6 +6,7 @@ package org.ihtsdo.otf.refset.service;
 import java.util.List;
 
 import org.ihtsdo.otf.refset.domain.Refset;
+import org.ihtsdo.otf.refset.exception.EntityNotFoundException;
 import org.ihtsdo.otf.refset.exception.RefsetServiceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,6 +67,26 @@ public class RefsetBrowseServiceStub implements RefsetBrowseService {
 			throws RefsetServiceException {
 		// TODO Auto-generated method stub
 		return false;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.otf.refset.service.RefsetBrowseService#getRefset(java.lang.String, java.lang.Integer, java.lang.Integer)
+	 */
+	@Override
+	public Refset getRefset(String refsetId, Integer from, Integer to)
+			throws RefsetServiceException, EntityNotFoundException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.otf.refset.service.RefsetBrowseService#getRefsetHeader(java.lang.String)
+	 */
+	@Override
+	public Refset getRefsetHeader(String refSetId)
+			throws RefsetServiceException, EntityNotFoundException {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }
