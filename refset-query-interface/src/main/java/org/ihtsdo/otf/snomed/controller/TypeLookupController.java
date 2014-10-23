@@ -131,6 +131,7 @@ public class TypeLookupController {
 		modules.put("449081005", "SNOMED CT Spanish edition module (core metadata concept)");
 		modules.put("449080006", "SNOMED CT to ICD-10 rule-based mapping module (core metadata concept)");
 		modules.put("449079008", "SNOMED CT to ICD-9CM equivalency mapping module (core metadata concept)");
+		modules.put("705115006", "Technology Preview module (core metadata concept)");
 
 		Map<String, Object> data = new HashMap<String, Object>();
 		data.put("modules", modules);
