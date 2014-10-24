@@ -44,7 +44,7 @@ public class Rf2SnapshotAuditor {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(Rf2SnapshotAuditor.class);
 	
-	private static final String SNAPSHOT_USER = "snomed_st_loader";
+	private static final String SNAPSHOT_USER = "system";
 	
 	private TitanGraph g;
 	private int bufferSize = 100000;
@@ -82,12 +82,6 @@ public class Rf2SnapshotAuditor {
 		descMap.put("900000000000013009", DescriptionType.synonym);
 		descMap.put("900000000000550004", DescriptionType.definition);
 		descMap.put("900000000000003001", DescriptionType.fsn);
-
-		characteristicsMap.put("900000000000011006", Relationship.inferred);
-		characteristicsMap.put("900000000000010007", Relationship.stated);
-		characteristicsMap.put("900000000000227009", Relationship.additional);
-		characteristicsMap.put("900000000000225001", Relationship.qualifying);
-
 
 	}
 	
@@ -322,59 +316,6 @@ public class Rf2SnapshotAuditor {
 
 	}
 	
-	
-	private void processRelationship(Rf2Relationship rel) {
-		long start = System.currentTimeMillis();
-		LOGGER.debug("Processing relationship {}", rel.getId());
-		
-		//this is special vertex only required to get to have special relationships
-		
-		Vertex vR = g.addVertexWithLabel(Types.relationship.toString());
-		vR.setProperty(Properties.sctid.toString(), rel.getId());
-		
-		//add module
-		Vertex vM = processModule(rel.getModuleId());
-		g.addEdge(rel.getModuleId(), vR, vM, Relationship.hasModule.toString());
-
-		//type
-		Vertex vT = processType(rel.getTypeId());
-		g.addEdge(rel.getModuleId(), vR, vT, Relationship.hasType.toString());
-		
-		//modifier
-		Vertex vMo = processModifier(rel.getTypeId());
-		g.addEdge(rel.getModifierId(), vR, vMo, Relationship.hasModifier.toString());
-
-		//concept
-		Vertex vSource = getVertex(rel.getSourceId(), Types.concept.toString());
-		Vertex vDest = getVertex(rel.getDestinationId(), Types.concept.toString());
-		LOGGER.trace("Source concept {} - vertex {}", rel.getSourceId(), vSource);
-		LOGGER.trace("Destination concept {} - vertex {}", rel.getDestinationId(), vDest);
-		
-		if (vSource != null && vDest != null) {
-			
-			Relationship relName = characteristicsMap.get(rel.getCharacteristicTypeId());
-			String label = relName != null ? relName.toString() : null;
-			
-			LOGGER.trace("Relationship edge label {} ", label);
-
-			Edge eR = g.addEdge(rel.getId(), vSource, vDest, label);
-			eR.setProperty(Properties.sctid.toString(), rel.getId());
-			eR.setProperty(Properties.effectiveTime.toString(), rel.getEffectiveTime().getMillis());
-			eR.setProperty(Properties.status.toString(), rel.getActive());
-			eR.setProperty(Properties.created.toString(), new DateTime().getMillis());
-			eR.setProperty(Properties.createdBy.toString(), SNAPSHOT_USER);
-			eR.setProperty(Properties.group.toString(), rel.getRelationshipGroup());
-			//these are special relationship edge properties in a sense that they should represent as v --> v "relationship" if relationship is a vertex.
-			eR.setProperty(Properties.typeId.toString(), rel.getTypeId());
-			eR.setProperty(Properties.moduleId.toString(), rel.getModuleId());
-			eR.setProperty(Properties.modifierId.toString(), rel.getModifierId());
-		}
-		
-		LOGGER.trace("processRelationship total time {} sec ", (System.currentTimeMillis() - start)/1000);
-
-
-	}
-
 	
 	
 	

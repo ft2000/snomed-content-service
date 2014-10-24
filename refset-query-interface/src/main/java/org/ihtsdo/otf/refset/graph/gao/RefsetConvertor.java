@@ -393,6 +393,9 @@ public class RefsetConvertor {
 			}
 			
 		}
+		Collections.sort(refsets);
+		Collections.reverse(refsets);
+
 		return Collections.unmodifiableList(refsets);
 	}
 
@@ -644,6 +647,7 @@ public class RefsetConvertor {
 			}
 		}
 		
+		Collections.sort(members);
 		return members;
 	}
 			

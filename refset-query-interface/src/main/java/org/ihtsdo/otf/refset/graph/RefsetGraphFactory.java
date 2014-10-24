@@ -60,7 +60,7 @@ public class RefsetGraphFactory {
 			throw new IllegalArgumentException("Graph not initialized, please check provide confiuration");
 		}
 		TitanGraph tg =  this.tg;
-        LOGGER.debug("Returning Transactional Graph {}", tg);
+        LOGGER.trace("Returning Transactional Graph {}", tg);
 
         return tg;
         
@@ -74,7 +74,7 @@ public class RefsetGraphFactory {
 		TitanGraph tg = getTitanGraph();
 		tg.buildTransaction().readOnly();
 		
-        LOGGER.debug("Returning readonly Graph {}", tg);
+        LOGGER.trace("Returning readonly Graph {}", tg);
 
 		return tg;
         
@@ -91,7 +91,7 @@ public class RefsetGraphFactory {
 	
 	public static void rollback(Graph g) {
 		
-		LOGGER.info("rollback {}", g);
+		LOGGER.trace("rollback {}", g);
 
 		if (g instanceof TitanGraph) {
 			
@@ -108,7 +108,7 @@ public class RefsetGraphFactory {
 
 		} else {
 			
-			LOGGER.info("No rollback unknown graph {}", g);
+			LOGGER.trace("No rollback unknown graph {}", g);
 
 		}
 		
@@ -116,7 +116,7 @@ public class RefsetGraphFactory {
 	
 	public static void commit(Graph g) {
 		
-		LOGGER.info("commit {}", g);
+		LOGGER.trace("commit {}", g);
 		if (g instanceof TitanGraph) {
 			
 			if (g != null) ((TitanGraph)g).commit();
@@ -132,7 +132,7 @@ public class RefsetGraphFactory {
 
 		} else {
 			
-			LOGGER.info("Not committing unknown graph {}", g);
+			LOGGER.trace("Not committing unknown graph {}", g);
 
 		}
   

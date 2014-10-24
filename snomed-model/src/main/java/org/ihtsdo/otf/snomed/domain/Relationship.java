@@ -17,6 +17,6 @@ package org.ihtsdo.otf.snomed.domain;
 public enum Relationship {
 	
 	//inferred and stated should be just relation and their can be a property of type.
-	isA, inferred, stated, hasModifier, ds, hasModule, hasCaseSignificance, hasType, additional, qualifying
+	isA, hasModifier, ds, hasModule, hasCaseSignificance, hasType, fs, ps, method, using, generic
 
 }

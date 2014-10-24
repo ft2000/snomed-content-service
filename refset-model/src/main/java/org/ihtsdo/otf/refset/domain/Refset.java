@@ -11,7 +11,7 @@ import org.joda.time.DateTime;
  * @author Episteme Partners
  *
  */
-public class Refset extends BaseObj {
+public class Refset extends BaseObj implements Comparable<Refset> {
 
 
 		
@@ -99,12 +99,21 @@ public class Refset extends BaseObj {
    public boolean equals(Object input) {
 		   
 	   if ( this == input ) return true;
-	   if ( !(input instanceof Refset) ) return false;
-
+	   if ( !(input instanceof Refset) ||  input == null) return false;
+		   
 	   Refset r = (Refset)input;
 	   
-	   return ( this.id == r.id );
+	   return ( this.id == r.id && this.created.equals(r.getCreated()));
 	   
+   }
+   
+   /* (non-Javadoc)
+    * @see java.lang.Object#hashCode()
+    */
+   @Override
+   public int hashCode() {
+	   // TODO Auto-generated method stub
+	   return (id + created).hashCode();
    }
    
    @Override
@@ -158,6 +167,21 @@ public class Refset extends BaseObj {
 	 */
 	public void setTotalNoOfMembers(long totalNoOfMembers) {
 		this.totalNoOfMembers = totalNoOfMembers;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Comparable#compareTo(java.lang.Object)
+	 */
+	public int compareTo(Refset o) {
+
+		if(o == null) {
+			
+			return 1;
+		}
+		
+		int outcome = this.created.compareTo(o.getCreated());
+				
+		return outcome;
 	}
 
 

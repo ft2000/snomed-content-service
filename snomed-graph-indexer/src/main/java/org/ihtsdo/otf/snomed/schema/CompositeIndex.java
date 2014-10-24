@@ -16,6 +16,6 @@ package org.ihtsdo.otf.snomed.schema;
  */
 public enum CompositeIndex {
 
-	bySctId, bySctIdStatus, conceptBySctId
+	bySctId, bySctIdStatus, conceptBySctId, byDescription, relation
 	
 }
