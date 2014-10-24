@@ -44,7 +44,7 @@ public class Rf2SnapshotLoader {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(Rf2SnapshotLoader.class);
 	
-	private static final String SNAPSHOT_USER = "snomed_st_loader";
+	private static final String SNAPSHOT_USER = "system";
 	
 	private TitanGraph g;
 	private int bufferSize = 100000;
@@ -52,7 +52,8 @@ public class Rf2SnapshotLoader {
 	//map to 
 	private Map<String, Vertex> vMap = new HashMap<String, Vertex>();
 	private Map<String, DescriptionType> descMap = new HashMap<String, DescriptionType>();
-	private Map<String, Relationship> characteristicsMap = new HashMap<String, Relationship>();
+	private Map<String, Properties> characteristicsMap = new HashMap<String, Properties>();
+	private Map<String, Relationship> relTypeMap = new HashMap<String, Relationship>();
 
 	
 	
@@ -73,12 +74,16 @@ public class Rf2SnapshotLoader {
 		descMap.put("900000000000550004", DescriptionType.definition);
 		descMap.put("900000000000003001", DescriptionType.fsn);
 
-		characteristicsMap.put("900000000000011006", Relationship.inferred);
-		characteristicsMap.put("900000000000010007", Relationship.stated);
-		characteristicsMap.put("900000000000227009", Relationship.additional);
-		characteristicsMap.put("900000000000225001", Relationship.qualifying);
+		characteristicsMap.put("900000000000011006", Properties.inferred);
+		characteristicsMap.put("900000000000010007", Properties.stated);
+		characteristicsMap.put("900000000000227009", Properties.additional);
+		characteristicsMap.put("900000000000225001", Properties.qualifying);
 
-
+		relTypeMap.put("116680003", Relationship.isA);
+		relTypeMap.put("261583007", Relationship.using);
+		relTypeMap.put("260686004", Relationship.method);
+		relTypeMap.put("405813007", Relationship.ps);
+		relTypeMap.put("363698007", Relationship.fs);
 	}
 	
 	
@@ -364,17 +369,17 @@ public class Rf2SnapshotLoader {
 		
 		Vertex vR = g.addVertexWithLabel(Types.relationship.toString());
 		vR.setProperty(Properties.sctid.toString(), rel.getId());
-		
+		vR.setProperty(Properties.characteristicId.toString(), rel.getCharacteristicTypeId());
 		//add module
 		Vertex vM = processModule(rel.getModuleId());
 		g.addEdge(rel.getModuleId(), vR, vM, Relationship.hasModule.toString());
 
 		//type
 		Vertex vT = processType(rel.getTypeId());
-		g.addEdge(rel.getModuleId(), vR, vT, Relationship.hasType.toString());
+		g.addEdge(rel.getTypeId(), vR, vT, Relationship.hasType.toString());
 		
 		//modifier
-		Vertex vMo = processModifier(rel.getTypeId());
+		Vertex vMo = processModifier(rel.getModifierId());
 		g.addEdge(rel.getModifierId(), vR, vMo, Relationship.hasModifier.toString());
 
 		//concept
@@ -385,18 +390,24 @@ public class Rf2SnapshotLoader {
 		
 		if (vSource != null && vDest != null) {
 			
-			Relationship relName = characteristicsMap.get(rel.getCharacteristicTypeId());
-			String label = relName != null ? relName.toString() : null;
-			
-			LOGGER.trace("Relationship edge label {} ", label);
+			Properties relName = characteristicsMap.get(rel.getCharacteristicTypeId());
+			String nature = relName != null ? relName.toString() : null;
 
-			Edge eR = g.addEdge(rel.getId(), vSource, vDest, label);
+			Relationship relType = relTypeMap.get(rel.getTypeId());
+			String type = relType != null ? relType.toString() : Relationship.generic.toString();
+
+			LOGGER.trace("Relationship edge label {} ", type);
+
+			Edge eR = g.addEdge(rel.getId(), vSource, vDest, type);
 			eR.setProperty(Properties.sctid.toString(), rel.getId());
 			eR.setProperty(Properties.effectiveTime.toString(), rel.getEffectiveTime().getMillis());
 			eR.setProperty(Properties.status.toString(), rel.getActive());
 			eR.setProperty(Properties.created.toString(), new DateTime().getMillis());
 			eR.setProperty(Properties.createdBy.toString(), SNAPSHOT_USER);
 			eR.setProperty(Properties.group.toString(), rel.getRelationshipGroup());
+			eR.setProperty(Properties.characteristic.toString(), nature);
+			vR.setProperty(Properties.characteristicId.toString(), rel.getCharacteristicTypeId());
+
 			//these are special relationship edge properties in a sense that they should represent as v --> v "relationship" if relationship is a vertex.
 			eR.setProperty(Properties.typeId.toString(), rel.getTypeId());
 			eR.setProperty(Properties.moduleId.toString(), rel.getModuleId());

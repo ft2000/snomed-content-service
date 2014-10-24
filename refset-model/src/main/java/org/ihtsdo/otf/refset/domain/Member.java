@@ -1,7 +1,7 @@
 package org.ihtsdo.otf.refset.domain;
 
 
-public class Member extends BaseObj {
+public class Member extends BaseObj implements Comparable<Member>{
 	
 	
 	
@@ -29,10 +29,23 @@ public class Member extends BaseObj {
 
 	   Member m = (Member)input;
 	   
-	   return ( this.id == m.id ) && ( this.effectiveTime == m.effectiveTime ) 
+	   return ( this.id == m.id )
 			   && ( this.referencedComponentId == m.referencedComponentId ) 
-			   && ( this.moduleId == m.moduleId );
+			   && ( this.moduleId == m.moduleId )
+			   && (this.active == m.active);
 	   
+   }
+   
+   /* (non-Javadoc)
+    * @see java.lang.Object#hashCode()
+    */
+   @Override
+   public int hashCode() {
+
+	   return (this.id 
+			   + this.referencedComponentId 
+			   + this.moduleId
+			   + new Boolean(this.active)).hashCode();
    }
    
    @Override
@@ -41,6 +54,21 @@ public class Member extends BaseObj {
 	   return String.format( "Member [id - %s, referencedComponentId - %s, moduleId - %s, isActive - %s "
 	   		+ "effectiveTime - %s, description - %s]", this.id, this.referencedComponentId, this.moduleId, 
 	   		this.active, this.effectiveTime, this.description);
+	   
+   }
+   
+   
+   /* (non-Javadoc)
+    * @see java.lang.Comparable#compareTo(java.lang.Object)
+    */
+   public int compareTo(Member o) {
+
+	   if (o == null) {
+		
+		   return 1;
+	   }
+	
+	   return new Boolean(this.active).compareTo(new Boolean(o.active));
 	   
    }   
 }

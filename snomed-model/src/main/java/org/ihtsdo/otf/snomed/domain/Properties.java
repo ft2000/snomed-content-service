@@ -16,5 +16,7 @@ package org.ihtsdo.otf.snomed.domain;
  */
 public enum Properties {
 
-	effectiveTime, title, sctid, created, createdBy, modifiedDate, modifiedBy, status, languageCode, group, typeId, moduleId, modifierId
+	effectiveTime, title, sctid, created, createdBy, modifiedDate, 
+	modifiedBy, status, languageCode, group, typeId, moduleId, modifierId, 
+	characteristic, characteristicId, inferred, stated, additional, qualifying
 }
