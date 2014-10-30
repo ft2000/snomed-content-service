@@ -42,7 +42,7 @@
 	<logger name="com.tinkerpop.blueprints" level="debug" />
 		
 	<logger name="com.thinkaurelius.titan.diskstorage.es" level="info" />
-	<logger name="com.thinkaurelius.titan.diskstorage.cassandra" level="error" />
+	<logger name="com.thinkaurelius.titan.diskstorage.cassandra" level="info" />
 		
 	<!-- 3rdparty Loggers -->
 	<logger name="org.springframework.core" level="info" />
@@ -70,7 +70,7 @@
 		
 
 	<!-- Root Logger -->
-	<root level="error">
+	<root level="debug">
 		<appender-ref ref="file" />
 		<appender-ref ref="console" />
 	</root>

@@ -9,13 +9,12 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.ihtsdo.otf.refset.schema;
+package org.ihtsdo.otf.refset.graph.gao;
 
 /**
  *
  */
-public enum CompositeIndex {
+public enum VertexType {
 
-	bySctId, bySctIdStatus, byDescription, byIdAndCreatedBy, byId, byIdAndCreated, byIdAndModified, byRefComponentId, byPublished, byType
-	
+	refset, member
 }

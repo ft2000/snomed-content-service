@@ -37,6 +37,7 @@ public class RefsetIndexer {
 		switch (Operation.valueOf(args[1])) {
 		
 		case index:
+			s.createMixedIndex();
 			s.printIndexes();
 			break;
 			

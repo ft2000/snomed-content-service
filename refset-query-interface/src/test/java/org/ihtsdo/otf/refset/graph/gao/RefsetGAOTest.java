@@ -20,6 +20,7 @@ import org.ihtsdo.otf.refset.graph.RefsetGraphFactory;
 import org.ihtsdo.otf.refset.graph.gao.RefsetGAO;
 import org.ihtsdo.otf.refset.schema.RefsetSchema;
 import org.ihtsdo.otf.refset.service.RefsetBrowseServiceStubData;
+import org.ihtsdo.otf.snomed.schema.SnomedConceptSchema;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -40,22 +41,43 @@ public class RefsetGAOTest {
 		System.setProperty("env", "junit");
 	}
 	
-	private RefsetGAO gao;
+	private static RefsetGAO gao;
 	
-	private RefsetAdminGAO aGao;
+	private static RefsetAdminGAO aGao;
 
 	
 	@Autowired
 	private RefsetBrowseServiceStubData data;
 	
-	private List<Refset> rs;
+	private static List<Refset> rs;
 	
-	private RefsetGraphFactory f;
+	private static RefsetGraphFactory f;
 	
 	@Before
 	public void setUp() throws Exception {
 		
+		rs = data.getRefSets();
 		
+		assertNotNull(rs);
+		assertTrue(!rs.isEmpty());		
+
+	}
+	
+	@BeforeClass
+	public static void reset() throws RefsetServiceException {
+
+		delete();
+		
+		/*create refset schema*/
+		
+		RefsetSchema sg = new RefsetSchema("src/test/resources/titan-graph-es-junit.properties");
+		
+		sg.createSchema();
+		
+		/*create snomed schema*/
+		SnomedConceptSchema s = new SnomedConceptSchema("src/test/resources/titan-graph-es-junit.properties");
+		s.createSchema();
+		s.createIndex();
 		
 		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("storage.directory", "/tmp/berkeley");
@@ -65,11 +87,6 @@ public class RefsetGAOTest {
 		
 		Configuration config = new MapConfiguration(map);
 		
-		/*create schema*/
-		
-		RefsetSchema sg = new RefsetSchema("src/test/resources/titan-graph-es-junit.properties");
-		
-		sg.createSchema();
 		
 		
 		
@@ -87,16 +104,7 @@ public class RefsetGAOTest {
 		aGao.setMemberGao(mGao);
 		aGao.setRefsetGao(gao);
 		
-		rs = data.getRefSets();
-		assertNotNull(rs);
-		assertTrue(!rs.isEmpty());				
 
-	}
-	
-	@BeforeClass
-	public static void cleanUp() {
-
-		delete();
 		
 	}
 

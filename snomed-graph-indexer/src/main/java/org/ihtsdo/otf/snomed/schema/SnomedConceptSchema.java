@@ -37,7 +37,7 @@ public class SnomedConceptSchema {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(SnomedConceptSchema.class);
 
-	private static final String SEARCH = "search";
+	private static final String SEARCH = "snomed";
 
 	private static final String MAPPED = "mapped-name";
 	

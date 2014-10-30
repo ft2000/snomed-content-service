@@ -76,6 +76,13 @@
 		  <scope>test</scope>
 		</dependency>
 		
+		<dependency>
+		  <groupId>org.ihtsdo.otf</groupId>
+		  <artifactId>snomed-graph-indexer</artifactId>
+		  <version>${org.ihtsdo.otf-version}</version>
+		  <scope>test</scope>
+		</dependency>
+		
 		<!-- enable post demo dependency>
 			<groupId>com.hazelcast</groupId>
 			<artifactId>hazelcast</artifactId>

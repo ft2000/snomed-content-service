@@ -17,5 +17,5 @@ package org.ihtsdo.otf.refset.schema;
  */
 public enum MixedIndex {
 
-	
+	Member, Refset
 }

@@ -8,7 +8,7 @@
   <modelVersion>4.0.0</modelVersion>
   <artifactId>snomed-graph-indexer</artifactId>
   <name>snomed-graph-indexer</name>
-  <version>0.0.1-SNAPSHOT</version>
+  <version>0.0.1</version>
   <url>http://maven.apache.org</url>
   <build>
     <plugins>

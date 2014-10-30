@@ -3,6 +3,7 @@
  */
 package org.ihtsdo.otf.refset.service;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.ihtsdo.otf.refset.domain.Refset;
@@ -36,25 +37,10 @@ public class RefsetGraphService implements RefsetBrowseService {
 
 		LOGGER.debug("getRefsets");
 		
-		/*TODO Temporary for front end*/
-		if( page == 1 && size == 10) { 
-			
-			try {
-				
-				return gao.getRefSets(published);
-				
-			} catch (RefsetGraphAccessException e) {
-				
-				LOGGER.error("Error in graph db call", e);
-				throw new RefsetServiceException(e.getMessage());
-			}
-		}
-		
-		
-		List<Refset> refsets;
+		List<Refset> refsets = Collections.emptyList();
 		try {
 			
-			refsets = gao.getRefSets(published);
+			refsets = gao.getRefSets(published, page, size);
 			
 		} catch (RefsetGraphAccessException e) {
 			
@@ -62,15 +48,7 @@ public class RefsetGraphService implements RefsetBrowseService {
 			throw new RefsetServiceException(e.getMessage());
 		}
 		
-		int total = refsets.size();
-		
-		int from_temp = page >= 1 ? (Math.min(total, Math.abs(page * size)) - size) : 0;
-		
-		int from = from_temp >= 0 ? from_temp : 0;
-		
-		int temp = Math.min(total, Math.abs(page * size));
-		int to = temp <= total ? temp : total;
-		return refsets.subList(from, to);
+		return refsets;
 		
 	}
 
