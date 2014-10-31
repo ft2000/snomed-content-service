@@ -178,26 +178,26 @@ public interface GRefset extends VertexFrame {
 	 * @return the isPublished
 	 */
 	@Property( value = "published")
-	public boolean isPublished();
+	public Integer getPublished();
 
 	/**
 	 * @param isPublished the isPublished to set
 	 */
 	@Property( value = "published")
-	public void setPublished(boolean isPublished);
+	public void setPublished(Integer isPublished);
 	
 	
 	/**
 	 * @return the active
 	 */
 	@Property( value = "active")
-	public boolean isActive();
+	public Integer getActive();
 
 	/**
 	 * @param active the active to set
 	 */
 	@Property( value = "active")
-	public void setActive(boolean active);
+	public void setActive(Integer active);
 	
 	/**
 	 * @return the componentTypeId
@@ -246,5 +246,17 @@ public interface GRefset extends VertexFrame {
 	 */
 	@Property( value = "sctdId")
 	public void setSctdId(String id);
+	
+	/**
+	 * @return the id
+	 */
+	@Property( value = "noOfMembers")
+	public Long getNoOfMembers();
+
+	/**
+	 * @param id the id to set
+	 */
+	@Property( value = "noOfMembers")
+	public void setNoOfMembers(Long noOfMembers);
 
 }

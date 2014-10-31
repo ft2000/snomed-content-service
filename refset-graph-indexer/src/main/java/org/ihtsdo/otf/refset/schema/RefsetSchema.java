@@ -15,8 +15,12 @@ import static org.ihtsdo.otf.refset.domain.RGC.REFERENCE_COMPONENT_ID;
 import static org.ihtsdo.otf.refset.domain.RGC.SUPER_REFSET_TYPE_ID;
 import static org.ihtsdo.otf.refset.domain.RGC.TYPE;
 import static org.ihtsdo.otf.refset.domain.RGC.TYPE_ID;
+import static org.ihtsdo.otf.refset.domain.RGC.SCTID;
+import static org.ihtsdo.otf.refset.domain.RGC.MEMBER_TYPE_ID;
+import static org.ihtsdo.otf.refset.domain.RGC.EXPECTED_RLS_DT;
 
 import org.apache.commons.lang.StringUtils;
+import org.ihtsdo.otf.snomed.domain.Properties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,6 +29,7 @@ import com.thinkaurelius.titan.core.RelationType;
 import com.thinkaurelius.titan.core.TitanFactory;
 import com.thinkaurelius.titan.core.TitanGraph;
 import com.thinkaurelius.titan.core.VertexLabel;
+import com.thinkaurelius.titan.core.schema.Parameter;
 import com.thinkaurelius.titan.core.schema.TitanGraphIndex;
 import com.thinkaurelius.titan.core.schema.TitanManagement;
 import com.tinkerpop.blueprints.Edge;
@@ -33,14 +38,16 @@ import com.tinkerpop.blueprints.Vertex;
 public class RefsetSchema {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(RefsetSchema.class);
+	private static final String SEARCH = "refset";
 
+	private static final String MAPPED = "mapped-name";
+	
 	private String config;
 
 	/**
 	 * 
 	 */
 	public RefsetSchema(String config) {
-		// TODO Auto-generated constructor stub
 		
 	    this.config = config;
 	    if (StringUtils.isBlank(config)) {
@@ -77,262 +84,28 @@ public class RefsetSchema {
 
 		try {
 			
-		
-				
-				LOGGER.debug("Making members edge label");
-				
-				mgmt.makeEdgeLabel(RefsetRelations.members.toString());
-		
-				if (!mgmt.containsRelationType(ACTIVE)) {
-		
-					mgmt.makePropertyKey(ACTIVE).dataType(Boolean.class).make();
-		
-				} else {
-					
-					LOGGER.debug("Not Creating Property {} already exist", ACTIVE);
-		
-				}
-				
-				LOGGER.debug("Creating Index  {} for property {}" , "PublishedGRefset" , PUBLISHED);
-				
-				/*mgmt.buildIndex("PublishedGRefset", Vertex.class).addKey(mgmt
-						.makePropertyKey(PUBLISHED).dataType(Boolean.class).make(), 
-						com.thinkaurelius.titan.core.schema.Parameter.of("mapped-name","published")).buildMixedIndex("search");*/
+			LOGGER.debug("creating required property keys");
 
-				
-				mgmt.buildIndex("PublishedGRefset", Vertex.class).addKey(mgmt
-						.makePropertyKey(PUBLISHED).dataType(Boolean.class).make()).buildCompositeIndex();
-				
-				
-				if (!mgmt.containsRelationType(PUBLISHED_DATE)) {
-					
-					mgmt.makePropertyKey(PUBLISHED_DATE).dataType(Long.class).make();
-					
-				} else {
-					
-					LOGGER.debug("Not Creating Property {} already exist", PUBLISHED_DATE);
-		
-				}
-				
-				
-				if (!mgmt.containsRelationType(CREATED))  {
-		
-					mgmt.makePropertyKey(CREATED).dataType(Long.class).make();
-					
-				} else {
-					
-					LOGGER.debug("Not Creating Property {} already exist", CREATED);
-		
-				}
-				
-				if (!mgmt.containsRelationType(CREATED_BY)) {
-		
-					mgmt.makePropertyKey(CREATED_BY).dataType(String.class).make();
-					
-				} else {
-					
-					LOGGER.debug("Not Creating Property {} already exist", CREATED_BY);
-		
-				}
-				
-				if (!mgmt.containsRelationType(MODIFIED_DATE))  {
-					
-					mgmt.makePropertyKey(MODIFIED_DATE).dataType(Long.class).make();
-					
-				} else {
-					
-					LOGGER.debug("Not Creating Property {} already exist", MODIFIED_DATE);
-		
-				}
-				
-				if (!mgmt.containsRelationType(MODIFIED_BY)) {
-		
-					mgmt.makePropertyKey(MODIFIED_BY).dataType(String.class).make();
-					
-				} else {
-					
-					LOGGER.debug("Not Creating Property {} already exist", CREATED_BY);
-		
-				}
-				
-				if (!mgmt.containsRelationType(DESC)) {
-		
-					mgmt.makePropertyKey(DESC).dataType(String.class).make();
-				} else {
-					
-					LOGGER.debug("Not Creating Property {} already exist", DESC);
-				
-				}
-				
-				if (!mgmt.containsRelationType(EFFECTIVE_DATE)) {
-		
-					mgmt.makePropertyKey(EFFECTIVE_DATE).dataType(Long.class).make();
-					
-				} else {
-					
-					LOGGER.debug("Not Creating Property {} already exist", EFFECTIVE_DATE);
-				
-				}
-				
-				if ( !mgmt.containsRelationType(ID)) {
-		
-					mgmt.makePropertyKey(ID).dataType(String.class).make();
-					
-				} else {
-					
-					LOGGER.debug("Not Creating Property {} already exist", "id");
-		
-				}
-				
-				LOGGER.debug("Creating Index  {} for property {}" , "UniqueSid" , ID);
-				
-				
-				
-				/*mgmt.buildIndex("UniqueSid", Vertex.class).addKey(mgmt.makePropertyKey(ID).dataType(String.class).make(), 
-						com.thinkaurelius.titan.core.schema.Parameter.of("mapped-name","sid")).buildMixedIndex("search");*/
-				mgmt.buildIndex("UniqueSid", Vertex.class).addKey(mgmt.getPropertyKey(ID)).unique().buildCompositeIndex();
-				
-				
-							
+			makePropertyKeys(mgmt);
+			
+			LOGGER.debug("Making members edge label");
+			mgmt.makeEdgeLabel(RefsetRelations.members.toString());
+	
+			createRefsetVertexLabel(mgmt);
+			createMemberVertexLabel(mgmt);
 
-				
-				if (!mgmt.containsRelationType(LANG_CODE)) {
-		
-					mgmt.makePropertyKey(LANG_CODE).dataType(String.class).make();
-					
-				} else {
-					
-					LOGGER.debug("Not Creating Property {} already exist", LANG_CODE);
-				
-				}
-				
-				if (!mgmt.containsRelationType(MODULE_ID)) {
-					
-					mgmt.makePropertyKey(MODULE_ID).dataType(String.class).make();
-		
-				} else {
-					
-					LOGGER.debug("Not Creating Property {} already exist", MODULE_ID);
-				
-				}
+			createCompositIndex(mgmt);			
+			
+			LOGGER.debug("commiting Index & schema  ");
 
-				
-				
-				
-				LOGGER.debug("Creating Index  {} for property {}" , "MemberRefComponentId" , REFERENCE_COMPONENT_ID);
-				
-				
-				/*mgmt.buildIndex("MemberRefComponentId", Vertex.class).addKey(mgmt.makePropertyKey(REFERENCE_COMPONENT_ID)
-						.dataType(String.class).make(), com.thinkaurelius.titan.core.schema.Parameter.of("mapped-name","sid")
-						).buildMixedIndex("search");*/
-				
-				mgmt.buildIndex("MemberRefComponentId", Vertex.class).addKey(mgmt.makePropertyKey(REFERENCE_COMPONENT_ID)
-						.dataType(String.class).make()).buildCompositeIndex();
-				
-				if (!mgmt.containsRelationType(SUPER_REFSET_TYPE_ID)) {
-					
-					
-					mgmt.makePropertyKey(SUPER_REFSET_TYPE_ID).dataType(String.class).make();
-		
-				} else {
-					
-					LOGGER.debug("Not Creating Property {} already exist", SUPER_REFSET_TYPE_ID);
-				
-				}
-				
-				if (!mgmt.containsRelationType(TYPE)) {
-					
-					mgmt.makePropertyKey(TYPE).dataType(String.class).make();
-		
-				} else {
-					
-					LOGGER.debug("Not Creating Property {} already exist", TYPE);
-				
-				}
-				
-				if (!mgmt.containsRelationType(TYPE_ID)) {
-		
-					mgmt.makePropertyKey(TYPE_ID).dataType(String.class).make();
-					
-				} else {
-					
-					LOGGER.debug("Not Creating Property {} already exist", TYPE_ID);
-				
-				}
-		
-		
-		
-				
-				
-				//create desired index
-				
-				LOGGER.debug("Creating Vertex Label {}" , "GRefset");
-				mgmt.makeVertexLabel("GRefset");
-				
-				
-				VertexLabel refset = mgmt.getVertexLabel("GRefset");
-				TitanGraphIndex gi = mgmt.getGraphIndex("Refset");
-				
-				LOGGER.debug("Creating Index  {}" , "Refset");
-		
-				if (gi == null) {
-				
-					LOGGER.debug("Creating Index  {}" , "Refset");
-		
-				}
-				mgmt.buildIndex("Refset", Vertex.class)
-				.addKey(mgmt.getPropertyKey(ID))
-				.addKey(mgmt.getPropertyKey(CREATED))
-				.addKey(mgmt.getPropertyKey(EFFECTIVE_DATE))
-				.addKey(mgmt.getPropertyKey(CREATED_BY))
-				.addKey(mgmt.getPropertyKey(PUBLISHED_DATE))
-				.addKey(mgmt.getPropertyKey(DESC))
-				.addKey(mgmt.getPropertyKey(MODIFIED_BY))
-				.addKey(mgmt.getPropertyKey(MODIFIED_DATE))
-				.indexOnly(refset).buildCompositeIndex();
-				
-				if (!mgmt.containsVertexLabel("GMember")) {
-					
-					mgmt.makeVertexLabel("GMember");
-
-				}
-				
-		
-				VertexLabel member = mgmt.getVertexLabel("GMember");
-				
-				gi = mgmt.getGraphIndex("Member");
-		
-				if (gi == null) {
-					LOGGER.debug("Creating Index  {}" , "Member");
-		
-					//mgmt.buildIndex("Member", Vertex.class).indexOnly(member).buildMixedIndex("search");
-					
-					mgmt.buildIndex("Member", Vertex.class)
-					.addKey(mgmt.getPropertyKey(ID))
-					.addKey(mgmt.getPropertyKey(REFERENCE_COMPONENT_ID))
-					.indexOnly(member).buildCompositeIndex();
-
-		
-				}
-				
-				mgmt.buildIndex("EdgeRefComponentId", Edge.class).addKey(mgmt.getPropertyKey(REFERENCE_COMPONENT_ID)).buildCompositeIndex();
-				mgmt.buildIndex("EdgeEffectiveDate", Edge.class).addKey(mgmt.getPropertyKey(EFFECTIVE_DATE)).buildCompositeIndex();
-				mgmt.buildIndex("EdgeStatus", Edge.class).addKey(mgmt.getPropertyKey(ACTIVE)).buildCompositeIndex();
-				mgmt.buildIndex("EdgePublished", Edge.class).addKey(mgmt.getPropertyKey(PUBLISHED)).buildCompositeIndex();
-				
-				
-				LOGGER.debug("commiting Index & schema  ");
-
-				mgmt.commit();
-				g.commit();
-				
+			mgmt.commit();	
+			g.commit();
 		} catch(Exception e) {
 			
-			e.printStackTrace();
 
 			mgmt.rollback();
-			g.rollback();
-			
+			e.printStackTrace();
+
 			
 		} finally {
 			
@@ -343,6 +116,118 @@ public class RefsetSchema {
 		
 	}
 	
+	/**
+	 * @param mgmt
+	 */
+	private void createCompositIndex(TitanManagement mgmt) {
+		
+		TitanGraphIndex byIdAndCreatedBy = mgmt.getGraphIndex(CompositeIndex.byIdAndCreatedBy.toString());
+		
+		if (byIdAndCreatedBy == null) {
+		
+			LOGGER.debug("Creating Index  {}" , CompositeIndex.byIdAndCreatedBy.toString());
+			mgmt.buildIndex(CompositeIndex.byIdAndCreatedBy.toString(), Vertex.class)
+			.addKey(mgmt.getPropertyKey(ID))
+			.addKey(mgmt.getPropertyKey(CREATED_BY))
+			.addKey(mgmt.getPropertyKey(TYPE))
+			.buildCompositeIndex();
+		}
+		
+		TitanGraphIndex byId = mgmt.getGraphIndex(CompositeIndex.byId.toString());
+		
+		if (byId == null) {
+		
+			LOGGER.debug("Creating Index  {}" , CompositeIndex.byId.toString());
+			mgmt.buildIndex(CompositeIndex.byId.toString(), Vertex.class)
+			.addKey(mgmt.getPropertyKey(ID))
+			.addKey(mgmt.getPropertyKey(TYPE))
+			.buildCompositeIndex();
+		}
+		
+		TitanGraphIndex byIdAndCreated = mgmt.getGraphIndex(CompositeIndex.byIdAndCreated.toString());
+		
+		if (byIdAndCreated == null) {
+		
+			LOGGER.debug("Creating Index  {}" , CompositeIndex.byIdAndCreated.toString());
+			mgmt.buildIndex(CompositeIndex.byIdAndCreated.toString(), Vertex.class)
+			.addKey(mgmt.getPropertyKey(ID))
+			.addKey(mgmt.getPropertyKey(CREATED))
+			.addKey(mgmt.getPropertyKey(TYPE))
+			.buildCompositeIndex();
+		}
+		
+		TitanGraphIndex byDescription = mgmt.getGraphIndex(CompositeIndex.byDescription.toString());
+		
+		if (byDescription == null) {
+		
+			LOGGER.debug("Creating Index  {}" , CompositeIndex.byDescription.toString());
+			mgmt.buildIndex(CompositeIndex.byDescription.toString(), Vertex.class)
+			.addKey(mgmt.getPropertyKey(DESC))
+			.addKey(mgmt.getPropertyKey(TYPE))
+			.buildCompositeIndex();
+		}
+		
+		TitanGraphIndex byPublished = mgmt.getGraphIndex(CompositeIndex.byPublished.toString());
+		
+		if (byPublished == null) {
+		
+			LOGGER.debug("Creating Index  {}" , CompositeIndex.byPublished.toString());
+			mgmt.buildIndex(CompositeIndex.byPublished.toString(), Vertex.class)
+			.addKey(mgmt.getPropertyKey(TYPE))
+			.addKey(mgmt.getPropertyKey(PUBLISHED)).buildCompositeIndex();
+		}
+		
+		TitanGraphIndex byType = mgmt.getGraphIndex(CompositeIndex.byType.toString());
+		
+		if (byType == null) {
+		
+			LOGGER.debug("Creating Index  {}" , CompositeIndex.byType.toString());
+			mgmt.buildIndex(CompositeIndex.byType.toString(), Vertex.class)
+			.addKey(mgmt.getPropertyKey(TYPE))
+			.buildCompositeIndex();
+		}
+		
+		TitanGraphIndex byRefComponentId = mgmt.getGraphIndex(CompositeIndex.byRefComponentId.toString());
+
+		if (byRefComponentId == null) {
+			
+			LOGGER.debug("Creating Index  {}" , CompositeIndex.byRefComponentId.toString());
+			mgmt.buildIndex(CompositeIndex.byRefComponentId.toString(), Edge.class)
+			.addKey(mgmt.getPropertyKey(REFERENCE_COMPONENT_ID))
+			.indexOnly(mgmt.getEdgeLabel(RefsetRelations.members.toString()))
+			.buildCompositeIndex();
+		}
+		
+	}
+
+	/**
+	 * @param mgmt
+	 */
+	private void createRefsetVertexLabel(TitanManagement mgmt) {
+
+		if (!mgmt.containsVertexLabel("GRefset")) {
+			
+			LOGGER.debug("Creating Vertex Label {}" , "GRefset");
+			mgmt.makeVertexLabel("GRefset");
+
+		}
+		
+	}
+	
+	/**
+	 * @param mgmt
+	 */
+	private void createMemberVertexLabel(TitanManagement mgmt) {
+		
+		if (!mgmt.containsVertexLabel("GMember")) {
+			
+			
+			LOGGER.debug("Creating Vertex Label {}" , "GMember");
+			mgmt.makeVertexLabel("GMember");
+
+		}
+	}
+
 	public void printSchema() {
 		
 
@@ -376,24 +261,17 @@ public class RefsetSchema {
 		} catch (Exception e) {
 			
 			LOGGER.error("Management Transaction Rolledback");
-
-			e.printStackTrace();
 			mgmt.rollback();
-			// TODO: handle exception
+			e.printStackTrace();
+
 		} finally {
 			
 			g.shutdown();
 		}
-	    
-	    
-	    
 	
 	}
 	
 	public void printIndexes() {
-
-		
-
 		
 	    LOGGER.info("Schema has following indexes");
 	    LOGGER.info("==============================");
@@ -408,14 +286,25 @@ public class RefsetSchema {
 		    
 		    for (TitanGraphIndex gi : vis) {
 				
-		    	LOGGER.info("Vertex Index  {}", gi.getName());
+		    	LOGGER.info("Vertex Index Name -->  {} Backing Index --> {}  Indexed Element -->{}", gi.getName(), gi.getBackingIndex(), gi.getIndexedElement());
+		    	PropertyKey[] keys = gi.getFieldKeys();
+		    	for (PropertyKey prop : keys) {
+					
+			    	LOGGER.info("Vertex Index  {} indexes --> key {}", gi.getName(), prop);
+
+		    	}
 		    	
 			}
 		    Iterable<TitanGraphIndex> eis = mgmt.getGraphIndexes(Edge.class);
 		    for (TitanGraphIndex gi : eis) {
 				
-		    	LOGGER.info("Edge Index  {}", gi.getName());
-		    	
+		    	LOGGER.info("Edge Index Name -->  {} Backing Index --> {}  Indexed Element -->{}", gi.getName(), gi.getBackingIndex(), gi.getIndexedElement());
+		    	PropertyKey[] keys = gi.getFieldKeys();
+		    	for (PropertyKey prop : keys) {
+					
+			    	LOGGER.info("Vertex Index  {} indexes --> key {}", gi.getName(), prop);
+
+		    	}
 			}
 		    LOGGER.info("==============================");
 		    
@@ -424,10 +313,9 @@ public class RefsetSchema {
 		} catch (Exception e) {
 			
 			LOGGER.error("Management Transaction Rolledback");
-
-			e.printStackTrace();
 			mgmt.rollback();
-			// TODO: handle exception
+			e.printStackTrace();
+
 		} finally {
 			
 			g.shutdown();
@@ -440,7 +328,6 @@ public class RefsetSchema {
 	 */
 	public void update(String index) {
 		
-	    LOGGER.info("Schema has following indexes");
 	    LOGGER.info("==============================");
 		
 		TitanGraph g = openGraph(config);
@@ -449,7 +336,6 @@ public class RefsetSchema {
 	    
 	    try {
 
-			// TODO Auto-generated method stub
 			if("MemberRefComponentId".equalsIgnoreCase(index)) {
 				
 				//mgmt.updateIndex(index, updateAction);
@@ -460,27 +346,265 @@ public class RefsetSchema {
 			LOGGER.info("==============================");
 		    
 		    mgmt.commit();
-
-	} catch (Exception e) {
+	    } catch (Exception e) {
 		
-		LOGGER.error("Management Transaction Rolledback");
-
-		e.printStackTrace();
-		mgmt.rollback();
-		// TODO: handle exception
-	} finally {
+	    	LOGGER.error("Management Transaction Rolledback");
+	    	mgmt.rollback();
+	    	e.printStackTrace();
+	    	
+	    } finally {
 		
-		g.shutdown();
+	    	g.shutdown();
+	    }
+	
 	}
-
+	
+	private void makePropertyKeys(TitanManagement mgmt) {
 		
+		
+		
+		if (!mgmt.containsRelationType(ACTIVE)) {
+			
+			LOGGER.debug("Creating Property {}", ACTIVE);
+
+			mgmt.makePropertyKey(ACTIVE).dataType(Integer.class).make();
+
+		} 
+		
+		if (!mgmt.containsRelationType(CREATED))  {
+
+			LOGGER.debug("Creating Property {}", CREATED);
+			mgmt.makePropertyKey(CREATED).dataType(Long.class).make();
+			
+		}
+		
+		
+		if (!mgmt.containsRelationType(CREATED_BY)) {
+
+			LOGGER.debug("Creating Property {}", CREATED_BY);
+
+			mgmt.makePropertyKey(CREATED_BY).dataType(String.class).make();
+			
+		}
+		
+		if (!mgmt.containsRelationType(DESC)) {
+
+			LOGGER.debug("Creating Property {}", DESC);
+			mgmt.makePropertyKey(DESC).dataType(String.class).make();
+			
+		} 
+		
+		if (!mgmt.containsRelationType(EFFECTIVE_DATE)) {
+
+			LOGGER.debug("Creating Property {}", EFFECTIVE_DATE);
+			mgmt.makePropertyKey(EFFECTIVE_DATE).dataType(Long.class).make();
+			
+		} 
+		
+		if (!mgmt.containsRelationType(EXPECTED_RLS_DT)) {
+			
+			LOGGER.debug("Creating Property {}", EXPECTED_RLS_DT);
+			mgmt.makePropertyKey(EXPECTED_RLS_DT).dataType(String.class).make();
+
+		} 
+		
+		if ( !mgmt.containsRelationType(ID)) {
+
+			LOGGER.debug("Creating Property {}", ID);
+			mgmt.makePropertyKey(ID).dataType(String.class).make();
+			
+		} 
+		
+		if (!mgmt.containsRelationType(LANG_CODE)) {
+			
+			LOGGER.debug("Creating Property {}", LANG_CODE);
+			mgmt.makePropertyKey(LANG_CODE).dataType(String.class).make();
+			
+		} 
+		
+		if (!mgmt.containsRelationType(MEMBER_TYPE_ID)) {
+			
+			LOGGER.debug("Creating Property {}", MEMBER_TYPE_ID);
+			mgmt.makePropertyKey(MEMBER_TYPE_ID).dataType(String.class).make();
+
+		} 
+		
+		if (!mgmt.containsRelationType(MODULE_ID)) {
+			
+			LOGGER.debug("Creating Property {}", MODULE_ID);
+			mgmt.makePropertyKey(MODULE_ID).dataType(String.class).make();
+
+		} 
+		
+		if (!mgmt.containsRelationType(MODIFIED_DATE))  {
+			
+			LOGGER.debug("Creating Property {}", MODIFIED_DATE);
+			mgmt.makePropertyKey(MODIFIED_DATE).dataType(Long.class).make();
+			
+		} 
+		
+		if (!mgmt.containsRelationType(MODIFIED_BY)) {
+
+			LOGGER.debug("Creating Property {}", MODIFIED_BY);
+			mgmt.makePropertyKey(MODIFIED_BY).dataType(String.class).make();
+			
+		} 
+		
+		if (!mgmt.containsRelationType(PUBLISHED_DATE)) {
+			
+			LOGGER.debug("Creating Property {}", PUBLISHED_DATE);
+			mgmt.makePropertyKey(PUBLISHED_DATE).dataType(Long.class).make();
+			
+		} 
+		
+		if (!mgmt.containsRelationType(PUBLISHED)) {
+			
+			LOGGER.debug("Creating Property {}", PUBLISHED);
+			mgmt.makePropertyKey(PUBLISHED).dataType(Integer.class).make();
+			
+		} 
+		
+		if (!mgmt.containsRelationType(REFERENCE_COMPONENT_ID)) {
+			
+			LOGGER.debug("Creating Property {}", REFERENCE_COMPONENT_ID);
+			mgmt.makePropertyKey(REFERENCE_COMPONENT_ID).dataType(String.class).make();
+
+		} 
+		
+		
+		if (!mgmt.containsRelationType(SUPER_REFSET_TYPE_ID)) {
+			
+			LOGGER.debug("Creating Property {}", SUPER_REFSET_TYPE_ID);
+			mgmt.makePropertyKey(SUPER_REFSET_TYPE_ID).dataType(String.class).make();
+
+		} 
+		
+		if (!mgmt.containsRelationType(SCTID)) {
+			
+			LOGGER.debug("Creating Property {}", SCTID);
+			mgmt.makePropertyKey(SCTID).dataType(String.class).make();
+
+		} 
+		
+		if (!mgmt.containsRelationType(TYPE)) {
+			
+			LOGGER.debug("Creating Property {}", TYPE);
+			mgmt.makePropertyKey(TYPE).dataType(String.class).make();
+
+		} 
+		
+		if (!mgmt.containsRelationType(TYPE_ID)) {
+
+			LOGGER.debug("Creating Property {}", TYPE_ID);
+			mgmt.makePropertyKey(TYPE_ID).dataType(String.class).make();
+			
+		} 
 	}
-
 	
+	/**
+	 * @param mgmt
+	 */
+	public void createMixedIndex() {
+		
+		TitanGraph g = openGraph(config);
+	    //management api
+	    TitanManagement mgmt = g.getManagementSystem();
+	    
+	    try {
+		
+		
+			TitanGraphIndex giRefset = mgmt.getGraphIndex(MixedIndex.Refset.toString());
+			
+			if (giRefset == null) {
+			
+				LOGGER.debug("Creating Index  {}" , "Refset mixed index");
+				mgmt.buildIndex(MixedIndex.Refset.toString(), Vertex.class)
+				.addKey(mgmt.getPropertyKey(ACTIVE), 
+						Parameter.of(MAPPED, Properties.status.toString()))
+				.addKey(mgmt.getPropertyKey(ID), 
+						Parameter.of(MAPPED, Properties.sid.toString()))
+				.addKey(mgmt.getPropertyKey(CREATED), 
+						Parameter.of(MAPPED, Properties.created.toString()))
+				.addKey(mgmt.getPropertyKey(EFFECTIVE_DATE), 
+						Parameter.of(MAPPED, Properties.effectiveTime.toString()))
+				.addKey(mgmt.getPropertyKey(CREATED_BY), 
+						Parameter.of(MAPPED, Properties.createdBy.toString()))
+				.addKey(mgmt.getPropertyKey(PUBLISHED_DATE), 
+						Parameter.of(MAPPED, Properties.publishedDate.toString()))
+				.addKey(mgmt.getPropertyKey(PUBLISHED), 
+						Parameter.of(MAPPED, Properties.published.toString()))
+				.addKey(mgmt.getPropertyKey(DESC), 
+						Parameter.of(MAPPED, Properties.title.toString()))
+				.addKey(mgmt.getPropertyKey(MODIFIED_BY), 
+						Parameter.of(MAPPED, Properties.modifiedBy.toString()))
+				.addKey(mgmt.getPropertyKey(MODIFIED_DATE), 
+						Parameter.of(MAPPED, Properties.modifiedDate.toString()))
+				.addKey(mgmt.getPropertyKey(MODULE_ID), 
+						Parameter.of(MAPPED, Properties.moduleId.toString()))
+				.addKey(mgmt.getPropertyKey(LANG_CODE), 
+						Parameter.of(MAPPED, Properties.languageCode.toString()))
+				.addKey(mgmt.getPropertyKey(REFERENCE_COMPONENT_ID), 
+						Parameter.of(MAPPED, Properties.referenceComponentId.toString()))
+				.addKey(mgmt.getPropertyKey(SCTID), 
+						Parameter.of(MAPPED, Properties.sctid.toString()))
+				.addKey(mgmt.getPropertyKey(EXPECTED_RLS_DT), 
+						Parameter.of(MAPPED, EXPECTED_RLS_DT))
+				.addKey(mgmt.getPropertyKey(SUPER_REFSET_TYPE_ID), 
+						Parameter.of(MAPPED, SUPER_REFSET_TYPE_ID))
+				.addKey(mgmt.getPropertyKey(TYPE), 
+						Parameter.of(MAPPED, TYPE))
+				.addKey(mgmt.getPropertyKey(TYPE_ID), 
+						Parameter.of(MAPPED, TYPE_ID))
 
+				.indexOnly(mgmt.getVertexLabel("GRefset")).buildMixedIndex(SEARCH);
+			}
+			
+			
+						
+			TitanGraphIndex giMember = mgmt.getGraphIndex(MixedIndex.Member.toString());
 	
+			if (giMember == null) {
+				LOGGER.debug("Creating Index  {}" , "Member mixed index");
+					
+				mgmt.buildIndex(MixedIndex.Member.toString(), Vertex.class)
+				.addKey(mgmt.getPropertyKey(ACTIVE), 
+						Parameter.of(MAPPED, Properties.status.toString()))
+				.addKey(mgmt.getPropertyKey(ID), 
+						Parameter.of(MAPPED, Properties.sid.toString()))
+				.addKey(mgmt.getPropertyKey(SCTID), 
+		    				Parameter.of(MAPPED, Properties.sctid.toString()))
+				.addKey(mgmt.getPropertyKey(REFERENCE_COMPONENT_ID), 
+	    				Parameter.of(MAPPED, Properties.referenceComponentId.toString()))
+				.addKey(mgmt.getPropertyKey(MODULE_ID), 
+	    				Parameter.of(MAPPED, Properties.moduleId.toString()))
+				.addKey(mgmt.getPropertyKey(MODIFIED_DATE), 
+	    				Parameter.of(MAPPED, Properties.modifiedDate.toString()))
+				.addKey(mgmt.getPropertyKey(MODIFIED_BY), 
+	    				Parameter.of(MAPPED, Properties.modifiedBy.toString()))
+				.addKey(mgmt.getPropertyKey(CREATED), 
+	    				Parameter.of(MAPPED, Properties.created.toString()))
+				.addKey(mgmt.getPropertyKey(CREATED_BY), 
+	    				Parameter.of(MAPPED, Properties.createdBy.toString()))
+				.addKey(mgmt.getPropertyKey(TYPE), 
+						Parameter.of(MAPPED, TYPE))
 
+				.indexOnly(mgmt.getVertexLabel("GMember"))
+	    		.buildMixedIndex(SEARCH);
 	
-	
-
+			}
+			
+			mgmt.commit();
+			
+	    } catch (Exception e) {
+		
+	    	LOGGER.error("Management Transaction Rolledback");
+	    	mgmt.rollback();
+	    	e.printStackTrace();
+	    	
+	    } finally {
+		
+	    	g.shutdown();
+	    }
+	}
 }
+

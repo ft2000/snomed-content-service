@@ -51,13 +51,13 @@ public interface GMember extends VertexFrame {
 	 * @return the isActive
 	 */
 	@Property(value = "active")
-	public boolean isActive();
+	public Integer getActive();
 	
 	/**
 	 * @param isActive the isActive to set
 	 */
 	@Property(value = "active")
-	public void setActive(boolean isActive);
+	public void setActive(Integer isActive);
 	/**
 	 * @return the referenceComponentId
 	 */
@@ -73,13 +73,13 @@ public interface GMember extends VertexFrame {
 	 * @return the published
 	 */
 	@Property(value = "published")
-	public boolean isPublished();
+	public Integer getPublished();
 	
 	/**
 	 * @param published the published to set
 	 */
 	@Property(value = "published")
-	public void setPublished(boolean isPublished);
+	public void setPublished(Integer isPublished);
 	
 	/**
 	 * @return the modifiedDate
@@ -129,5 +129,17 @@ public interface GMember extends VertexFrame {
 	 */
 	@Property( value = "createdBy")
 	public void setCreateBy(String createdBy);
+
+	/**
+	 * @param type
+	 */
+	@Property( value = "type")
+	public void setType(String type);
+	
+	/**
+	 * @param type
+	 */
+	@Property( value = "type")
+	public void getType();
    
 }

@@ -105,7 +105,7 @@ public class RefsetConvertor {
 	 */
 	@Deprecated
 	protected static Map<String, Object> getMemberProperties(Member m) {
-		// TODO Auto-generated method stub
+
 		LOGGER.debug("getMemberProperties {}", m);
 
 		Map<String, Object> props = new HashMap<String, Object>();
@@ -133,135 +133,6 @@ public class RefsetConvertor {
 
 		return props;
 	}
-	
-	@Deprecated
-	protected static List<Refset> getRefsets(Iterable<Vertex> vXs) {
-
-		LOGGER.debug("getRefsets {}", vXs);
-
-		List<Refset> refsets = new ArrayList<Refset>();
-
-		for (Vertex vR : vXs) {
-			
-
-			
-			Refset r = new Refset();
-			Set<String> keys = vR.getPropertyKeys();
-			
-			if ( keys.contains(CREATED) ) {
-			
-				long created = vR.getProperty(CREATED);
-				r.setCreated(new DateTime(created));
-			}
-			
-			if ( keys.contains(CREATED_BY) ) {
-				
-				String createdBy = vR.getProperty(CREATED_BY);
-				r.setCreatedBy(createdBy);
-				
-			}
-			
-			
-			if ( keys.contains(DESC) ) {
-				
-				String description = vR.getProperty(DESC);
-				r.setDescription(description);
-				
-			}
-			
-			if ( keys.contains(EFFECTIVE_DATE) ) {
-				
-				long effectiveDate = vR.getProperty(EFFECTIVE_DATE);
-				r.setEffectiveTime(new DateTime(effectiveDate));
-				
-			}
-			
-			if ( keys.contains(ID) ) {
-				
-				String id = vR.getProperty(ID);
-				r.setId(id);
-			}
-			
-			if ( keys.contains(LANG_CODE) ) {
-				
-				String languageCode = vR.getProperty(LANG_CODE);
-				r.setLanguageCode(languageCode);
-				
-			}
-			
-			if ( keys.contains(MODULE_ID) ) {
-				
-				String moduleId = vR.getProperty(MODULE_ID);
-				r.setModuleId(moduleId);
-				
-			}
-			
-			if ( keys.contains(PUBLISHED) ) {
-				
-				boolean isPublished = vR.getProperty(PUBLISHED);
-				r.setPublished(isPublished);
-				
-			}
-			
-			
-			if ( keys.contains(PUBLISHED_DATE) ) {
-				
-				long publishedDate = vR.getProperty(PUBLISHED_DATE);
-				r.setPublishedDate(new DateTime(publishedDate));
-				
-			}
-			
-			
-			if ( keys.contains(SUPER_REFSET_TYPE_ID) ) {
-				
-				String superRefsetTypeId = vR.getProperty(SUPER_REFSET_TYPE_ID);
-				r.setSuperRefsetTypeId(superRefsetTypeId);
-				
-			}
-			
-
-			if ( keys.contains(TYPE_ID) ) {
-				
-				String typeId = vR.getProperty(TYPE_ID);
-				r.setTypeId(typeId);
-				
-			}
-			
-			if ( keys.contains(ACTIVE) ) {
-				
-				boolean active = vR.getProperty(ACTIVE);
-				r.setActive(active);
-				
-			}
-			
-			if ( keys.contains(MEMBER_TYPE_ID) ) {
-				
-				String typeId = vR.getProperty(MEMBER_TYPE_ID);
-				r.setComponentTypeId(typeId);
-				
-			}
-			
-			if ( keys.contains(MODIFIED_DATE) ) {
-				
-				long modified = vR.getProperty(MODIFIED_DATE);
-				r.setModifiedDate(new DateTime(modified));
-			}
-			
-			if ( keys.contains(MODIFIED_BY) ) {
-				
-				String modifiedby = vR.getProperty(MODIFIED_BY);
-				r.setModifiedBy(modifiedby);
-				
-			}
-
-			
-			LOGGER.debug("Adding Refset  {} in list ", r.toString());
-
-			refsets.add(r);
-		}
-		LOGGER.debug("No of refset rerieved {}", refsets.size());
-		return refsets;
-	}
 
 
 	/**
@@ -269,7 +140,7 @@ public class RefsetConvertor {
 	 * @return
 	 */
 	public static List<Refset> getRefsetss(Iterable<GRefset> vs) {
-		// TODO Auto-generated method stub
+
 		List<Refset> refsets = new ArrayList<Refset>();
 
 		for (GRefset gr : vs) {
@@ -312,7 +183,7 @@ public class RefsetConvertor {
 
 				}
 				
-				if ( keys.contains(SCTDID) ) {
+				if ( keys.contains(SCTID) ) {
 					
 					r.setId(gr.getSctdId());
 
@@ -333,7 +204,7 @@ public class RefsetConvertor {
 				
 				if ( keys.contains(PUBLISHED) ) {
 					
-					r.setPublished(gr.isPublished());
+					r.setPublished(gr.getPublished() == 1 ? true : false);
 					
 				}
 				
@@ -366,7 +237,7 @@ public class RefsetConvertor {
 				
 				if ( keys.contains(ACTIVE) ) {
 					
-					r.setActive(gr.isActive());
+					r.setActive(gr.getActive() == 1 ? true : false);
 					
 				}
 				
@@ -386,6 +257,8 @@ public class RefsetConvertor {
 					r.setExpectedReleaseDate(new DateTime(gr.getExpectedReleaseDate()));
 
 				}
+				
+				r.setTotalNoOfMembers(gr.getNoOfMembers());
 
 				
 				refsets.add(r);
@@ -415,7 +288,7 @@ public class RefsetConvertor {
 		Iterable<Edge> eRs = vR.asVertex().getEdges(Direction.IN, "members");
 		r.setMembers(getMembers(eRs));
 		
-		LOGGER.debug("Returning Refset as {} ", r.toString());
+		LOGGER.trace("Returning Refset as {} ", r.toString());
 
 		return r;
 		
@@ -474,7 +347,7 @@ public class RefsetConvertor {
 		
 		if ( keys.contains(PUBLISHED) ) {
 			
-			r.setPublished(vR.isPublished());
+			r.setPublished(vR.getPublished() == 1 ? true : false);
 			
 		}
 		
@@ -522,7 +395,7 @@ public class RefsetConvertor {
 
 		}
 		
-		if ( keys.contains(SCTDID) ) {
+		if ( keys.contains(SCTID) ) {
 			
 			r.setId(vR.getSctdId());
 
@@ -577,9 +450,9 @@ public class RefsetConvertor {
 				if (mKeys.contains(PUBLISHED)) {
 					
 
-					boolean published = vM.getProperty(PUBLISHED);
+					Integer published = vM.getProperty(PUBLISHED);
 					
-					m.setPublished(published);;
+					m.setPublished(published == 1 ? true : false);;
 					
 				}
 
@@ -588,8 +461,8 @@ public class RefsetConvertor {
 				
 				if ( mKeys.contains(ACTIVE) ) {
 					
-					boolean isActive = vM.getProperty(ACTIVE);
-					m.setActive(isActive);
+					Integer isActive = vM.getProperty(ACTIVE);
+					m.setActive(isActive == 1 ? true : false);
 					
 				}
 				

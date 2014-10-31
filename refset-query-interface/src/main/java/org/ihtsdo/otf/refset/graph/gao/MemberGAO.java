@@ -10,6 +10,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import javax.annotation.Resource;
+
 import org.ihtsdo.otf.refset.domain.Member;
 import org.ihtsdo.otf.refset.exception.EntityNotFoundException;
 import org.ihtsdo.otf.refset.graph.RefsetGraphAccessException;
@@ -71,7 +73,7 @@ public class MemberGAO {
 		try {
 
 			//TODO upgrade this search with status and effective date
-			Iterable<Vertex> vr = tg.getVertices(ID, id);
+			Iterable<Vertex> vr = tg.query().has(ID, id).has(TYPE, VertexType.member.toString()).limit(1).vertices();
 			
 			for (Vertex v : vr) {
 				
@@ -127,9 +129,13 @@ public class MemberGAO {
 			
 			LOGGER.debug("Member does not exist adding {}", m);
 
-			GMember mg = tg.addVertex("GMember", GMember.class);
+			TitanGraph g = tg.getBaseGraph();
+			Vertex vM = g.addVertexWithLabel(g.getVertexLabel("GMember"));
+			GMember mg = tg.getVertex(vM.getId(), GMember.class);
 			
-			mg.setActive(m.isActive());
+			Integer activeFlag = m.isActive() ? 1 : 0;
+
+			mg.setActive(activeFlag);
 			
 			if (StringUtils.isEmpty(m.getId())) {
 				
@@ -152,8 +158,11 @@ public class MemberGAO {
 			mg.setCreated(new DateTime().getMillis());
 			mg.setModifiedDate(new DateTime().getMillis());
 			mg.setModuleId(m.getModuleId());
-			mg.setPublished(m.isPublished());
 			
+			Integer publishedFlag = m.isPublished() ? 1 : 0;
+
+			mg.setPublished(publishedFlag);
+			mg.setType(VertexType.member.toString());
 			mV = mg.asVertex();
 			LOGGER.debug("Added Member as vertex to graph", mV.getId());
 
@@ -173,7 +182,7 @@ public class MemberGAO {
 	/**
 	 * @param factory the factory to set
 	 */
-	@Autowired
+	@Resource(name = "refsetGraphFactory")
 	public  void setFactory(RefsetGraphFactory factory) {
 		
 		this.factory = factory;
@@ -313,66 +322,66 @@ public class MemberGAO {
 		}
 	}
 		
-		/**This is a transaction so we can not individually send error/success for a conceptId!! 
-		 * @param refsetId
-		 * @param rcId
-		 * @throws EntityNotFoundException 
-		 * @throws RefsetGraphAccessException 
-		 */
-		public Map<String, String> removeMembers(String refsetId, Set<String> rcIds) throws EntityNotFoundException, RefsetGraphAccessException {
+	/**This is a transaction so we can not individually send error/success for a conceptId!! 
+	 * @param refsetId
+	 * @param rcId
+	 * @throws EntityNotFoundException 
+	 * @throws RefsetGraphAccessException 
+	 */
+	public Map<String, String> removeMembers(String refsetId, Set<String> rcIds) throws EntityNotFoundException, RefsetGraphAccessException {
 
-			LOGGER.debug("removing members {} from refset {}", rcIds, refsetId);
-			TitanGraph tg = null;
-			Map<String, String> outcome = new HashMap<String, String>();
+		LOGGER.debug("removing members {} from refset {}", rcIds, refsetId);
+		TitanGraph tg = null;
+		Map<String, String> outcome = new HashMap<String, String>();
+		
+		try {
 			
-			try {
-				
-				tg = factory.getTitanGraph();
-				
-				Vertex rV = rGao.getRefsetVertex(refsetId, fgf.create(tg));
+			tg = factory.getTitanGraph();
+			
+			Vertex rV = rGao.getRefsetVertex(refsetId, fgf.create(tg));
 
-				Iterable<Edge> eR = rV.getEdges(Direction.IN, "members");
+			Iterable<Edge> eR = rV.getEdges(Direction.IN, "members");
+			
+			for (Edge e : eR) {
 				
-				for (Edge e : eR) {
+				String referencedComponentId = e.getProperty(REFERENCE_COMPONENT_ID);
+				
+				if (!StringUtils.isEmpty(referencedComponentId) 
+						&& rcIds.contains(referencedComponentId)) {
 					
-					String referencedComponentId = e.getProperty(REFERENCE_COMPONENT_ID);
+					LOGGER.debug("Removing member {} relationship from refset {}", e, rV);
+					e.remove();
 					
-					if (!StringUtils.isEmpty(referencedComponentId) 
-							&& rcIds.contains(referencedComponentId)) {
-						
-						LOGGER.debug("Removing member {} relationship from refset {}", e, rV);
-						e.remove();
-						
-						outcome.put(referencedComponentId, "Success");
+					outcome.put(referencedComponentId, "Success");
 
-					}
 				}
-
-				RefsetGraphFactory.commit(tg);
-
-			} catch (EntityNotFoundException e) {
-				
-				LOGGER.error("Error while removing member", e);
-
-				RefsetGraphFactory.rollback(tg);
-				
-				throw e;
-				
-			} catch (Exception e) {
-				
-				LOGGER.error("Error while removing member", e);
-
-				RefsetGraphFactory.rollback(tg);
-				
-				throw new RefsetGraphAccessException("Error while removing members");
-				
-			} finally {
-				
-				RefsetGraphFactory.shutdown(tg);
 			}
 
+			RefsetGraphFactory.commit(tg);
+
+		} catch (EntityNotFoundException e) {
 			
-			return outcome;
+			LOGGER.error("Error while removing member", e);
+
+			RefsetGraphFactory.rollback(tg);
+			
+			throw e;
+			
+		} catch (Exception e) {
+			
+			LOGGER.error("Error while removing member", e);
+
+			RefsetGraphFactory.rollback(tg);
+			
+			throw new RefsetGraphAccessException("Error while removing members");
+			
+		} finally {
+			
+			RefsetGraphFactory.shutdown(tg);
+		}
+
+		
+		return outcome;
 		
 	}
 
@@ -394,7 +403,9 @@ public class MemberGAO {
 			Iterable<GMember> ms = tg.getVertices(ID, m.getId(), GMember.class);
 			for (GMember mg : ms) {
 				
-				mg.setActive(m.isActive());
+				Integer activeFlag = m.isActive() ? 1 : 0;
+
+				mg.setActive(activeFlag);
 				
 				DateTime et = m.getEffectiveTime();
 				if ( et != null) {
@@ -410,8 +421,10 @@ public class MemberGAO {
 					mg.setModuleId(m.getModuleId());
 
 				}
+				
+				Integer publishedFlag = m.isPublished() ? 1 : 0;
 
-				mg.setPublished(m.isPublished());
+				mg.setPublished(publishedFlag);
 				
 				mV = mg.asVertex();
 				LOGGER.debug("Updated Member as vertex to graph", mV.getId());	

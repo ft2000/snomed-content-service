@@ -51,15 +51,15 @@ public class RefsetBrowseController {
 	private RefsetBrowseService bService;
 	
 	@RequestMapping( method = RequestMethod.GET, produces = "application/json" )
-	@ApiOperation( value = "Retrieves list of existing refsets. By default it returns 10 refset and theirafter another 10 or desired page size" )
-    public ResponseEntity<Result< Map<String, Object>>> getRefsets( @RequestParam( value = "page", defaultValue = "1" ) int page, 
-    		@RequestParam( value = "size", defaultValue = "10" ) int size ) throws Exception {
+	@ApiOperation( value = "Retrieves list of existing refsets. By default it returns 10 refset and thereafter another 10 or desired range" )
+    public ResponseEntity<Result< Map<String, Object>>> getRefsets( @RequestParam( value = "page", defaultValue = "0" ) int from, 
+    		@RequestParam( value = "size", defaultValue = "10" ) int to ) throws Exception {
 		
 		logger.debug("Existing refsets");
 
 		Result<Map<String, Object>> response = new Result<Map<String, Object>>();
 		Meta m = new Meta();
-		m.add( linkTo( methodOn( RefsetBrowseController.class ).getRefsets( page, size ) ).withSelfRel() );
+		m.add( linkTo( methodOn( RefsetBrowseController.class ).getRefsets( from, to ) ).withSelfRel() );
 		
 		response.setMeta(m);
 
@@ -72,7 +72,7 @@ public class RefsetBrowseController {
 			logger.debug("Geting only published ? = {}", published);
 			
 		}
-		List<Refset> refSets =  bService.getRefsets( page, size, published );
+		List<Refset> refSets =  bService.getRefsets( from, to, published );
 
 		Map<String, Object> data = new HashMap<String, Object>();
 		data.put("refsets", refSets);

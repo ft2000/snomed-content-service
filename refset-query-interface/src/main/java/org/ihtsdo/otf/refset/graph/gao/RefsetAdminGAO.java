@@ -7,6 +7,8 @@ import static org.ihtsdo.otf.refset.domain.RGC.*;
 
 import java.util.List;
 
+import javax.annotation.Resource;
+
 import org.ihtsdo.otf.refset.domain.Member;
 import org.ihtsdo.otf.refset.domain.MetaData;
 import org.ihtsdo.otf.refset.domain.Refset;
@@ -96,10 +98,10 @@ public class RefsetAdminGAO {
 
 			}
 			
-			LOGGER.info("Commiting");
+			LOGGER.debug("Commiting");
 
 			md = RefsetConvertor.getMetaData(rV);
-			
+
 			RefsetGraphFactory.commit(tg);
 						
 		} catch (Exception e) {
@@ -144,8 +146,10 @@ public class RefsetAdminGAO {
 		} catch (EntityNotFoundException e) {
 			
 			LOGGER.debug("Refset does not exist, adding  {}", r.toString());
+			TitanGraph g = tg.getBaseGraph();
+			Vertex vR = g.addVertexWithLabel(g.getVertexLabel("GRefset"));
+			GRefset gr = tg.getVertex(vR.getId(), GRefset.class);
 			
-			GRefset gr = tg.addVertex("GRefset", GRefset.class);
 			gr.setCreated(r.getCreated().getMillis());
 			gr.setCreatedBy(r.getCreatedBy());
 			gr.setDescription(r.getDescription());
@@ -158,7 +162,10 @@ public class RefsetAdminGAO {
 			gr.setId(r.getId());
 			gr.setLanguageCode(r.getLanguageCode());
 			gr.setModuleId(r.getModuleId());
-			gr.setPublished(r.isPublished());
+			
+			Integer publishedFlag = r.isPublished() ? 1 : 0;
+
+			gr.setPublished(publishedFlag);
 			
 			if (r.getPublishedDate() != null) {
 				
@@ -171,7 +178,8 @@ public class RefsetAdminGAO {
 			gr.setComponentTypeId(r.getComponentTypeId());
 			gr.setTypeId(r.getTypeId());
 			
-			gr.setActive(r.isActive());
+			Integer activeFlag = r.isActive() ? 1 : 0;
+			gr.setActive(activeFlag);
 			gr.setModifiedBy(r.getModifiedBy());
 			gr.setModifiedDate(new DateTime().getMillis());
 			
@@ -186,6 +194,8 @@ public class RefsetAdminGAO {
 				gr.setSctdId(r.getSctId());
 
 			}
+			gr.setType(VertexType.refset.toString());
+			
 			LOGGER.debug("Added Refset as vertex to graph {}", gr.getId());
 
 			rV = gr.asVertex();			
@@ -220,13 +230,14 @@ public class RefsetAdminGAO {
 			
 			Vertex refset = rGao.getRefsetVertex(refsetId, g);
 			
-			boolean published = refset.getProperty(PUBLISHED);
+			Integer published = refset.getProperty(PUBLISHED);
 			
-			if (published) {
+			
+			if (published == 1) {
 				
 				LOGGER.debug("Not removing only making it inactive  {} ", refsetId);
 
-				refset.setProperty(ACTIVE, false);
+				refset.setProperty(ACTIVE, 0);
 				
 			} else {
 				
@@ -375,7 +386,9 @@ public class RefsetAdminGAO {
 
 		}
 		
-		rV.setPublished(r.isPublished());
+		Integer publishedFlag = r.isPublished() ? 1 : 0;
+
+		rV.setPublished(publishedFlag);
 		
 		if (r.getPublishedDate() != null) {
 			
@@ -399,8 +412,9 @@ public class RefsetAdminGAO {
 
 		}
 		
-		
-		rV.setActive(r.isActive());
+		Integer activeFlag = r.isActive() ? 1 : 0;
+
+		rV.setActive(activeFlag);
 		
 		String typeId = r.getTypeId();
 
@@ -436,7 +450,7 @@ public class RefsetAdminGAO {
 	/**
 	 * @param factory the factory to set
 	 */
-	@Autowired
+	@Resource(name = "refsetGraphFactory")
 	public  void setFactory(RefsetGraphFactory factory) {
 		
 		this.factory = factory;
