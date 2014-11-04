@@ -20,10 +20,10 @@
                       http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-		<groupId>org.ihtsdo.otf</groupId>
-		<artifactId>snomed-content-service</artifactId>
+	<groupId>org.ihtsdo.otf</groupId>
+	<artifactId>snomed-content-service</artifactId>
+    <version>0.1.1-SNAPSHOT</version>
     <packaging>pom</packaging>
-    <version>1.0.0-BUILD-SNAPSHOT</version>
     <name>Snomed Content Service</name>
     <description>Snomed Content Service - Refset tool</description>
     <url>http://refset.ihtsdotools.org/</url>

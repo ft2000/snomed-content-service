@@ -9,7 +9,7 @@
 	<parent>
 		<groupId>org.ihtsdo.otf</groupId>
 		<artifactId>snomed-content-service</artifactId>
-    	<version>1.0.0-BUILD-SNAPSHOT</version>
+    	<version>0.1.1-SNAPSHOT</version>
     	<relativePath>../pom.xml</relativePath>
 	</parent>
 	<repositories>

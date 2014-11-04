@@ -4,7 +4,7 @@
 
   <groupId>com.epl.rdf2java</groupId>
   <artifactId>rdf2java</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+  <!--  <version>0.0.1-SNAPSHOT</version> -->
   <packaging>jar</packaging>
 
   <name>rdf2java</name>
