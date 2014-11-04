@@ -9,6 +9,13 @@
 
   <name>rdf2java</name>
   <url>http://maven.apache.org</url>
+  
+  	<parent>
+		<groupId>org.ihtsdo.otf</groupId>
+		<artifactId>snomed-content-service</artifactId>
+	   	<version>0.1.0</version>
+	   	<relativePath>../pom.xml</relativePath>
+	</parent>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
