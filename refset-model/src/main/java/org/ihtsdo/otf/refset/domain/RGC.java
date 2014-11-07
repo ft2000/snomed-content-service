@@ -29,6 +29,9 @@ public final class RGC {
 	public static final String MODIFIED_BY = "modifiedBy";
 	public static final String SCTID = "sctId";
 	public static final String EXPECTED_RLS_DT = "expectedReleaseDate";
+	public static final String START = "start";
+	public static final String END = "end";
+
 
 
 }
