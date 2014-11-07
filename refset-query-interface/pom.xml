@@ -53,9 +53,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<refset-query-interface-app-port>8080</refset-query-interface-app-port>
-		
-		<!--  <org.ihtsdo.otf-version>${project.version}</org.ihtsdo.otf-version> -->
-		
+	
 		<!-- Maven Plugin Versions -->
   		<maven.enforcer.plugin>1.2</maven.enforcer.plugin>
   		<maven.version.range>[2.2.1,3.2.3)</maven.version.range>		
