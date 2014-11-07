@@ -156,22 +156,6 @@ public class GraphLoader {
 	}
 	
 	/**
-	 * @param cli
-	 * @param string
-	 */
-	private static void validateFiles(CommandLine cli, String message) {
-
-		if (StringUtils.isBlank(cli.getOptionValue("df")) 
-				&& StringUtils.isBlank(cli.getOptionValue("cf")) 
-				&& StringUtils.isBlank(cli.getOptionValue("rf"))
-				&& StringUtils.isBlank(cli.getOptionValue("nt"))) {
-			
-			throw new IllegalArgumentException(message + USAGE);
-		}
-		
-	}
-
-	/**
 	 * @param type
 	 * @param string
 	 */

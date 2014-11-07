@@ -52,8 +52,6 @@ public class Rf2SnapshotAuditor {
 	//map to 
 	private Map<String, Vertex> vMap = new HashMap<String, Vertex>();
 	private Map<String, DescriptionType> descMap = new HashMap<String, DescriptionType>();
-	private Map<String, Relationship> characteristicsMap = new HashMap<String, Relationship>();
-	
 	private String subType;
 
 	
@@ -320,42 +318,6 @@ public class Rf2SnapshotAuditor {
 	
 	
 	/**
-	 * @param modifierId
-	 * @return
-	 */
-	private Vertex processModifier(String modifierId) {
-
-		long start = System.currentTimeMillis();
-		Vertex v = null;
-		
-		v = vMap.get(modifierId);
-		LOGGER.trace("Vertex from local cache {}", v);
-
-		if (v == null) {
-			
-			v = getVertex(modifierId, Types.modifier.toString());
-			LOGGER.trace("Vertex from db {}", v);
-
-			vMap.put(modifierId, v);
-
-		}
-		
-		if (v == null) {
-		
-			v = g.addVertexWithLabel(g.getVertexLabel(Types.modifier.toString()));
-			v.setProperty(Properties.sctid.toString(), modifierId);
-			vMap.put(modifierId, v);
-			LOGGER.trace("Adding module vertex {}", v);
-
-		}
-		
-		LOGGER.trace("processModifier total time {} sec ", (System.currentTimeMillis() - start)/1000);
-
-		return v;
-	}
-
-
-	/**
 	 * @param typeId
 	 * @return
 	 */
@@ -460,34 +422,6 @@ public class Rf2SnapshotAuditor {
 			
 		}
 		LOGGER.trace("processModule total time {}", (System.currentTimeMillis() - start)/6000);
-
-		return v;
-	}
-	
-	private Vertex processDefinitionStatus(String dsId) {
-		
-		long start = System.currentTimeMillis();
-		Vertex v = null;
-		
-		v = vMap.get(dsId);
-		LOGGER.trace("Vertex from local cache {}", v);
-
-		if (v == null) {
-			
-			v = getVertex(dsId, Types.definition.toString());
-			LOGGER.trace("Vertex from db {}", v);
-			vMap.put(dsId, v);
-
-		}
-		if (v == null) {
-		
-			v = g.addVertexWithLabel(Types.definition.toString());
-			v.setProperty(Properties.sctid.toString(), dsId);
-			LOGGER.trace("Adding module vertex {}", v);
-			vMap.put(dsId, v);
-
-		}
-		LOGGER.trace("processDefinitionStatus total time {}", (System.currentTimeMillis() - start)/6000);
 
 		return v;
 	}

@@ -504,8 +504,12 @@ public class RefsetSchema {
 	/**
 	 * @param mgmt
 	 */
-	public void createMixedIndex() {
+	public void createMixedIndex(String backingIndexName) {
 		
+		if (StringUtils.isEmpty(backingIndexName)) {
+			
+			backingIndexName = SEARCH;
+		}
 		TitanGraph g = openGraph(config);
 	    //management api
 	    TitanManagement mgmt = g.getManagementSystem();
@@ -556,7 +560,7 @@ public class RefsetSchema {
 				.addKey(mgmt.getPropertyKey(TYPE_ID), 
 						Parameter.of(MAPPED, TYPE_ID))
 
-				.indexOnly(mgmt.getVertexLabel("GRefset")).buildMixedIndex(SEARCH);
+				.indexOnly(mgmt.getVertexLabel("GRefset")).buildMixedIndex(backingIndexName);
 			}
 			
 			
@@ -589,7 +593,7 @@ public class RefsetSchema {
 						Parameter.of(MAPPED, TYPE))
 
 				.indexOnly(mgmt.getVertexLabel("GMember"))
-	    		.buildMixedIndex(SEARCH);
+	    		.buildMixedIndex(backingIndexName);
 	
 			}
 			
