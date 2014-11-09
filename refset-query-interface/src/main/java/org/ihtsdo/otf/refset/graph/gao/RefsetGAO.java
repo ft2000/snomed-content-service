@@ -124,7 +124,7 @@ public class RefsetGAO {
 			
 			for (GRefset v : vs) {
 				
-				r = RefsetConvertor.convert2Refsets(v);
+				r = RefsetConvertor.convert2Refset(v);
 				LOGGER.debug("Refset is {} ", r);
 				r.setMetaData(RefsetConvertor.getMetaData(v.asVertex()));
 				break;
@@ -190,7 +190,7 @@ public class RefsetGAO {
 				
 			}			
 			
-			refsets = RefsetConvertor.getRefsetss(vs);
+			refsets = RefsetConvertor.getRefsets(vs);
 			RefsetGraphFactory.commit(g);
 
 		} catch (Exception e) {
@@ -254,7 +254,7 @@ public class RefsetGAO {
 		return md;
 	}
 	
-	private String getMemberDescription(String referenceComponentId) throws RefsetGraphAccessException  {
+	protected String getMemberDescription(String referenceComponentId) throws RefsetGraphAccessException  {
 		
 		LOGGER.debug("getting member description for {} ", referenceComponentId);
 
@@ -278,6 +278,7 @@ public class RefsetGAO {
 					Vertex v = r.getElement();
 					
 					label = v.getProperty(Properties.title.toString());
+					break;
 					
 				}
 
@@ -458,7 +459,7 @@ public class RefsetGAO {
 
 			FramedGraph<TitanGraph> tg = fgf.create(g);
 			
-			Iterable<GRefset> vRs = tg.getVertices(ID, refSetId, GRefset.class);
+			Iterable<GRefset> vRs = tg.query().has(ID, refSetId).has(TYPE, VertexType.refset.toString()).limit(1).vertices(GRefset.class);
 			
 			
 			if (!vRs.iterator().hasNext()) {
@@ -504,12 +505,7 @@ public class RefsetGAO {
 		try {
 			
 			g = rgFactory.getReadOnlyGraph();
-			/*Iterable<Vertex> vs = g.query().has(PUBLISHED, 1).has(TYPE, VertexType.refset.toString()).limit(1).vertices();
-			
-			for (Vertex vertex : vs) {
-				
-				System.out.println(vertex.getId());
-			}*/
+
 			GremlinPipeline<Vertex, Vertex> pipe = new GremlinPipeline<Vertex, Vertex>(g);
 			
 			if (published) {
@@ -539,7 +535,7 @@ public class RefsetGAO {
 				
 			}
 			
-			refsets = RefsetConvertor.getRefsetss(ls);
+			refsets = RefsetConvertor.getRefsets(ls);
 
 					
 			

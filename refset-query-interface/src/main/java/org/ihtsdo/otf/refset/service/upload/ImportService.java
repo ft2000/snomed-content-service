@@ -9,15 +9,17 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.ihtsdo.otf.refset.schema;
+package org.ihtsdo.otf.refset.service.upload;
 
+import java.io.InputStream;
+
+import org.ihtsdo.otf.refset.exception.EntityNotFoundException;
+import org.ihtsdo.otf.refset.exception.RefsetServiceException;
 /**
  *
  */
-public enum CompositeIndex {
-
-	bySctId, bySctIdStatus, byDescription, byIdAndCreatedBy, byId, byIdAndCreated, byIdAndModified, 
-	byRefComponentId, byPublished, byType, byIdAndEndAndStartDate, byIdAndStartDate, byIdAndEndDate,
-	byEndDateAndPublished, byEndDateAndType
+public interface ImportService {
 	
+	public void importFile(InputStream is, String refsetId) throws RefsetServiceException, EntityNotFoundException;
+
 }

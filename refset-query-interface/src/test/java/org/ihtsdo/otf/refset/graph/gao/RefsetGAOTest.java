@@ -5,22 +5,18 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.configuration.Configuration;
-import org.apache.commons.configuration.MapConfiguration;
+import org.apache.commons.configuration.ConfigurationException;
+import org.ihtsdo.otf.refset.common.TestGraph;
 import org.ihtsdo.otf.refset.domain.MetaData;
 import org.ihtsdo.otf.refset.domain.Refset;
 import org.ihtsdo.otf.refset.exception.EntityNotFoundException;
 import org.ihtsdo.otf.refset.exception.RefsetServiceException;
 import org.ihtsdo.otf.refset.graph.RefsetGraphAccessException;
 import org.ihtsdo.otf.refset.graph.RefsetGraphFactory;
-import org.ihtsdo.otf.refset.graph.gao.RefsetGAO;
-import org.ihtsdo.otf.refset.schema.RefsetSchema;
 import org.ihtsdo.otf.refset.service.RefsetBrowseServiceStubData;
-import org.ihtsdo.otf.snomed.schema.SnomedConceptSchema;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -64,37 +60,25 @@ public class RefsetGAOTest {
 	}
 	
 	@BeforeClass
-	public static void reset() throws RefsetServiceException {
+	public static void initialize() throws RefsetServiceException, ConfigurationException {
 
-		delete();
+		TestGraph.deleteGraph();
 		
-		/*create refset schema*/
+		TestGraph.createTestRefsetGraphSchema();
+		TestGraph.createTestSnomedGraphSchema();
 		
-		RefsetSchema sg = new RefsetSchema("src/test/resources/titan-graph-es-junit.properties");
-		
-		sg.createSchema();
-		
-		/*create snomed schema*/
-		SnomedConceptSchema s = new SnomedConceptSchema("src/test/resources/titan-graph-es-junit.properties");
-		s.createSchema();
-		s.createIndex();
-		
-		Map<String, Object> map = new HashMap<String, Object>();
-		map.put("storage.directory", "/tmp/berkeley");
-		map.put("storage.backend", "berkeleyje");
-		
-		
-		
-		Configuration config = new MapConfiguration(map);
-		
+		Configuration config = TestGraph.getTestGraphConfig();
+
 		
 		
 		
 		
 		gao = new RefsetGAO();
-		f = new RefsetGraphFactory(config);
-		gao.setFactory(f);
 		
+		f = new RefsetGraphFactory(config);
+		gao.setRGFactory(f);
+		gao.setSGFactory(f);
+
 		aGao = new RefsetAdminGAO();
 		aGao.setFactory(f);
 		
@@ -118,28 +102,11 @@ public class RefsetGAOTest {
 	@AfterClass
 	public  static void cleanup() throws RefsetGraphAccessException, EntityNotFoundException {
 		
-		delete();
+		TestGraph.deleteGraph();
 
 	}
 	
-	private static void delete() {
-		File f = new File("/tmp/berkeley");
-		String[] files = f.list();
-		
-		if (files != null) {
-			
-			for (int i = 0; i < files.length; i++) {
-				
-				File file = new File("/tmp/berkeley/" + files[i]);
-				System.err.println(file.getAbsolutePath());
-
-				file.delete();
-				
-			}
-		}
-		
-		f.delete();
-	}
+	
 	
 	
 	@Test

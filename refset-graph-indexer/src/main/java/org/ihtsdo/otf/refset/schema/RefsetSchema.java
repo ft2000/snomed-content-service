@@ -18,6 +18,8 @@ import static org.ihtsdo.otf.refset.domain.RGC.TYPE_ID;
 import static org.ihtsdo.otf.refset.domain.RGC.SCTID;
 import static org.ihtsdo.otf.refset.domain.RGC.MEMBER_TYPE_ID;
 import static org.ihtsdo.otf.refset.domain.RGC.EXPECTED_RLS_DT;
+import static org.ihtsdo.otf.refset.domain.RGC.START;
+import static org.ihtsdo.otf.refset.domain.RGC.END;
 
 import org.apache.commons.lang.StringUtils;
 import org.ihtsdo.otf.snomed.domain.Properties;
@@ -181,7 +183,7 @@ public class RefsetSchema {
 		
 		if (byType == null) {
 		
-			LOGGER.debug("Creating Index  {}" , CompositeIndex.byType.toString());
+			LOGGER.debug("Creating Index  {}" , CompositeIndex.byType);
 			mgmt.buildIndex(CompositeIndex.byType.toString(), Vertex.class)
 			.addKey(mgmt.getPropertyKey(TYPE))
 			.buildCompositeIndex();
@@ -191,12 +193,74 @@ public class RefsetSchema {
 
 		if (byRefComponentId == null) {
 			
-			LOGGER.debug("Creating Index  {}" , CompositeIndex.byRefComponentId.toString());
+			LOGGER.debug("Creating Index  {}" , CompositeIndex.byRefComponentId);
 			mgmt.buildIndex(CompositeIndex.byRefComponentId.toString(), Edge.class)
 			.addKey(mgmt.getPropertyKey(REFERENCE_COMPONENT_ID))
 			.indexOnly(mgmt.getEdgeLabel(RefsetRelations.members.toString()))
 			.buildCompositeIndex();
 		}
+		
+		
+		TitanGraphIndex byIdEndDate = mgmt.getGraphIndex(CompositeIndex.byIdAndEndDate.toString());
+		
+		if (byIdEndDate == null) {
+		
+			LOGGER.debug("Creating Index  {}" , CompositeIndex.byIdAndEndDate);
+			mgmt.buildIndex(CompositeIndex.byIdAndEndDate.toString(), Vertex.class)
+			.addKey(mgmt.getPropertyKey(ID))
+			.addKey(mgmt.getPropertyKey(TYPE))
+			.addKey(mgmt.getPropertyKey(END))
+			.buildCompositeIndex();
+		}
+		
+		TitanGraphIndex byIdStartDate = mgmt.getGraphIndex(CompositeIndex.byIdAndStartDate.toString());
+		
+		if (byIdStartDate == null) {
+		
+			LOGGER.debug("Creating Index  {}" , CompositeIndex.byIdAndStartDate);
+			mgmt.buildIndex(CompositeIndex.byIdAndStartDate.toString(), Vertex.class)
+			.addKey(mgmt.getPropertyKey(ID))
+			.addKey(mgmt.getPropertyKey(TYPE))
+			.addKey(mgmt.getPropertyKey(START))
+			.buildCompositeIndex();
+		}
+		
+		TitanGraphIndex byIdEndStartDate = mgmt.getGraphIndex(CompositeIndex.byIdAndEndAndStartDate.toString());
+		
+		if (byIdEndStartDate == null) {
+		
+			LOGGER.debug("Creating Index  {}" , CompositeIndex.byIdAndEndAndStartDate);
+			mgmt.buildIndex(CompositeIndex.byIdAndEndAndStartDate.toString(), Vertex.class)
+			.addKey(mgmt.getPropertyKey(ID))
+			.addKey(mgmt.getPropertyKey(TYPE))
+			.addKey(mgmt.getPropertyKey(START))
+			.addKey(mgmt.getPropertyKey(END))
+			.buildCompositeIndex();
+		}
+		
+		TitanGraphIndex byEndDateAndPublished = mgmt.getGraphIndex(CompositeIndex.byEndDateAndPublished.toString());
+		
+		if (byEndDateAndPublished == null) {
+		
+			LOGGER.debug("Creating Index  {}" , CompositeIndex.byEndDateAndPublished);
+			mgmt.buildIndex(CompositeIndex.byEndDateAndPublished.toString(), Vertex.class)
+			.addKey(mgmt.getPropertyKey(TYPE))
+			.addKey(mgmt.getPropertyKey(PUBLISHED))
+			.addKey(mgmt.getPropertyKey(END))
+			.buildCompositeIndex();
+		}
+		
+		TitanGraphIndex byEndDateAndType = mgmt.getGraphIndex(CompositeIndex.byEndDateAndType.toString());
+		
+		if (byEndDateAndType == null) {
+		
+			LOGGER.debug("Creating Index  {}" , CompositeIndex.byEndDateAndType);
+			mgmt.buildIndex(CompositeIndex.byEndDateAndType.toString(), Vertex.class)
+			.addKey(mgmt.getPropertyKey(TYPE))
+			.addKey(mgmt.getPropertyKey(END))
+			.buildCompositeIndex();
+		}
+
 		
 	}
 
@@ -499,6 +563,21 @@ public class RefsetSchema {
 			mgmt.makePropertyKey(TYPE_ID).dataType(String.class).make();
 			
 		} 
+		
+		if (!mgmt.containsRelationType(START)) {
+
+			LOGGER.debug("Creating Property {}", START);
+			mgmt.makePropertyKey(START).dataType(Long.class).make();
+			
+		} 
+		
+		if (!mgmt.containsRelationType(END)) {
+
+			LOGGER.debug("Creating Property {}", END);
+			mgmt.makePropertyKey(END).dataType(Long.class).make();
+			
+		} 
+
 	}
 	
 	/**
@@ -559,6 +638,11 @@ public class RefsetSchema {
 						Parameter.of(MAPPED, TYPE))
 				.addKey(mgmt.getPropertyKey(TYPE_ID), 
 						Parameter.of(MAPPED, TYPE_ID))
+				.addKey(mgmt.getPropertyKey(START), 
+						Parameter.of(MAPPED, START))
+				.addKey(mgmt.getPropertyKey(END), 
+						Parameter.of(MAPPED, END))
+						
 
 				.indexOnly(mgmt.getVertexLabel("GRefset")).buildMixedIndex(backingIndexName);
 			}
@@ -591,6 +675,10 @@ public class RefsetSchema {
 	    				Parameter.of(MAPPED, Properties.createdBy.toString()))
 				.addKey(mgmt.getPropertyKey(TYPE), 
 						Parameter.of(MAPPED, TYPE))
+				.addKey(mgmt.getPropertyKey(START), 
+						Parameter.of(MAPPED, START))
+				.addKey(mgmt.getPropertyKey(END), 
+						Parameter.of(MAPPED, END))
 
 				.indexOnly(mgmt.getVertexLabel("GMember"))
 	    		.buildMixedIndex(backingIndexName);

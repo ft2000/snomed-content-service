@@ -3,18 +3,33 @@
  */
 package org.ihtsdo.otf.refset.graph.gao;
 
-import static org.ihtsdo.otf.refset.domain.RGC.*;
+import static org.ihtsdo.otf.refset.domain.RGC.ACTIVE;
+import static org.ihtsdo.otf.refset.domain.RGC.CREATED;
+import static org.ihtsdo.otf.refset.domain.RGC.CREATED_BY;
+import static org.ihtsdo.otf.refset.domain.RGC.DESC;
+import static org.ihtsdo.otf.refset.domain.RGC.EFFECTIVE_DATE;
+import static org.ihtsdo.otf.refset.domain.RGC.EXPECTED_RLS_DT;
+import static org.ihtsdo.otf.refset.domain.RGC.ID;
+import static org.ihtsdo.otf.refset.domain.RGC.LANG_CODE;
+import static org.ihtsdo.otf.refset.domain.RGC.MEMBER_TYPE_ID;
+import static org.ihtsdo.otf.refset.domain.RGC.MODIFIED_BY;
+import static org.ihtsdo.otf.refset.domain.RGC.MODIFIED_DATE;
+import static org.ihtsdo.otf.refset.domain.RGC.MODULE_ID;
+import static org.ihtsdo.otf.refset.domain.RGC.PUBLISHED;
+import static org.ihtsdo.otf.refset.domain.RGC.PUBLISHED_DATE;
+import static org.ihtsdo.otf.refset.domain.RGC.REFERENCE_COMPONENT_ID;
+import static org.ihtsdo.otf.refset.domain.RGC.SCTID;
+import static org.ihtsdo.otf.refset.domain.RGC.SUPER_REFSET_TYPE_ID;
+import static org.ihtsdo.otf.refset.domain.RGC.TYPE_ID;
+
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.ihtsdo.otf.refset.domain.Member;
 import org.ihtsdo.otf.refset.domain.MetaData;
 import org.ihtsdo.otf.refset.domain.Refset;
-import org.ihtsdo.otf.refset.graph.schema.GMember;
 import org.ihtsdo.otf.refset.graph.schema.GRefset;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -33,113 +48,12 @@ public class RefsetConvertor {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(RefsetConvertor.class);
 
-	
-	/** Extracts {@link Refset} properties in a map to be added in {@link Refset} node
-	 * @param r
-	 * @return
-	 * use frames instead ie {@link GRefset}
-	 */
-	@Deprecated
-	protected static Map<String, Object> getRefsetProperties(Refset r) {
-		
-		LOGGER.debug("getRefsetProperties {}", r);
-		
-		Map<String, Object> props = new HashMap<String, Object>();
-		
-		if (r == null) {
-			
-			return props;
-		}
-		DateTime effDate = r.getEffectiveTime();
-		
-		if( effDate != null )
-			props.put(EFFECTIVE_DATE, effDate.getMillis());
-		
-		DateTime created = r.getCreated();
-		if( created != null )
-			props.put(CREATED, created.getMillis());
-		
-		DateTime publishedDate = r.getPublishedDate();
-		
-		if( publishedDate != null)
-			props.put(PUBLISHED_DATE, publishedDate.getMillis());
-		
-		if(!StringUtils.isEmpty(r.getDescription()))
-				props.put(DESC, r.getDescription());
-		
-		if(!StringUtils.isEmpty(r.getCreatedBy()))
-			props.put(CREATED_BY, r.getCreatedBy());
-		
-		if(!StringUtils.isEmpty(r.getSuperRefsetTypeId()))
-			props.put(SUPER_REFSET_TYPE_ID, r.getSuperRefsetTypeId());
-
-		if(!StringUtils.isEmpty(r.getLanguageCode()))
-			props.put(LANG_CODE, r.getLanguageCode());
-		
-		if(!StringUtils.isEmpty(r.getModuleId()))
-			props.put(MODULE_ID, r.getModuleId());
-		
-
-		if(!StringUtils.isEmpty(r.getTypeId()))
-			props.put(TYPE_ID, r.getTypeId());
-		
-		if(!StringUtils.isEmpty(r.getComponentTypeId()))
-			props.put(MEMBER_TYPE_ID, r.getComponentTypeId());
-		
-		props.put(PUBLISHED, r.isPublished());
-
-		if(!StringUtils.isEmpty(r.getId()))
-			props.put(ID, r.getId());//This has to be updated by real refsetId after publishing
-		
-		LOGGER.info("getRefsetProperties property map size {}", props.size());
-
-		return props;
-	}
-	
-	
-	/** Extracts {@link Member} properties in a map to be added in {@link Member} node
-	 * @param m
-	 * @return
-	 * use frames instead ie {@link GMember}
-
-	 */
-	@Deprecated
-	protected static Map<String, Object> getMemberProperties(Member m) {
-
-		LOGGER.debug("getMemberProperties {}", m);
-
-		Map<String, Object> props = new HashMap<String, Object>();
-		if(m == null) {
-			
-			return props;
-		}
-		
-		DateTime effDate = m.getEffectiveTime();
-		if(effDate != null)
-			props.put(EFFECTIVE_DATE, effDate.getMillis());
-		
-		if(!StringUtils.isEmpty(m.getModuleId()))
-			props.put(MODULE_ID, m.getModuleId());
-	
-		if(!StringUtils.isEmpty(m.getReferencedComponentId()))
-			props.put(REFERENCE_COMPONENT_ID, m.getReferencedComponentId());
-
-		props.put(ACTIVE, m.isActive());
-
-		if(!StringUtils.isEmpty(m.getId()))
-			props.put(ID, m.getId());
-
-		LOGGER.debug("getMemberProperties size {}", props.size());
-
-		return props;
-	}
-
 
 	/**
 	 * @param vs.
 	 * @return
 	 */
-	public static List<Refset> getRefsetss(Iterable<GRefset> vs) {
+	public static List<Refset> getRefsets(Iterable<GRefset> vs) {
 
 		List<Refset> refsets = new ArrayList<Refset>();
 
@@ -277,7 +191,7 @@ public class RefsetConvertor {
 	 * @param v
 	 * @return
 	 */
-	public static Refset convert2Refsets(GRefset vR) {
+	public static Refset convert2Refset(GRefset vR) {
 
 
 		
