@@ -47,7 +47,7 @@ public class Rf2SnapshotLoader {
 	private static final String SNAPSHOT_USER = "system";
 	
 	private TitanGraph g;
-	private int bufferSize = 100000;
+	private int bufferSize = 1000;
 	
 	//map to 
 	private Map<String, Vertex> vMap = new HashMap<String, Vertex>();
