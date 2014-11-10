@@ -12,6 +12,7 @@
 package org.ihtsdo.otf.refset.service.upload;
 
 import java.io.InputStream;
+import java.util.Map;
 
 import org.ihtsdo.otf.refset.exception.EntityNotFoundException;
 import org.ihtsdo.otf.refset.exception.RefsetServiceException;
@@ -20,6 +21,6 @@ import org.ihtsdo.otf.refset.exception.RefsetServiceException;
  */
 public interface ImportService {
 	
-	public void importFile(InputStream is, String refsetId) throws RefsetServiceException, EntityNotFoundException;
+	public Map<String, String> importFile(InputStream is, String refsetId) throws RefsetServiceException, EntityNotFoundException;
 
 }

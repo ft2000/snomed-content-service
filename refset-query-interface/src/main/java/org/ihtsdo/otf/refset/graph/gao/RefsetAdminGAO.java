@@ -483,7 +483,7 @@ public class RefsetAdminGAO {
 				
 				rV.getEdges(Direction.OUT, "members");
 				GremlinPipeline<Vertex, Edge> pipe = new GremlinPipeline<Vertex, Edge>();			
-				pipe.start(rV).inE("members").has(REFERENCE_COMPONENT_ID, T.eq, r.getReferencedComponentId()).has(START, T.eq, r.getEffectiveTime());
+				pipe.start(rV).inE("members").has(REFERENCE_COMPONENT_ID, T.eq, r.getReferencedComponentId()).has(START, T.eq, r.getEffectiveTime().getMillis());
 				List<Edge> ls = pipe.toList();
 				
 				if(ls.isEmpty()) {
@@ -524,7 +524,7 @@ public class RefsetAdminGAO {
 							Edge e = fgf.create(g).addEdge(null, mg.asVertex(), rV, "members");
 							e.setProperty(REFERENCE_COMPONENT_ID, r.getReferencedComponentId());
 							e.setProperty(START, r.getEffectiveTime().getMillis());
-							e.setProperty(END, expected);
+							e.setProperty(END, expected.longValue());
 						}
 						
 					}
@@ -552,7 +552,7 @@ public class RefsetAdminGAO {
 		}
 		
 		
-		return null;
+		return outcome;
 	}
 	
 	private GMember addMemberProperties(Rf2Refset r, GMember mg) {

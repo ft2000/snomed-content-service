@@ -17,6 +17,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.ihtsdo.otf.refset.exception.EntityNotFoundException;
@@ -53,7 +54,7 @@ public class ImportRF2Service implements ImportService {
 	 * @see org.ihtsdo.otf.refset.service.upload.ImportService#importFile(org.springframework.web.multipart.MultipartFile, java.lang.String)
 	 */
 	@Override
-	public void importFile(InputStream is, String refsetId) throws RefsetServiceException, EntityNotFoundException {
+	public Map<String, String> importFile(InputStream is, String refsetId) throws RefsetServiceException, EntityNotFoundException {
 		
 		
 		if (is == null || StringUtils.isBlank(refsetId)) {
@@ -105,7 +106,7 @@ public class ImportRF2Service implements ImportService {
 
             }
             
-        	srp.process(rf2RLst, refsetId);
+        	return srp.process(rf2RLst, refsetId);
 
 			
 		} catch (IOException e) {
