@@ -472,6 +472,15 @@ public class RefsetAdminGAO {
 			Vertex rV = rGao.getRefsetVertex(refsetId, fgf.create(g));
 
 			for (Rf2Refset r : rf2rLst) {
+				
+				GRefset gr = fgf.create(g).frame(rV, GRefset.class);
+				if ( StringUtils.isEmpty(r.getRefsetId()) || !(r.getRefsetId().equals(gr.getId()) 
+						|| r.getRefsetId().equals(gr.getSctdId())) ) {
+					
+					String error = String.format("Member does not have valid refset id - %s", r.getRefsetId());
+					outcome.put(r.getReferencedComponentId(), error);
+					continue;
+				}
 			
 				String desc = rGao.getMemberDescription(r.getReferencedComponentId());
 				
@@ -529,10 +538,10 @@ public class RefsetAdminGAO {
 						
 					}
 				}
-				outcome.put(r.getReferencedComponentId(), "Success");
 
 			}
 			
+			outcome.put("All members", "Success");
 			RefsetGraphFactory.commit(g);
 			
 		} catch(EntityNotFoundException e) {

@@ -11,6 +11,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.zip.GZIPInputStream;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.ihtsdo.otf.refset.common.Meta;
 import org.ihtsdo.otf.refset.common.Result;
 import org.ihtsdo.otf.refset.controller.RefsetBrowseController;
@@ -48,10 +50,10 @@ public class RefsetImportController {
 	@Autowired
 	private Rf2VerificationService vService;
 
-	@RequestMapping( method = RequestMethod.POST, value = "/{refsetId}/import", produces = {MediaType.APPLICATION_JSON_VALUE})
+	@RequestMapping( method = RequestMethod.POST, value = "/{refsetId}/importMultipart", produces = {MediaType.APPLICATION_JSON_VALUE})
 	@ApiOperation( value = "Import a Refset in RF2 format" )
 	@PreAuthorize("hasRole('ROLE_USER')")
-    public ResponseEntity<Result< Map<String, Object>>> importRF2( @RequestParam("file") MultipartFile file, @PathVariable String refsetId) throws Exception {
+    public ResponseEntity<Result< Map<String, Object>>> importRF2Multipart( @RequestParam("file") MultipartFile file, @PathVariable String refsetId) throws Exception {
 		
 		logger.debug("Importing an existing refset {} in rf2 format");
 		
@@ -91,11 +93,50 @@ public class RefsetImportController {
 		m.setStatus(HttpStatus.OK);
 		
 		return new ResponseEntity<Result<Map<String,Object>>>(result, HttpStatus.OK);
+    }
+	/*needed as front end is not able support multipart upload*/
+	@RequestMapping( method = RequestMethod.POST, value = "/{refsetId}/import", produces = {MediaType.APPLICATION_JSON_VALUE})
+	@ApiOperation( value = "Import a Refset in RF2 format" )
+	@PreAuthorize("hasRole('ROLE_USER')")
+    public ResponseEntity<Result< Map<String, Object>>> importRF2(@PathVariable String refsetId, HttpServletRequest request) throws Exception {
+		
+		logger.debug("Importing an existing refset {} in rf2 format");
+		
+		Result<Map<String, Object>> result = new Result<Map<String, Object>>();
+		Meta m = new Meta();
+		m.add( linkTo( methodOn( RefsetBrowseController.class ).getRefsetHeader(refsetId)).withSelfRel());
+		
+		result.setMeta(m);
+
+		
+		//call verify service
+		final InputStream is = request.getInputStream();
+		if (is == null) {
+			
+			throw new IllegalArgumentException("Please check file supplied.");
+			
+		} 		
+		
+		//call import service
+		Map<String, String> outcome = iService.importFile(is, refsetId);
+	    
+	    is.close();
+	    		
+		Map<String, Object> data = new HashMap<String, Object>();
+		data.put("outcome", outcome);
+		
+		result.setData(data);
+		
+		m.setMessage(SUCCESS);
+		m.setStatus(HttpStatus.OK);
+		
+		return new ResponseEntity<Result<Map<String,Object>>>(result, HttpStatus.OK);
 
 
 	    
 		
     }
+
 	
 
 }
