@@ -32,6 +32,7 @@ public class DefaultParser extends BasicParser {
 		options.addOption(FileType.df.toString(), true, "Absolute path of rf2 description file");
 		options.addOption(FileType.rf.toString(), true, "Absolute path of rf2 relationship file");
 		options.addOption("subType", true, "subType fsn or synonym or definition");
+		options.addOption("reload", true, "flag to indicate if this load is reload.");
 
 		
 

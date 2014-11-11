@@ -11,13 +11,19 @@
 */
 package org.ihtsdo.otf.snomed.loader;
 
+import static org.ihtsdo.otf.snomed.loader.RF2ImportHelper.descMap;
+import static org.ihtsdo.otf.snomed.loader.RF2ImportHelper.vMap;
+import static org.ihtsdo.otf.snomed.loader.RF2ImportHelper.getVertex;
+import static org.ihtsdo.otf.snomed.loader.RF2ImportHelper.processCaseSinificance;
+import static org.ihtsdo.otf.snomed.loader.RF2ImportHelper.processModule;
+import static org.ihtsdo.otf.snomed.loader.RF2ImportHelper.processType;
+
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.zip.GZIPInputStream;
 
 import org.apache.commons.lang3.StringUtils;
@@ -49,10 +55,8 @@ public class Rf2SnapshotAuditor {
 	private TitanGraph g;
 	private int bufferSize = 1000;
 	
-	//map to 
-	private Map<String, Vertex> vMap = new HashMap<String, Vertex>();
-	private Map<String, DescriptionType> descMap = new HashMap<String, DescriptionType>();
 	private String subType;
+	boolean isReload = false;
 
 	
 	
@@ -77,9 +81,7 @@ public class Rf2SnapshotAuditor {
 		}
 		this.g = g;
 		
-		descMap.put("900000000000013009", DescriptionType.synonym);
-		descMap.put("900000000000550004", DescriptionType.definition);
-		descMap.put("900000000000003001", DescriptionType.fsn);
+
 
 	}
 	
@@ -133,6 +135,18 @@ public class Rf2SnapshotAuditor {
                 	String[] columns = StringUtils.splitByWholeSeparator(line, "\t");
                 	
                 	if (columns != null && columns.length == 9 && row != 0) {
+                		
+                		
+                		if (isReload) {
+                			
+                			Vertex v = getVertex(g, columns[0]);
+                			
+                			if (v != null) {
+                				
+                				LOGGER.debug("Not Processing line={}, rowNo={} as record already loaded", line, row);
+                				continue;
+                			}
+                		}
 
                 		LOGGER.debug("Processing rowNo={} , {}", row, line);
 
@@ -274,19 +288,19 @@ public class Rf2SnapshotAuditor {
 		vD.setProperty(Properties.title.toString(), desc.getTerm());
 
 		//add module
-		Vertex vM = processModule(desc.getModuleId());
+		Vertex vM = processModule(g, desc.getModuleId());
 		vD.addEdge(Relationship.hasModule.toString(), vM);
 		
 		//case significance
-		Vertex vCs = processCaseSinificance(desc.getCaseSignificanceId());
+		Vertex vCs = processCaseSinificance(g, desc.getCaseSignificanceId());
 		vD.addEdge(Relationship.hasCaseSignificance.toString(), vCs);
 
 		//type
-		Vertex vT = processType(desc.getTypeId());
+		Vertex vT = processType(g, desc.getTypeId());
 		vD.addEdge(Relationship.hasType.toString(), vT);
 
 		//concept
-		Vertex vC = getVertex(desc.getConceptId(), Types.concept.toString());
+		Vertex vC = getVertex(g, desc.getConceptId());
 		
 		LOGGER.trace("Concept vertex {}", vC);
 		
@@ -317,121 +331,19 @@ public class Rf2SnapshotAuditor {
 	
 	
 	
-	/**
-	 * @param typeId
-	 * @return
-	 */
-	private Vertex processType(String typeId) {
-
-		long start = System.currentTimeMillis();
-		Vertex v = null;
-		
-		v = vMap.get(typeId);
-		LOGGER.trace("Vertex from local cache {}", v);
-
-		if (v == null) {
-			
-			v = getVertex(typeId, Types.type.toString());
-			LOGGER.trace("Vertex from db {}", v);
-
-			vMap.put(typeId, v);
-
-		}
-		
-		if (v == null) {
-		
-			v = g.addVertexWithLabel(g.getVertexLabel(Types.type.toString()));
-			v.setProperty(Properties.sctid.toString(), typeId);
-			vMap.put(typeId, v);
-			LOGGER.trace("Adding module vertex {}", v);
-
-		}
-		LOGGER.trace("processType total time {} sec ", (System.currentTimeMillis() - start)/1000);
-
-		return v;
-		
-	}
 
 
-	private Vertex getVertex(String sctid, String label) {
-		long start = System.currentTimeMillis();
-		
-		Iterable<Vertex> vs = g.getVertices(Properties.sctid.toString(), sctid);
 
-		for (Vertex vertex : vs) {
-			
-			LOGGER.trace("getVertex - returning vertex as {} in total time {} sec ", vertex, (System.currentTimeMillis() - start)/1000);
-			return vertex;
-		}
 
-		return null;
-	}
 	
-	private Vertex processCaseSinificance(String caseSensitiveId) {
-		long start = System.currentTimeMillis();
-		Vertex v = null;
-		
-		v = vMap.get(caseSensitiveId);
-		LOGGER.trace("Vertex from local cache {}", v);
-
-		if (v == null) {
-			
-			v = getVertex(caseSensitiveId, Types.caseSensitive.toString());
-			LOGGER.trace("Vertex from db {}", v);
-
-			vMap.put(caseSensitiveId, v);
-
-		}
-		
-		if (v == null) {
-		
-			v = g.addVertexWithLabel(g.getVertexLabel(Types.caseSensitive.toString()));
-			v.setProperty(Properties.sctid.toString(), caseSensitiveId);
-			vMap.put(caseSensitiveId, v);
-			LOGGER.trace("Adding module vertex {}", v);
-
-		}
-		
-		LOGGER.trace("processCaseSinificance total time {}", (System.currentTimeMillis() - start)/6000);
-
-		return v;
-	}
 	
-	private Vertex processModule(String moduleId) {
-		
-		long start = System.currentTimeMillis();
-		Vertex v = null;
-		
-		v = vMap.get(moduleId);
-		LOGGER.trace("Vertex from local cache {}", v);
-		
-		if (v == null) {
-			
-			v = getVertex(moduleId, Types.module.toString());
-			LOGGER.trace("Vertex from db {}", v);
-			vMap.put(moduleId, v);
-
-		}
-		
-		if (v == null) {
-		
-			v = g.addVertexWithLabel(Types.module.toString());
-			v.setProperty(Properties.sctid.toString(), moduleId);
-			vMap.put(moduleId, v);
-			LOGGER.trace("Adding module vertex {}", v);
-			
-		}
-		LOGGER.trace("processModule total time {}", (System.currentTimeMillis() - start)/6000);
-
-		return v;
-	}
 	
 	private void auditDescription(Rf2Description desc) {
 		
 
 		long start = System.currentTimeMillis();
 		LOGGER.debug("auditDescription description {}", desc.getId());
-		Vertex existingVD = getVertex(desc.getId(), Types.description.toString());
+		Vertex existingVD = getVertex(g, desc.getId());
 		
 		if (existingVD == null) {
 			
@@ -466,7 +378,7 @@ public class Rf2SnapshotAuditor {
 						+ "Auditing concept for title ", desc.getId());
 
 				//verify if concept vertex has title
-				Vertex vC = getVertex(desc.getConceptId(), Types.concept.toString());
+				Vertex vC = getVertex(g, desc.getConceptId());
 				if (vC != null) {
 					
 					String title = vC.getProperty(Properties.title.toString());
@@ -503,7 +415,7 @@ public class Rf2SnapshotAuditor {
 		if (descMap.get(desc.getTypeId()).equals(DescriptionType.fsn)) {
 			
 			//verify if concept vertex has title
-			Vertex vC = getVertex(desc.getConceptId(), Types.concept.toString());
+			Vertex vC = getVertex(g, desc.getConceptId());
 			if (vC != null) {
 				
 				String title = vC.getProperty(Properties.title.toString());
@@ -545,7 +457,7 @@ public class Rf2SnapshotAuditor {
 		if (!descMap.get(desc.getTypeId()).equals(DescriptionType.fsn)) {
 			
 			//verify if concept vertex has title
-			Vertex vC = getVertex(desc.getConceptId(), Types.concept.toString());
+			Vertex vC = getVertex(g, desc.getConceptId());
 			if (vC != null) {
 				Iterable<Edge> es = vC.getEdges(Direction.OUT, descMap.get(desc.getTypeId()).toString());
 				
@@ -582,6 +494,17 @@ public class Rf2SnapshotAuditor {
 	public void setBufferSize(int bufferSize) {
 		this.bufferSize = bufferSize;
 	}
+
+
+	/**
+	 * @param isReload the isReload to set
+	 */
+	public void setReload(boolean isReload) {
+		
+		this.isReload = isReload;
+		
+	}
+
 
 
 }

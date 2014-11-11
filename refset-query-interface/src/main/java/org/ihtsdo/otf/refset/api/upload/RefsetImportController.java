@@ -29,7 +29,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -56,12 +55,6 @@ public class RefsetImportController {
     public ResponseEntity<Result< Map<String, Object>>> importRF2Multipart( @RequestParam("file") MultipartFile file, @PathVariable String refsetId) throws Exception {
 		
 		logger.debug("Importing an existing refset {} in rf2 format");
-		
-		Result<Map<String, Object>> result = new Result<Map<String, Object>>();
-		Meta m = new Meta();
-		m.add( linkTo( methodOn( RefsetBrowseController.class ).getRefsetHeader(refsetId)).withSelfRel());
-		
-		result.setMeta(m);
 
 		//call verify service
 		final InputStream is;
@@ -83,16 +76,8 @@ public class RefsetImportController {
 		Map<String, String> outcome = iService.importFile(is, refsetId);
 	    
 	    is.close();
-	    		
-		Map<String, Object> data = new HashMap<String, Object>();
-		data.put("outcome", outcome);
 		
-		result.setData(data);
-		
-		m.setMessage(SUCCESS);
-		m.setStatus(HttpStatus.OK);
-		
-		return new ResponseEntity<Result<Map<String,Object>>>(result, HttpStatus.OK);
+		return getResponse(outcome, refsetId);
     }
 	/*needed as front end is not able support multipart upload*/
 	@RequestMapping( method = RequestMethod.POST, value = "/{refsetId}/import", produces = {MediaType.APPLICATION_JSON_VALUE})
@@ -101,13 +86,6 @@ public class RefsetImportController {
     public ResponseEntity<Result< Map<String, Object>>> importRF2(@PathVariable String refsetId, HttpServletRequest request) throws Exception {
 		
 		logger.debug("Importing an existing refset {} in rf2 format");
-		
-		Result<Map<String, Object>> result = new Result<Map<String, Object>>();
-		Meta m = new Meta();
-		m.add( linkTo( methodOn( RefsetBrowseController.class ).getRefsetHeader(refsetId)).withSelfRel());
-		
-		result.setMeta(m);
-
 		
 		//call verify service
 		final InputStream is = request.getInputStream();
@@ -119,9 +97,20 @@ public class RefsetImportController {
 		
 		//call import service
 		Map<String, String> outcome = iService.importFile(is, refsetId);
-	    
 	    is.close();
 	    		
+		
+		
+		return getResponse(outcome, refsetId);
+		
+    }
+	
+	private ResponseEntity<Result<Map<String,Object>>> getResponse(Map<String, String> outcome, String refsetId) throws Exception {
+		
+		Result<Map<String, Object>> result = new Result<Map<String, Object>>();
+		Meta m = new Meta();
+		m.add( linkTo( methodOn( RefsetBrowseController.class ).getRefsetHeader(refsetId)).withSelfRel());
+		result.setMeta(m);
 		Map<String, Object> data = new HashMap<String, Object>();
 		data.put("outcome", outcome);
 		
@@ -132,10 +121,7 @@ public class RefsetImportController {
 		
 		return new ResponseEntity<Result<Map<String,Object>>>(result, HttpStatus.OK);
 
-
-	    
-		
-    }
+	}
 
 	
 
