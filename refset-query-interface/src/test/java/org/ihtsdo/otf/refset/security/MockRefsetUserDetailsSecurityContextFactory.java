@@ -7,16 +7,16 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.test.context.support.WithSecurityContextFactory;
-import org.springframework.security.test.context.support.WithUserDetails;
+//import org.springframework.security.test.context.support.WithSecurityContextFactory;
+//import org.springframework.security.test.context.support.WithUserDetails;
 
-public class MockRefsetUserDetailsSecurityContextFactory implements WithSecurityContextFactory<WithUserDetails>{
+public class MockRefsetUserDetailsSecurityContextFactory /*implements WithSecurityContextFactory<WithUserDetails>*/{
 
     private UserDetailsService service;
 
 	
 	
-	@Override
+	/*@Override
 	public SecurityContext createSecurityContext(WithUserDetails uDetails) {
 		// TODO Auto-generated method stub
 		String username = uDetails.value();
@@ -26,7 +26,7 @@ public class MockRefsetUserDetailsSecurityContextFactory implements WithSecurity
         SecurityContext ctx = SecurityContextHolder.createEmptyContext();
         ctx.setAuthentication(authentication);
         return ctx;
-	}
+	}*/
 	
 
     @Autowired

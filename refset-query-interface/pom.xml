@@ -40,7 +40,7 @@
 		<net.sf.supercsv-version>2.2.0</net.sf.supercsv-version>
 		<!-- using milestone-release as few security testing artifacts needed
 		http://spring.io/blog/2014/05/05/spring-security-4-0-0-m1-released -->
-		<org.springframework.security-version>4.0.0.M2</org.springframework.security-version>
+		<org.springframework.security-version>3.2.5.RELEASE</org.springframework.security-version>
 		<org.webjars.swagger-ui-version>2.0.22</org.webjars.swagger-ui-version>
 		<com.mangofactory.swagger-springmvc-version>0.8.8</com.mangofactory.swagger-springmvc-version>
 		<!-- graph db -->
@@ -170,11 +170,11 @@
     		<artifactId>spring-security-config</artifactId>
 			<version>${org.springframework.security-version}</version>
   		</dependency>
-		<dependency>
+		<!--  dependency>uncomment when next 4.x GA release available 
     		<groupId>org.springframework.security</groupId>
     		<artifactId>spring-security-test</artifactId>
 			<version>${org.springframework.security-version}</version>
-  		</dependency>
+  		</dependency-->
 		<!-- AspectJ -->
 		<dependency>
 			<groupId>org.aspectj</groupId>
