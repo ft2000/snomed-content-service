@@ -48,8 +48,6 @@
   </dependencies>
   <properties>
     <net.sf.supercsv-version>2.2.0</net.sf.supercsv-version>
-
-    <org.ihtsdo.otf-version>${project.version}</org.ihtsdo.otf-version>
     <com.fasterxml.jackson-version>2.4.0</com.fasterxml.jackson-version>
     <com.thinkaurelius.titan-version>0.5.0</com.thinkaurelius.titan-version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

@@ -59,7 +59,7 @@ public class RefsetAuthoringController {
 	
 	private static final Logger logger = LoggerFactory.getLogger(RefsetAuthoringController.class);
 
-	private static final String SUCESS = "Success";
+	private static final String SUCCESS = "Success";
 	
 	@Resource(name = "browseGraphService")
 	private RefsetBrowseService bService;
@@ -103,7 +103,7 @@ public class RefsetAuthoringController {
 
 		result.setData(data);
 
-		m.setMessage(SUCESS);
+		m.setMessage(SUCCESS);
 		m.setStatus(HttpStatus.CREATED);
 
 		return new ResponseEntity<Result<Map<String,Object>>>(result, HttpStatus.CREATED);
@@ -168,7 +168,7 @@ public class RefsetAuthoringController {
 
 		result.setData(data);
 		
-		m.setMessage(SUCESS);
+		m.setMessage(SUCCESS);
 		m.setStatus(HttpStatus.OK);
 		
 		return new ResponseEntity<Result<Map<String,Object>>>(result, HttpStatus.OK);
@@ -209,7 +209,7 @@ public class RefsetAuthoringController {
 
 		response.setData(data);
 
-		m.setMessage(SUCESS);
+		m.setMessage(SUCCESS);
 		m.setStatus(HttpStatus.OK);
 
 		return new ResponseEntity<Result<Map<String,Object>>>(response, HttpStatus.OK);
@@ -238,7 +238,7 @@ public class RefsetAuthoringController {
 
 		m.add( linkTo( methodOn( RefsetBrowseController.class ).getRefsets(1, 10)).withRel("Refset"));
 
-		m.setMessage(SUCESS);
+		m.setMessage(SUCCESS);
 		m.setStatus(HttpStatus.OK);
 
 		return new ResponseEntity<Result<Map<String,Object>>>(response, HttpStatus.OK);
@@ -277,7 +277,7 @@ public class RefsetAuthoringController {
 
 		result.setData(data);
 		
-		m.setMessage(SUCESS);
+		m.setMessage(SUCCESS);
 		m.setStatus(HttpStatus.OK);
 		
 		return new ResponseEntity<Result<Map<String,Object>>>(result, HttpStatus.OK);
@@ -335,7 +335,7 @@ public class RefsetAuthoringController {
 
 		m.add( linkTo( methodOn( RefsetBrowseController.class ).getRefsets(1, 10)).withRel("Refset"));
 
-		m.setMessage(SUCESS);
+		m.setMessage(SUCCESS);
 		m.setStatus(HttpStatus.OK);
 
 		return new ResponseEntity<Result<Map<String,Object>>>(response, HttpStatus.OK);
@@ -366,7 +366,7 @@ public class RefsetAuthoringController {
 
 		result.setData(data);
 		
-		m.setMessage(SUCESS);
+		m.setMessage(SUCCESS);
 		m.setStatus(HttpStatus.OK);
 
 		return new ResponseEntity<Result<Map<String,Object>>>(result, HttpStatus.OK);

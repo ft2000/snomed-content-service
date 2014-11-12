@@ -72,7 +72,7 @@ public class RefsetAdminGAOTest {
 		
 		gao = new RefsetGAO();
 		f = new RefsetGraphFactory(config);
-		gao.setFactory(f);
+		gao.setRGFactory(f);
 		
 		MemberGAO mGao = new MemberGAO();
 		mGao.setFactory(f);
@@ -83,13 +83,6 @@ public class RefsetAdminGAOTest {
 		aGao.setFactory(f);
 		aGao.setMemberGao(mGao);
 		aGao.setRefsetGao(gao);
-		
-		
-		
-
-		
-		
-		
 		
 		rs = data.getRefSets();
 		assertNotNull(rs);

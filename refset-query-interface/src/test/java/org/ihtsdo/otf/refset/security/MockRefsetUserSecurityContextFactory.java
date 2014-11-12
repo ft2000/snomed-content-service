@@ -5,15 +5,15 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.test.context.support.WithSecurityContextFactory;
+//import org.springframework.security.test.context.support.WithSecurityContextFactory;
 
 /**
  * @author http://spring.io/blog/2014/05/07/preview-spring-security-test-method-security
  *
  */
-public class MockRefsetUserSecurityContextFactory implements WithSecurityContextFactory<MockRefsetUser>{
+public class MockRefsetUserSecurityContextFactory /*implements WithSecurityContextFactory<MockRefsetUser>*/{
 
-	@Override
+	/*@Override
 	public SecurityContext createSecurityContext(MockRefsetUser annotation) {
 		// TODO Auto-generated method stub
 		
@@ -27,6 +27,6 @@ public class MockRefsetUserSecurityContextFactory implements WithSecurityContext
         ctx.setAuthentication(auth);
         return ctx;
         
-	}
+	}*/
 
 }

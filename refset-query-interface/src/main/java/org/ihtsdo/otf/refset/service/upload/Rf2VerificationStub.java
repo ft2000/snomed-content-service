@@ -9,15 +9,23 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.ihtsdo.otf.refset.schema;
+package org.ihtsdo.otf.refset.service.upload;
+
+import org.springframework.stereotype.Service;
 
 /**
  *
  */
-public enum CompositeIndex {
+@Service
+public class Rf2VerificationStub implements Rf2VerificationService {
 
-	bySctId, bySctIdStatus, byDescription, byIdAndCreatedBy, byId, byIdAndCreated, byIdAndModified, 
-	byRefComponentId, byPublished, byType, byIdAndEndAndStartDate, byIdAndStartDate, byIdAndEndDate,
-	byEndDateAndPublished, byEndDateAndType
-	
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.otf.refset.service.upload.Rf2VerificationService#verify()
+	 */
+	@Override
+	public boolean verify() {
+		// TODO Auto-generated method stub
+		return true;
+	}
+
 }

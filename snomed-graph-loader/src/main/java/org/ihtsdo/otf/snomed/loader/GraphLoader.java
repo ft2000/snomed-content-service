@@ -79,6 +79,12 @@ public class GraphLoader {
 					loader.setBufferSize(Integer.parseInt(cli.getOptionValue("bSize")));
 
 				}
+				if (!StringUtils.isBlank(cli.getOptionValue("reload"))) {
+					
+					loader.setReload(Boolean.parseBoolean(cli.getOptionValue("reload")));
+
+				}
+
 				FileType[] fTypes = FileType.values();
 				
 				for (int i = 0; i < fTypes.length; i++) {
@@ -108,6 +114,13 @@ public class GraphLoader {
 					auditor.setBufferSize(Integer.parseInt(cli.getOptionValue("bSize")));
 
 				}
+				
+				if (!StringUtils.isBlank(cli.getOptionValue("reload"))) {
+					
+					auditor.setReload(Boolean.parseBoolean(cli.getOptionValue("reload")));
+
+				}
+
 				FileType[] afTypes = FileType.values();
 				
 				for (int i = 0; i < afTypes.length; i++) {

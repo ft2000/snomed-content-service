@@ -3,8 +3,6 @@ package org.ihtsdo.otf.refset.error;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.validation.FieldError;
-
 /**
  * Class to create a unified error info object
  * @author Episteme Partners

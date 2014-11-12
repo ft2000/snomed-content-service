@@ -3,11 +3,9 @@ package org.ihtsdo.otf.refset.security;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -19,6 +17,8 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
+
+import com.fasterxml.jackson.databind.JsonNode;
 
 /**Custom refset authentication provider 
  * @author Episteme Partners
@@ -84,27 +84,32 @@ public class RefsetAuthenticationProvider implements AuthenticationProvider {
 
 		LOGGER.debug("Authenticating user {} ", userName);
 
+		
 		User user = getUser();
         
         MultiValueMap<String, String> params = new LinkedMultiValueMap<String, String>();
         params.add("username", userName);
         params.add("password", token);
         params.add("queryName", "getUserByNameAuth");
-    
+        
         		
 		try {
 			
+			if (StringUtils.isEmpty(userName) || StringUtils.isEmpty(token)) {
+				
+				throw new AccessDeniedException("User is unauthorized. Please check user name and password");
+			}
 			Assert.notNull(rt, "Rest template can not be empty");
 			
 			LOGGER.debug("Calling authentication service with URL {}, User {} and Parameters {} ", otfServiceUrl, userName);
 
-			JSONObject obj = rt.postForObject(otfServiceUrl, params, JSONObject.class);
+			JsonNode obj = rt.postForObject(otfServiceUrl, params, JsonNode.class);
 
 			LOGGER.debug("authentication service call successfully returned with {} ", obj);
 
-			JSONObject userJson = obj.getJSONObject("user");
-			String id = userJson.getString("name");
-			String status = userJson.getString("status");
+			JsonNode userJson = obj.get("user");
+			String id = userJson.findValue("name").asText();
+			String status = userJson.findValue("status").asText();
 
 			boolean authenticated = !StringUtils.isEmpty(status) && status.equalsIgnoreCase("enabled") ? true : false;
 			
@@ -117,15 +122,15 @@ public class RefsetAuthenticationProvider implements AuthenticationProvider {
 
 			LOGGER.debug("Calling authentication service with URL {}, User {} and Parameters {} ", otfServiceUrl, userName);
 
-	        JSONObject appJson = rt.postForObject(otfServiceUrl, params, JSONObject.class);
+			JsonNode appJson = rt.postForObject(otfServiceUrl, params, JsonNode.class);
 
 			LOGGER.debug("authentication service call successfully returned with {} ", appJson);
 
-			JSONArray apps = appJson.getJSONArray("apps");
+			JsonNode apps = appJson.get("apps");
 
-	        for (Object object : apps) {
+	        for (JsonNode object : apps) {
 	        	
-				if (object.equals(APP_NAME)) {
+				if (object != null && object.asText().equals(APP_NAME)) {
 					//TODO need revisiting as we will need to cater specific roles
 					user.setAuthenticated(authenticated);
 					Collection<RefsetRole> roles = new ArrayList<RefsetRole>();			        
@@ -141,12 +146,9 @@ public class RefsetAuthenticationProvider implements AuthenticationProvider {
 
 		} catch (Exception e) {
 			
-			LOGGER.error("Error during authentication {}", e);
-			user = new User();
-			user.setAuthenticated(false);
-        	LOGGER.info("Check TODO on this code");
+			LOGGER.error("Error during authentication for user:password - {} ", userName + ":" + token, e);
 
-			//throw new AccessDeniedException(e.getLocalizedMessage()); //TODO this need a custom exception handling after spring securirty exception filter
+			//throw new AccessDeniedException("User is unauthorized. Please check user name and password");
 		}
 	
 		

@@ -12,13 +12,10 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.springframework.http.converter.StringHttpMessageConverter;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 import org.springframework.security.web.util.matcher.RequestMatcher;
-import org.springframework.web.client.RestTemplate;
 
 /**
  * @author Episteme Partners
@@ -34,9 +31,7 @@ public class RefsetAuthenticationFilter extends
 		
 		// TODO Auto-generated constructor stub
 	}
-	
-	private String serviceUrl;
-	
+		
 
 	@Override
 	public Authentication attemptAuthentication(HttpServletRequest req,

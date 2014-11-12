@@ -79,11 +79,9 @@
 	<context:component-scan base-package="org.ihtsdo.otf.snomed" />
 	<beans:bean class="com.mangofactory.swagger.configuration.SpringSwaggerConfig"/>	
 	
-	<beans:import resource="service-camel-route.xml"/>
-	<beans:import resource="sparql-queries.xml"/>
-	<beans:import resource="common-app-config.xml"/>
-	<beans:import resource="spring-refset-browse-service-stub-data.xml"/>
-	<beans:import resource="refset-snomed-service-config.xml"/>
+	<beans:import resource="common-app-config.xml" />
+	<beans:import resource="spring-refset-browse-service-stub-data.xml" />
+	<beans:import resource="refset-snomed-service-config.xml" />
 	<!-- beans:import resource="refset-cache-config.xml"/ -->
 	
 </beans:beans>

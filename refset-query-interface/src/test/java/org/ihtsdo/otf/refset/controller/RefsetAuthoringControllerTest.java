@@ -6,10 +6,11 @@ package org.ihtsdo.otf.refset.controller;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.testSecurityContext;
+//import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.testSecurityContext;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetup;
 
 import org.ihtsdo.otf.refset.domain.Refset;
 import org.ihtsdo.otf.refset.exception.EntityNotFoundException;
@@ -28,7 +29,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithSecurityContextTestExecutionListener;
+//import org.springframework.security.test.context.support.WithSecurityContextTestExecutionListener;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -38,7 +39,6 @@ import org.springframework.test.context.transaction.TransactionalTestExecutionLi
 import org.springframework.test.context.web.ServletTestExecutionListener;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 /**
@@ -51,10 +51,10 @@ import org.springframework.web.context.WebApplicationContext;
 @TestExecutionListeners(listeners={ServletTestExecutionListener.class,
         DependencyInjectionTestExecutionListener.class,
         DirtiesContextTestExecutionListener.class,
-        TransactionalTestExecutionListener.class,
-        WithSecurityContextTestExecutionListener.class})
+        TransactionalTestExecutionListener.class/*,
+        WithSecurityContextTestExecutionListener.class*/})
 @WebAppConfiguration
-@MockRefsetUser(username = "junit")
+/*@MockRefsetUser(username = "junit")*/
 public class RefsetAuthoringControllerTest {
 	 private final static String REFSET =
 		     "{" 
@@ -97,10 +97,10 @@ public class RefsetAuthoringControllerTest {
 	public void setUp() throws Exception {
 		
 		MockitoAnnotations.initMocks(this);
-
-	    this.mockMvc = MockMvcBuilders.webAppContextSetup(ctx)
+		//TODO uncomment when required spring securirty version available
+	    this.mockMvc = standaloneSetup(controller).build(); /*MockMvcBuilders.webAppContextSetup(ctx)
 	    					.defaultRequest(post("/").with(testSecurityContext()))
-	    					.build();
+	    					.build();*/
 	    
 		when(refset.getId()).thenReturn("Junit_1");
 		when(refset.getDescription()).thenReturn("Junit Refset"); 

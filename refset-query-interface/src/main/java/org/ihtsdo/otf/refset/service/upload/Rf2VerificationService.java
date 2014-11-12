@@ -9,15 +9,13 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.ihtsdo.otf.refset.schema;
+package org.ihtsdo.otf.refset.service.upload;
 
 /**
  *
  */
-public enum CompositeIndex {
-
-	bySctId, bySctIdStatus, byDescription, byIdAndCreatedBy, byId, byIdAndCreated, byIdAndModified, 
-	byRefComponentId, byPublished, byType, byIdAndEndAndStartDate, byIdAndStartDate, byIdAndEndDate,
-	byEndDateAndPublished, byEndDateAndType
+public interface Rf2VerificationService {
 	
+	public boolean verify();
+
 }
