@@ -73,6 +73,7 @@ public class MemberGAO {
 		try {
 
 			//TODO upgrade this search with status and effective date
+			@SuppressWarnings("unchecked")
 			Iterable<Vertex> vr = tg.query().has(ID, id).has(TYPE, VertexType.member.toString()).limit(1).vertices();
 			
 			for (Vertex v : vr) {

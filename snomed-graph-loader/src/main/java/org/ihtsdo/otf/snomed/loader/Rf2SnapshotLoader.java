@@ -11,12 +11,22 @@
 */
 package org.ihtsdo.otf.snomed.loader;
 
+import static org.ihtsdo.otf.snomed.loader.RF2ImportHelper.characteristicsMap;
+import static org.ihtsdo.otf.snomed.loader.RF2ImportHelper.descMap;
+import static org.ihtsdo.otf.snomed.loader.RF2ImportHelper.relTypeMap;
+import static org.ihtsdo.otf.snomed.loader.RF2ImportHelper.vMap;
+import static org.ihtsdo.otf.snomed.loader.RF2ImportHelper.getVertex;
+import static org.ihtsdo.otf.snomed.loader.RF2ImportHelper.processCaseSinificance;
+import static org.ihtsdo.otf.snomed.loader.RF2ImportHelper.processDefinitionStatus;
+import static org.ihtsdo.otf.snomed.loader.RF2ImportHelper.processModifier;
+import static org.ihtsdo.otf.snomed.loader.RF2ImportHelper.processModule;
+import static org.ihtsdo.otf.snomed.loader.RF2ImportHelper.processType;
+
 import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.zip.GZIPInputStream;
 
 import org.apache.commons.lang3.StringUtils;
@@ -47,15 +57,11 @@ public class Rf2SnapshotLoader {
 	private static final String SNAPSHOT_USER = "system";
 	
 	private TitanGraph g;
-	private int bufferSize = 100000;
+	private int bufferSize = 1000;
 	
-	//map to 
-	private Map<String, Vertex> vMap = new HashMap<String, Vertex>();
-	private Map<String, DescriptionType> descMap = new HashMap<String, DescriptionType>();
-	private Map<String, Properties> characteristicsMap = new HashMap<String, Properties>();
-	private Map<String, Relationship> relTypeMap = new HashMap<String, Relationship>();
+	
 
-	
+	boolean isReload = false;
 	
 
 	/**all files together
@@ -70,20 +76,7 @@ public class Rf2SnapshotLoader {
 		}
 		this.g = g;
 		
-		descMap.put("900000000000013009", DescriptionType.synonym);
-		descMap.put("900000000000550004", DescriptionType.definition);
-		descMap.put("900000000000003001", DescriptionType.fsn);
-
-		characteristicsMap.put("900000000000011006", Properties.inferred);
-		characteristicsMap.put("900000000000010007", Properties.stated);
-		characteristicsMap.put("900000000000227009", Properties.additional);
-		characteristicsMap.put("900000000000225001", Properties.qualifying);
-
-		relTypeMap.put("116680003", Relationship.isA);
-		relTypeMap.put("261583007", Relationship.using);
-		relTypeMap.put("260686004", Relationship.method);
-		relTypeMap.put("405813007", Relationship.ps);
-		relTypeMap.put("363698007", Relationship.fs);
+		
 	}
 	
 	
@@ -170,9 +163,20 @@ public class Rf2SnapshotLoader {
                 beginTx();
                 while( (bean = (Rf2Base)beanReader.read(rf2Base, header, processors)) != null ) {
                   
-                	LOGGER.debug("Processing lineNo={}, rowNo={} ", beanReader.getLineNumber(),
-                                beanReader.getRowNumber());
-					
+            		if (isReload) {
+            			
+            			Vertex v = getVertex(g, bean.getId());
+            			
+            			if (v != null) {
+            				
+            				LOGGER.debug("Not Processing lineNo={}, rowNo={} as record already loaded", beanReader.getLineNumber(),
+                                    beanReader.getRowNumber());
+            				continue;
+            			}
+            		}
+            		
+            		LOGGER.debug("Processing lineNo={}, rowNo={} ", beanReader.getLineNumber(),
+                            beanReader.getRowNumber());
             		switch (noOfColumns) {
 					case 9:
 						//process description
@@ -294,11 +298,11 @@ public class Rf2SnapshotLoader {
 
 		//add module
 		
-		Vertex vM = processModule(bean.getModuleId());
+		Vertex vM = processModule(g, bean.getModuleId());
 		vC.addEdge(Relationship.hasModule.toString(), vM);
 
 		//definition status
-		Vertex vDs = processDefinitionStatus(bean.getDefinitionStatusId());
+		Vertex vDs = processDefinitionStatus(g, bean.getDefinitionStatusId());
 		vC.addEdge(Relationship.ds.toString(), vDs);
 
 		LOGGER.trace("processConcept total time {} sec ", (System.currentTimeMillis() - start)/1000);
@@ -310,6 +314,7 @@ public class Rf2SnapshotLoader {
 		long start = System.currentTimeMillis();
 		LOGGER.debug("Processing description {}", desc.getId());
 		
+		
 		Vertex vD = g.addVertexWithLabel(Types.description.toString());
 		vD.setProperty(Properties.sctid.toString(), desc.getId());
 		vD.setProperty(Properties.effectiveTime.toString(), desc.getEffectiveTime().getMillis());
@@ -320,19 +325,19 @@ public class Rf2SnapshotLoader {
 		vD.setProperty(Properties.title.toString(), desc.getTerm());
 
 		//add module
-		Vertex vM = processModule(desc.getModuleId());
+		Vertex vM = processModule(g, desc.getModuleId());
 		vD.addEdge(Relationship.hasModule.toString(), vM);
 		
 		//case significance
-		Vertex vCs = processCaseSinificance(desc.getCaseSignificanceId());
+		Vertex vCs = processCaseSinificance(g, desc.getCaseSignificanceId());
 		vD.addEdge(Relationship.hasCaseSignificance.toString(), vCs);
 
 		//type
-		Vertex vT = processType(desc.getTypeId());
+		Vertex vT = processType(g, desc.getTypeId());
 		vD.addEdge(Relationship.hasType.toString(), vT);
 
 		//concept
-		Vertex vC = getVertex(desc.getConceptId(), Types.concept.toString());
+		Vertex vC = getVertex(g, desc.getConceptId());
 		
 		LOGGER.trace("Concept vertex {}", vC);
 		
@@ -371,20 +376,20 @@ public class Rf2SnapshotLoader {
 		vR.setProperty(Properties.sctid.toString(), rel.getId());
 		vR.setProperty(Properties.characteristicId.toString(), rel.getCharacteristicTypeId());
 		//add module
-		Vertex vM = processModule(rel.getModuleId());
+		Vertex vM = processModule(g, rel.getModuleId());
 		g.addEdge(rel.getModuleId(), vR, vM, Relationship.hasModule.toString());
 
 		//type
-		Vertex vT = processType(rel.getTypeId());
+		Vertex vT = processType(g, rel.getTypeId());
 		g.addEdge(rel.getTypeId(), vR, vT, Relationship.hasType.toString());
 		
 		//modifier
-		Vertex vMo = processModifier(rel.getModifierId());
+		Vertex vMo = processModifier(g, rel.getModifierId());
 		g.addEdge(rel.getModifierId(), vR, vMo, Relationship.hasModifier.toString());
 
 		//concept
-		Vertex vSource = getVertex(rel.getSourceId(), Types.concept.toString());
-		Vertex vDest = getVertex(rel.getDestinationId(), Types.concept.toString());
+		Vertex vSource = getVertex(g, rel.getSourceId());
+		Vertex vDest = getVertex(g, rel.getDestinationId());
 		LOGGER.trace("Source concept {} - vertex {}", rel.getSourceId(), vSource);
 		LOGGER.trace("Destination concept {} - vertex {}", rel.getDestinationId(), vDest);
 		
@@ -420,188 +425,19 @@ public class Rf2SnapshotLoader {
 	}
 
 	
-	
-	
-	/**
-	 * @param modifierId
-	 * @return
-	 */
-	private Vertex processModifier(String modifierId) {
-
-		long start = System.currentTimeMillis();
-		Vertex v = null;
-		
-		v = vMap.get(modifierId);
-		LOGGER.trace("Vertex from local cache {}", v);
-
-		if (v == null) {
-			
-			v = getVertex(modifierId, Types.modifier.toString());
-			LOGGER.trace("Vertex from db {}", v);
-
-			vMap.put(modifierId, v);
-
-		}
-		
-		if (v == null) {
-		
-			v = g.addVertexWithLabel(g.getVertexLabel(Types.modifier.toString()));
-			v.setProperty(Properties.sctid.toString(), modifierId);
-			vMap.put(modifierId, v);
-			LOGGER.trace("Adding module vertex {}", v);
-
-		}
-		
-		LOGGER.trace("processModifier total time {} sec ", (System.currentTimeMillis() - start)/1000);
-
-		return v;
-	}
-
-
-	/**
-	 * @param typeId
-	 * @return
-	 */
-	private Vertex processType(String typeId) {
-
-		long start = System.currentTimeMillis();
-		Vertex v = null;
-		
-		v = vMap.get(typeId);
-		LOGGER.trace("Vertex from local cache {}", v);
-
-		if (v == null) {
-			
-			v = getVertex(typeId, Types.type.toString());
-			LOGGER.trace("Vertex from db {}", v);
-
-			vMap.put(typeId, v);
-
-		}
-		
-		if (v == null) {
-		
-			v = g.addVertexWithLabel(g.getVertexLabel(Types.type.toString()));
-			v.setProperty(Properties.sctid.toString(), typeId);
-			vMap.put(typeId, v);
-			LOGGER.trace("Adding module vertex {}", v);
-
-		}
-		LOGGER.trace("processType total time {} sec ", (System.currentTimeMillis() - start)/1000);
-
-		return v;
-		
-	}
-
-
-	private Vertex getVertex(String sctid, String label) {
-		long start = System.currentTimeMillis();
-		
-		Iterable<Vertex> vs = g.getVertices(Properties.sctid.toString(), sctid);
-
-		for (Vertex vertex : vs) {
-			
-			LOGGER.trace("getVertex - returning vertex as {} in total time {} sec ", vertex, (System.currentTimeMillis() - start)/1000);
-			return vertex;
-		}
-
-		return null;
-	}
-	
-	private Vertex processCaseSinificance(String caseSensitiveId) {
-		long start = System.currentTimeMillis();
-		Vertex v = null;
-		
-		v = vMap.get(caseSensitiveId);
-		LOGGER.trace("Vertex from local cache {}", v);
-
-		if (v == null) {
-			
-			v = getVertex(caseSensitiveId, Types.caseSensitive.toString());
-			LOGGER.trace("Vertex from db {}", v);
-
-			vMap.put(caseSensitiveId, v);
-
-		}
-		
-		if (v == null) {
-		
-			v = g.addVertexWithLabel(g.getVertexLabel(Types.caseSensitive.toString()));
-			v.setProperty(Properties.sctid.toString(), caseSensitiveId);
-			vMap.put(caseSensitiveId, v);
-			LOGGER.trace("Adding module vertex {}", v);
-
-		}
-		
-		LOGGER.trace("processCaseSinificance total time {}", (System.currentTimeMillis() - start)/6000);
-
-		return v;
-	}
-	
-	private Vertex processModule(String moduleId) {
-		
-		long start = System.currentTimeMillis();
-		Vertex v = null;
-		
-		v = vMap.get(moduleId);
-		LOGGER.trace("Vertex from local cache {}", v);
-		
-		if (v == null) {
-			
-			v = getVertex(moduleId, Types.module.toString());
-			LOGGER.trace("Vertex from db {}", v);
-			vMap.put(moduleId, v);
-
-		}
-		
-		if (v == null) {
-		
-			v = g.addVertexWithLabel(Types.module.toString());
-			v.setProperty(Properties.sctid.toString(), moduleId);
-			vMap.put(moduleId, v);
-			LOGGER.trace("Adding module vertex {}", v);
-			
-		}
-		LOGGER.trace("processModule total time {}", (System.currentTimeMillis() - start)/6000);
-
-		return v;
-	}
-	
-	private Vertex processDefinitionStatus(String dsId) {
-		
-		long start = System.currentTimeMillis();
-		Vertex v = null;
-		
-		v = vMap.get(dsId);
-		LOGGER.trace("Vertex from local cache {}", v);
-
-		if (v == null) {
-			
-			v = getVertex(dsId, Types.definition.toString());
-			LOGGER.trace("Vertex from db {}", v);
-			vMap.put(dsId, v);
-
-		}
-		if (v == null) {
-		
-			v = g.addVertexWithLabel(Types.definition.toString());
-			v.setProperty(Properties.sctid.toString(), dsId);
-			LOGGER.trace("Adding module vertex {}", v);
-			vMap.put(dsId, v);
-
-		}
-		LOGGER.trace("processDefinitionStatus total time {}", (System.currentTimeMillis() - start)/6000);
-
-		return v;
-	}
-
-
-
 	/**
 	 * @param bufferSize the bufferSize to set
 	 */
 	public void setBufferSize(int bufferSize) {
 		this.bufferSize = bufferSize;
+	}
+
+
+	/**
+	 * @param isReload the isReload to set
+	 */
+	public void setReload(boolean isReload) {
+		this.isReload = isReload;
 	}
 
 

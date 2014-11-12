@@ -21,7 +21,6 @@
 	<junit-version>4.11</junit-version>
 	<commons-cli-version>1.2</commons-cli-version>
 	<com.thinkaurelius.titan-version>0.5.0</com.thinkaurelius.titan-version>
-	<org.ihtsdo.otf-version>0.0.1</org.ihtsdo.otf-version>
   </properties>
 
   <dependencies>
@@ -72,12 +71,12 @@
 	<dependency>
 	  <groupId>org.ihtsdo.otf</groupId>
 	  <artifactId>snomed-model</artifactId>
-	  <version>${org.ihtsdo.otf-version}</version>
+	  <version>${project.version}</version>
 	</dependency>
 	<dependency>
 	  <groupId>org.ihtsdo.otf</groupId>
 	  <artifactId>refset-model</artifactId>
-	  <version>${org.ihtsdo.otf-version}</version>
+	  <version>${project.version}</version>
 	</dependency>
 	
   </dependencies>

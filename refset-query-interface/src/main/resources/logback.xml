@@ -9,11 +9,10 @@
 	      <Pattern>%d{ISO8601} [%thread] %-5level %logger{36} - %msg%n</Pattern>
 	    </layout>
 	    <filter class="ch.qos.logback.classic.filter.LevelFilter">
-	      <level>INFO</level>
+	      <level>ERROR</level>
 	      <onMatch>ACCEPT</onMatch>
 	      <onMismatch>DENY</onMismatch>
 	    </filter>
-    
       </appender>
 	  
 	  
@@ -64,15 +63,11 @@
 
 	<logger name="com.mangofactory" level="error" >
 			<appender-ref ref="file" />
-	</logger>
-	
-	<logger name="org.apache.camel" level="error" />
-		
+	</logger>		
 
 	<!-- Root Logger -->
-	<root level="debug">
+	<root level="info">
 		<appender-ref ref="file" />
-		<appender-ref ref="console" />
 	</root>
 	
 </configuration>

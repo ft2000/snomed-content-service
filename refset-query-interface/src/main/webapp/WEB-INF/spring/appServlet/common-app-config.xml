@@ -4,47 +4,6 @@
 	xmlns:util="http://www.springframework.org/schema/util"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
 		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.0.xsd">
-		<!-- application wide configurations  -->		
-		
-		<!-- util:map id="kiwi.outputMapper" >
-			<entry key="json" value="application/json" />
-			<entry key="tsv" value="tabs" />
-			<entry key="xml" value="application/xml" />
-			<entry key="csv" value="text/csv" />
-		</util:map-->
-		<!-- Bigdat output reusing -->
-		<util:map id="kiwi.outputMapper" >
-			<entry key="json" value="application/sparql-results+json" />
-			<entry key="tsv" value="text/tab-separated-values" />
-			<entry key="xml" value="application/sparql-results+xml" />
-			<entry key="csv" value="text/csv" />
-		</util:map>
-		
-		<util:map id="jena.outputMapper" >
-			<entry key="json" value="json" />
-			<entry key="tsv" value="tsv" />
-			<entry key="xml" value="xml" />
-			<entry key="text" value="text" />
-		</util:map>
-	
-	
-		<bean class="java.util.EnumMap" id="uri.formats">
-		    <constructor-arg>
-		        <util:map key-type="org.ihtsdo.otf.refset.common.URIFormats">
-		            <entry key="baseUri" value="http://sct.snomed.info/" />
-	   	            <entry key="namedGraphUriFmt" value="&lt;http://sct.snomed.info/module/%s/release/%s&gt;" />
-	   	            <entry key="releaseUriFmt" value="&lt;http://sct.snomed.info/module/%s/release/%s&gt;" />
-	   	            <entry key="moduleUriFmt" value="&lt;http://sct.snomed.info/module/%s&gt;" />
-	   	            <entry key="conceptUriFmt" value="&lt;http://sct.snomed.info/%s&gt;" />
-		        </util:map> 
-		    </constructor-arg>
-		</bean>
-		
-		<bean id="uriformatter" class="org.ihtsdo.otf.refset.common.UriFormatter" >
-			<property name="formats" ref="uri.formats" />
-		</bean>	
-		
-		
 		
 		<bean id="conversionService" class="org.springframework.format.support.FormattingConversionServiceFactoryBean">
 	        <property name="registerDefaultFormatters" value="false" />
@@ -65,6 +24,6 @@
 	      </set>
 	      </property>
 	    </bean>			
-
-
+		
+	    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver"/>
 </beans>

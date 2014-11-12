@@ -5,7 +5,9 @@ package org.ihtsdo.otf.refset.graph.gao;
 
 import static org.ihtsdo.otf.refset.domain.RGC.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Resource;
 
@@ -15,7 +17,9 @@ import org.ihtsdo.otf.refset.domain.Refset;
 import org.ihtsdo.otf.refset.exception.EntityNotFoundException;
 import org.ihtsdo.otf.refset.graph.RefsetGraphAccessException;
 import org.ihtsdo.otf.refset.graph.RefsetGraphFactory;
+import org.ihtsdo.otf.refset.graph.schema.GMember;
 import org.ihtsdo.otf.refset.graph.schema.GRefset;
+import org.ihtsdo.otf.refset.service.upload.Rf2Refset;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,10 +29,13 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import com.thinkaurelius.titan.core.TitanGraph;
+import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.frames.FramedGraphFactory;
 import com.tinkerpop.frames.FramedTransactionalGraph;
+import com.tinkerpop.gremlin.Tokens.T;
+import com.tinkerpop.gremlin.java.GremlinPipeline;
 
 /**Graph Access component to do CRUD operation on underlying Refset graph
  * @author Episteme Partners
@@ -444,6 +451,141 @@ public class RefsetAdminGAO {
 		LOGGER.debug("updateRefsetNode {} finished", rV);
 
 		return rV.asVertex();
+	}
+	
+	
+	/**Adds member and refset and their history.
+	 * @param rf2rLst
+	 * @param refsetId 
+	 * @return
+	 * @throws EntityNotFoundException 
+	 * @throws RefsetGraphAccessException 
+	 */
+	public Map<String, String> addMembers(List<Rf2Refset> rf2rLst, String refsetId) throws EntityNotFoundException, RefsetGraphAccessException {
+		
+		Map<String, String> outcome = new HashMap<String, String>();
+		
+		TitanGraph g = factory.getTitanGraph();
+		
+		try {
+			
+			Vertex rV = rGao.getRefsetVertex(refsetId, fgf.create(g));
+
+			for (Rf2Refset r : rf2rLst) {
+				
+				GRefset gr = fgf.create(g).frame(rV, GRefset.class);
+				if ( StringUtils.isEmpty(r.getRefsetId()) || !(r.getRefsetId().equals(gr.getId()) 
+						|| r.getRefsetId().equals(gr.getSctdId())) ) {
+					
+					String error = String.format("Member does not have valid refset id - %s", r.getRefsetId());
+					outcome.put(r.getReferencedComponentId(), error);
+					continue;
+				}
+			
+				String desc = rGao.getMemberDescription(r.getReferencedComponentId());
+				
+				if (StringUtils.isEmpty(desc)) {
+					
+					outcome.put(r.getReferencedComponentId(), "Unknown referenced component");
+					continue;
+				}
+				
+				rV.getEdges(Direction.OUT, "members");
+				GremlinPipeline<Vertex, Edge> pipe = new GremlinPipeline<Vertex, Edge>();			
+				pipe.start(rV).inE("members").has(REFERENCE_COMPONENT_ID, T.eq, r.getReferencedComponentId()).has(START, T.eq, r.getEffectiveTime().getMillis());
+				List<Edge> ls = pipe.toList();
+				
+				if(ls.isEmpty()) {
+					
+					//add this member
+					Vertex vM = g.addVertexWithLabel(g.getVertexLabel("GMember"));
+					GMember mg = fgf.create(g).getVertex(vM.getId(), GMember.class);
+					
+					addMemberProperties(r, mg);
+					
+					LOGGER.debug("Added Member as vertex to graph", mg.getId());
+					
+					Edge e = fgf.create(g).addEdge(null, mg.asVertex(), rV, "members");
+					e.setProperty(REFERENCE_COMPONENT_ID, r.getReferencedComponentId());
+					e.setProperty(START, r.getEffectiveTime().getMillis());
+					e.setProperty(END, new DateTime(Long.MAX_VALUE).getMillis());
+					
+				} else {
+					
+					for (Edge edge : ls) {
+						
+						Long endTime = edge.getProperty(END);
+						Long expected = new DateTime(Long.MAX_VALUE).getMillis();
+						
+						if (endTime == expected) {
+							
+							//end this member
+							edge.setProperty(END, r.getEffectiveTime().getMillis());
+							
+							//add new member vertex with new end date
+							Vertex vM = g.addVertexWithLabel(g.getVertexLabel("GMember"));
+							GMember mg = fgf.create(g).getVertex(vM.getId(), GMember.class);
+							
+							addMemberProperties(r, mg);
+							
+							LOGGER.debug("Added Member as vertex to graph with new state", mg.getId());
+							
+							Edge e = fgf.create(g).addEdge(null, mg.asVertex(), rV, "members");
+							e.setProperty(REFERENCE_COMPONENT_ID, r.getReferencedComponentId());
+							e.setProperty(START, r.getEffectiveTime().getMillis());
+							e.setProperty(END, expected.longValue());
+						}
+						
+					}
+				}
+
+			}
+			
+			outcome.put("All members", "Success");
+			RefsetGraphFactory.commit(g);
+			
+		} catch(EntityNotFoundException e) {
+			
+			throw e;
+			
+		} catch (Exception e) {
+			
+			RefsetGraphFactory.rollback(g);			
+			LOGGER.error("Error during graph ineraction", e);
+			
+			throw new RefsetGraphAccessException(e.getMessage(), e);
+			
+		} finally {
+			
+			RefsetGraphFactory.shutdown(g);
+		}
+		
+		
+		return outcome;
+	}
+	
+	private GMember addMemberProperties(Rf2Refset r, GMember mg) {
+		Integer activeFlag = "1".equals(r.getActive()) ? 1 : 0;
+
+		mg.setActive(activeFlag);
+		
+		mg.setId(r.getId());
+
+		DateTime et = r.getEffectiveTime();
+		mg.setEffectiveTime(et.getMillis());
+
+		
+		mg.setModifiedBy(r.getModifiedBy());
+		mg.setCreateBy(r.getCreatedBy());
+		mg.setCreated(new DateTime().getMillis());
+		mg.setModifiedDate(new DateTime().getMillis());
+		mg.setModuleId(r.getModuleId());
+		
+		//everything in RF2 is published already hence make it published
+		mg.setPublished(1);
+		mg.setType(VertexType.member.toString());
+		
+		return mg;
 	}
 	
 	

@@ -1,25 +1,20 @@
 package org.ihtsdo.otf.refset.graph.gao;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.MapConfiguration;
 import org.ihtsdo.otf.refset.domain.Member;
-import org.ihtsdo.otf.refset.domain.MetaData;
 import org.ihtsdo.otf.refset.domain.Refset;
 import org.ihtsdo.otf.refset.exception.EntityNotFoundException;
-import org.ihtsdo.otf.refset.exception.RefsetServiceException;
 import org.ihtsdo.otf.refset.graph.RefsetGraphAccessException;
 import org.ihtsdo.otf.refset.graph.RefsetGraphFactory;
-import org.ihtsdo.otf.refset.graph.gao.RefsetGAO;
-import org.ihtsdo.otf.refset.schema.RefsetIndexer;
 import org.ihtsdo.otf.refset.schema.RefsetSchema;
 import org.ihtsdo.otf.refset.service.RefsetBrowseServiceStubData;
 import org.joda.time.DateTime;
@@ -53,9 +48,7 @@ public class MemberGAOTest {
 	
 	@Autowired
 	private RefsetBrowseServiceStubData data;
-	
-	private List<Refset> rs;
-	
+		
 	private RefsetGraphFactory f;
 	
 	@Before
@@ -79,7 +72,7 @@ public class MemberGAOTest {
 		
 		rGao = new RefsetGAO();
 		f = new RefsetGraphFactory(config);
-		rGao.setFactory(f);
+		rGao.setRGFactory(f);
 			
 		
 		gao = new MemberGAO();

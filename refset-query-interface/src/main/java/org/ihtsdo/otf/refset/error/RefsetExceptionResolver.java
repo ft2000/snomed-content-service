@@ -21,13 +21,11 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.FieldError;
+import org.springframework.web.bind.ServletRequestBindingException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
-
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 
 @ControllerAdvice
 public class RefsetExceptionResolver {
@@ -44,7 +42,7 @@ public class RefsetExceptionResolver {
 	@ExceptionHandler(EntityNotFoundException.class)
 	@ResponseBody Result<Map<String, Object>> handleEntityNotFoundException(EntityNotFoundException e) {
 		
-		LOGGER.error("Exception details \n {}", e);
+		LOGGER.error("Exception details \n", e);
 		ErrorInfo errorInfo = new ErrorInfo(e.getMessage(), Integer.toString(org.apache.commons.httpclient.HttpStatus.SC_NOT_FOUND));
 
 		Meta m = new Meta();
@@ -61,7 +59,7 @@ public class RefsetExceptionResolver {
 	@ExceptionHandler(InvalidServiceException.class)
 	@ResponseBody Result<Map<String, Object>> handleInvalidService(InvalidServiceException e) {
 		
-		LOGGER.error("Exception details \n {}", e);
+		LOGGER.error("Exception details \n", e);
 		
 		ErrorInfo errorInfo = new ErrorInfo(e.getMessage(), Integer.toString(org.apache.commons.httpclient.HttpStatus.SC_NOT_FOUND));
 	    
@@ -77,7 +75,7 @@ public class RefsetExceptionResolver {
 	@ExceptionHandler(ExportServiceException.class)
 	@ResponseBody Result<Map<String, Object>> handleExportException(ExportServiceException e) {
 		
-		LOGGER.error("Exception details \n {}", e);
+		LOGGER.error("Exception details \n", e);
 
 		ErrorInfo errorInfo = new ErrorInfo("Error occurred during export. Try after sometime", ERROR_CODE_SERVER);
 	    
@@ -95,7 +93,7 @@ public class RefsetExceptionResolver {
 	@ExceptionHandler
 	@ResponseBody Result<Map<String, Object>> handleGlobalException(Exception e) {
 		
-		LOGGER.error("Exception details \n {}", e);
+		LOGGER.error("Exception details \n", e);
 
 		ErrorInfo errorInfo = new ErrorInfo("An unknown error occurred in service call, try after sometime", ERROR_CODE_GEN);
 	    
@@ -112,7 +110,7 @@ public class RefsetExceptionResolver {
 	@ExceptionHandler(RefsetServiceException.class)
 	@ResponseBody Result<Map<String, Object>> handleRefsetServiceException(RefsetServiceException e) {
 		
-		LOGGER.error("Exception details \n {}", e);
+		LOGGER.error("Exception details \n", e);
 
 		ErrorInfo errorInfo = new ErrorInfo("An unknown error occurred in service call, try after sometime", ERROR_CODE_SERVER);
 	    
@@ -129,7 +127,7 @@ public class RefsetExceptionResolver {
 	@ExceptionHandler(ConceptServiceException.class)
 	@ResponseBody Result<Map<String, Object>> handleConceptServiceException(ConceptServiceException e) {
 		
-		LOGGER.error("Exception details \n {}", e);
+		LOGGER.error("Exception details \n", e);
 
 		ErrorInfo errorInfo = new ErrorInfo("An unknown error occurred in service call, try after sometime", ERROR_CODE_SERVER);
 	    
@@ -145,7 +143,7 @@ public class RefsetExceptionResolver {
 	@ExceptionHandler(AccessDeniedException.class)
 	@ResponseBody Result<Map<String, Object>> handleAccessDeniedException(AccessDeniedException e) {
 		
-		LOGGER.error("Exception details \n {}", e);
+		LOGGER.error("Exception details \n", e);
 
 		String message = StringUtils.isEmpty(e.getMessage()) ? "Unauthorized access, please check provided credentials in service call"  : e.getMessage();
 		
@@ -164,7 +162,7 @@ public class RefsetExceptionResolver {
 	@ExceptionHandler(ValidationException.class)
 	@ResponseBody Result<Map<String, Object>> handleValidationException(ValidationException e) {
 		
-		LOGGER.error("Exception details \n {}", e);
+		LOGGER.error("Exception details \n", e);
 
 		String message = StringUtils.isEmpty(e.getMessage()) ? "Request does not conform to expected input. Please see error details and try again"  : e.getMessage();
 		
@@ -204,9 +202,28 @@ public class RefsetExceptionResolver {
 	@ExceptionHandler(HttpMessageNotReadableException.class)
 	@ResponseBody Result<Map<String, Object>> handleValidationException(HttpMessageNotReadableException e) {
 		
-		LOGGER.error("Exception details \n {}", e);
+		LOGGER.error("Exception details \n", e);
 
-		String message = StringUtils.isEmpty(e.getMessage()) ? "Request does not conform to expected input. Please error details and try again"  : e.getMessage();
+		String message = StringUtils.isEmpty(e.getMessage()) ? "Request does not conform to expected input. Please see error details and try again"  : e.getMessage();
+		
+		ErrorInfo errorInfo = new ErrorInfo(message, Integer.toString(org.apache.commons.httpclient.HttpStatus.SC_BAD_REQUEST));
+	    
+		Meta m = new Meta();
+		m.setStatus(HttpStatus.BAD_REQUEST);
+		m.setErrorInfo(errorInfo);
+		response.setMeta(m);
+
+		return response;
+
+	}
+	
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	@ExceptionHandler(ServletRequestBindingException.class)
+	@ResponseBody Result<Map<String, Object>> handleRequesBindingException(ServletRequestBindingException e) {
+		
+		LOGGER.error("Exception details \n", e);
+
+		String message = StringUtils.isEmpty(e.getMessage()) ? "Request does not conform to expected input. Please see error details and try again"  : e.getMessage();
 		
 		ErrorInfo errorInfo = new ErrorInfo(message, Integer.toString(org.apache.commons.httpclient.HttpStatus.SC_BAD_REQUEST));
 	    

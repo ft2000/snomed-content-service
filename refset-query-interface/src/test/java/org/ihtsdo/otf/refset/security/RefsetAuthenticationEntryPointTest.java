@@ -3,7 +3,6 @@
  */
 package org.ihtsdo.otf.refset.security;
 
-import static org.junit.Assert.*;
 
 import org.junit.After;
 import org.junit.Before;
@@ -15,8 +14,6 @@ import org.junit.Test;
  */
 public class RefsetAuthenticationEntryPointTest {
 	
-	private RefsetAuthenticationEntryPoint p;
-
 	/**
 	 * @throws java.lang.Exception
 	 */

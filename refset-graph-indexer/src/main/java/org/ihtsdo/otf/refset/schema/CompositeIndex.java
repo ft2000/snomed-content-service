@@ -16,6 +16,8 @@ package org.ihtsdo.otf.refset.schema;
  */
 public enum CompositeIndex {
 
-	bySctId, bySctIdStatus, byDescription, byIdAndCreatedBy, byId, byIdAndCreated, byIdAndModified, byRefComponentId, byPublished, byType
+	bySctId, bySctIdStatus, byDescription, byIdAndCreatedBy, byId, byIdAndCreated, byIdAndModified, 
+	byRefComponentId, byPublished, byType, byIdAndEndAndStartDate, byIdAndStartDate, byIdAndEndDate,
+	byEndDateAndPublished, byEndDateAndType
 	
 }

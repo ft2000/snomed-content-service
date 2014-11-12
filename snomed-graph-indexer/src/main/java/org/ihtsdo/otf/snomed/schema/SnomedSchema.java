@@ -37,7 +37,7 @@ public class SnomedSchema {
 		switch (Operation.valueOf(args[1])) {
 		
 		case index:
-			s.createIndex();
+			s.createIndex(null);//default index name
 			s.printIndexes();
 			break;
 			

@@ -564,10 +564,15 @@ public class SnomedConceptSchema {
 	}
 
 
-	public void createIndex() {
+	public void createIndex(String backingIndex) {
+		
 		
 		LOGGER.debug("Creating Snomed Index");
 		
+		if (StringUtils.isEmpty(backingIndex)) {
+			
+			backingIndex = SEARCH;
+		}
 		TitanGraph g = openGraph(config);
 	    //management api
 	    TitanManagement mgmt = g.getManagementSystem();
@@ -583,7 +588,7 @@ public class SnomedConceptSchema {
 
 		    	mgmt.buildIndex(typeId, Edge.class).addKey(mgmt.getPropertyKey(typeId),
 	    				Parameter.of(MAPPED, Properties.typeId.toString())
-		    			).buildMixedIndex(SEARCH);
+		    			).buildMixedIndex(backingIndex);
 		    	
 		    }
 	    		    	
@@ -617,7 +622,7 @@ public class SnomedConceptSchema {
 				.addKey(mgmt.getPropertyKey(Properties.characteristic.toString()),
 	    				Parameter.of(MAPPED, Properties.characteristic.toString()))
 	    		
-	    		.buildMixedIndex(SEARCH);
+	    		.buildMixedIndex(backingIndex);
 
 		    	
 		    }
@@ -650,7 +655,7 @@ public class SnomedConceptSchema {
 				.addKey(mgmt.getPropertyKey(Properties.characteristic.toString()),
 	    				Parameter.of(MAPPED, Properties.characteristic.toString()))
 
-	    		.buildMixedIndex(SEARCH);		    	
+	    		.buildMixedIndex(backingIndex);		    	
 		    }
 	    	
 	    	String ps = Relationship.ps.toString(); 
@@ -680,7 +685,7 @@ public class SnomedConceptSchema {
 	    				Parameter.of(MAPPED, Properties.modifiedBy.toString()))
 				.addKey(mgmt.getPropertyKey(Properties.characteristic.toString()),
 	    				Parameter.of(MAPPED, Properties.characteristic.toString()))
-	    		.buildMixedIndex(SEARCH);		    	
+	    		.buildMixedIndex(backingIndex);		    	
 		    	
 		    }
 	    	
@@ -711,7 +716,7 @@ public class SnomedConceptSchema {
 	    				Parameter.of(MAPPED, Properties.modifiedBy.toString()))
 				.addKey(mgmt.getPropertyKey(Properties.characteristic.toString()),
 	    				Parameter.of(MAPPED, Properties.characteristic.toString()))
-	    		.buildMixedIndex(SEARCH);		    	
+	    		.buildMixedIndex(backingIndex);		    	
 		    	
 		    }
 	    	
@@ -735,7 +740,7 @@ public class SnomedConceptSchema {
 	    		.addKey(mgmt.getPropertyKey(Properties.languageCode.toString()),
 	    				Parameter.of(MAPPED, Properties.languageCode.toString()))
 
-	    		.buildMixedIndex(SEARCH);
+	    		.buildMixedIndex(backingIndex);
 		    	
 		    }
 	    	
@@ -756,7 +761,7 @@ public class SnomedConceptSchema {
 		    				Parameter.of(MAPPED, Properties.effectiveTime.toString()))
 
 
-		    		.buildMixedIndex(SEARCH);
+		    		.buildMixedIndex(backingIndex);
 		    	
 		    }
 	    	
@@ -769,7 +774,7 @@ public class SnomedConceptSchema {
 	    		.indexOnly(mgmt.getVertexLabel(relationship))
 	    		.addKey(mgmt.getPropertyKey(Properties.sctid.toString()), 
 	    				Parameter.of(MAPPED, Properties.sctid.toString()))
-	    		.buildMixedIndex(SEARCH);
+	    		.buildMixedIndex(backingIndex);
 		    }
 
 	    	//generic index
@@ -794,7 +799,7 @@ public class SnomedConceptSchema {
 	    				Parameter.of(MAPPED, Properties.status.toString()))
 	    		.addKey(mgmt.getPropertyKey(Properties.effectiveTime.toString()), 
 	    				Parameter.of(MAPPED, Properties.effectiveTime.toString()))
-	    		.buildMixedIndex(SEARCH);
+	    		.buildMixedIndex(backingIndex);
 		    }
 
 			LOGGER.debug("commiting index created");
