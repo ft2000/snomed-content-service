@@ -157,6 +157,10 @@ public class RefsetAdminGAO {
 			Vertex vR = g.addVertexWithLabel(g.getVertexLabel("GRefset"));
 			GRefset gr = tg.getVertex(vR.getId(), GRefset.class);
 			
+			if (r.getCreated() == null) {
+				
+				r.setCreated(new DateTime());
+			}
 			gr.setCreated(r.getCreated().getMillis());
 			gr.setCreatedBy(r.getCreatedBy());
 			gr.setDescription(r.getDescription());

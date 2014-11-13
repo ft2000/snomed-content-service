@@ -552,6 +552,7 @@ public class RefsetGAO {
 		}
 	
 		
+		LOGGER.debug("Returning {} refsets  ", (refsets == null ? 0 : refsets.size()));
 
 		return refsets;
 
