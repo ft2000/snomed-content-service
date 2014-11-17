@@ -21,11 +21,11 @@
 		
 	<bean id="snomed.graph.titan.config" 
 			class="org.apache.commons.configuration.PropertiesConfiguration" 
-			c:fileName="snomed-graph-es-${env}.properties" />
+			c:fileName="${snomed.graph.config}" />
 			
 	<bean id="refset.graph.titan.config" 
 			class="org.apache.commons.configuration.PropertiesConfiguration" 
-			c:fileName="refset-graph-es-${env}.properties" />
+			c:fileName="${refset.graph.config}" />
 	
 
 
