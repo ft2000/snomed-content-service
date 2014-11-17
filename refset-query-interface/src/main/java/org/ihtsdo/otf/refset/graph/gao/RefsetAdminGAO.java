@@ -19,7 +19,7 @@ import org.ihtsdo.otf.refset.graph.RefsetGraphAccessException;
 import org.ihtsdo.otf.refset.graph.RefsetGraphFactory;
 import org.ihtsdo.otf.refset.graph.schema.GMember;
 import org.ihtsdo.otf.refset.graph.schema.GRefset;
-import org.ihtsdo.otf.refset.service.upload.Rf2Refset;
+import org.ihtsdo.otf.refset.service.upload.Rf2Record;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -94,6 +94,9 @@ public class RefsetAdminGAO {
 					/*Add this member to refset*/
 					Edge e = tg.addEdge(null, mV, rV, "members");
 					e.setProperty(REFERENCE_COMPONENT_ID, m.getReferencedComponentId());
+					long start = r.getEffectiveTime() != null ? r.getEffectiveTime().getMillis() : new DateTime().getMillis();
+					e.setProperty(START, start);
+					e.setProperty(END, Long.MAX_VALUE);
 
 					LOGGER.debug("Added relationship as edge from {} to {}", mV.getId(), rV.getId());
 				}
@@ -148,7 +151,7 @@ public class RefsetAdminGAO {
 			rV = rGao.getRefsetVertex(r.getId(), tg);
 			
 			LOGGER.debug("Refset {} already exist, not adding");
-
+			
 			
 		} catch (EntityNotFoundException e) {
 			
@@ -302,7 +305,7 @@ public class RefsetAdminGAO {
 			
 			LOGGER.debug("Updating members");
 
-			/*if members exist then add members*/
+			/*if members exist then update members*/
 			List<Member> members = r.getMembers();
 			
 			if( !CollectionUtils.isEmpty(members) ) {
@@ -373,7 +376,11 @@ public class RefsetAdminGAO {
 			
 		} 
 		
-		rV.setDescription(r.getDescription());
+		if (!StringUtils.isEmpty(r.getDescription())) {
+			
+			rV.setDescription(r.getDescription());
+
+		}
 		
 		if (r.getEffectiveTime() != null) {
 			
@@ -458,14 +465,14 @@ public class RefsetAdminGAO {
 	}
 	
 	
-	/**Adds member and refset and their history.
+	/**Adds member and refset and their history.Used when importing a RF2 file
 	 * @param rf2rLst
 	 * @param refsetId 
 	 * @return
 	 * @throws EntityNotFoundException 
 	 * @throws RefsetGraphAccessException 
 	 */
-	public Map<String, String> addMembers(List<Rf2Refset> rf2rLst, String refsetId) throws EntityNotFoundException, RefsetGraphAccessException {
+	public Map<String, String> addMembers(List<Rf2Record> rf2rLst, String refsetId) throws EntityNotFoundException, RefsetGraphAccessException {
 		
 		Map<String, String> outcome = new HashMap<String, String>();
 		
@@ -475,11 +482,11 @@ public class RefsetAdminGAO {
 			
 			Vertex rV = rGao.getRefsetVertex(refsetId, fgf.create(g));
 
-			for (Rf2Refset r : rf2rLst) {
+			for (Rf2Record r : rf2rLst) {
 				
 				GRefset gr = fgf.create(g).frame(rV, GRefset.class);
 				if ( StringUtils.isEmpty(r.getRefsetId()) || !(r.getRefsetId().equals(gr.getId()) 
-						|| r.getRefsetId().equals(gr.getSctdId())) ) {
+						|| r.getRefsetId().equals(gr.getSctdId())) || r.getEffectiveTime() == null) {
 					
 					String error = String.format("Member does not have valid refset id - %s", r.getRefsetId());
 					outcome.put(r.getReferencedComponentId(), error);
@@ -494,9 +501,8 @@ public class RefsetAdminGAO {
 					continue;
 				}
 				
-				rV.getEdges(Direction.OUT, "members");
 				GremlinPipeline<Vertex, Edge> pipe = new GremlinPipeline<Vertex, Edge>();			
-				pipe.start(rV).inE("members").has(REFERENCE_COMPONENT_ID, T.eq, r.getReferencedComponentId()).has(START, T.eq, r.getEffectiveTime().getMillis());
+				pipe.start(rV).inE("members").has(REFERENCE_COMPONENT_ID, T.eq, r.getReferencedComponentId());
 				List<Edge> ls = pipe.toList();
 				
 				if(ls.isEmpty()) {
@@ -512,35 +518,50 @@ public class RefsetAdminGAO {
 					Edge e = fgf.create(g).addEdge(null, mg.asVertex(), rV, "members");
 					e.setProperty(REFERENCE_COMPONENT_ID, r.getReferencedComponentId());
 					e.setProperty(START, r.getEffectiveTime().getMillis());
-					e.setProperty(END, new DateTime(Long.MAX_VALUE).getMillis());
+					e.setProperty(END, Long.MAX_VALUE);
 					
 				} else {
 					
+
 					for (Edge edge : ls) {
 						
-						Long endTime = edge.getProperty(END);
-						Long expected = new DateTime(Long.MAX_VALUE).getMillis();
 						
-						if (endTime == expected) {
+						//do a check if an existing member exist with some other state and lesser effective time
+						
+						Vertex vExistingMember = edge.getVertex(Direction.OUT);
+						Long currentEndDt = edge.getProperty(END);
+						Member m = RefsetConvertor.getMember(vExistingMember);
+						if (m.getEffectiveTime().getMillis() == r.getEffectiveTime().getMillis()
+								&& (m.isActive() ? "1" : "0").equals(r.getActive())) {
 							
-							//end this member
+							LOGGER.trace("Not adding this record as it already exist {}", r.getId());
+
+							//same record so do not reimport
+							outcome.put(r.getReferencedComponentId(), "Already exist, not imported again");
+							break;
+							
+						} else if (m.getEffectiveTime().getMillis() < r.getEffectiveTime().getMillis() && currentEndDt == Long.MAX_VALUE) {
+							
+							//mark this relationship with an end date of current effective time
 							edge.setProperty(END, r.getEffectiveTime().getMillis());
-							
-							//add new member vertex with new end date
+												
+							//add a new member vertex with Long.MAX_VALUE end date
 							Vertex vM = g.addVertexWithLabel(g.getVertexLabel("GMember"));
 							GMember mg = fgf.create(g).getVertex(vM.getId(), GMember.class);
 							
 							addMemberProperties(r, mg);
 							
-							LOGGER.debug("Added Member as vertex to graph with new state", mg.getId());
+							LOGGER.trace("Added Member as vertex to graph with new state {}", mg.getId());
 							
 							Edge e = fgf.create(g).addEdge(null, mg.asVertex(), rV, "members");
 							e.setProperty(REFERENCE_COMPONENT_ID, r.getReferencedComponentId());
 							e.setProperty(START, r.getEffectiveTime().getMillis());
-							e.setProperty(END, expected.longValue());
+							e.setProperty(END, Long.MAX_VALUE);
+							
 						}
-						
 					}
+					
+					
 				}
 
 			}
@@ -568,7 +589,7 @@ public class RefsetAdminGAO {
 		return outcome;
 	}
 	
-	private GMember addMemberProperties(Rf2Refset r, GMember mg) {
+	private GMember addMemberProperties(Rf2Record r, GMember mg) {
 		Integer activeFlag = "1".equals(r.getActive()) ? 1 : 0;
 
 		mg.setActive(activeFlag);

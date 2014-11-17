@@ -21,6 +21,7 @@ import static org.ihtsdo.otf.refset.domain.RGC.REFERENCE_COMPONENT_ID;
 import static org.ihtsdo.otf.refset.domain.RGC.SCTID;
 import static org.ihtsdo.otf.refset.domain.RGC.SUPER_REFSET_TYPE_ID;
 import static org.ihtsdo.otf.refset.domain.RGC.TYPE_ID;
+import static org.ihtsdo.otf.refset.domain.RGC.END;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -328,93 +329,26 @@ public class RefsetConvertor {
 			
 			for (Edge eR : eRs) {
 				
+				//only get edges which has LONG.MAX_VALUE end date
+				if (eR.getPropertyKeys().contains(END)) {
+					
+					long end = eR.getProperty(END);
+					
+					if (!(end == Long.MAX_VALUE)) {
+						//we have to get only latest member state not history
+						LOGGER.trace("skipping {} as this member is does not have current state", eR.getProperty(ID));
+						continue;
+					}
+					
+				} else {
+					
+					continue;//not a valid member
+				}
+				
+				
 				Vertex vM = eR.getVertex(Direction.OUT);
 				
-				Set<String> mKeys = vM.getPropertyKeys();
-				
-				Member m = new Member();
-				
-				if ( mKeys.contains(ID) ) {
-					
-					String lId = vM.getProperty(ID);
-
-					m.setId(lId);
-					
-				}
-				
-				if ( mKeys.contains(MODULE_ID) ) {
-					
-					
-					String mModuleId = vM.getProperty(MODULE_ID);
-					m.setModuleId(mModuleId);
-					
-				}
-				
-				if (mKeys.contains(EFFECTIVE_DATE)) {
-					
-
-					long effectivetime = vM.getProperty(EFFECTIVE_DATE);
-					
-					LOGGER.trace("Actual effective date when this member tied to given refset is  {} ", effectivetime);
-
-					m.setEffectiveTime(new DateTime(effectivetime));
-					
-				}
-				
-				if (mKeys.contains(PUBLISHED)) {
-					
-
-					Integer published = vM.getProperty(PUBLISHED);
-					
-					m.setPublished(published == 1 ? true : false);;
-					
-				}
-
-
-				
-				
-				if ( mKeys.contains(ACTIVE) ) {
-					
-					Integer isActive = vM.getProperty(ACTIVE);
-					m.setActive(isActive == 1 ? true : false);
-					
-				}
-				
-				
-				if ( mKeys.contains(EFFECTIVE_DATE) ) {
-					
-					long effectivetime = vM.getProperty(EFFECTIVE_DATE);
-					m.setEffectiveTime(new DateTime(effectivetime));
-					
-				}
-				
-				if ( mKeys.contains(MODIFIED_DATE) ) {
-					
-					long modified = vM.getProperty(MODIFIED_DATE);
-					m.setModifiedDate(new DateTime(modified));
-				}
-				
-				if ( mKeys.contains(MODIFIED_BY) ) {
-					
-					String modifiedby = vM.getProperty(MODIFIED_BY);
-					m.setModifiedBy(modifiedby);
-					
-				}
-				
-				if ( mKeys.contains(CREATED) ) {
-					
-					m.setCreated(new DateTime(vM.getProperty(CREATED)));
-				}
-				
-				if ( mKeys.contains(CREATED_BY) ) {
-					
-					String createdBy = vM.getProperty(CREATED_BY);
-					m.setCreatedBy(createdBy);
-					
-				}
-				
-				
-				
+				Member m = getMember(vM);
 				
 				//this has to be edge effective date. //TODO remove above
 				Set<String> eKeys = eR.getPropertyKeys();
@@ -440,6 +374,98 @@ public class RefsetConvertor {
 			
 	
 	
+	/**
+	 * @param vM
+	 */
+	protected static Member getMember(Vertex vM) {
+		// TODO Auto-generated method stub
+		Set<String> mKeys = vM.getPropertyKeys();
+		
+		Member m = new Member();
+		
+		if ( mKeys.contains(ID) ) {
+			
+			String lId = vM.getProperty(ID);
+
+			m.setId(lId);
+			
+		}
+		
+		if ( mKeys.contains(MODULE_ID) ) {
+			
+			
+			String mModuleId = vM.getProperty(MODULE_ID);
+			m.setModuleId(mModuleId);
+			
+		}
+		
+		if (mKeys.contains(EFFECTIVE_DATE)) {
+			
+
+			long effectivetime = vM.getProperty(EFFECTIVE_DATE);
+			
+			LOGGER.trace("Actual effective date when this member tied to given refset is  {} ", effectivetime);
+
+			m.setEffectiveTime(new DateTime(effectivetime));
+			
+		}
+		
+		if (mKeys.contains(PUBLISHED)) {
+			
+
+			Integer published = vM.getProperty(PUBLISHED);
+			
+			m.setPublished(published == 1 ? true : false);;
+			
+		}
+
+
+		
+		
+		if ( mKeys.contains(ACTIVE) ) {
+			
+			Integer isActive = vM.getProperty(ACTIVE);
+			m.setActive(isActive == 1 ? true : false);
+			
+		}
+		
+		
+		if ( mKeys.contains(EFFECTIVE_DATE) ) {
+			
+			long effectivetime = vM.getProperty(EFFECTIVE_DATE);
+			m.setEffectiveTime(new DateTime(effectivetime));
+			
+		}
+		
+		if ( mKeys.contains(MODIFIED_DATE) ) {
+			
+			long modified = vM.getProperty(MODIFIED_DATE);
+			m.setModifiedDate(new DateTime(modified));
+		}
+		
+		if ( mKeys.contains(MODIFIED_BY) ) {
+			
+			String modifiedby = vM.getProperty(MODIFIED_BY);
+			m.setModifiedBy(modifiedby);
+			
+		}
+		
+		if ( mKeys.contains(CREATED) ) {
+			
+			m.setCreated(new DateTime(vM.getProperty(CREATED)));
+		}
+		
+		if ( mKeys.contains(CREATED_BY) ) {
+			
+			String createdBy = vM.getProperty(CREATED_BY);
+			m.setCreatedBy(createdBy);
+			
+		}
+		
+		return m;
+	}
+
+
 	/** Utility method to create {@link MetaData} object from {@link Vertex} 
 	 * @param vertex
 	 * @return

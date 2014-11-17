@@ -44,7 +44,7 @@ public class ImportRF2ServiceTest {
 		srp = mock(SimpleRefsetProcessor.class);
 		
 		service.setSrp(srp);
-		doNothing().when(srp).process(anyListOf(Rf2Refset.class), anyString());
+		doNothing().when(srp).process(anyListOf(Rf2Record.class), anyString());
 	}
 
 	/**
@@ -99,7 +99,7 @@ public class ImportRF2ServiceTest {
 	public void testImportFile() throws RefsetServiceException, EntityNotFoundException, FileNotFoundException {
 		
 		service.importFile(new FileInputStream(GOOD_FILE), "junit");
-		verify(srp).process(anyListOf(Rf2Refset.class), anyString());
+		verify(srp).process(anyListOf(Rf2Record.class), anyString());
 	}
 	
 	

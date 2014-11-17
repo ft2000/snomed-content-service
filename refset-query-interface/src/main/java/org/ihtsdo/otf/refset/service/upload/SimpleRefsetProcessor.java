@@ -35,7 +35,7 @@ public class SimpleRefsetProcessor implements RefsetProcessor {
 	 * @see org.ihtsdo.otf.refset.service.upload.RefsetProcessor#process(java.util.List)
 	 */
 	@Override
-	public Map<String, String> process(List<Rf2Refset> rf2rLst, String refsetId) throws RefsetServiceException, EntityNotFoundException {
+	public Map<String, String> process(List<Rf2Record> rf2rLst, String refsetId) throws RefsetServiceException, EntityNotFoundException {
 		
 		if (StringUtils.isEmpty(refsetId) || CollectionUtils.isEmpty(rf2rLst)) {
 			

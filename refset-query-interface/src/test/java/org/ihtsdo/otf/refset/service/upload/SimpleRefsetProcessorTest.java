@@ -32,11 +32,11 @@ public class SimpleRefsetProcessorTest {
 	
 	private SimpleRefsetProcessor srp;
 	private RefsetAdminGAO gao;
-	private static List<Rf2Refset> refsets = new ArrayList<Rf2Refset>();
+	private static List<Rf2Record> refsets = new ArrayList<Rf2Record>();
 	static {
 		
 		
-		Rf2Refset rf2r = new Rf2Refset();
+		Rf2Record rf2r = new Rf2Record();
 		rf2r.setActive("1");
 		rf2r.setCreatedBy("junit");
 		refsets.add(rf2r);
@@ -52,7 +52,7 @@ public class SimpleRefsetProcessorTest {
 		srp = new SimpleRefsetProcessor();
 		gao = mock(RefsetAdminGAO.class);
 		srp.setGao(gao);
-		when(gao.addMembers(anyListOf(Rf2Refset.class), anyString())).thenReturn(new HashMap<String, String>());
+		when(gao.addMembers(anyListOf(Rf2Record.class), anyString())).thenReturn(new HashMap<String, String>());
 	}
 
 	/**
@@ -70,7 +70,7 @@ public class SimpleRefsetProcessorTest {
 	@Test(expected = RefsetServiceException.class)
 	public void testProcessNoData() throws RefsetServiceException, EntityNotFoundException {
 		
-		srp.process(new ArrayList<Rf2Refset>(), "junitrefset");
+		srp.process(new ArrayList<Rf2Record>(), "junitrefset");
 
 	}
 	
@@ -82,7 +82,7 @@ public class SimpleRefsetProcessorTest {
 	@Test(expected = RefsetServiceException.class)
 	public void testProcessNoRefsetId() throws RefsetServiceException, EntityNotFoundException {
 		
-		srp.process(new ArrayList<Rf2Refset>(), null);
+		srp.process(new ArrayList<Rf2Record>(), null);
 
 	}
 	
@@ -97,7 +97,7 @@ public class SimpleRefsetProcessorTest {
 
 		srp.process(refsets, "junit");
 		
-		verify(gao).addMembers(anyListOf(Rf2Refset.class), anyString());
+		verify(gao).addMembers(anyListOf(Rf2Record.class), anyString());
 	}
 	
 	/**
@@ -109,7 +109,7 @@ public class SimpleRefsetProcessorTest {
 	@Test(expected = RefsetServiceException.class)
 	public void testProcessRefsetServiceException() throws RefsetServiceException, EntityNotFoundException, RefsetGraphAccessException {
 
-		doThrow(new RefsetGraphAccessException()).when(gao).addMembers(anyListOf(Rf2Refset.class), anyString());
+		doThrow(new RefsetGraphAccessException()).when(gao).addMembers(anyListOf(Rf2Record.class), anyString());
 		
 		srp.process(refsets, "junit");
 		
@@ -124,7 +124,7 @@ public class SimpleRefsetProcessorTest {
 	@Test(expected = EntityNotFoundException.class)
 	public void testProcessEntityNotFoundException() throws RefsetServiceException, EntityNotFoundException, RefsetGraphAccessException {
 		
-		doThrow(new EntityNotFoundException()).when(gao).addMembers(anyListOf(Rf2Refset.class), anyString());
+		doThrow(new EntityNotFoundException()).when(gao).addMembers(anyListOf(Rf2Record.class), anyString());
 		
 		srp.process(refsets, "junit");
 		

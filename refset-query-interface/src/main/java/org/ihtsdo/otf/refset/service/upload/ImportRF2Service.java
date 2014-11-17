@@ -71,7 +71,7 @@ public class ImportRF2Service implements ImportService {
 
         	int row = 0;
         	
-        	List<Rf2Refset> rf2RLst = new ArrayList<Rf2Refset>();
+        	List<Rf2Record> rf2RLst = new ArrayList<Rf2Record>();
         	
             while( (line = reader.readLine()) != null ) {
             	
@@ -88,7 +88,7 @@ public class ImportRF2Service implements ImportService {
             	
         		if (columns != null & columns.length == 6) {
         			
-        			Rf2Refset rf2r = new Rf2Refset();
+        			Rf2Record rf2r = new Rf2Record();
         			
         			rf2r.setId(columns[0]);
         			rf2r.setEffectiveTime(fmt.parseDateTime(columns[1]));

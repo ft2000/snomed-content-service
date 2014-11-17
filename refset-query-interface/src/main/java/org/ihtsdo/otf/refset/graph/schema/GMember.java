@@ -15,13 +15,13 @@ public interface GMember extends VertexFrame {
 	/**
 	 * @return the effectiveTime
 	 */
-	@Property( value = "effectiveTime")
+	@Property( value = "effectiveDate")
 	public long getEffectiveTime();
 	
 	/**
 	 * @param effectiveTime the effectiveTime to set
 	 */
-	@Property( value = "effectiveTime")
+	@Property( value = "effectiveDate")
 	public void setEffectiveTime(long effectiveTime);
 	
 	/**

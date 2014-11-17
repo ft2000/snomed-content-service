@@ -4,6 +4,7 @@
 package org.ihtsdo.otf.refset.graph.gao;
 import static org.ihtsdo.otf.refset.domain.RGC.TYPE;
 import static org.ihtsdo.otf.refset.domain.RGC.DESC;
+import static org.ihtsdo.otf.refset.domain.RGC.END;
 import static org.ihtsdo.otf.refset.domain.RGC.ID;
 import static org.ihtsdo.otf.refset.domain.RGC.PUBLISHED;
 
@@ -399,7 +400,7 @@ public class RefsetGAO {
 			
 			//get required members as per range
 			GremlinPipeline<Vertex, Edge> pipe = new GremlinPipeline<Vertex, Edge>();			
-			pipe.start(vR.asVertex()).inE("members").range(from, to);
+			pipe.start(vR.asVertex()).inE("members").has(END, Long.MAX_VALUE).range(from, to);
 			List<Edge> ls = pipe.toList();
 
 			if (r != null) {
@@ -470,7 +471,7 @@ public class RefsetGAO {
 			GRefset vR = vRs.iterator().next();
 
 			GremlinPipeline<Vertex, Long> pipe = new GremlinPipeline<Vertex, Long>();
-			long totalNoOfMembers = pipe.start(vR.asVertex()).inE("members").count();
+			long totalNoOfMembers = pipe.start(vR.asVertex()).inE("members").has(END, Long.MAX_VALUE).count();
 			
 			LOGGER.debug("total members {}", totalNoOfMembers);
 			
@@ -552,7 +553,7 @@ public class RefsetGAO {
 		}
 	
 		
-		LOGGER.debug("Returning {} refsets  ", (refsets == null ? 0 : refsets.size()));
+		LOGGER.debug("Returning {} refsets  ", (refsets != null ? refsets.size() : 0));
 
 		return refsets;
 

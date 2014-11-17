@@ -267,6 +267,9 @@ public class RefsetAuthoringController {
 			
 			member.setCreatedBy(getUserDetails().getUsername());
 			member.setModifiedBy(getUserDetails().getUsername());
+			member.setCreated(new DateTime());
+			member.setModifiedDate(new DateTime());
+
 
 		}
 		Map<String, String> outcome = aService.addMembers(refsetId, members);
