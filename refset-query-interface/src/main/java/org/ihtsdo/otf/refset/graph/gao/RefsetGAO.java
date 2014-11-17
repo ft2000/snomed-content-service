@@ -530,7 +530,7 @@ public class RefsetGAO {
 				
 				GRefset gR = fg.getVertex(rV.getId(), GRefset.class);
 				GremlinPipeline<Vertex, Long> mPipe = new GremlinPipeline<Vertex, Long>();
-				long noOfMembers = mPipe.start(rV).inE("members").count();
+				long noOfMembers = mPipe.start(rV).inE("members").has(END, Long.MAX_VALUE).count();
 				gR.setNoOfMembers(noOfMembers);
 				ls.add(gR);
 				
