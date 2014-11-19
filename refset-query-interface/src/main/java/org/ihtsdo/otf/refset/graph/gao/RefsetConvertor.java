@@ -64,118 +64,8 @@ public class RefsetConvertor {
 			
 			if (!StringUtils.isEmpty(gr.getId()) && keys.contains(DESC) ) {
 				
-				
-				Refset r = new Refset();
-				
-				
-				if ( keys.contains(CREATED) ) {
-				
-					r.setCreated(new DateTime(gr.getCreated()));
-				}
-				
-				if ( keys.contains(CREATED_BY) ) {
-					
-					r.setCreatedBy(gr.getCreatedBy());
-					
-				}
-				
-				
-				if ( keys.contains(DESC) ) {
-					
-					r.setDescription(gr.getDescription());
-					
-				}
-				
-				if ( keys.contains(EFFECTIVE_DATE) ) {
-					
-					r.setEffectiveTime(new DateTime(gr.getEffectiveTime()));
+				Refset r = getRefset(gr);
 
-				}
-				
-				if ( keys.contains(ID) ) {
-					
-					r.setId(gr.getId());
-
-				}
-				
-				if ( keys.contains(SCTID) ) {
-					
-					r.setId(gr.getSctdId());
-
-				}
-				
-				if ( keys.contains(LANG_CODE) ) {
-					
-					r.setLanguageCode(gr.getLanguageCode());
-
-					
-				}
-				
-				if ( keys.contains(MODULE_ID) ) {
-					
-					r.setModuleId(gr.getModuleId());
-					
-				}
-				
-				if ( keys.contains(PUBLISHED) ) {
-					
-					r.setPublished(gr.getPublished() == 1 ? true : false);
-					
-				}
-				
-				
-				if ( keys.contains(PUBLISHED_DATE) ) {
-					
-					r.setPublishedDate(new DateTime(gr.getPublishedDate()));
-
-					
-				}
-				
-				
-				if ( keys.contains(SUPER_REFSET_TYPE_ID) ) {
-					
-					r.setSuperRefsetTypeId(gr.getSuperRefsetTypeId());
-					
-				}
-				
-				if ( keys.contains(MEMBER_TYPE_ID) ) {
-					
-					r.setComponentTypeId(gr.getComponentTypeId());
-					
-				}
-
-				if ( keys.contains(TYPE_ID) ) {
-					
-					r.setTypeId(gr.getTypeId());
-					
-				}
-				
-				if ( keys.contains(ACTIVE) ) {
-					
-					r.setActive(gr.getActive() == 1 ? true : false);
-					
-				}
-				
-				if ( keys.contains(MODIFIED_DATE) ) {
-					
-					r.setModifiedDate(new DateTime(gr.getModifiedDate()));
-				}
-				
-				if ( keys.contains(MODIFIED_BY) ) {
-					
-					r.setModifiedBy(gr.getModifiedBy());
-					
-				}
-				
-				if ( keys.contains(EXPECTED_RLS_DT) ) {
-					
-					r.setExpectedReleaseDate(new DateTime(gr.getExpectedReleaseDate()));
-
-				}
-				
-				r.setTotalNoOfMembers(gr.getNoOfMembers());
-
-				
 				refsets.add(r);
 				
 			}
@@ -316,6 +206,14 @@ public class RefsetConvertor {
 
 		}
 		
+		if ( keys.contains(ACTIVE) ) {
+			
+			r.setActive(vR.getActive() == 1 ? true : false);
+			
+		}
+		
+		r.setTotalNoOfMembers(vR.getNoOfMembers());
+
 		return r;
 	}
 
