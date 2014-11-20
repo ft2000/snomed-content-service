@@ -403,8 +403,20 @@ public class MemberGAO {
 		}			
 		
 		LOGGER.debug("Updating member {}", m);
-		Iterable<GMember> ms = tg.getVertices(ID, m.getId(), GMember.class);
-		for (GMember mg : ms) {
+		Iterable<Vertex> vr = tg.query().has(TYPE, VertexType.member.toString()).has(ID, m.getId()).limit(1).vertices();
+		GMember mg = null;
+		if (vr != null ) {
+			
+			for (Vertex v : vr) {
+				
+				LOGGER.debug("Member is {} for member id {}", v, m.getId());
+				mg = fgf.create(tg).getVertex(v.getId(), GMember.class);
+				break;
+								
+			}
+		}
+
+		if (mg != null) {
 			
 			Integer activeFlag = m.isActive() ? 1 : 0;
 
