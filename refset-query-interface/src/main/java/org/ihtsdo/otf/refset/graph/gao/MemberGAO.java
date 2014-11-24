@@ -275,16 +275,17 @@ public class MemberGAO {
 	public void removeMember(String refsetId, String rcId) throws EntityNotFoundException, RefsetGraphAccessException {
 
 		LOGGER.debug("removing member {} from refset {}", rcId, refsetId);
-		FramedTransactionalGraph<TitanGraph> tg = null;
+		EventGraph<TitanGraph> tg = null;
 		if (StringUtils.isEmpty(refsetId) || StringUtils.isEmpty(rcId)) {
 			
 			throw new EntityNotFoundException("Invalid request, refset id and reference component id is required in member remove request");
 		}
 		try {
 			
-			tg = fgf.create(factory.getTitanGraph());
-			
-			Vertex rV = rGao.getRefsetVertex(refsetId, tg);
+			tg = factory.getEventGraph();
+	        tg.addListener(new MemberChangeListener(tg.getBaseGraph(), "service"));
+
+			Vertex rV = rGao.getRefsetVertex(refsetId, fgf.create(tg.getBaseGraph()));
 
 			Iterable<Edge> eR = tg.getEdges(REFERENCE_COMPONENT_ID, rcId);
 						
@@ -335,14 +336,15 @@ public class MemberGAO {
 	public Map<String, String> removeMembers(String refsetId, Set<String> rcIds) throws EntityNotFoundException, RefsetGraphAccessException {
 
 		LOGGER.debug("removing members {} from refset {}", rcIds, refsetId);
-		TitanGraph tg = null;
+		EventGraph<TitanGraph> tg = null;
 		Map<String, String> outcome = new HashMap<String, String>();
 		
 		try {
 			
-			tg = factory.getTitanGraph();
-			
-			Vertex rV = rGao.getRefsetVertex(refsetId, fgf.create(tg));
+			tg = factory.getEventGraph();
+	        tg.addListener(new MemberChangeListener(tg.getBaseGraph(), "service"));
+
+			Vertex rV = rGao.getRefsetVertex(refsetId, fgf.create(tg.getBaseGraph()));
 
 			Iterable<Edge> eR = rV.getEdges(Direction.IN, "members");
 			
@@ -397,7 +399,6 @@ public class MemberGAO {
 	 */
 	protected Vertex updateMemberNode(Member m, EventGraph<TitanGraph> tg) throws RefsetGraphAccessException, EntityNotFoundException {
 		
-		Vertex mV = null;
 		if (m == null || StringUtils.isEmpty(m.getId()) || StringUtils.isEmpty(m.getReferencedComponentId())) {
 			
 			throw new EntityNotFoundException("Invalid member details. Reference component id and member id is mandatory in member details");

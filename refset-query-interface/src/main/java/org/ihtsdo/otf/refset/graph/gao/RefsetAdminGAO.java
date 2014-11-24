@@ -237,13 +237,14 @@ public class RefsetAdminGAO {
 			
 		}
 
-		FramedTransactionalGraph<TitanGraph> g = null;
+		EventGraph<TitanGraph> g = null;
 		
 		try {
 			
-			g = fgf.create(factory.getTitanGraph());
-			
-			Vertex refset = rGao.getRefsetVertex(refsetId, g);
+			g = factory.getEventGraph();
+	        g.addListener(new RefsetHeaderChangeListener(g.getBaseGraph(), "service"));
+
+			Vertex refset = rGao.getRefsetVertex(refsetId, fgf.create(g.getBaseGraph()));
 			
 			Integer published = refset.getProperty(PUBLISHED);
 			
@@ -479,11 +480,11 @@ public class RefsetAdminGAO {
 		
 		Map<String, String> outcome = new HashMap<String, String>();
 		
-		TitanGraph g = factory.getTitanGraph();
-		
+		EventGraph<TitanGraph> g = factory.getEventGraph();
+		g.addListener(new Rf2ImportMemberChangeListener(g.getBaseGraph(), "rf2import"));
 		try {
 			
-			Vertex rV = rGao.getRefsetVertex(refsetId, fgf.create(g));
+			Vertex rV = rGao.getRefsetVertex(refsetId, fgf.create(g.getBaseGraph()));
 
 			for (Rf2Record r : rf2rLst) {
 				
@@ -511,7 +512,7 @@ public class RefsetAdminGAO {
 				if(ls.isEmpty()) {
 					
 					//add this member
-					Vertex vM = g.addVertexWithLabel(g.getVertexLabel("GMember"));
+					Vertex vM = g.getBaseGraph().addVertexWithLabel(g.getBaseGraph().getVertexLabel("GMember"));
 					GMember mg = fgf.create(g).getVertex(vM.getId(), GMember.class);
 					
 					addMemberProperties(r, mg);
@@ -546,20 +547,41 @@ public class RefsetAdminGAO {
 						} else if (m.getEffectiveTime().getMillis() < r.getEffectiveTime().getMillis() && currentEndDt == Long.MAX_VALUE) {
 							
 							//mark this relationship with an end date of current effective time
-							edge.setProperty(END, r.getEffectiveTime().getMillis());
+							//edge.setProperty(END, r.getEffectiveTime().getMillis());
 												
 							//add a new member vertex with Long.MAX_VALUE end date
-							Vertex vM = g.addVertexWithLabel(g.getVertexLabel("GMember"));
-							GMember mg = fgf.create(g).getVertex(vM.getId(), GMember.class);
-							
+							//Vertex vM = g.getBaseGraph().addVertexWithLabel(g.getBaseGraph().getVertexLabel("GMember"));
+							//GMember mg = fgf.create(g).getVertex(vM.getId(), GMember.class);
+							GMember mg = fgf.create(g).getVertex(vExistingMember.getId(), GMember.class);
 							addMemberProperties(r, mg);
 							
 							LOGGER.trace("Added Member as vertex to graph with new state {}", mg.getId());
 							
-							Edge e = fgf.create(g).addEdge(null, mg.asVertex(), rV, "members");
+							//Edge e = fgf.create(g).addEdge(null, mg.asVertex(), rV, "members");
+							edge.setProperty(REFERENCE_COMPONENT_ID, r.getReferencedComponentId());
+							edge.setProperty(START, r.getEffectiveTime().getMillis());
+							edge.setProperty(END, Long.MAX_VALUE);
+							
+						} else if (m.getEffectiveTime().getMillis() > r.getEffectiveTime().getMillis() && currentEndDt == Long.MAX_VALUE) {
+							
+							//edge.setProperty(END, r.getEffectiveTime().getMillis());
+							
+							//add a new member vertex with Long.MAX_VALUE end date
+							Vertex vM = g.getBaseGraph().addVertexWithLabel(g.getBaseGraph().getVertexLabel("GMember"));
+				            vM.setProperty(TYPE, VertexType.hMember.toString());
+
+							//GMember mg = fgf.create(g).getVertex(vM.getId(), GMember.class);
+							GMember mg = fgf.create(g).getVertex(vM.getId(), GMember.class);
+							addMemberProperties(r, mg);
+							
+							LOGGER.trace("Added Member as vertex to graph with new state {}", mg.getId());
+							
+							//Edge e = fgf.create(g).addEdge(null, mg.asVertex(), rV, EdgeLabel.hasState.toString());
+							Edge e = vExistingMember.addEdge(EdgeLabel.hasState.toString(), vM);
 							e.setProperty(REFERENCE_COMPONENT_ID, r.getReferencedComponentId());
 							e.setProperty(START, r.getEffectiveTime().getMillis());
-							e.setProperty(END, Long.MAX_VALUE);
+							e.setProperty(END, r.getEffectiveTime().getMillis());
+
 							
 						}
 					}
