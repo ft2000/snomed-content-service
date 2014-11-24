@@ -197,7 +197,7 @@ public class RefsetGAO {
 		} catch (Exception e) {
 			
 			RefsetGraphFactory.rollback(g);			
-			LOGGER.error("Error during graph ineraction", e);
+			LOGGER.error("Error during graph interaction", e);
 			throw new RefsetGraphAccessException(e.getMessage(), e);
 
 		} finally {
@@ -240,7 +240,7 @@ public class RefsetGAO {
 		} catch (Exception e) {
 			
 			RefsetGraphFactory.rollback(g);
-			LOGGER.error("Error during graph ineraction ", e);
+			LOGGER.error("Error during graph interaction ", e);
 			throw new RefsetGraphAccessException(e.getMessage(), e);
 
 		} finally {

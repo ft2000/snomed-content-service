@@ -28,6 +28,7 @@ import com.thinkaurelius.titan.core.TitanGraph;
 import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Vertex;
+import com.tinkerpop.blueprints.util.wrappers.event.EventGraph;
 import com.tinkerpop.frames.FramedGraphFactory;
 import com.tinkerpop.frames.FramedTransactionalGraph;
 
@@ -394,58 +395,60 @@ public class MemberGAO {
 	 * @throws RefsetGraphAccessException 
 	 * @throws EntityNotFoundException 
 	 */
-	protected Vertex updateMemberNode(Member m, FramedTransactionalGraph<TitanGraph> tg) throws RefsetGraphAccessException, EntityNotFoundException {
+	protected Vertex updateMemberNode(Member m, EventGraph<TitanGraph> tg) throws RefsetGraphAccessException, EntityNotFoundException {
 		
 		Vertex mV = null;
 		if (m == null || StringUtils.isEmpty(m.getId()) || StringUtils.isEmpty(m.getReferencedComponentId())) {
 			
-			throw new EntityNotFoundException("Invalid member details. refset component id and member id is mandatory in member details");
+			throw new EntityNotFoundException("Invalid member details. Reference component id and member id is mandatory in member details");
 		}			
-		
+        tg.addListener(new MemberChangeListener(tg.getBaseGraph(), m.getModifiedBy()));
+
 		LOGGER.debug("Updating member {}", m);
 		Iterable<Vertex> vr = tg.query().has(TYPE, VertexType.member.toString()).has(ID, m.getId()).limit(1).vertices();
-		GMember mg = null;
+
 		if (vr != null ) {
 			
 			for (Vertex v : vr) {
 				
-				LOGGER.debug("Member is {} for member id {}", v, m.getId());
-				mg = fgf.create(tg).getVertex(v.getId(), GMember.class);
-				break;
-								
+				LOGGER.debug("Member is {} for member id {}", v, v.getId());
+				//mg = tg.getVertex(v.getId());//, GMember.class);
+				LOGGER.debug("Updating member ", m);
+
+				Integer activeFlag = m.isActive() ? 1 : 0;
+
+				//mg.setActive(activeFlag);
+				v.setProperty(ACTIVE, activeFlag);
+				DateTime et = m.getEffectiveTime();
+				if ( et != null) {
+					
+					//mg.setEffectiveTime(et.getMillis());
+					v.setProperty(EFFECTIVE_DATE, et.getMillis());
+				}
+				v.setProperty(MODIFIED_BY, m.getModifiedBy());
+				v.setProperty(MODIFIED_DATE, new DateTime().getMillis());
+				//mg.setModifiedBy(m.getModifiedBy());
+				//mg.setModifiedDate(new DateTime().getMillis());
+				if (!StringUtils.isEmpty(m.getModuleId())) {
+					
+					v.setProperty(MODULE_ID, m.getModuleId());
+
+					//mg.setModuleId(m.getModuleId());
+
+				}
+				
+				Integer publishedFlag = m.isPublished() ? 1 : 0;
+
+				//mg.setPublished(publishedFlag);
+				v.setProperty(PUBLISHED, publishedFlag);
+				
+				//mV = mg;//mg.asVertex();
+				LOGGER.debug("Updated Member as vertex to graph", v.getId());	
+				return v;
+				
 			}
 		}
 
-		if (mg != null) {
-			
-			Integer activeFlag = m.isActive() ? 1 : 0;
-
-			mg.setActive(activeFlag);
-			
-			DateTime et = m.getEffectiveTime();
-			if ( et != null) {
-				
-				mg.setEffectiveTime(et.getMillis());
-
-			}
-			
-			mg.setModifiedBy(m.getModifiedBy());
-			mg.setModifiedDate(new DateTime().getMillis());
-			if (!StringUtils.isEmpty(m.getModuleId())) {
-				
-				mg.setModuleId(m.getModuleId());
-
-			}
-			
-			Integer publishedFlag = m.isPublished() ? 1 : 0;
-
-			mg.setPublished(publishedFlag);
-			
-			mV = mg.asVertex();
-			LOGGER.debug("Updated Member as vertex to graph", mV.getId());	
-			return mV;
-
-		}
 		
 		String msg = "Member details not available for id " + m.getId();
 		

@@ -32,6 +32,7 @@ import com.thinkaurelius.titan.core.TitanGraph;
 import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Vertex;
+import com.tinkerpop.blueprints.util.wrappers.event.EventGraph;
 import com.tinkerpop.frames.FramedGraphFactory;
 import com.tinkerpop.frames.FramedTransactionalGraph;
 import com.tinkerpop.gremlin.Tokens.T;
@@ -118,7 +119,7 @@ public class RefsetAdminGAO {
 			
 			RefsetGraphFactory.rollback(tg);
 
-			LOGGER.error("Error during graph ineraction", e);
+			LOGGER.error("Error during graph interaction", e);
 			
 			throw new RefsetGraphAccessException(e.getMessage(), e);
 			
@@ -292,16 +293,14 @@ public class RefsetAdminGAO {
 		
 		LOGGER.debug("Updating refset {}", r);
 
-		TitanGraph g = null;
+		EventGraph<TitanGraph> g = null;
 		MetaData md = r.getMetaData();
 		
 		try {
 			
-			g = factory.getTitanGraph();
+			g = factory.getEventGraph();
 			
-			FramedTransactionalGraph<TitanGraph> tg = fgf.create(g);
-
-			final Vertex rV = updateRefsetNode(r, tg);	
+			final Vertex rV = updateRefsetNode(r, g);	
 			
 			LOGGER.debug("Updating members");
 
@@ -314,7 +313,7 @@ public class RefsetAdminGAO {
 					
 					LOGGER.debug("Updating member {}", m);
 
-					mGao.updateMemberNode(m, tg);
+					mGao.updateMemberNode(m, g);
 						
 				}
 
@@ -328,12 +327,11 @@ public class RefsetAdminGAO {
 			
 			LOGGER.debug("Commiting updated refset");
 
-			RefsetGraphFactory.commit(tg);
 			RefsetGraphFactory.commit(g);
 						
 		} catch(EntityNotFoundException e) {
 			
-			LOGGER.error("Error during graph ineraction", e);
+			LOGGER.error("Error during graph interaction", e);
 			RefsetGraphFactory.rollback(g);
 			
 			throw e;
@@ -342,7 +340,7 @@ public class RefsetAdminGAO {
 		catch (Exception e) {
 			
 			RefsetGraphFactory.rollback(g);			
-			LOGGER.error("Error during graph ineraction", e);
+			LOGGER.error("Error during graph interaction", e);
 			
 			throw new RefsetGraphAccessException(e.getMessage(), e);
 			
@@ -362,106 +360,111 @@ public class RefsetAdminGAO {
 	 * @throws RefsetGraphAccessException
 	 * @throws EntityNotFoundException 
 	 */
-	private Vertex updateRefsetNode(Refset r, FramedTransactionalGraph<TitanGraph> tg) throws RefsetGraphAccessException, EntityNotFoundException {
+	private Vertex updateRefsetNode(Refset r, EventGraph<TitanGraph> g) throws RefsetGraphAccessException, EntityNotFoundException {
 
 		LOGGER.debug("updateRefsetNode {}", r);
 
-		Object rVId = rGao.getRefsetVertex(r.getId(), tg);
+		Object rVId = rGao.getRefsetVertex(r.getId(), fgf.create(g.getBaseGraph()));
 		
-		GRefset rV = tg.getVertex(rVId, GRefset.class);
+        g.addListener(new RefsetHeaderChangeListener(g.getBaseGraph(), r.getModifiedBy()));
+
+		Vertex rV = g.getVertex(rVId);//, GRefset.class);
 		
 		if(rV == null) {
 			
 			throw new EntityNotFoundException("Can not find given refset to update");
 			
 		} 
-		
-		if (!StringUtils.isEmpty(r.getDescription())) {
+		String desc = r.getDescription();
+				
+		if (!StringUtils.isEmpty(desc)) {
 			
-			rV.setDescription(r.getDescription());
-
+			//rV.setDescription(r.getDescription());
+			rV.setProperty(DESC, desc);
 		}
 		
 		if (r.getEffectiveTime() != null) {
 			
-			rV.setEffectiveTime(r.getEffectiveTime().getMillis());
-
+			//rV.setEffectiveTime(r.getEffectiveTime().getMillis());
+			rV.setProperty(EFFECTIVE_DATE, r.getEffectiveTime().getMillis());
 		}
 		
 		String lang = r.getLanguageCode();
 
 		if (!StringUtils.isEmpty(lang)) {
 			
-			rV.setLanguageCode(lang);
-
+			//rV.setLanguageCode(lang);
+			rV.setProperty(LANG_CODE, lang);
 		}
 		
 		String moduleId = r.getModuleId();
 
 		if (!StringUtils.isEmpty(moduleId)) {
 			
-			rV.setModuleId(moduleId);
-
+			//rV.setModuleId(moduleId);
+			rV.setProperty(MODULE_ID, moduleId);
 		}
 		
 		Integer publishedFlag = r.isPublished() ? 1 : 0;
 
-		rV.setPublished(publishedFlag);
-		
+		//rV.setPublished(publishedFlag);
+		rV.setProperty(PUBLISHED, publishedFlag);
 		if (r.getPublishedDate() != null) {
 			
-			 rV.setPublishedDate(r.getPublishedDate().getMillis());
-
+			// rV.setPublishedDate(r.getPublishedDate().getMillis());
+			rV.setProperty(PUBLISHED_DATE, r.getPublishedDate().getMillis());
 		}
 		
 		String superRefsetTypeId = r.getSuperRefsetTypeId();
 
 		if (!StringUtils.isEmpty(superRefsetTypeId)) {
 			
-			rV.setSuperRefsetTypeId(superRefsetTypeId);
-
+			///rV.setSuperRefsetTypeId(superRefsetTypeId);
+			rV.setProperty(SUPER_REFSET_TYPE_ID, r.getSuperRefsetTypeId());
 		}
 
 		String compTypeId = r.getComponentTypeId();
 
 		if (!StringUtils.isEmpty(compTypeId)) {
 			
-			rV.setComponentTypeId(compTypeId);
-
+			//rV.setComponentTypeId(compTypeId);
+			rV.setProperty(MEMBER_TYPE_ID, compTypeId);
 		}
 		
 		Integer activeFlag = r.isActive() ? 1 : 0;
 
-		rV.setActive(activeFlag);
+		//rV.setActive(activeFlag);
+		rV.setProperty(ACTIVE, activeFlag);
 		
 		String typeId = r.getTypeId();
 
 		if (!StringUtils.isEmpty(typeId)) {
 			
-			rV.setTypeId(typeId);
-
+			//rV.setTypeId(typeId);
+			rV.setProperty(TYPE_ID, typeId);
 		}
 
-		rV.setModifiedBy(r.getModifiedBy());
-		rV.setModifiedDate(new DateTime().getMillis());
-
+		//rV.setModifiedBy(r.getModifiedBy());
+		//rV.setModifiedDate(new DateTime().getMillis());
+		rV.setProperty(MODIFIED_BY, r.getModifiedBy());
+		rV.setProperty(MODIFIED_DATE, new DateTime().getMillis());
 		DateTime ert = r.getExpectedReleaseDate();
 		if (ert != null) {
 			
-			rV.setExpectedReleaseDate(ert.getMillis());
-
+			//rV.setExpectedReleaseDate(ert.getMillis());
+			rV.setProperty(EXPECTED_RLS_DT, ert.getMillis());
 		}
 		
 		if (!StringUtils.isEmpty(r.getSctId())) {
 			
-			rV.setSctdId(r.getSctId());
-
+			//rV.setSctdId(r.getSctId());
+			rV.setProperty(SCTID, r.getSctId());
 		}
 
 		
 		LOGGER.debug("updateRefsetNode {} finished", rV);
 
-		return rV.asVertex();
+		return rV;//.asVertex();
 	}
 	
 	
@@ -536,7 +539,7 @@ public class RefsetAdminGAO {
 							
 							LOGGER.trace("Not adding this record as it already exist {}", r.getId());
 
-							//same record so do not reimport
+							//same record so do not re-import
 							outcome.put(r.getReferencedComponentId(), "Already exist, not imported again");
 							break;
 							
@@ -576,7 +579,7 @@ public class RefsetAdminGAO {
 		} catch (Exception e) {
 			
 			RefsetGraphFactory.rollback(g);			
-			LOGGER.error("Error during graph ineraction", e);
+			LOGGER.error("Error during graph interaction", e);
 			
 			throw new RefsetGraphAccessException(e.getMessage(), e);
 			

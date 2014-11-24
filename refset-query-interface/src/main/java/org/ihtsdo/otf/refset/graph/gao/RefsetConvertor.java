@@ -211,8 +211,11 @@ public class RefsetConvertor {
 			r.setActive(vR.getActive() == 1 ? true : false);
 			
 		}
-		
-		r.setTotalNoOfMembers(vR.getNoOfMembers());
+		if (keys.contains("noOfMembers")) {
+			
+			r.setTotalNoOfMembers(vR.getNoOfMembers());
+
+		}
 
 		return r;
 	}
@@ -248,7 +251,6 @@ public class RefsetConvertor {
 				
 				Member m = getMember(vM);
 				
-				//this has to be edge effective date. //TODO remove above
 				Set<String> eKeys = eR.getPropertyKeys();
 				if ( eKeys.contains(REFERENCE_COMPONENT_ID) ) {
 					
@@ -383,5 +385,207 @@ public class RefsetConvertor {
 		}
 		
 		return md;
+	}
+
+
+	/**
+	 * @param ls
+	 * @return
+	 */
+	public static List<Refset> getHistoryRefsets(List<Edge> ls) {
+
+		List<Refset> history = new ArrayList<Refset>();
+
+		if(ls != null) {
+			
+			
+			for (Edge eR : ls) {
+				
+				Vertex vR = eR.getVertex(Direction.IN);
+				
+				Refset r = getRefset(vR);
+
+				LOGGER.trace("Adding history refset as {} ", r.toString());
+
+				history.add(r);
+			}
+		}
+		
+		Collections.sort(history);
+		return history;
+
+	}
+
+
+	/**
+	 * @param vR
+	 * @return
+	 */
+	private static Refset getRefset(Vertex vR) {
+
+		if (vR == null) {
+			
+			return null;
+		}
+		
+		Refset r = new Refset();
+		Set<String> keys = vR.getPropertyKeys();
+		
+		if ( keys.contains(CREATED) ) {
+		
+			r.setCreated(new DateTime(vR.getProperty(CREATED)));
+		}
+		
+		if ( keys.contains(CREATED_BY) ) {
+			
+			String createdBy = vR.getProperty(CREATED_BY);
+			r.setCreatedBy(createdBy);
+			
+		}
+		
+		
+		if ( keys.contains(DESC) ) {
+			
+			String description = vR.getProperty(DESC);
+
+			r.setDescription(description);
+			
+		}
+		
+		if ( keys.contains(EFFECTIVE_DATE) ) {
+			
+			r.setEffectiveTime(new DateTime(vR.getProperty(EFFECTIVE_DATE)));
+			
+		}
+		
+		if ( keys.contains(ID) ) {
+			
+			String id = vR.getProperty(ID);
+			
+			r.setId(id);
+		}
+		
+		if ( keys.contains(LANG_CODE) ) {
+			
+			String lang = vR.getProperty(LANG_CODE);
+			r.setLanguageCode(lang);
+			
+		}
+		
+		if ( keys.contains(MODULE_ID) ) {
+			
+			String moduleId = vR.getProperty(MODULE_ID);
+			
+			r.setModuleId(moduleId);
+			
+		}
+		
+		if ( keys.contains(PUBLISHED) ) {
+			
+			Integer published = vR.getProperty(PUBLISHED);
+			
+			r.setPublished(published == 1 ? true : false);
+			
+		}
+		
+		
+		if ( keys.contains(PUBLISHED_DATE) ) {
+			
+			r.setPublishedDate(new DateTime(vR.getProperty(PUBLISHED_DATE)));
+			
+		}
+		
+		
+		if ( keys.contains(SUPER_REFSET_TYPE_ID) ) {
+			
+			String superRefsetTypeId = vR.getProperty(SUPER_REFSET_TYPE_ID);
+			r.setSuperRefsetTypeId(superRefsetTypeId);
+			
+		}
+		
+
+		if ( keys.contains(TYPE_ID) ) {
+			
+			String typeId = vR.getProperty(TYPE_ID);
+			r.setTypeId(typeId);
+			
+		}
+
+		if ( keys.contains(MEMBER_TYPE_ID) ) {
+			
+			String memberTypeId = vR.getProperty(MEMBER_TYPE_ID);
+			r.setComponentTypeId(memberTypeId);
+			
+		}
+		
+		if ( keys.contains(MODIFIED_DATE) ) {
+			
+			
+			r.setModifiedDate(new DateTime(vR.getProperty(MODIFIED_DATE)));
+		}
+		
+		if ( keys.contains(MODIFIED_BY) ) {
+			
+			String modifiedBy = vR.getProperty(MODIFIED_BY);
+
+			r.setModifiedBy(modifiedBy);
+			
+		}
+		
+		if ( keys.contains(EXPECTED_RLS_DT) ) {
+			
+			r.setExpectedReleaseDate(new DateTime(vR.getProperty(EXPECTED_RLS_DT)));
+
+		}
+		
+		if ( keys.contains(SCTID) ) {
+			
+			String sctid = vR.getProperty(SCTID);
+
+			r.setId(sctid);
+
+		}
+		
+		if ( keys.contains(ACTIVE) ) {
+			
+			Integer active = vR.getProperty(ACTIVE);
+
+			r.setActive(active == 1 ? true : false);
+			
+		}
+		
+		return r;
+
+	}
+	
+protected static List<Member> getHistoryMembers(Iterable<Edge> eRs ) {
+		
+		List<Member> members = new ArrayList<Member>();
+
+		if(eRs != null) {
+			
+			
+			for (Edge eR : eRs) {
+				
+				Vertex vM = eR.getVertex(Direction.IN);
+				
+				Member m = getMember(vM);
+				
+				Set<String> eKeys = eR.getPropertyKeys();
+				if ( eKeys.contains(REFERENCE_COMPONENT_ID) ) {
+					
+					String referenceComponentId = eR.getProperty(REFERENCE_COMPONENT_ID);
+					m.setReferencedComponentId(referenceComponentId);
+					
+				}
+
+				LOGGER.trace("Adding member as {} ", m.toString());
+
+				members.add(m);
+			}
+		}
+		
+		Collections.sort(members);
+		return members;
 	}
 }

@@ -14,7 +14,7 @@ package org.ihtsdo.otf.refset.graph.gao;
 /**
  *
  */
-public enum VertexType {
+public enum EdgeLabel {
 
-	refset, member, hRefset, hMember
+	hasState, members
 }
