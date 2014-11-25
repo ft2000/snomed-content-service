@@ -296,7 +296,14 @@ public class MemberGAO {
 				if (vIn != null && vIn.equals(rV)) {
 					
 					LOGGER.debug("Removing member relationship from refset {}", rV);
-					tg.removeEdge(e);
+					if(!"1".equals(e.getVertex(Direction.OUT).getProperty(PUBLISHED))) {
+						
+						tg.removeEdge(e);
+
+					} else {
+						
+						throw new EntityNotFoundException("Published member can not be deleted");
+					}
 
 					break;
 				}
@@ -412,10 +419,12 @@ public class MemberGAO {
 			
 			for (Vertex v : vr) {
 				
-				LOGGER.debug("Member is {} for member id {}", v, v.getId());
 				//mg = tg.getVertex(v.getId());//, GMember.class);
-				LOGGER.debug("Updating member ", m);
-
+				LOGGER.debug("Updating member {} and vertex {} ", m, v);
+				if(Integer.valueOf(1).equals(v.getProperty(PUBLISHED))) {
+					
+					throw new EntityNotFoundException("Member can not be updated once published");
+				}
 				Integer activeFlag = m.isActive() ? 1 : 0;
 
 				//mg.setActive(activeFlag);

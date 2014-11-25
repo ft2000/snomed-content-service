@@ -303,6 +303,7 @@ public class RefsetAdminGAO {
 			
 			g = factory.getEventGraph();
 			
+			
 			final Vertex rV = updateRefsetNode(r, g);	
 			
 			LOGGER.debug("Updating members");
@@ -373,11 +374,19 @@ public class RefsetAdminGAO {
 
 		Vertex rV = g.getVertex(rVId);//, GRefset.class);
 		
+		
+		
 		if(rV == null) {
 			
 			throw new EntityNotFoundException("Can not find given refset to update");
 			
 		} 
+		//no update is allowed in inactive refset. Only allowed if refset is being made active simultaneously
+		if (Integer.valueOf(0).equals(rV.getProperty(ACTIVE)) && !r.isActive()) {
+			
+			throw new  EntityNotFoundException("No update is allowed for inactive refset. Re-activate and try again");
+		}
+		
 		String desc = r.getDescription();
 				
 		if (!StringUtils.isEmpty(desc)) {
