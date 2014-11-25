@@ -246,7 +246,8 @@ public class RefsetAdminGAO {
 
 			Vertex refset = rGao.getRefsetVertex(refsetId, fgf.create(g.getBaseGraph()));
 			
-			Integer published = refset.getProperty(PUBLISHED);
+			// removing this check as delete is needed for any state 
+			/**Integer published = refset.getProperty(PUBLISHED);
 			
 			
 			if (published == 1) {
@@ -259,8 +260,9 @@ public class RefsetAdminGAO {
 				
 				g.removeVertex(refset);
 
-			}
-
+			}*/
+			
+			g.removeVertex(refset);
 			
 			RefsetGraphFactory.commit(g);
 			

@@ -54,7 +54,7 @@ public class ImportRF2Service implements ImportService {
 	 * @see org.ihtsdo.otf.refset.service.upload.ImportService#importFile(org.springframework.web.multipart.MultipartFile, java.lang.String)
 	 */
 	@Override
-	public Map<String, String> importFile(InputStream is, String refsetId) throws RefsetServiceException, EntityNotFoundException {
+	public Map<String, String> importFile(InputStream is, String refsetId, String user) throws RefsetServiceException, EntityNotFoundException {
 		
 		
 		if (is == null || StringUtils.isBlank(refsetId)) {
@@ -96,6 +96,8 @@ public class ImportRF2Service implements ImportService {
         			rf2r.setModuleId(columns[3]);
         			rf2r.setRefsetId(columns[4]);
         			rf2r.setReferencedComponentId(columns[5]);
+        			rf2r.setCreatedBy(user);
+        			rf2r.setModifiedBy(user);
         			rf2RLst.add(rf2r);
         			
         		} else {
@@ -124,15 +126,6 @@ public class ImportRF2Service implements ImportService {
 				LOGGER.info("Could not close IO resources");
 			}
 		}
-		
-		
-		
 	}
-
-
-        
-        
-	
-	
 
 }

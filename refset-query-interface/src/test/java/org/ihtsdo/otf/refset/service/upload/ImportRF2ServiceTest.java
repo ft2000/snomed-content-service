@@ -62,7 +62,7 @@ public class ImportRF2ServiceTest {
 	@Test(expected = IllegalArgumentException.class)
 	public void testImportFileInvalidRequest() throws RefsetServiceException, EntityNotFoundException {
 		
-		service.importFile(null, "jnunit");
+		service.importFile(null, "jnunit", "jnunit");
 	}
 	
 	/**
@@ -74,7 +74,7 @@ public class ImportRF2ServiceTest {
 	@Test(expected = IllegalArgumentException.class)
 	public void testImportFileInvalidRequestNullOrEmptyRefsetId() throws RefsetServiceException, EntityNotFoundException, FileNotFoundException {
 		
-		service.importFile(new FileInputStream(GOOD_FILE), "");
+		service.importFile(new FileInputStream(GOOD_FILE), "", "jnunit");
 	}
 	
 	/**
@@ -86,7 +86,7 @@ public class ImportRF2ServiceTest {
 	@Test(expected = RefsetServiceException.class)
 	public void testImportFileInvalidRequestInvalidFile() throws RefsetServiceException, EntityNotFoundException, FileNotFoundException {
 		
-		service.importFile(new FileInputStream(INVALID_FILE), "junit");
+		service.importFile(new FileInputStream(INVALID_FILE), "junit", "jnunit");
 	}
 	
 	/**
@@ -98,7 +98,7 @@ public class ImportRF2ServiceTest {
 	@Test
 	public void testImportFile() throws RefsetServiceException, EntityNotFoundException, FileNotFoundException {
 		
-		service.importFile(new FileInputStream(GOOD_FILE), "junit");
+		service.importFile(new FileInputStream(GOOD_FILE), "junit", "jnunit");
 		verify(srp).process(anyListOf(Rf2Record.class), anyString());
 	}
 	

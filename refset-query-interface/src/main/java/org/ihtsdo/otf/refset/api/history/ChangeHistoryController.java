@@ -34,7 +34,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -61,7 +60,11 @@ public class ChangeHistoryController {
 	private RefsetChangeHistoryService service;
 	
 	@RequestMapping( method = RequestMethod.GET, value = "/{refsetId}/member/{memberId}/history",  produces = "application/json", consumes = "application/json")
-	@ApiOperation( value = "Get a member history) " )
+	@ApiOperation( value = "Get a member history ",
+			notes = "This api call is to get last 10 days of history of given members under given refset and for given range. "
+					+ "It is sorted by latest first."
+				+ "If user of this api want to retrieve specific dates history, they should provide from date and to date"
+				+ "in the format of yyyy-mm-dd")
 	@PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<Result< Map<String, Object>>> getMemberHistory( @PathVariable String refsetId, 
     		@PathVariable String memberId,
@@ -90,9 +93,10 @@ public class ChangeHistoryController {
     }
 	
 	@RequestMapping( method = RequestMethod.GET, value = "/{refsetId}/history",  produces = "application/json", consumes = "application/json")
-	@ApiOperation( value = "Get all members history under a refset) ",
-			notes = "This api call is to get last 10 days of history of all members under given refset , by default for last 10 days. It is sorted by latest first."
-				+ "If user of this api want to retrieves specific dates history, they should provide from date and to date"
+	@ApiOperation( value = "Get all members history under a refset ",
+			notes = "This api call is to get last 10 days of history of all members under given refset and for given range of members. "
+					+ "It is sorted by latest first."
+				+ "If user of this api want to retrieve specific dates history, they should provide from date and to date"
 				+ "in the format of yyyy-mm-dd")
 	@PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<Result< Map<String, Object>>> getAllMembersHistory( @PathVariable String refsetId,
@@ -121,9 +125,9 @@ public class ChangeHistoryController {
     }
 	
 	@RequestMapping( method = RequestMethod.GET, value = "/{refsetId}/headerHistory",  produces = "application/json", consumes = "application/json")
-	@ApiOperation( value = "Get a refset header history) ", 
+	@ApiOperation( value = "Get a refset header history", 
 		notes = "This api call retrieves refset header history by default for last 10 days. It is sorted by latest first."
-				+ "If user of this api want to retrieves specific dates history, they should provide from date and to date"
+				+ "If user of this api want to retrieve specific dates history, they should provide from date and to date"
 				+ "in the format of yyyy-mm-dd" )
 	@PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<Result< Map<String, Object>>> getRefseHeaderHistory( @PathVariable String refsetId,
