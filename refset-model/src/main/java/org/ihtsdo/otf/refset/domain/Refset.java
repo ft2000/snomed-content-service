@@ -29,6 +29,10 @@ public class Refset extends BaseObj implements Comparable<Refset> {
 	
 	private long totalNoOfMembers;
 	
+	private DateTime earliestEffectiveTime;
+	
+	private DateTime latestEffectiveTime;
+	
 	
 	/**
 	 * @return the typeId
@@ -121,9 +125,10 @@ public class Refset extends BaseObj implements Comparable<Refset> {
 	   
 	   return String.format( "Refset [id - %s, created - %s, createdBy - %s, description - %s, "
 	   		+ "effectiveTime - %s,  isPublished - %s, languageCode - %s, members - %s, moduleId - %s, publishedDate - %s "
-	   		+ "superRefsetTypeId - %s, type - %s, typeId - %s, description - %s]", this.id, this.created, this.createdBy, this.description,
+	   		+ "superRefsetTypeId - %s, type - %s, typeId - %s, description - %s, latestEffectiveTime - %s,"
+	   		+ " earliestEffectiveTime -%s ]", this.id, this.created, this.createdBy, this.description,
 	   		this.effectiveTime, this.published, this.languageCode, this.members, this.moduleId, this.publishedDate,
-	   		this.superRefsetTypeId, this.type, this.typeId, this.description );
+	   		this.superRefsetTypeId, this.type, this.typeId, this.description, this.earliestEffectiveTime, this.latestEffectiveTime );
    }
 
 
@@ -182,6 +187,34 @@ public class Refset extends BaseObj implements Comparable<Refset> {
 		int outcome = this.created.compareTo(o.getCreated());
 				
 		return outcome;
+	}
+
+	/**
+	 * @return the earliestEffectiveTime
+	 */
+	public DateTime getEarliestEffectiveTime() {
+		return earliestEffectiveTime;
+	}
+
+	/**
+	 * @param earliestEffectiveTime the earliestEffectiveTime to set
+	 */
+	public void setEarliestEffectiveTime(DateTime earliestEffectiveTime) {
+		this.earliestEffectiveTime = earliestEffectiveTime;
+	}
+
+	/**
+	 * @return the latestEffectiveTime
+	 */
+	public DateTime getLatestEffectiveTime() {
+		return latestEffectiveTime;
+	}
+
+	/**
+	 * @param latestEffectiveTime the latestEffectiveTime to set
+	 */
+	public void setLatestEffectiveTime(DateTime latestEffectiveTime) {
+		this.latestEffectiveTime = latestEffectiveTime;
 	}
 
 

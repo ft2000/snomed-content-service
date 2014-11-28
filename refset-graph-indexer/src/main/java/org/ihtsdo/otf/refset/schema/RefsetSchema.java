@@ -20,6 +20,8 @@ import static org.ihtsdo.otf.refset.domain.RGC.MEMBER_TYPE_ID;
 import static org.ihtsdo.otf.refset.domain.RGC.EXPECTED_RLS_DT;
 import static org.ihtsdo.otf.refset.domain.RGC.START;
 import static org.ihtsdo.otf.refset.domain.RGC.END;
+import static org.ihtsdo.otf.refset.domain.RGC.E_EFFECTIVE_TIME;
+import static org.ihtsdo.otf.refset.domain.RGC.L_EFFECTIVE_TIME;
 
 import org.apache.commons.lang.StringUtils;
 import org.ihtsdo.otf.snomed.domain.Properties;
@@ -387,41 +389,6 @@ public class RefsetSchema {
 	    
 	}
 
-	/**
-	 * @param string
-	 */
-	public void update(String index) {
-		
-	    LOGGER.info("==============================");
-		
-		TitanGraph g = openGraph(config);
-	    //management api
-	    TitanManagement mgmt = g.getManagementSystem();
-	    
-	    try {
-
-			if("MemberRefComponentId".equalsIgnoreCase(index)) {
-				
-				//mgmt.updateIndex(index, updateAction);
-				mgmt.buildIndex("MemberRefComponentId", Vertex.class).addKey(mgmt.makePropertyKey(REFERENCE_COMPONENT_ID)
-						.dataType(String.class).make()).buildCompositeIndex();
-	
-			}
-			LOGGER.info("==============================");
-		    
-		    mgmt.commit();
-	    } catch (Exception e) {
-		
-	    	LOGGER.error("Management Transaction Rolledback");
-	    	mgmt.rollback();
-	    	e.printStackTrace();
-	    	
-	    } finally {
-		
-	    	g.shutdown();
-	    }
-	
-	}
 	
 	private void makePropertyKeys(TitanManagement mgmt) {
 		
@@ -577,6 +544,20 @@ public class RefsetSchema {
 			mgmt.makePropertyKey(END).dataType(Long.class).make();
 			
 		} 
+		
+		if (!mgmt.containsRelationType(E_EFFECTIVE_TIME)) {
+
+			LOGGER.debug("Creating Property {}", E_EFFECTIVE_TIME);
+			mgmt.makePropertyKey(E_EFFECTIVE_TIME).dataType(Long.class).make();
+			
+		}
+		
+		if (!mgmt.containsRelationType(L_EFFECTIVE_TIME)) {
+
+			LOGGER.debug("Creating Property {}", L_EFFECTIVE_TIME);
+			mgmt.makePropertyKey(L_EFFECTIVE_TIME).dataType(Long.class).make();
+			
+		}
 
 	}
 	
@@ -698,5 +679,54 @@ public class RefsetSchema {
 	    	g.shutdown();
 	    }
 	}
-}
+	
+	
+	public void updateMixedIndex() {
 
+		TitanGraph g = openGraph(config);
+	    //management api
+	    TitanManagement mgmt = g.getManagementSystem();
+	    
+	    try {
+		
+		
+			TitanGraphIndex giRefset = mgmt.getGraphIndex(MixedIndex.Refset.toString());
+			
+			if (giRefset != null) {
+			
+				LOGGER.debug("Updating Index  {}" , "Refset mixed index");
+				mgmt.addIndexKey(giRefset, mgmt.getPropertyKey(E_EFFECTIVE_TIME), 
+						Parameter.of(MAPPED, Properties.earliestEffectiveTime.toString()));
+				mgmt.addIndexKey(giRefset, mgmt.getPropertyKey(L_EFFECTIVE_TIME), 
+						Parameter.of(MAPPED, Properties.latestEffectiveTime.toString()));
+			}
+			
+			
+						
+			TitanGraphIndex giMember = mgmt.getGraphIndex(MixedIndex.Member.toString());
+	
+			if (giMember != null) {
+				LOGGER.debug("Updating Index  {}" , "Member mixed index");
+					
+				mgmt.addIndexKey(giMember, mgmt.getPropertyKey(EFFECTIVE_DATE), 
+						Parameter.of(MAPPED, Properties.effectiveTime.toString()));
+				mgmt.addIndexKey(giMember, mgmt.getPropertyKey(DESC), 
+						Parameter.of(MAPPED, Properties.title.toString()));
+	
+			}
+			
+			mgmt.commit();
+			
+	    } catch (Exception e) {
+		
+	    	LOGGER.error("Management Transaction Rolledback");
+	    	mgmt.rollback();
+	    	e.printStackTrace();
+	    	
+	    } finally {
+		
+	    	g.shutdown();
+	    }
+	
+	}
+}
