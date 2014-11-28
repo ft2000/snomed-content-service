@@ -162,7 +162,6 @@ public class ChangeHistoryController {
 	private DateTime getFromDate(String fromDate) {
 		
 		DateTime fromDt = new DateTime().minusDays(10);
-		//TODO format to jodatime
 		if (!StringUtils.isEmpty(fromDate)) {
 			
 			fromDt = FORMATTER.parseDateTime(fromDate);

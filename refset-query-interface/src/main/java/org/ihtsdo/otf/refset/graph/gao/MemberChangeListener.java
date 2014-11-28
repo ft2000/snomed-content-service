@@ -21,6 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.thinkaurelius.titan.core.TitanGraph;
+import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.util.wrappers.event.listener.GraphChangedListener;
@@ -181,8 +182,15 @@ public class MemberChangeListener implements GraphChangedListener {
 			hV.setProperty(ID, cV.getProperty(ID));
 			Edge e = cV.addEdge(EdgeLabel.hasState.toString(), hV);
 			historyEdgeIds.put(hV.getId(), e.getId());
-			e.setProperty(START, cV.getProperty(MODIFIED_DATE));
-			e.setProperty(END, new DateTime().getMillis());
+			Iterable<Edge> mES = cV.getEdges(Direction.OUT, EdgeLabel.members.toString());
+			for (Edge edge : mES) {
+				
+	            LOGGER.debug("Adding Start date {}", edge.getProperty(START));
+				
+				e.setProperty(START, edge.getProperty(START));
+				e.setProperty(END, new DateTime().getMillis());
+				break;
+			}
             LOGGER.debug("State edge with an id - {} was added by {}", e.getId(), user);
 
 		} else {

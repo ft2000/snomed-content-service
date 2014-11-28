@@ -108,7 +108,7 @@ public class ImportRF2Service implements ImportService {
 
             }
             
-        	return srp.process(rf2RLst, refsetId);
+        	return srp.process(rf2RLst, refsetId, user);
 
 			
 		} catch (IOException e) {

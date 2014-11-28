@@ -157,7 +157,7 @@ public class RefsetAdminGAOTest {
 
 		aGao.addRefset(rs.get(0));
 
-		aGao.removeRefset(new Refset().getId());
+		aGao.removeRefset(new Refset().getId(), "junit");
 
 	}
 	

@@ -5,6 +5,7 @@ package org.ihtsdo.otf.refset.graph.gao;
 
 import static org.ihtsdo.otf.refset.domain.RGC.*;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,7 +40,10 @@ import com.tinkerpop.gremlin.Tokens.T;
 import com.tinkerpop.gremlin.java.GremlinPipeline;
 
 /**Graph Access component to do CRUD operation on underlying Refset graph
- * @author Episteme Partners
+ * Operation in this class supports
+ * 1. New Refset Creation
+ * 2. Deletion of a refset
+ * 3. Update an existing refset
  *
  */
 @Repository
@@ -52,8 +56,6 @@ public class RefsetAdminGAO {
 	private MemberGAO mGao;
 	
 	private RefsetGAO rGao;
-	
-
 
 	private static FramedGraphFactory fgf = new FramedGraphFactory();
 
@@ -69,16 +71,14 @@ public class RefsetAdminGAO {
 
 		TitanGraph g = null;
 		MetaData md = r.getMetaData();
-		FramedTransactionalGraph<TitanGraph> tg = null;
+		EventGraph<TitanGraph> tg = null;
 		
 		try {
-			
-			g = factory.getTitanGraph();
-			
-			tg = fgf.create(g);
+						
+			tg = factory.getEventGraph();
 			
 
-			final Vertex rV = addRefsetNode(r, tg);	
+			final Vertex rV = addRefsetNode(r, fgf.create(tg.getBaseGraph()));	
 			
 			
 			/*if members exist then add members*/
@@ -223,11 +223,12 @@ public class RefsetAdminGAO {
 
 	/** Removes a {@link Refset} if it is not yet published
 	 * or update as inactive in  graph
+	 * @param user 
 	 * @param r {@link Refset}
 	 * @throws RefsetGraphAccessException
 	 * @throws EntityNotFoundException 
 	 */
-	public void removeRefset(String refsetId) throws RefsetGraphAccessException, EntityNotFoundException {
+	public void removeRefset(String refsetId, String user) throws RefsetGraphAccessException, EntityNotFoundException {
 		
 		LOGGER.debug("removeRefset  {} ", refsetId);
 		
@@ -242,7 +243,7 @@ public class RefsetAdminGAO {
 		try {
 			
 			g = factory.getEventGraph();
-	        g.addListener(new RefsetHeaderChangeListener(g.getBaseGraph(), "service"));
+	        g.addListener(new RefsetHeaderChangeListener(g.getBaseGraph(), user));
 
 			Vertex refset = rGao.getRefsetVertex(refsetId, fgf.create(g.getBaseGraph()));
 			
@@ -487,16 +488,19 @@ public class RefsetAdminGAO {
 	 * @throws EntityNotFoundException 
 	 * @throws RefsetGraphAccessException 
 	 */
-	public Map<String, String> addMembers(List<Rf2Record> rf2rLst, String refsetId) throws EntityNotFoundException, RefsetGraphAccessException {
+	public Map<String, String> addMembers(List<Rf2Record> rf2rLst, String refsetId, String user) throws EntityNotFoundException, RefsetGraphAccessException {
 		
 		Map<String, String> outcome = new HashMap<String, String>();
 		
 		EventGraph<TitanGraph> g = factory.getEventGraph();
-		g.addListener(new Rf2ImportMemberChangeListener(g.getBaseGraph(), "rf2import"));
+		g.addListener(new Rf2ImportMemberChangeListener(g.getBaseGraph(), user));
+		g.addListener(new EffectiveTimeChangeListener(g.getBaseGraph(), user));
+
 		try {
 			
 			Vertex rV = rGao.getRefsetVertex(refsetId, fgf.create(g.getBaseGraph()));
 
+			Map<String, String> descriptions = populateDescription(rf2rLst);
 			for (Rf2Record r : rf2rLst) {
 				
 				GRefset gr = fgf.create(g).frame(rV, GRefset.class);
@@ -508,16 +512,16 @@ public class RefsetAdminGAO {
 					continue;
 				}
 			
-				String desc = rGao.getMemberDescription(r.getReferencedComponentId());
-				
-				if (StringUtils.isEmpty(desc)) {
+				if (StringUtils.isEmpty(descriptions.containsKey(r.getReferencedComponentId()))) {
 					
 					outcome.put(r.getReferencedComponentId(), "Unknown referenced component");
 					continue;
 				}
 				
 				GremlinPipeline<Vertex, Edge> pipe = new GremlinPipeline<Vertex, Edge>();			
-				pipe.start(rV).inE("members").has(REFERENCE_COMPONENT_ID, T.eq, r.getReferencedComponentId());
+				pipe.start(rV).inE("members")
+					.has(REFERENCE_COMPONENT_ID, T.eq, r.getReferencedComponentId())
+					.has(EFFECTIVE_DATE, Long.MAX_VALUE);
 				List<Edge> ls = pipe.toList();
 				
 				if(ls.isEmpty()) {
@@ -556,13 +560,8 @@ public class RefsetAdminGAO {
 							break;
 							
 						} else if (m.getEffectiveTime().getMillis() < r.getEffectiveTime().getMillis() && currentEndDt == Long.MAX_VALUE) {
-							
-							//mark this relationship with an end date of current effective time
-							//edge.setProperty(END, r.getEffectiveTime().getMillis());
-												
+																			
 							//add a new member vertex with Long.MAX_VALUE end date
-							//Vertex vM = g.getBaseGraph().addVertexWithLabel(g.getBaseGraph().getVertexLabel("GMember"));
-							//GMember mg = fgf.create(g).getVertex(vM.getId(), GMember.class);
 							GMember mg = fgf.create(g).getVertex(vExistingMember.getId(), GMember.class);
 							addMemberProperties(r, mg);
 							
@@ -574,9 +573,7 @@ public class RefsetAdminGAO {
 							edge.setProperty(END, Long.MAX_VALUE);
 							
 						} else if (m.getEffectiveTime().getMillis() > r.getEffectiveTime().getMillis() && currentEndDt == Long.MAX_VALUE) {
-							
-							//edge.setProperty(END, r.getEffectiveTime().getMillis());
-							
+														
 							//add a new member vertex with Long.MAX_VALUE end date
 							Vertex vM = g.getBaseGraph().addVertexWithLabel(g.getBaseGraph().getVertexLabel("GMember"));
 				            vM.setProperty(TYPE, VertexType.hMember.toString());
@@ -592,12 +589,10 @@ public class RefsetAdminGAO {
 							e.setProperty(REFERENCE_COMPONENT_ID, r.getReferencedComponentId());
 							e.setProperty(START, r.getEffectiveTime().getMillis());
 							e.setProperty(END, r.getEffectiveTime().getMillis());
-
 							
 						}
 					}
-					
-					
+
 				}
 
 			}
@@ -625,6 +620,32 @@ public class RefsetAdminGAO {
 		return outcome;
 	}
 	
+	/**
+	 * @param rf2rLst
+	 * @return
+	 * @throws RefsetGraphAccessException 
+	 */
+	private Map<String, String> populateDescription(List<Rf2Record> rf2rLst) throws RefsetGraphAccessException {
+
+		Map<String, String> descriptions = new HashMap<String, String>();
+		
+		if (rf2rLst == null || rf2rLst.isEmpty()) {
+			
+			return descriptions;
+		}
+		List<String> rcIds = new ArrayList<String>();
+		
+		for (Rf2Record record : rf2rLst) {
+			
+			rcIds.add(record.getReferencedComponentId());
+			
+		}
+		descriptions = rGao.getMembersDescription(rcIds);
+
+		return descriptions;
+	}
+
+
 	private GMember addMemberProperties(Rf2Record r, GMember mg) {
 		Integer activeFlag = "1".equals(r.getActive()) ? 1 : 0;
 

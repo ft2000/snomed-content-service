@@ -258,5 +258,29 @@ public interface GRefset extends VertexFrame {
 	 */
 	@Property( value = "noOfMembers")
 	public void setNoOfMembers(Long noOfMembers);
+	
+	/**
+	 * @return the earliestEffectiveTime
+	 */
+	@Property( value = "earliestEffectiveTime")
+	public long getEarliestEffectiveTime();
+
+	/**
+	 * @param earliestEffectiveTime the earliestEffectiveTime to set
+	 */
+	@Property( value = "earliestEffectiveTime")
+	public void setEarliestEffectiveTime(long earliestEffectiveTime);
+	
+	/**
+	 * @return the latestEffectiveTime
+	 */
+	@Property( value = "latestEffectiveTime")
+	public long getLatestEffectiveTime();
+
+	/**
+	 * @param latestEffectiveTime the latestEffectiveTime to set
+	 */
+	@Property( value = "latestEffectiveTime")
+	public void setLatestEffectiveTime(long latestEffectiveTime);
 
 }

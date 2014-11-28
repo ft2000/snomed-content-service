@@ -22,7 +22,7 @@ import org.ihtsdo.otf.refset.exception.RefsetServiceException;
  */
 public interface  RefsetProcessor {
 	
-	public Map<String, String> process(List<Rf2Record> rf2rLst, String refsetId) throws RefsetServiceException, EntityNotFoundException;
+	public Map<String, String> process(List<Rf2Record> rf2rLst, String refsetId, String user) throws RefsetServiceException, EntityNotFoundException;
 	
 	
 }

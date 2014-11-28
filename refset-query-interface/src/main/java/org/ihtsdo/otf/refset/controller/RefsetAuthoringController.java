@@ -8,6 +8,7 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 import java.nio.file.AccessDeniedException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -20,6 +21,7 @@ import org.ihtsdo.otf.refset.common.Result;
 import org.ihtsdo.otf.refset.domain.Member;
 import org.ihtsdo.otf.refset.domain.MemberValidator;
 import org.ihtsdo.otf.refset.domain.Refset;
+import org.ihtsdo.otf.refset.domain.RefsetValidator;
 import org.ihtsdo.otf.refset.exception.ValidationException;
 import org.ihtsdo.otf.refset.security.User;
 import org.ihtsdo.otf.refset.service.RefsetAuthoringService;
@@ -34,7 +36,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.util.Assert;
-import org.springframework.util.StringUtils;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.Errors;
 import org.springframework.validation.FieldError;
@@ -69,16 +70,24 @@ public class RefsetAuthoringController {
 	
 	@Autowired
 	private MemberValidator mValidator;
+	
+	@Autowired
+	private RefsetValidator rValidator;
 
 	@RequestMapping( method = RequestMethod.POST, value = "/new",  produces = "application/json", consumes = "application/json")
 	@ApiOperation( value = "Add a Refset) " )
 	@PreAuthorize("hasRole('ROLE_USER')")
-    public ResponseEntity<Result< Map<String, Object>>> addRefset( @RequestBody Refset r, 
-    		@RequestHeader("X-REFSET-PRE-AUTH-TOKEN") String authToken, 
-    		@RequestHeader("X-REFSET-PRE-AUTH-USERNAME") String userName) throws Exception {
+    public ResponseEntity<Result< Map<String, Object>>> addRefset( @RequestBody Refset r) throws Exception {
 		
 		logger.debug("Adding refsets {}", r);
+		validateRefset(r);
+		Set<Member> ms = new HashSet<Member>();
+		ms.addAll(r.getMembers());
+		if (ms != null && !ms.isEmpty()) {
+			
+			validateMembers(ms);
 
+		}
 		Result<Map<String, Object>> result = new Result<Map<String, Object>>();
 		Meta m = new Meta();
 		result.setMeta(m);
@@ -117,14 +126,9 @@ public class RefsetAuthoringController {
 	 */
 	private void addMetaDetails(Refset r) throws AccessDeniedException {
 		
-		// TODO Auto-generated method stub
-		if (StringUtils.isEmpty(r.getId())) {
-			
-			String id = UUID.randomUUID().toString();
-			r.setId(id);
-			r.setCreated(new DateTime());
-			
-		}
+		String id = UUID.randomUUID().toString();
+		r.setId(id);
+		r.setCreated(new DateTime());
 		r.setCreatedBy(getUserDetails().getUsername());
 		r.setActive(r.isActive());		
 		
@@ -147,12 +151,17 @@ public class RefsetAuthoringController {
 	@ApiOperation( value = "Shortcut method to add a member to an existing refset." )
 	@PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<Result< Map<String, Object>>> addMember(@PathVariable(value = "refSetId") String refsetId, 
-    		@RequestBody( required = true) Member member, 
-    		@RequestHeader("X-REFSET-PRE-AUTH-TOKEN") String authToken, 
-    		@RequestHeader("X-REFSET-PRE-AUTH-USERNAME") String userName) throws Exception {
+    		@RequestBody( required = true) Member member) throws Exception {
 		
 		logger.debug("Adding member {} to refset {}", member, refsetId);
 
+		Set<Member> ms = new HashSet<Member>();
+		ms.add(member);
+		if (ms != null && !ms.isEmpty()) {
+			
+			validateMembers(ms);
+
+		}
 		Result<Map<String, Object>> result = new Result<Map<String, Object>>();
 		
 		Meta m = new Meta();
@@ -179,12 +188,18 @@ public class RefsetAuthoringController {
 	@RequestMapping( method = RequestMethod.POST, value = "/update",  produces = "application/json", consumes = "application/json")
 	@ApiOperation( value = "Update a Refset" )
 	@PreAuthorize("hasRole('ROLE_USER')")
-    public ResponseEntity<Result< Map<String, Object>>> updateRefset( @RequestBody Refset r, 
-    		@RequestHeader("X-REFSET-PRE-AUTH-TOKEN") String authToken, 
-    		@RequestHeader("X-REFSET-PRE-AUTH-USERNAME") String userName) throws Exception {
+    public ResponseEntity<Result< Map<String, Object>>> updateRefset( @RequestBody Refset r) throws Exception {
 		
 		logger.debug("Updating an existing refsets {}", r);
 
+		validateRefset(r);
+		Set<Member> ms = new HashSet<Member>();
+		ms.addAll(r.getMembers());
+		if (ms != null && !ms.isEmpty()) {
+			
+			validateMembers(ms);
+
+		}
 		Result<Map<String, Object>> response = new Result<Map<String, Object>>();
 		Meta m = new Meta();
 		
@@ -234,7 +249,7 @@ public class RefsetAuthoringController {
 
 		Assert.notNull(refsetId, "Required refset id is not available in request");
 		
-		aService.remove(refsetId);
+		aService.remove(refsetId, getUserDetails().getUsername());
 
 		m.add( linkTo( methodOn( RefsetBrowseController.class ).getRefsets(1, 10)).withRel("Refset"));
 
@@ -272,7 +287,7 @@ public class RefsetAuthoringController {
 
 
 		}
-		Map<String, String> outcome = aService.addMembers(refsetId, members);
+		Map<String, String> outcome = aService.addMembers(refsetId, members, getUserDetails().getUsername());
 		
 		Map<String, Object> data = new HashMap<String, Object>();
 		data.put("outcome", outcome);
@@ -321,9 +336,7 @@ public class RefsetAuthoringController {
 	@ApiOperation( value = "Removes a member from refset" )
 	@PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<Result< Map<String, Object>>> removeMember( @PathVariable String refsetId,
-    		@PathVariable String referenceComponentId,
-    		@RequestHeader("X-REFSET-PRE-AUTH-TOKEN") String authToken, 
-    		@RequestHeader("X-REFSET-PRE-AUTH-USERNAME") String userName) throws Exception {
+    		@PathVariable String referenceComponentId) throws Exception {
 		
 		logger.debug("Removing an existing refsets {}", refsetId);
 
@@ -334,7 +347,7 @@ public class RefsetAuthoringController {
 
 		Assert.notNull(refsetId, "Required refset id is not available in request");
 		
-		aService.removeMemberFromRefset(refsetId, referenceComponentId);
+		aService.removeMemberFromRefset(refsetId, referenceComponentId, getUserDetails().getUsername());
 
 		m.add( linkTo( methodOn( RefsetBrowseController.class ).getRefsets(1, 10)).withRel("Refset"));
 
@@ -350,9 +363,7 @@ public class RefsetAuthoringController {
 	@ApiOperation( value = "Removes list of members from refset." )
 	@PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<Result< Map<String, Object>>> removeMembers( @PathVariable String refsetId,
-    		@RequestBody Set<String> referencedComponentIds,
-    		@RequestHeader("X-REFSET-PRE-AUTH-TOKEN") String authToken, 
-    		@RequestHeader("X-REFSET-PRE-AUTH-USERNAME") String userName) throws Exception {
+    		@RequestBody Set<String> referencedComponentIds) throws Exception {
 		
 		logger.debug("Removing an existing refsets {}", refsetId);
 
@@ -361,7 +372,7 @@ public class RefsetAuthoringController {
 		
 		result.setMeta(m);
 		
-		Map<String, String> outcome = aService.removeMembers(refsetId, referencedComponentIds);
+		Map<String, String> outcome = aService.removeMembers(refsetId, referencedComponentIds, getUserDetails().getUsername());
 
 		Map<String, Object> data = new HashMap<String, Object>();
 		data.put("outcome", outcome);
@@ -378,6 +389,30 @@ public class RefsetAuthoringController {
     }
 
 
+	/**
+	 * @param members
+	 */
+	private void validateRefset(Refset r) throws ValidationException {
+		// TODO Auto-generated method stub
+		
+		Map<Object, List<FieldError>> errors = new HashMap<Object, List<FieldError>>();
+
+		Errors e = new BeanPropertyBindingResult(r, "refset");
+		rValidator.validate(r, e );
+		
+		if (e.hasErrors()) {
+			
+			errors.put(r, e.getFieldErrors());
+		}
+		
+		
 	
+		
+		if (!errors.isEmpty()) {
+			
+			throw new ValidationException(errors);
+		}
+		
+	}
 
 }

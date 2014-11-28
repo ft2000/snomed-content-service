@@ -16,7 +16,6 @@ import org.ihtsdo.otf.refset.domain.Member;
 import org.ihtsdo.otf.refset.exception.EntityNotFoundException;
 import org.ihtsdo.otf.refset.graph.RefsetGraphAccessException;
 import org.ihtsdo.otf.refset.graph.RefsetGraphFactory;
-import org.ihtsdo.otf.refset.graph.schema.GMember;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,10 +29,9 @@ import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.util.wrappers.event.EventGraph;
 import com.tinkerpop.frames.FramedGraphFactory;
-import com.tinkerpop.frames.FramedTransactionalGraph;
 
-/**Graph Access component to do CRUD operation on underlying Refset graph
- * @author Episteme Partners
+/**Graph Access component to do CRUD operation on underlying Refset graph 
+ * for {@link Member} node only
  *
  */
 @Repository
@@ -106,51 +104,53 @@ public class MemberGAO {
 	 * @throws RefsetGraphAccessException 
 	 * @throws EntityNotFoundException 
 	 */
-	protected Vertex addMemberNode(Member m, FramedTransactionalGraph<TitanGraph> tg) throws RefsetGraphAccessException, EntityNotFoundException {
+	protected Vertex addMemberNode(Member m, EventGraph<TitanGraph> eg) throws RefsetGraphAccessException, EntityNotFoundException {
 		
-		Vertex mV = null;
 		if (m == null || StringUtils.isEmpty(m.getReferencedComponentId())) {
 			
 			throw new EntityNotFoundException("Invalid member details. refset component id is mandatory in member details");
 		}
 		
 		LOGGER.debug("Adding member {}", m);
-
-		TitanGraph g = tg.getBaseGraph();
-		Vertex vM = g.addVertexWithLabel(g.getVertexLabel("GMember"));
-		GMember mg = tg.getVertex(vM.getId(), GMember.class);
+		eg.addListener(new EffectiveTimeChangeListener(eg.getBaseGraph(), m.getModifiedBy()));
+		//Vertex mV = eg.getBaseGraph().addVertexWithLabel(eg.getBaseGraph().getVertexLabel("GMember"));
+		
+		Vertex mV = eg.addVertex(m.getId());
+		//Vertex mg = eg.getVertex(vM.getId());//, GMember.class);
 		
 		Integer activeFlag = m.isActive() ? 1 : 0;
 
-		mg.setActive(activeFlag);
-		
-		if (StringUtils.isEmpty(m.getId())) {
-			
-			mg.setId(UUID.randomUUID().toString());
-			
-		} else {
-		
-			mg.setId(m.getId());
+		//mg.setActive(activeFlag);
+		mV.setProperty(ACTIVE, activeFlag);
+		mV.setProperty(ID, UUID.randomUUID().toString());
 
-		}
 		DateTime et = m.getEffectiveTime();
 		if ( et != null) {
 			
-			mg.setEffectiveTime(et.getMillis());
+			mV.setProperty(EFFECTIVE_DATE, et.getMillis());
 
 		}
 		
-		mg.setModifiedBy(m.getModifiedBy());
-		mg.setCreateBy(m.getCreatedBy());
-		mg.setCreated(new DateTime().getMillis());
-		mg.setModifiedDate(new DateTime().getMillis());
-		mg.setModuleId(m.getModuleId());
+		//mg.setModifiedBy(m.getModifiedBy());
+		mV.setProperty(MODIFIED_BY, m.getModifiedBy());
+		//mg.setCreateBy(m.getCreatedBy());
+		mV.setProperty(CREATED_BY, m.getCreatedBy());
+		
+		//mg.setCreated(new DateTime().getMillis());
+		mV.setProperty(CREATED, new DateTime().getMillis());
+		//mg.setModifiedDate(new DateTime().getMillis());
+		mV.setProperty(MODIFIED_DATE, new DateTime().getMillis());
+		//mg.setModuleId(m.getModuleId());
+		mV.setProperty(MODULE_ID, m.getModuleId());
 		
 		Integer publishedFlag = m.isPublished() ? 1 : 0;
 
-		mg.setPublished(publishedFlag);
-		mg.setType(VertexType.member.toString());
-		mV = mg.asVertex();
+		//mg.setPublished(publishedFlag);
+		mV.setProperty(PUBLISHED, publishedFlag);
+		
+		//mg.setType(VertexType.member.toString());
+		mV.setProperty(TYPE, VertexType.member.toString());
+		
 		LOGGER.debug("Added Member as vertex to graph", mV.getId());
 		return mV;
 		
@@ -168,22 +168,21 @@ public class MemberGAO {
 	/**
 	 * @param refsetId
 	 * @param members
+	 * @param user 
 	 * @throws EntityNotFoundException 
 	 * @throws RefsetGraphAccessException 
 	 */
-	public Map<String, String> addMembers(String refsetId, Set<Member> members) throws RefsetGraphAccessException, EntityNotFoundException {
+	public Map<String, String> addMembers(String refsetId, Set<Member> members, String user) throws RefsetGraphAccessException, EntityNotFoundException {
 		
 		Map<String, String> outcomeMap = new HashMap<String, String>(); //needed at front end
 		
 		
 		
-		FramedTransactionalGraph<TitanGraph> tg = null;
+		EventGraph<TitanGraph> tg = null;
 		
 		try {
-			
-			tg = fgf.create(factory.getTitanGraph());
-			
-			Vertex rV = rGao.getRefsetVertex(refsetId, tg);
+			tg = factory.getEventGraph();			
+			Vertex rV = rGao.getRefsetVertex(refsetId, fgf.create(tg.getBaseGraph()));
 
 			
 			//try adding all members and accumulate error/success
@@ -195,30 +194,11 @@ public class MemberGAO {
 				try {
 					
 					mV = getMemberVertex(m.getId(), tg.getBaseGraph());
-					//mark this member as history member reinsert a new node and relationship
-
-					Iterable<Edge> mEdges = mV.getEdges(Direction.OUT, "members");
-					for (Edge e : mEdges) {
-						
-						Long end = e.getProperty(END);
-						if (Long.MAX_VALUE == end) {
-							
-							e.setProperty(END, new DateTime().getMillis());
-							break;//there will be only one edge which has LONG.MAX_VALUE
-						}
-					}
-										
-					long start = m.getEffectiveTime() != null ? m.getEffectiveTime().getMillis() : m.getCreated().getMillis();
-
-					Vertex mVNew = addMemberNode(m, tg);
-					Edge e = tg.addEdge(null, mVNew, rV, "members");
-					e.setProperty(REFERENCE_COMPONENT_ID, m.getReferencedComponentId());
-					e.setProperty(START, start);
-					e.setProperty(END, Long.MAX_VALUE);
 					
-					LOGGER.debug("Added relationship as edge from {} to {}", mV.getId(), rV.getId());
+					LOGGER.debug("Member & relation already exist  from {} to {}", mV.getId(), rV.getId());
 
-					
+					outcomeMap.put(m.getReferencedComponentId(), "Already exist, Not adding");
+
 				} catch(EntityNotFoundException ex) {
 					
 					//add member
@@ -231,11 +211,10 @@ public class MemberGAO {
 					e.setProperty(END, Long.MAX_VALUE);
 
 					LOGGER.debug("Added relationship as edge from {} to {}", mV.getId(), rV.getId());
-										
+					outcomeMap.put(m.getReferencedComponentId(), "Success");
 				}				
 				
 
-				outcomeMap.put(m.getReferencedComponentId(), "Success");
 			}
 			
 			RefsetGraphFactory.commit(tg);;
@@ -269,10 +248,11 @@ public class MemberGAO {
 	/**
 	 * @param refsetId
 	 * @param rcId
+	 * @param user 
 	 * @throws EntityNotFoundException 
 	 * @throws RefsetGraphAccessException 
 	 */
-	public void removeMember(String refsetId, String rcId) throws EntityNotFoundException, RefsetGraphAccessException {
+	public void removeMember(String refsetId, String rcId, String user) throws EntityNotFoundException, RefsetGraphAccessException {
 
 		LOGGER.debug("removing member {} from refset {}", rcId, refsetId);
 		EventGraph<TitanGraph> tg = null;
@@ -283,8 +263,8 @@ public class MemberGAO {
 		try {
 			
 			tg = factory.getEventGraph();
-	        tg.addListener(new MemberChangeListener(tg.getBaseGraph(), "service"));
-
+	        tg.addListener(new MemberChangeListener(tg.getBaseGraph(), user));
+	        tg.addListener(new EffectiveTimeChangeListener(tg.getBaseGraph(), user));
 			Vertex rV = rGao.getRefsetVertex(refsetId, fgf.create(tg.getBaseGraph()));
 
 			Iterable<Edge> eR = tg.getEdges(REFERENCE_COMPONENT_ID, rcId);
@@ -336,11 +316,12 @@ public class MemberGAO {
 		
 	/**This is a transaction so we can not individually send error/success for a conceptId!! 
 	 * @param refsetId
+	 * @param user 
 	 * @param rcId
 	 * @throws EntityNotFoundException 
 	 * @throws RefsetGraphAccessException 
 	 */
-	public Map<String, String> removeMembers(String refsetId, Set<String> rcIds) throws EntityNotFoundException, RefsetGraphAccessException {
+	public Map<String, String> removeMembers(String refsetId, Set<String> rcIds, String user) throws EntityNotFoundException, RefsetGraphAccessException {
 
 		LOGGER.debug("removing members {} from refset {}", rcIds, refsetId);
 		EventGraph<TitanGraph> tg = null;
@@ -349,9 +330,10 @@ public class MemberGAO {
 		try {
 			
 			tg = factory.getEventGraph();
-	        tg.addListener(new MemberChangeListener(tg.getBaseGraph(), "service"));
+	        tg.addListener(new MemberChangeListener(tg.getBaseGraph(), user));
+	        tg.addListener(new EffectiveTimeChangeListener(tg.getBaseGraph(), user));
 
-			Vertex rV = rGao.getRefsetVertex(refsetId, fgf.create(tg.getBaseGraph()));
+	        Vertex rV = rGao.getRefsetVertex(refsetId, fgf.create(tg.getBaseGraph()));
 
 			Iterable<Edge> eR = rV.getEdges(Direction.IN, "members");
 			
@@ -411,9 +393,10 @@ public class MemberGAO {
 			throw new EntityNotFoundException("Invalid member details. Reference component id and member id is mandatory in member details");
 		}			
         tg.addListener(new MemberChangeListener(tg.getBaseGraph(), m.getModifiedBy()));
+        tg.addListener(new EffectiveTimeChangeListener(tg.getBaseGraph(), m.getModifiedBy()));
 
 		LOGGER.debug("Updating member {}", m);
-		Iterable<Vertex> vr = tg.query().has(TYPE, VertexType.member.toString()).has(ID, m.getId()).limit(1).vertices();
+		Iterable<Vertex> vr = tg.query().has(TYPE, VertexType.member.toString()).has(ID, m.getId()).has(END, Long.MAX_VALUE).limit(1).vertices();
 
 		if (vr != null ) {
 			
@@ -427,7 +410,6 @@ public class MemberGAO {
 				}
 				Integer activeFlag = m.isActive() ? 1 : 0;
 
-				//mg.setActive(activeFlag);
 				v.setProperty(ACTIVE, activeFlag);
 				DateTime et = m.getEffectiveTime();
 				if ( et != null) {

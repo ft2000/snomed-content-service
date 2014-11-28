@@ -4,7 +4,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import java.io.File;
 import java.util.List;
 
 import org.apache.commons.configuration.Configuration;
@@ -112,7 +111,7 @@ public class RefsetGAOTest {
 	@Test
 	public void testGetReftest() throws RefsetServiceException, RefsetGraphAccessException, EntityNotFoundException {
 		Refset i = rs.get(0);
-		aGao.removeRefset(i.getId());
+		aGao.removeRefset(i.getId(), "junit");
 		aGao.addRefset(data.getRefSet(i.getId()));
 
 		Refset r = gao.getRefset(i.getId());

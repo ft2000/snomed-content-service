@@ -138,7 +138,7 @@ public class RefsetHeaderChangeListener implements GraphChangedListener {
 
 		Object type = cV.getProperty(TYPE);
 
-        if (!VertexType.member.toString().equals(type)) {
+        if (!VertexType.refset.toString().equals(type)) {
 			
         	return;
 		}

@@ -78,9 +78,6 @@ public class HistoryGao {
 			
 			g = f.getReadOnlyGraph();
 
-			GremlinPipeline<Vertex, Vertex> pipe = new GremlinPipeline<Vertex, Vertex>(g);
-
-			
 			Iterable<Vertex> vRs = g.query().has(TYPE, VertexType.refset.toString()).has(ID, refsetId).limit(1).vertices();
 
 			
@@ -150,9 +147,6 @@ public class HistoryGao {
 			
 			g = f.getReadOnlyGraph();
 
-			GremlinPipeline<Vertex, Vertex> pipe = new GremlinPipeline<Vertex, Vertex>(g);
-
-			
 			Iterable<Vertex> vRs = g.query().has(TYPE, VertexType.refset.toString()).has(ID, refsetId).limit(1).vertices();
 
 			

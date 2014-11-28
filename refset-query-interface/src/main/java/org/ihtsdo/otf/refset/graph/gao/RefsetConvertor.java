@@ -22,6 +22,8 @@ import static org.ihtsdo.otf.refset.domain.RGC.SCTID;
 import static org.ihtsdo.otf.refset.domain.RGC.SUPER_REFSET_TYPE_ID;
 import static org.ihtsdo.otf.refset.domain.RGC.TYPE_ID;
 import static org.ihtsdo.otf.refset.domain.RGC.END;
+import static org.ihtsdo.otf.refset.domain.RGC.E_EFFECTIVE_TIME;
+import static org.ihtsdo.otf.refset.domain.RGC.L_EFFECTIVE_TIME;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -214,6 +216,18 @@ public class RefsetConvertor {
 		if (keys.contains("noOfMembers")) {
 			
 			r.setTotalNoOfMembers(vR.getNoOfMembers());
+
+		}
+		
+		if ( keys.contains(E_EFFECTIVE_TIME) ) {
+			
+			r.setEarliestEffectiveTime(new DateTime(vR.getEarliestEffectiveTime()));
+
+		}
+		
+		if ( keys.contains(L_EFFECTIVE_TIME) ) {
+			
+			r.setLatestEffectiveTime(new DateTime(vR.getLatestEffectiveTime()));
 
 		}
 
@@ -552,6 +566,18 @@ public class RefsetConvertor {
 
 			r.setActive(active == 1 ? true : false);
 			
+		}
+		
+		if ( keys.contains(E_EFFECTIVE_TIME) ) {
+			
+			r.setEarliestEffectiveTime(new DateTime(vR.getProperty(E_EFFECTIVE_TIME)));
+
+		}
+		
+		if ( keys.contains(L_EFFECTIVE_TIME) ) {
+			
+			r.setLatestEffectiveTime(new DateTime(vR.getProperty(L_EFFECTIVE_TIME)));
+
 		}
 		
 		return r;
