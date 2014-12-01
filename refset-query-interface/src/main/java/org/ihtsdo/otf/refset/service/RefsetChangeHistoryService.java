@@ -29,9 +29,12 @@ public class RefsetChangeHistoryService {
 	@Autowired
 	private HistoryGao gao;
 
+
 	/**
 	 * @param refsetId
 	 * @param referenceComponentId
+	 * @param fromDate
+	 * @param toDate
 	 * @param from
 	 * @param to
 	 * @return
@@ -52,9 +55,12 @@ public class RefsetChangeHistoryService {
 		}
 				
 	}
-	
+
+
 	/**
 	 * @param refsetId
+	 * @param fromDate
+	 * @param toDate
 	 * @param from
 	 * @param to
 	 * @return
@@ -78,6 +84,8 @@ public class RefsetChangeHistoryService {
 	
 	/**
 	 * @param refsetId
+	 * @param fromDate
+	 * @param toDate
 	 * @param from
 	 * @param to
 	 * @return
@@ -97,5 +105,84 @@ public class RefsetChangeHistoryService {
 			throw new RefsetServiceException(e.getMessage());
 		}
 				
+	}
+
+	/**
+	 * @param refsetId
+	 * @param memberId
+	 * @param fromDate
+	 * @param toDate
+	 * @param from
+	 * @param to
+	 * @return
+	 * @throws RefsetServiceException 
+	 */
+	public ChangeRecord<Member> getMemberStateHistory(String refsetId,
+			String memberId, DateTime fromDate, DateTime toDate, int from,
+			int to) throws RefsetServiceException {
+		
+		LOGGER.debug("getMemberStateHistory");
+		
+		try {
+			
+			return gao.getMemberStateHistory(refsetId, memberId, fromDate, toDate, from, to);
+			
+		} catch (RefsetGraphAccessException e) {
+			
+			LOGGER.error("Error in graph db call", e);
+			throw new RefsetServiceException(e.getMessage());
+		}
+
+	}
+
+	/**
+	 * @param refsetId
+	 * @param fromDate
+	 * @param toDate
+	 * @param from
+	 * @param to
+	 * @return
+	 * @throws RefsetServiceException 
+	 */
+	public Map<String, ChangeRecord<Member>> getAllMembersStateHistory(
+			String refsetId, DateTime fromDate, DateTime toDate, int from,
+			int to) throws RefsetServiceException {
+		
+		LOGGER.debug("getAllMembersStateHistory");
+		
+		try {
+			
+			return gao.getAllMembersStateHistory(refsetId, fromDate, toDate, from, to);
+			
+		} catch (RefsetGraphAccessException e) {
+			
+			LOGGER.error("Error in graph db call", e);
+			throw new RefsetServiceException(e.getMessage());
+		}
+	}
+
+	/**
+	 * @param refsetId
+	 * @param fromDate
+	 * @param toDate
+	 * @param from
+	 * @param to
+	 * @return
+	 * @throws RefsetServiceException 
+	 */
+	public ChangeRecord<Refset> getRefseHeaderStateHistory(String refsetId,
+			DateTime fromDate, DateTime toDate, int from, int to) throws RefsetServiceException {
+		
+		LOGGER.debug("getRefseHeaderStateHistory");
+		
+		try {
+			
+			return gao.getRefsetHeaderStateHistory(refsetId, fromDate, toDate, from, to);
+			
+		} catch (RefsetGraphAccessException e) {
+			
+			LOGGER.error("Error in graph db call", e);
+			throw new RefsetServiceException(e.getMessage());
+		}
 	}
 }

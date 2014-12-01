@@ -36,7 +36,7 @@ public class RefsetBrowseServiceStubData {
 	private static final String REFSET_LIST = "refset";
 	private static final String MEMBER_LIST = "members";
 	private static Map<String, Integer> refsetIdsAndMembers = new HashMap<String, Integer>() ;
-	private static final String[] REFSET_MAPPING = new String[] {"id", "description", "created", "createdBy", "languageCode", 
+	private static final String[] REFSET_MAPPING = new String[] {"uuid", "description", "created", "createdBy", "languageCode", 
 			"type", "publishedDate", "effectiveTime", "moduleId", "published"};
 	private static String[] MEMBER_MAPPING = new String[] {"referencedComponentId", "effectiveTime", "active", "moduleId"}; 
 
@@ -249,7 +249,7 @@ public class RefsetBrowseServiceStubData {
 		
 		for (Refset refset : refSets) {
 			
-			if(refset.getId().equalsIgnoreCase(refSetId)) {
+			if(refset.getUuid().equalsIgnoreCase(refSetId)) {
 								
 				result = refset;
 				break;
@@ -280,7 +280,7 @@ public class RefsetBrowseServiceStubData {
 			s.configureBeanMapping(Member.class, MEMBER_MAPPING);
 			Member m = null;
 			while( (m = s.read(Member.class, getMemberProcessors())) != null ) {
-	            m.setId(UUID.randomUUID().toString());
+	            m.setUuid(UUID.randomUUID().toString());
 	            members.add(m);
 
 			}
@@ -308,7 +308,7 @@ public class RefsetBrowseServiceStubData {
 			}
 		}
 	    
-		List<Member> ms = members.subList(refsetIdsAndMembers.get(result.getId()) - 300, refsetIdsAndMembers.get(result.getId()));
+		List<Member> ms = members.subList(refsetIdsAndMembers.get(result.getUuid()) - 300, refsetIdsAndMembers.get(result.getUuid()));
 		result.setMembers(Collections.unmodifiableList(ms));
 		return result;
 	}

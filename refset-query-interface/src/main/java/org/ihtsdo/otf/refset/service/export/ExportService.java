@@ -67,7 +67,7 @@ public class ExportService {
             /**
              * id	effectiveTime	active	moduleId	refSetId	referencedComponentId
              */
-			final String[] header = new String[] { "id", "effectiveTime", "active"
+			final String[] header = new String[] { "uuid", "effectiveTime", "active"
             		, "moduleId", "refSetId", "referencedComponentId"};
 			            
 
@@ -84,8 +84,8 @@ public class ExportService {
 			for (Member m : ms) {
 								
 				String active = m.isActive() ? "1" : "0";
-				List<Object> concept = Arrays.asList(new Object[] { m.getId(), Utility.getDate(m.getEffectiveTime()), active
-                		, r.getModuleId(), r.getId(), m.getReferencedComponentId()});
+				List<Object> concept = Arrays.asList(new Object[] { m.getUuid(), Utility.getDate(m.getEffectiveTime()), active
+                		, r.getModuleId(), r.getUuid(), m.getReferencedComponentId()});
 
 				lWriter.write(concept, processors);
 				

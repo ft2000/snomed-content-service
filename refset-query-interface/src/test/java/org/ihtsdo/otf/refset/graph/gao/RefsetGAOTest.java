@@ -111,10 +111,10 @@ public class RefsetGAOTest {
 	@Test
 	public void testGetReftest() throws RefsetServiceException, RefsetGraphAccessException, EntityNotFoundException {
 		Refset i = rs.get(0);
-		aGao.removeRefset(i.getId(), "junit");
-		aGao.addRefset(data.getRefSet(i.getId()));
+		aGao.removeRefset(i.getUuid(), "junit");
+		aGao.addRefset(data.getRefSet(i.getUuid()));
 
-		Refset r = gao.getRefset(i.getId());
+		Refset r = gao.getRefset(i.getUuid());
 
 		assertNotNull(r);
 		assertEquals(i.getCreated().getMillis(), r.getCreated().getMillis(), 1000);
@@ -142,11 +142,11 @@ public class RefsetGAOTest {
 		
 		Refset i = rs.get(0);
 		
-		Refset rInput = data.getRefSet(i.getId());
+		Refset rInput = data.getRefSet(i.getUuid());
 		
 		aGao.addRefset(rInput);
 
-		Refset r = gao.getRefset(rInput.getId());
+		Refset r = gao.getRefset(rInput.getUuid());
 		
 		assertNotNull(r);
 		
@@ -163,7 +163,7 @@ public class RefsetGAOTest {
 		//make sure atleast one Refset exist in database to avoid schema exception
 		Refset input = rs.get(0);
 		
-		aGao.addRefset(data.getRefSet(input.getId()));
+		aGao.addRefset(data.getRefSet(input.getUuid()));
 
 		gao.getMetaData("someID");
 		
@@ -174,7 +174,7 @@ public class RefsetGAOTest {
 	public void testGetReftestInvalidNodeId() throws RefsetServiceException, RefsetGraphAccessException, EntityNotFoundException {		
 		Refset input = rs.get(0);
 		
-		aGao.addRefset(data.getRefSet(input.getId()));//to avoid NPE when there is no class available of type Refset
+		aGao.addRefset(data.getRefSet(input.getUuid()));//to avoid NPE when there is no class available of type Refset
 
 		gao.getRefset("junitId");
 		

@@ -115,7 +115,7 @@ public class MemberGAO {
 		eg.addListener(new EffectiveTimeChangeListener(eg.getBaseGraph(), m.getModifiedBy()));
 		//Vertex mV = eg.getBaseGraph().addVertexWithLabel(eg.getBaseGraph().getVertexLabel("GMember"));
 		
-		Vertex mV = eg.addVertex(m.getId());
+		Vertex mV = eg.addVertex(m.getUuid());
 		//Vertex mg = eg.getVertex(vM.getId());//, GMember.class);
 		
 		Integer activeFlag = m.isActive() ? 1 : 0;
@@ -193,7 +193,7 @@ public class MemberGAO {
 				
 				try {
 					
-					mV = getMemberVertex(m.getId(), tg.getBaseGraph());
+					mV = getMemberVertex(m.getUuid(), tg.getBaseGraph());
 					
 					LOGGER.debug("Member & relation already exist  from {} to {}", mV.getId(), rV.getId());
 
@@ -388,7 +388,7 @@ public class MemberGAO {
 	 */
 	protected Vertex updateMemberNode(Member m, EventGraph<TitanGraph> tg) throws RefsetGraphAccessException, EntityNotFoundException {
 		
-		if (m == null || StringUtils.isEmpty(m.getId()) || StringUtils.isEmpty(m.getReferencedComponentId())) {
+		if (m == null || StringUtils.isEmpty(m.getUuid()) || StringUtils.isEmpty(m.getReferencedComponentId())) {
 			
 			throw new EntityNotFoundException("Invalid member details. Reference component id and member id is mandatory in member details");
 		}			
@@ -396,7 +396,7 @@ public class MemberGAO {
         tg.addListener(new EffectiveTimeChangeListener(tg.getBaseGraph(), m.getModifiedBy()));
 
 		LOGGER.debug("Updating member {}", m);
-		Iterable<Vertex> vr = tg.query().has(TYPE, VertexType.member.toString()).has(ID, m.getId()).has(END, Long.MAX_VALUE).limit(1).vertices();
+		Iterable<Vertex> vr = tg.query().has(TYPE, VertexType.member.toString()).has(ID, m.getUuid()).has(END, Long.MAX_VALUE).limit(1).vertices();
 
 		if (vr != null ) {
 			
@@ -442,7 +442,7 @@ public class MemberGAO {
 		}
 
 		
-		String msg = "Member details not available for id " + m.getId();
+		String msg = "Member details not available for id " + m.getUuid();
 		
 		throw new EntityNotFoundException(msg);
 		

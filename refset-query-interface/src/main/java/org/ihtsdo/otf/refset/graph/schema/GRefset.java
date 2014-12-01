@@ -236,16 +236,16 @@ public interface GRefset extends VertexFrame {
 	public void setModifiedBy(String modifiedBy);
 
 	/**
-	 * @return the id
+	 * @return the sctId
 	 */
-	@Property( value = "sctdId")
-	public String getSctdId();
+	@Property( value = "sctId")
+	public String getSctId();
 
 	/**
 	 * @param id the id to set
 	 */
-	@Property( value = "sctdId")
-	public void setSctdId(String id);
+	@Property( value = "sctId")
+	public void setSctId(String sctId);
 	
 	/**
 	 * @return the id

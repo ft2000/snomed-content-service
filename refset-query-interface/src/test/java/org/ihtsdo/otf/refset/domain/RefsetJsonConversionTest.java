@@ -73,7 +73,7 @@ public class RefsetJsonConversionTest {
 		
 		Refset r = new Refset();
 		
-		r.setId("700043003");
+		r.setUuid("700043003");
 		r.setCreated( new DateTime() );
 		r.setCreatedBy("Junit Refset Editor");
 		r.setDescription("GP/FP health issue reference set (foundation metadata concept)");
@@ -92,7 +92,7 @@ public class RefsetJsonConversionTest {
 		
 		List<Member> members = new ArrayList<Member>();
 		Member m = new Member();
-		m.setId("450451007");
+		m.setUuid("450451007");
 		m.setActive(true);
 		m.setReferencedComponentId("4504511107");
 		m.setModuleId("900000000000207002");
@@ -104,21 +104,21 @@ public class RefsetJsonConversionTest {
 		m.setReferencedComponentId("4504511107");
 		m.setModuleId("900000000000207002");
 		
-		m.setId("450451006");
+		m.setUuid("450451006");
 		members.add(m);
 		
 		m = new Member();
 		m.setActive(true);
 		m.setReferencedComponentId("4504511107");
 		m.setModuleId("900000000000207008");
-		m.setId("450451005");
+		m.setUuid("450451005");
 		members.add(m);
 		
 		m = new Member();
 		m.setActive(true);
 		m.setReferencedComponentId("4504511107");
 		m.setModuleId("900000000000207008");
-		m.setId("450451017");
+		m.setUuid("450451017");
 		members.add(m);
 		
 		r.setMembers(members);

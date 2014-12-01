@@ -77,7 +77,7 @@ public class ChangeHistoryController {
 
 		Result<Map<String, Object>> r = getResult();
 
-		ChangeRecord<Member> history = service.getMemberHistory(refsetId, memberId, getFromDate(fromDate), getToDate(toDate), from, to);
+		ChangeRecord<Member> history = service.getMemberHistory(refsetId, memberId, getFromDate(fromDate, 10), getToDate(toDate), from, to);
 		
 		Map<String, Object> data = new HashMap<String, Object>();
 		data.put("history", history);
@@ -109,7 +109,7 @@ public class ChangeHistoryController {
 
 		Result<Map<String, Object>> r = getResult();
 		
-		Map<String, ChangeRecord<Member>> history = service.getAllMembersHistory(refsetId, getFromDate(fromDate), getToDate(toDate), from, to);
+		Map<String, ChangeRecord<Member>> history = service.getAllMembersHistory(refsetId, getFromDate(fromDate, 10), getToDate(toDate), from, to);
 		
 		Map<String, Object> data = new HashMap<String, Object>();
 		data.put("history", history);
@@ -140,7 +140,7 @@ public class ChangeHistoryController {
 
 		Result<Map<String, Object>> r = getResult();
 
-		ChangeRecord<Refset> history = service.getRefsetHeaderHistory(refsetId, getFromDate(fromDate), getToDate(toDate), from, to);
+		ChangeRecord<Refset> history = service.getRefsetHeaderHistory(refsetId, getFromDate(fromDate, 10), getToDate(toDate), from, to);
 		
 		Map<String, Object> data = new HashMap<String, Object>();
 		data.put("history", history);
@@ -155,13 +155,112 @@ public class ChangeHistoryController {
 		return new ResponseEntity<Result<Map<String,Object>>>(r, HttpStatus.OK);
     }
 	
+	
+	
+	@RequestMapping( method = RequestMethod.GET, value = "/{refsetId}/member/{memberId}/state",  produces = "application/json", consumes = "application/json")
+	@ApiOperation( value = "Get a member history ",
+			notes = "This api call is to get last 200 days of  state history of given members under given refset and for given range. "
+					+ "It is sorted by latest first."
+				+ "If user of this api want to retrieve specific dates history, they should provide from date and to date"
+				+ "in the format of yyyy-mm-dd")
+	@PreAuthorize("hasRole('ROLE_USER')")
+    public ResponseEntity<Result< Map<String, Object>>> getMemberStateHistory( @PathVariable String refsetId, 
+    		@PathVariable String memberId,
+    		@RequestParam( value = "fromDate", required = false) String fromDate, 
+    		@RequestParam( value = "toDate", required = false) String toDate,
+    		@RequestParam( value = "from", defaultValue = "0", required= false ) int from, 
+    		@RequestParam( value = "to", defaultValue = "10", required = false) int to) throws Exception {
+		
+		logger.debug("getting member history {}", refsetId, memberId);
+
+		Result<Map<String, Object>> r = getResult();
+
+		ChangeRecord<Member> history = service.getMemberStateHistory(refsetId, memberId, getFromDate(fromDate, 200), getToDate(toDate), from, to);
+		
+		Map<String, Object> data = new HashMap<String, Object>();
+		data.put("history", history);
+		r.getMeta().add( linkTo( methodOn( ChangeHistoryController.class ).getMemberStateHistory(refsetId, memberId,
+				fromDate, toDate, from, to)).withRel("Member State History"));
+
+		r.setData(data);
+
+		r.getMeta().setMessage(SUCCESS);
+		r.getMeta().setStatus(HttpStatus.OK);
+
+		return new ResponseEntity<Result<Map<String,Object>>>(r, HttpStatus.OK);
+    }
+	
+	@RequestMapping( method = RequestMethod.GET, value = "/{refsetId}/state",  produces = "application/json", consumes = "application/json")
+	@ApiOperation( value = "Get all members state history under a refset ",
+			notes = "This api call is to get last 200 days of state history of all members under given refset and for given range of members. "
+					+ "It is sorted by latest first."
+				+ "If user of this api want to retrieve specific dates history, they should provide from date and to date"
+				+ "in the format of yyyy-mm-dd")
+	@PreAuthorize("hasRole('ROLE_USER')")
+    public ResponseEntity<Result< Map<String, Object>>> getAllMembersStateHistory( @PathVariable String refsetId,
+    		@RequestParam( value = "fromDate", required = false) String fromDate, 
+    		@RequestParam( value = "toDate", required = false) String toDate,
+    		@RequestParam( value = "from", defaultValue = "0", required= false ) int from, 
+    		@RequestParam( value = "to", defaultValue = "10", required = false) int to ) throws Exception {
+		
+		logger.debug("getting all members history {}", refsetId);
+
+		Result<Map<String, Object>> r = getResult();
+		
+		Map<String, ChangeRecord<Member>> history = service.getAllMembersStateHistory(refsetId, getFromDate(fromDate, 200), getToDate(toDate), from, to);
+		
+		Map<String, Object> data = new HashMap<String, Object>();
+		data.put("history", history);
+		r.getMeta().add( linkTo( methodOn( ChangeHistoryController.class ).getAllMembersStateHistory(refsetId, fromDate,
+				toDate, from, to)).withRel("All Member state History"));
+
+		r.setData(data);
+
+		r.getMeta().setMessage(SUCCESS);
+		r.getMeta().setStatus(HttpStatus.OK);
+
+		return new ResponseEntity<Result<Map<String,Object>>>(r, HttpStatus.OK);
+    }
+	
+	@RequestMapping( method = RequestMethod.GET, value = "/{refsetId}/headerState",  produces = "application/json", consumes = "application/json")
+	@ApiOperation( value = "Get a refset header state history", 
+		notes = "This api call retrieves refset header state history by default for last 200 days. It is sorted by latest first."
+				+ "If user of this api want to retrieve specific dates history, they should provide from date and to date"
+				+ "in the format of yyyy-mm-dd" )
+	@PreAuthorize("hasRole('ROLE_USER')")
+    public ResponseEntity<Result< Map<String, Object>>> getRefseHeaderStateHistory( @PathVariable String refsetId,
+    		@RequestParam( value = "fromDate", required = false) String fromDate, 
+    		@RequestParam( value = "toDate", required = false) String toDate,
+    		@RequestParam( value = "from", defaultValue = "0", required= false ) int from, 
+    		@RequestParam( value = "to", defaultValue = "10", required = false) int to) throws Exception {
+		
+		logger.debug("geting refset header history {}", refsetId);
+
+		Result<Map<String, Object>> r = getResult();
+
+		ChangeRecord<Refset> history = service.getRefseHeaderStateHistory(refsetId, getFromDate(fromDate, 200), getToDate(toDate), from, to);
+		
+		Map<String, Object> data = new HashMap<String, Object>();
+		data.put("history", history);
+		r.getMeta().add( linkTo( methodOn( ChangeHistoryController.class ).getRefseHeaderStateHistory(refsetId, fromDate,
+				toDate, from, to)).withRel("Refset header state history"));
+
+		r.setData(data);
+
+		r.getMeta().setMessage(SUCCESS);
+		r.getMeta().setStatus(HttpStatus.OK);
+
+		return new ResponseEntity<Result<Map<String,Object>>>(r, HttpStatus.OK);
+    }
+
+	
 	/**To convert string date to {@link DateTime}
 	 * @param fromDate
 	 * @return
 	 */
-	private DateTime getFromDate(String fromDate) {
+	private DateTime getFromDate(String fromDate, int daysOffset) {
 		
-		DateTime fromDt = new DateTime().minusDays(10);
+		DateTime fromDt = new DateTime().minusDays(daysOffset);
 		if (!StringUtils.isEmpty(fromDate)) {
 			
 			fromDt = FORMATTER.parseDateTime(fromDate);

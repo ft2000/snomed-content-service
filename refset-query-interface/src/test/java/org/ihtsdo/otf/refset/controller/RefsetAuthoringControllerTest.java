@@ -15,7 +15,6 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standal
 import org.ihtsdo.otf.refset.domain.Refset;
 import org.ihtsdo.otf.refset.exception.EntityNotFoundException;
 import org.ihtsdo.otf.refset.exception.RefsetServiceException;
-import org.ihtsdo.otf.refset.security.MockRefsetUser;
 import org.ihtsdo.otf.refset.service.RefsetAuthoringService;
 import org.ihtsdo.otf.refset.service.RefsetBrowseService;
 import org.joda.time.DateTime;
@@ -102,7 +101,7 @@ public class RefsetAuthoringControllerTest {
 	    					.defaultRequest(post("/").with(testSecurityContext()))
 	    					.build();*/
 	    
-		when(refset.getId()).thenReturn("Junit_1");
+		when(refset.getUuid()).thenReturn("Junit_1");
 		when(refset.getDescription()).thenReturn("Junit Refset"); 
 		when(refset.getModuleId()).thenReturn("Junit_module_1");
 		when(refset.getMembers()).thenReturn(null);

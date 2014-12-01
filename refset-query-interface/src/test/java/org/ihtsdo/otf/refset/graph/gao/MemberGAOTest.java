@@ -173,7 +173,7 @@ public class MemberGAOTest {
 	private void addRefset() throws RefsetGraphAccessException {
 		
 		Refset r = new Refset();
-		r.setId("junit_1");
+		r.setUuid("junit_1");
 		r.setDescription("Junit");
 		
 		Member m = new Member();

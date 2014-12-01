@@ -31,7 +31,7 @@ import com.wordnik.swagger.annotations.ApiOperation;
  *
  */
 @RestController
-@Api(value="Type look up service", description="Service to lookup type name and id", position = 4)
+@Api(value="Type look up service", description="Service to lookup type name and id", position = 7)
 @RequestMapping("/v1.0/snomed")
 public class TypeLookupController {
 	

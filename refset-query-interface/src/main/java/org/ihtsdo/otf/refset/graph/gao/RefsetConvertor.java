@@ -137,7 +137,7 @@ public class RefsetConvertor {
 		
 		if ( keys.contains(ID) ) {
 			
-			r.setId(vR.getId());
+			r.setUuid(vR.getId());
 		}
 		
 		if ( keys.contains(LANG_CODE) ) {
@@ -204,7 +204,7 @@ public class RefsetConvertor {
 		
 		if ( keys.contains(SCTID) ) {
 			
-			r.setId(vR.getSctdId());
+			r.setSctId(vR.getSctId());
 
 		}
 		
@@ -301,7 +301,7 @@ public class RefsetConvertor {
 			
 			String lId = vM.getProperty(ID);
 
-			m.setId(lId);
+			m.setUuid(lId);
 			
 		}
 		
@@ -476,7 +476,7 @@ public class RefsetConvertor {
 			
 			String id = vR.getProperty(ID);
 			
-			r.setId(id);
+			r.setUuid(id);
 		}
 		
 		if ( keys.contains(LANG_CODE) ) {
@@ -556,7 +556,7 @@ public class RefsetConvertor {
 			
 			String sctid = vR.getProperty(SCTID);
 
-			r.setId(sctid);
+			r.setSctId(sctid);
 
 		}
 		
@@ -584,7 +584,7 @@ public class RefsetConvertor {
 
 	}
 	
-protected static List<Member> getHistoryMembers(Iterable<Edge> eRs ) {
+	protected static List<Member> getHistoryMembers(Iterable<Edge> eRs ) {
 		
 		List<Member> members = new ArrayList<Member>();
 
@@ -614,4 +614,54 @@ protected static List<Member> getHistoryMembers(Iterable<Edge> eRs ) {
 		Collections.sort(members);
 		return members;
 	}
+
+
+	/**
+	 * @param ls
+	 * @return
+	 */
+	public static List<Refset> getStateRefsets(List<Vertex> ls) {
+	
+		List<Refset> history = new ArrayList<Refset>();
+		if (ls != null && !ls.isEmpty()) {
+			
+			for (Vertex vR : ls) {
+				
+				Refset r = getRefset(vR);
+
+				LOGGER.trace("Adding history refset as {} ", r.toString());
+
+				history.add(r);
+
+			}
+		}
+		return history;
+	}
+
+
+	/**
+	 * @param fls
+	 * @return
+	 */
+	public static List<Member> getStateMembers(List<Vertex> fls) {
+		
+		List<Member> members = new ArrayList<Member>();
+
+		if(fls != null) {
+			
+			for (Vertex vM : fls) {
+							
+				Member m = getMember(vM);
+				LOGGER.trace("Adding member as {} ", m.toString());
+
+				members.add(m);
+			
+			}
+			
+		}
+		
+		Collections.sort(members);
+		return members;
+	}
+
 }

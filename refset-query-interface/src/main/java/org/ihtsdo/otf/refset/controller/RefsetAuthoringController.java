@@ -50,7 +50,7 @@ import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 
 /**
- * @author Episteme Partners
+ * Controller class to facilitate {@link Refset} authoring.It also check required authorization  
  *
  */
 @RestController
@@ -107,8 +107,8 @@ public class RefsetAuthoringController {
 		
 
 		Map<String, Object> data = new HashMap<String, Object>();
-		data.put("id", r.getId());
-		m.add( linkTo( methodOn( RefsetBrowseController.class ).getRefsetDetails(r.getId())).withRel("Refset"));
+		data.put("uuid", r.getUuid());
+		m.add( linkTo( methodOn( RefsetBrowseController.class ).getRefsetDetails(r.getUuid())).withRel("Refset"));
 
 		result.setData(data);
 
@@ -127,7 +127,7 @@ public class RefsetAuthoringController {
 	private void addMetaDetails(Refset r) throws AccessDeniedException {
 		
 		String id = UUID.randomUUID().toString();
-		r.setId(id);
+		r.setUuid(id);
 		r.setCreated(new DateTime());
 		r.setCreatedBy(getUserDetails().getUsername());
 		r.setActive(r.isActive());		
@@ -172,7 +172,7 @@ public class RefsetAuthoringController {
 		aService.addMember(refsetId, member);
 		
 		Map<String, Object> data = new HashMap<String, Object>();
-		data.put("id", refsetId);
+		data.put("uuid", refsetId);
 		m.add( linkTo( methodOn( RefsetBrowseController.class ).getRefsetDetails(refsetId)).withRel("Refset"));
 
 		result.setData(data);
@@ -219,8 +219,8 @@ public class RefsetAuthoringController {
 		
 
 		Map<String, Object> data = new HashMap<String, Object>();
-		data.put("id", r.getId());
-		m.add( linkTo( methodOn( RefsetBrowseController.class ).getRefsetDetails(r.getId())).withRel("Refset"));
+		data.put("uuid", r.getUuid());
+		m.add( linkTo( methodOn( RefsetBrowseController.class ).getRefsetDetails(r.getUuid())).withRel("Refset"));
 
 		response.setData(data);
 

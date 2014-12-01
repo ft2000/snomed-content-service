@@ -40,7 +40,7 @@ import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Vertex;
 
 /**
- * @author Episteme Partners
+ * Service to look up Terminology data.
  *
  */
 public class ConceptLookUpServiceImplv1_0 implements ConceptLookupService {
@@ -125,6 +125,7 @@ public class ConceptLookUpServiceImplv1_0 implements ConceptLookupService {
 							}
 
 						}
+						concepts.put(sctid.toString(), c);
 					}
 					
 				}

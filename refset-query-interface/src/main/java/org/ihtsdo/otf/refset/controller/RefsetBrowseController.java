@@ -87,7 +87,7 @@ public class RefsetBrowseController {
     }
 	
 	@RequestMapping( method = RequestMethod.GET, value = "/{refSetId}", produces = "application/json" )
-	@ApiOperation( value = "Api to get details of a refset for given refset id." )
+	@ApiOperation( value = "Api to get details of a refset for given refset uuid." )
     public ResponseEntity<Result< Map<String, Object>>> getRefsetDetails( @PathVariable( value = "refSetId" ) String refSetId ) throws Exception {
 		
 		logger.debug("Getting refset details");
@@ -189,7 +189,7 @@ public class RefsetBrowseController {
 	
 	
 	@RequestMapping( method = RequestMethod.GET, value = "/{refSetId}/header", produces = "application/json")
-	@ApiOperation( value = "Api to get details of a refset excluding members for given refset id." )
+	@ApiOperation( value = "Api to get details of a refset excluding members for given refset uuid." )
     public ResponseEntity<Result< Map<String, Object>>> getRefsetHeader( @PathVariable( value = "refSetId" ) String refSetId ) throws Exception {
 		
 		logger.debug("Getting refset details");

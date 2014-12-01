@@ -149,7 +149,7 @@ public class RefsetAdminGAO {
 
 		try {
 			
-			rV = rGao.getRefsetVertex(r.getId(), tg);
+			rV = rGao.getRefsetVertex(r.getUuid(), tg);
 			
 			LOGGER.debug("Refset {} already exist, not adding");
 			
@@ -174,7 +174,7 @@ public class RefsetAdminGAO {
 				gr.setEffectiveTime(r.getEffectiveTime().getMillis());
 
 			}
-			gr.setId(r.getId());
+			gr.setId(r.getUuid());
 			gr.setLanguageCode(r.getLanguageCode());
 			gr.setModuleId(r.getModuleId());
 			
@@ -206,7 +206,7 @@ public class RefsetAdminGAO {
 			}
 			if (!StringUtils.isEmpty(r.getSctId())) {
 				
-				gr.setSctdId(r.getSctId());
+				gr.setSctId(r.getSctId());
 
 			}
 			gr.setType(VertexType.refset.toString());
@@ -369,7 +369,7 @@ public class RefsetAdminGAO {
 
 		LOGGER.debug("updateRefsetNode {}", r);
 
-		Object rVId = rGao.getRefsetVertex(r.getId(), fgf.create(g.getBaseGraph()));
+		Object rVId = rGao.getRefsetVertex(r.getUuid(), fgf.create(g.getBaseGraph()));
 		
         g.addListener(new RefsetHeaderChangeListener(g.getBaseGraph(), r.getModifiedBy()));
 
@@ -501,11 +501,12 @@ public class RefsetAdminGAO {
 			Vertex rV = rGao.getRefsetVertex(refsetId, fgf.create(g.getBaseGraph()));
 
 			Map<String, String> descriptions = populateDescription(rf2rLst);
+			Map<String, Vertex> processed = new HashMap<String, Vertex>();
 			for (Rf2Record r : rf2rLst) {
 				
 				GRefset gr = fgf.create(g).frame(rV, GRefset.class);
 				if ( StringUtils.isEmpty(r.getRefsetId()) || !(r.getRefsetId().equals(gr.getId()) 
-						|| r.getRefsetId().equals(gr.getSctdId())) || r.getEffectiveTime() == null) {
+						|| r.getRefsetId().equals(gr.getSctId())) || r.getEffectiveTime() == null) {
 					
 					String error = String.format("Member does not have valid refset id - %s", r.getRefsetId());
 					outcome.put(r.getReferencedComponentId(), error);
@@ -518,19 +519,14 @@ public class RefsetAdminGAO {
 					continue;
 				}
 				
-				GremlinPipeline<Vertex, Edge> pipe = new GremlinPipeline<Vertex, Edge>();			
-				pipe.start(rV).inE("members")
-					.has(REFERENCE_COMPONENT_ID, T.eq, r.getReferencedComponentId())
-					.has(EFFECTIVE_DATE, Long.MAX_VALUE);
-				List<Edge> ls = pipe.toList();
 				
-				if(ls.isEmpty()) {
+				if(!processed.containsKey(r.getReferencedComponentId())) {
 					
 					//add this member
 					Vertex vM = g.getBaseGraph().addVertexWithLabel(g.getBaseGraph().getVertexLabel("GMember"));
 					GMember mg = fgf.create(g).getVertex(vM.getId(), GMember.class);
 					
-					addMemberProperties(r, mg);
+					addMemberProperties(r, mg, VertexType.member);
 					
 					LOGGER.debug("Added Member as vertex to graph", mg.getId());
 					
@@ -539,59 +535,59 @@ public class RefsetAdminGAO {
 					e.setProperty(START, r.getEffectiveTime().getMillis());
 					e.setProperty(END, Long.MAX_VALUE);
 					
+					processed.put(r.getReferencedComponentId(), vM);
+					
 				} else {
 					
+					//do a check if an existing member exist with some other state and lesser effective time
+					
+					Vertex vExistingMember = processed.get(r.getReferencedComponentId());
 
-					for (Edge edge : ls) {
+					Member m = RefsetConvertor.getMember(vExistingMember);
+					if (m.getEffectiveTime().getMillis() == r.getEffectiveTime().getMillis()
+							&& (m.isActive() ? "1" : "0").equals(r.getActive())) {
 						
-						
-						//do a check if an existing member exist with some other state and lesser effective time
-						
-						Vertex vExistingMember = edge.getVertex(Direction.OUT);
-						Long currentEndDt = edge.getProperty(END);
-						Member m = RefsetConvertor.getMember(vExistingMember);
-						if (m.getEffectiveTime().getMillis() == r.getEffectiveTime().getMillis()
-								&& (m.isActive() ? "1" : "0").equals(r.getActive())) {
-							
-							LOGGER.trace("Not adding this record as it already exist {}", r.getId());
+						LOGGER.trace("Not adding this record as it already exist {}", r.getId());
 
-							//same record so do not re-import
-							outcome.put(r.getReferencedComponentId(), "Already exist, not imported again");
-							break;
+						//same record so do not re-import
+						outcome.put(r.getReferencedComponentId(), "Already exist, not imported again");
+						break;
+						
+					} else if (m.getEffectiveTime().getMillis() < r.getEffectiveTime().getMillis()) {
+																		
+						//update a existing member vertex with start date
+						GMember mg = fgf.create(g).getVertex(vExistingMember.getId(), GMember.class);
+						addMemberProperties(r, mg, VertexType.member);
+						
+						LOGGER.trace("Updated Member vertex with new properties and new state {}", mg.getId());
+						Iterable<Edge> eMs = vExistingMember.getEdges(Direction.OUT, EdgeLabel.members.toString());
+						for (Edge edge : eMs) {
 							
-						} else if (m.getEffectiveTime().getMillis() < r.getEffectiveTime().getMillis() && currentEndDt == Long.MAX_VALUE) {
-																			
-							//add a new member vertex with Long.MAX_VALUE end date
-							GMember mg = fgf.create(g).getVertex(vExistingMember.getId(), GMember.class);
-							addMemberProperties(r, mg);
-							
-							LOGGER.trace("Added Member as vertex to graph with new state {}", mg.getId());
-							
-							//Edge e = fgf.create(g).addEdge(null, mg.asVertex(), rV, "members");
 							edge.setProperty(REFERENCE_COMPONENT_ID, r.getReferencedComponentId());
 							edge.setProperty(START, r.getEffectiveTime().getMillis());
 							edge.setProperty(END, Long.MAX_VALUE);
-							
-						} else if (m.getEffectiveTime().getMillis() > r.getEffectiveTime().getMillis() && currentEndDt == Long.MAX_VALUE) {
-														
-							//add a new member vertex with Long.MAX_VALUE end date
-							Vertex vM = g.getBaseGraph().addVertexWithLabel(g.getBaseGraph().getVertexLabel("GMember"));
-				            vM.setProperty(TYPE, VertexType.hMember.toString());
 
-							//GMember mg = fgf.create(g).getVertex(vM.getId(), GMember.class);
-							GMember mg = fgf.create(g).getVertex(vM.getId(), GMember.class);
-							addMemberProperties(r, mg);
-							
-							LOGGER.trace("Added Member as vertex to graph with new state {}", mg.getId());
-							
-							//Edge e = fgf.create(g).addEdge(null, mg.asVertex(), rV, EdgeLabel.hasState.toString());
-							Edge e = vExistingMember.addEdge(EdgeLabel.hasState.toString(), vM);
-							e.setProperty(REFERENCE_COMPONENT_ID, r.getReferencedComponentId());
-							e.setProperty(START, r.getEffectiveTime().getMillis());
-							e.setProperty(END, r.getEffectiveTime().getMillis());
-							
 						}
+						
+					} else if (m.getEffectiveTime().getMillis() > r.getEffectiveTime().getMillis()) {
+													
+						//add a new member vertex with Long.MAX_VALUE end date
+						Vertex vM = g.getBaseGraph().addVertexWithLabel(g.getBaseGraph().getVertexLabel("GMember"));
+
+						//GMember mg = fgf.create(g).getVertex(vM.getId(), GMember.class);
+						GMember mg = fgf.create(g).getVertex(vM.getId(), GMember.class);
+						addMemberProperties(r, mg, VertexType.hMember);
+						
+						LOGGER.trace("Added Member as vertex to graph with new state {}", mg.getId());
+						
+						//Edge e = fgf.create(g).addEdge(null, mg.asVertex(), rV, EdgeLabel.hasState.toString());
+						Edge e = vExistingMember.addEdge(EdgeLabel.hasState.toString(), vM);
+						e.setProperty(REFERENCE_COMPONENT_ID, r.getReferencedComponentId());
+						e.setProperty(START, r.getEffectiveTime().getMillis());
+						e.setProperty(END, r.getEffectiveTime().getMillis());
+						
 					}
+				
 
 				}
 
@@ -646,7 +642,7 @@ public class RefsetAdminGAO {
 	}
 
 
-	private GMember addMemberProperties(Rf2Record r, GMember mg) {
+	private GMember addMemberProperties(Rf2Record r, GMember mg, VertexType type) {
 		Integer activeFlag = "1".equals(r.getActive()) ? 1 : 0;
 
 		mg.setActive(activeFlag);
@@ -665,7 +661,7 @@ public class RefsetAdminGAO {
 		
 		//everything in RF2 is published already hence make it published
 		mg.setPublished(1);
-		mg.setType(VertexType.member.toString());
+		mg.setType(type.toString());
 		
 		return mg;
 	}

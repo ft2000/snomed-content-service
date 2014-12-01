@@ -58,7 +58,7 @@ public class RefsetAuthoringServiceImpl implements RefsetAuthoringService {
 		try {
 			
 			adminGao.addRefset(r);
-			return r.getId();
+			return r.getUuid();
 			
 		} catch (RefsetGraphAccessException e) {
 
@@ -87,7 +87,7 @@ public class RefsetAuthoringServiceImpl implements RefsetAuthoringService {
 			Refset r = gao.getRefset(refsetId);
 			
 			List<Member> members = new ArrayList<Member>();
-			m.setId(UUID.randomUUID().toString());
+			m.setUuid(UUID.randomUUID().toString());
 			members.add(m);
 			
 			
@@ -132,7 +132,7 @@ public class RefsetAuthoringServiceImpl implements RefsetAuthoringService {
 			
 		}
 		 
-		 return r.getId();
+		 return r.getUuid();
 	}
 
 	/**Does required update checks and removes fields which can not be updated

@@ -15,6 +15,7 @@ import static org.ihtsdo.otf.refset.domain.RGC.END;
 import static org.ihtsdo.otf.refset.domain.RGC.ID;
 import static org.ihtsdo.otf.refset.domain.RGC.TYPE;
 import static org.ihtsdo.otf.refset.domain.RGC.START;
+import static org.ihtsdo.otf.refset.domain.RGC.ACTIVE;
 
 import java.util.HashMap;
 import java.util.List;
@@ -244,6 +245,205 @@ public class HistoryGao {
 		}
 
 		return history;
+	}
+
+	/**
+	 * @param refsetId
+	 * @param fromDate
+	 * @param toDate
+	 * @param from
+	 * @param to
+	 * @return
+	 */
+	public Map<String, ChangeRecord<Member>> getAllMembersStateHistory(
+			String refsetId, DateTime fromDate, DateTime toDate, int from,
+			int to) throws RefsetGraphAccessException {
+
+		LOGGER.debug("Getting all member state history for refset id {}", refsetId);
+
+		Map<String, ChangeRecord<Member>> history = new HashMap<String, ChangeRecord<Member>>();
+
+		TitanGraph g = null;
+		
+		try {
+			
+			g = f.getReadOnlyGraph();
+
+			Iterable<Vertex> vRs = g.query().has(TYPE, VertexType.refset.toString()).has(ID, refsetId).limit(1).vertices();
+
+			
+			if (!vRs.iterator().hasNext()) {
+				
+				throw new EntityNotFoundException("Refset does not exist for given refset id " + refsetId);
+			} 
+			
+			Vertex vR = vRs.iterator().next();
+			
+			GremlinPipeline<Vertex, Edge> fPipe = new GremlinPipeline<Vertex, Edge>();			
+			fPipe.start(vR).inE(EdgeLabel.members.toString()).range(from, to);
+			List<Edge> fls = fPipe.toList();
+			for (Edge e : fls) {
+				
+				Vertex v = e.getVertex(Direction.OUT);
+				GremlinPipeline<Vertex, Edge> mhPipe = new GremlinPipeline<Vertex, Edge>();			
+				mhPipe.start(v).outE(EdgeLabel.hasState.toString())
+				.has(END, T.lte, toDate.getMillis())
+				.has(START, T.gte, fromDate.getMillis())
+				.inV().has(ACTIVE).has(TYPE, VertexType.hMember.toString())
+				.range(from, to);
+				List<Edge> mhls = mhPipe.toList();
+				
+				List<Member> ms = RefsetConvertor.getHistoryMembers(mhls);
+				ChangeRecord<Member> cr = new ChangeRecord<Member>();
+				String rcId = e.getProperty(ID);
+				cr.setRecord(ms);
+				history.put(rcId, cr);
+
+				
+			}
+			
+		} catch (Exception e) {
+			
+			RefsetGraphFactory.rollback(g);			
+			LOGGER.error("Error getting refsets member history", e);
+			throw new RefsetGraphAccessException(e.getMessage(), e);
+			
+		} finally {
+			
+			RefsetGraphFactory.shutdown(g);
+		}
+
+		return history;
+
+	}
+
+	/**
+	 * @param refsetId
+	 * @param fromDate
+	 * @param toDate
+	 * @param from
+	 * @param to
+	 * @return
+	 */
+	public ChangeRecord<Refset> getRefsetHeaderStateHistory(String refsetId,
+			DateTime fromDate, DateTime toDate, int from, int to) throws RefsetGraphAccessException {
+		
+		Object[] criteria = {fromDate, toDate, from, to};
+		
+		LOGGER.debug("Getting refset history for refset id {}, and criteria {}", refsetId, criteria);
+
+		ChangeRecord<Refset> history = new ChangeRecord<Refset>();
+
+		TitanGraph g = null;
+		
+		try {
+			
+			g = f.getReadOnlyGraph();
+			
+			Iterable<Vertex> vRs = g.query().has(TYPE, VertexType.refset.toString()).has(ID, refsetId).limit(1).vertices();
+
+			
+			if (!vRs.iterator().hasNext()) {
+				
+				throw new EntityNotFoundException("Refset does not exist for given refset id " + refsetId);
+			} 
+			
+			Vertex vR = vRs.iterator().next();
+			//get required members as per range
+			GremlinPipeline<Vertex, Vertex> rPipe = new GremlinPipeline<Vertex, Vertex>();			
+			rPipe.start(vR).outE(EdgeLabel.hasState.toString())
+				.has(END, T.lte, toDate.getMillis())
+				.has(START, T.gte, fromDate.getMillis()).inV().has(ACTIVE).has(TYPE, VertexType.hMember.toString())
+				.range(from, to);
+			
+			List<Vertex> ls = rPipe.toList();
+			List<Refset> rs = RefsetConvertor.getStateRefsets(ls);
+
+			history.setRecord(rs);
+
+		} catch (Exception e) {
+			
+			RefsetGraphFactory.rollback(g);			
+			LOGGER.error("Error getting refsets member history", e);
+			throw new RefsetGraphAccessException(e.getMessage(), e);
+			
+		} finally {
+			
+			RefsetGraphFactory.shutdown(g);
+		}
+		
+		return history;
+
+	}
+
+	/**
+	 * @param refsetId
+	 * @param memberId
+	 * @param fromDate
+	 * @param toDate
+	 * @param from
+	 * @param to
+	 * @return
+	 */
+	public ChangeRecord<Member> getMemberStateHistory(String refsetId,
+			String id, DateTime fromDate, DateTime toDate, int from,
+			int to) throws RefsetGraphAccessException {
+		
+		Object[] criteria = {id, fromDate, toDate, from, to};
+		
+		LOGGER.debug("Getting member history for refset id {} and criteria {}", refsetId, criteria);
+
+		ChangeRecord<Member> history = new ChangeRecord<Member>();
+		
+		TitanGraph g = null;
+		
+		try {
+			
+			g = f.getReadOnlyGraph();
+
+			Iterable<Vertex> vRs = g.query().has(TYPE, VertexType.refset.toString()).has(ID, refsetId).limit(1).vertices();
+
+			
+			if (!vRs.iterator().hasNext()) {
+				
+				throw new EntityNotFoundException("Refset does not exist for given refset id " + refsetId);
+			} 
+			
+			Vertex vR = vRs.iterator().next();
+			
+			//get required members as per range
+			
+			
+			GremlinPipeline<Vertex, Vertex> fPipe = new GremlinPipeline<Vertex, Vertex>();			
+			fPipe.start(vR).inE(EdgeLabel.members.toString()).outV()
+				.has(ID, T.eq, id).outE(EdgeLabel.hasState.toString())
+				.has(END, T.lte, toDate.getMillis())
+				.has(START, T.gte, fromDate.getMillis())
+				.inV().has(ACTIVE).has(TYPE, VertexType.hMember.toString())
+				.range(from, to);
+			
+			List<Vertex> fls = fPipe.toList();
+
+			List<Member> ms = RefsetConvertor.getStateMembers(fls);
+			history.setRecord(ms);
+
+		} catch (Exception e) {
+			
+			RefsetGraphFactory.rollback(g);			
+			LOGGER.error("Error getting member state history", e);
+			throw new RefsetGraphAccessException(e.getMessage(), e);
+			
+		} finally {
+			
+			RefsetGraphFactory.shutdown(g);
+		}
+	
+		
+		LOGGER.debug("Returning {} ", history);
+
+	
+		return history;
+
 	}
 
 }
