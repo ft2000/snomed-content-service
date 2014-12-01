@@ -107,7 +107,7 @@ public class Refset extends BaseObj implements Comparable<Refset> {
 		   
 	   Refset r = (Refset)input;
 	   
-	   return ( this.id == r.id && this.created.equals(r.getCreated()));
+	   return ( this.uuid == r.uuid && this.created.equals(r.getCreated()));
 	   
    }
    
@@ -117,7 +117,7 @@ public class Refset extends BaseObj implements Comparable<Refset> {
    @Override
    public int hashCode() {
 	   // TODO Auto-generated method stub
-	   return (id + created).hashCode();
+	   return (uuid + created).hashCode();
    }
    
    @Override
@@ -126,7 +126,7 @@ public class Refset extends BaseObj implements Comparable<Refset> {
 	   return String.format( "Refset [id - %s, created - %s, createdBy - %s, description - %s, "
 	   		+ "effectiveTime - %s,  isPublished - %s, languageCode - %s, members - %s, moduleId - %s, publishedDate - %s "
 	   		+ "superRefsetTypeId - %s, type - %s, typeId - %s, description - %s, latestEffectiveTime - %s,"
-	   		+ " earliestEffectiveTime -%s ]", this.id, this.created, this.createdBy, this.description,
+	   		+ " earliestEffectiveTime -%s ]", this.uuid, this.created, this.createdBy, this.description,
 	   		this.effectiveTime, this.published, this.languageCode, this.members, this.moduleId, this.publishedDate,
 	   		this.superRefsetTypeId, this.type, this.typeId, this.description, this.earliestEffectiveTime, this.latestEffectiveTime );
    }

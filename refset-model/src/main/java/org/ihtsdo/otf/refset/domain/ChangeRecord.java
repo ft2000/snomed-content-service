@@ -12,9 +12,6 @@
 package org.ihtsdo.otf.refset.domain;
 
 import java.util.List;
-
-import org.joda.time.DateTime;
-
 /**
  *
  */
