@@ -71,7 +71,7 @@ public class RefsetBrowseControllerTest {
 	    refsets = data.getRefSets();
 		when(service.getRefsets(1, 10, false)).thenReturn(refsets.subList(0, 10));
 		
-		when(refset.getId()).thenReturn("Junit_1");
+		when(refset.getUuid()).thenReturn("Junit_1");
 		when(refset.getDescription()).thenReturn("Junit Refset"); 
 		when(refset.getModuleId()).thenReturn("Junit_module_1");
 		when(refset.getMembers()).thenReturn(null);

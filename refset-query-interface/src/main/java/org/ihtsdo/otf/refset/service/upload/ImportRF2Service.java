@@ -54,7 +54,7 @@ public class ImportRF2Service implements ImportService {
 	 * @see org.ihtsdo.otf.refset.service.upload.ImportService#importFile(org.springframework.web.multipart.MultipartFile, java.lang.String)
 	 */
 	@Override
-	public Map<String, String> importFile(InputStream is, String refsetId) throws RefsetServiceException, EntityNotFoundException {
+	public Map<String, String> importFile(InputStream is, String refsetId, String user) throws RefsetServiceException, EntityNotFoundException {
 		
 		
 		if (is == null || StringUtils.isBlank(refsetId)) {
@@ -71,7 +71,7 @@ public class ImportRF2Service implements ImportService {
 
         	int row = 0;
         	
-        	List<Rf2Refset> rf2RLst = new ArrayList<Rf2Refset>();
+        	List<Rf2Record> rf2RLst = new ArrayList<Rf2Record>();
         	
             while( (line = reader.readLine()) != null ) {
             	
@@ -88,7 +88,7 @@ public class ImportRF2Service implements ImportService {
             	
         		if (columns != null & columns.length == 6) {
         			
-        			Rf2Refset rf2r = new Rf2Refset();
+        			Rf2Record rf2r = new Rf2Record();
         			
         			rf2r.setId(columns[0]);
         			rf2r.setEffectiveTime(fmt.parseDateTime(columns[1]));
@@ -96,6 +96,8 @@ public class ImportRF2Service implements ImportService {
         			rf2r.setModuleId(columns[3]);
         			rf2r.setRefsetId(columns[4]);
         			rf2r.setReferencedComponentId(columns[5]);
+        			rf2r.setCreatedBy(user);
+        			rf2r.setModifiedBy(user);
         			rf2RLst.add(rf2r);
         			
         		} else {
@@ -106,7 +108,7 @@ public class ImportRF2Service implements ImportService {
 
             }
             
-        	return srp.process(rf2RLst, refsetId);
+        	return srp.process(rf2RLst, refsetId, user);
 
 			
 		} catch (IOException e) {
@@ -124,15 +126,6 @@ public class ImportRF2Service implements ImportService {
 				LOGGER.info("Could not close IO resources");
 			}
 		}
-		
-		
-		
 	}
-
-
-        
-        
-	
-	
 
 }

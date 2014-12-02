@@ -21,6 +21,9 @@ import static org.ihtsdo.otf.refset.domain.RGC.REFERENCE_COMPONENT_ID;
 import static org.ihtsdo.otf.refset.domain.RGC.SCTID;
 import static org.ihtsdo.otf.refset.domain.RGC.SUPER_REFSET_TYPE_ID;
 import static org.ihtsdo.otf.refset.domain.RGC.TYPE_ID;
+import static org.ihtsdo.otf.refset.domain.RGC.END;
+import static org.ihtsdo.otf.refset.domain.RGC.E_EFFECTIVE_TIME;
+import static org.ihtsdo.otf.refset.domain.RGC.L_EFFECTIVE_TIME;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -63,118 +66,8 @@ public class RefsetConvertor {
 			
 			if (!StringUtils.isEmpty(gr.getId()) && keys.contains(DESC) ) {
 				
-				
-				Refset r = new Refset();
-				
-				
-				if ( keys.contains(CREATED) ) {
-				
-					r.setCreated(new DateTime(gr.getCreated()));
-				}
-				
-				if ( keys.contains(CREATED_BY) ) {
-					
-					r.setCreatedBy(gr.getCreatedBy());
-					
-				}
-				
-				
-				if ( keys.contains(DESC) ) {
-					
-					r.setDescription(gr.getDescription());
-					
-				}
-				
-				if ( keys.contains(EFFECTIVE_DATE) ) {
-					
-					r.setEffectiveTime(new DateTime(gr.getEffectiveTime()));
+				Refset r = getRefset(gr);
 
-				}
-				
-				if ( keys.contains(ID) ) {
-					
-					r.setId(gr.getId());
-
-				}
-				
-				if ( keys.contains(SCTID) ) {
-					
-					r.setId(gr.getSctdId());
-
-				}
-				
-				if ( keys.contains(LANG_CODE) ) {
-					
-					r.setLanguageCode(gr.getLanguageCode());
-
-					
-				}
-				
-				if ( keys.contains(MODULE_ID) ) {
-					
-					r.setModuleId(gr.getModuleId());
-					
-				}
-				
-				if ( keys.contains(PUBLISHED) ) {
-					
-					r.setPublished(gr.getPublished() == 1 ? true : false);
-					
-				}
-				
-				
-				if ( keys.contains(PUBLISHED_DATE) ) {
-					
-					r.setPublishedDate(new DateTime(gr.getPublishedDate()));
-
-					
-				}
-				
-				
-				if ( keys.contains(SUPER_REFSET_TYPE_ID) ) {
-					
-					r.setSuperRefsetTypeId(gr.getSuperRefsetTypeId());
-					
-				}
-				
-				if ( keys.contains(MEMBER_TYPE_ID) ) {
-					
-					r.setComponentTypeId(gr.getComponentTypeId());
-					
-				}
-
-				if ( keys.contains(TYPE_ID) ) {
-					
-					r.setTypeId(gr.getTypeId());
-					
-				}
-				
-				if ( keys.contains(ACTIVE) ) {
-					
-					r.setActive(gr.getActive() == 1 ? true : false);
-					
-				}
-				
-				if ( keys.contains(MODIFIED_DATE) ) {
-					
-					r.setModifiedDate(new DateTime(gr.getModifiedDate()));
-				}
-				
-				if ( keys.contains(MODIFIED_BY) ) {
-					
-					r.setModifiedBy(gr.getModifiedBy());
-					
-				}
-				
-				if ( keys.contains(EXPECTED_RLS_DT) ) {
-					
-					r.setExpectedReleaseDate(new DateTime(gr.getExpectedReleaseDate()));
-
-				}
-				
-				r.setTotalNoOfMembers(gr.getNoOfMembers());
-
-				
 				refsets.add(r);
 				
 			}
@@ -244,7 +137,7 @@ public class RefsetConvertor {
 		
 		if ( keys.contains(ID) ) {
 			
-			r.setId(vR.getId());
+			r.setUuid(vR.getId());
 		}
 		
 		if ( keys.contains(LANG_CODE) ) {
@@ -311,10 +204,33 @@ public class RefsetConvertor {
 		
 		if ( keys.contains(SCTID) ) {
 			
-			r.setId(vR.getSctdId());
+			r.setSctId(vR.getSctId());
 
 		}
 		
+		if ( keys.contains(ACTIVE) ) {
+			
+			r.setActive(vR.getActive() == 1 ? true : false);
+			
+		}
+		if (keys.contains("noOfMembers")) {
+			
+			r.setTotalNoOfMembers(vR.getNoOfMembers());
+
+		}
+		
+		if ( keys.contains(E_EFFECTIVE_TIME) ) {
+			
+			r.setEarliestEffectiveTime(new DateTime(vR.getEarliestEffectiveTime()));
+
+		}
+		
+		if ( keys.contains(L_EFFECTIVE_TIME) ) {
+			
+			r.setLatestEffectiveTime(new DateTime(vR.getLatestEffectiveTime()));
+
+		}
+
 		return r;
 	}
 
@@ -328,95 +244,27 @@ public class RefsetConvertor {
 			
 			for (Edge eR : eRs) {
 				
+				//only get edges which has LONG.MAX_VALUE end date
+				if (eR.getPropertyKeys().contains(END)) {
+					
+					long end = eR.getProperty(END);
+					
+					if (!(end == Long.MAX_VALUE)) {
+						//we have to get only latest member state not history
+						LOGGER.trace("skipping {} as this member is does not have current state", eR.getProperty(ID));
+						continue;
+					}
+					
+				} else {
+					
+					continue;//not a valid member
+				}
+				
+				
 				Vertex vM = eR.getVertex(Direction.OUT);
 				
-				Set<String> mKeys = vM.getPropertyKeys();
+				Member m = getMember(vM);
 				
-				Member m = new Member();
-				
-				if ( mKeys.contains(ID) ) {
-					
-					String lId = vM.getProperty(ID);
-
-					m.setId(lId);
-					
-				}
-				
-				if ( mKeys.contains(MODULE_ID) ) {
-					
-					
-					String mModuleId = vM.getProperty(MODULE_ID);
-					m.setModuleId(mModuleId);
-					
-				}
-				
-				if (mKeys.contains(EFFECTIVE_DATE)) {
-					
-
-					long effectivetime = vM.getProperty(EFFECTIVE_DATE);
-					
-					LOGGER.trace("Actual effective date when this member tied to given refset is  {} ", effectivetime);
-
-					m.setEffectiveTime(new DateTime(effectivetime));
-					
-				}
-				
-				if (mKeys.contains(PUBLISHED)) {
-					
-
-					Integer published = vM.getProperty(PUBLISHED);
-					
-					m.setPublished(published == 1 ? true : false);;
-					
-				}
-
-
-				
-				
-				if ( mKeys.contains(ACTIVE) ) {
-					
-					Integer isActive = vM.getProperty(ACTIVE);
-					m.setActive(isActive == 1 ? true : false);
-					
-				}
-				
-				
-				if ( mKeys.contains(EFFECTIVE_DATE) ) {
-					
-					long effectivetime = vM.getProperty(EFFECTIVE_DATE);
-					m.setEffectiveTime(new DateTime(effectivetime));
-					
-				}
-				
-				if ( mKeys.contains(MODIFIED_DATE) ) {
-					
-					long modified = vM.getProperty(MODIFIED_DATE);
-					m.setModifiedDate(new DateTime(modified));
-				}
-				
-				if ( mKeys.contains(MODIFIED_BY) ) {
-					
-					String modifiedby = vM.getProperty(MODIFIED_BY);
-					m.setModifiedBy(modifiedby);
-					
-				}
-				
-				if ( mKeys.contains(CREATED) ) {
-					
-					m.setCreated(new DateTime(vM.getProperty(CREATED)));
-				}
-				
-				if ( mKeys.contains(CREATED_BY) ) {
-					
-					String createdBy = vM.getProperty(CREATED_BY);
-					m.setCreatedBy(createdBy);
-					
-				}
-				
-				
-				
-				
-				//this has to be edge effective date. //TODO remove above
 				Set<String> eKeys = eR.getPropertyKeys();
 				if ( eKeys.contains(REFERENCE_COMPONENT_ID) ) {
 					
@@ -440,6 +288,98 @@ public class RefsetConvertor {
 			
 	
 	
+	/**
+	 * @param vM
+	 */
+	protected static Member getMember(Vertex vM) {
+		// TODO Auto-generated method stub
+		Set<String> mKeys = vM.getPropertyKeys();
+		
+		Member m = new Member();
+		
+		if ( mKeys.contains(ID) ) {
+			
+			String lId = vM.getProperty(ID);
+
+			m.setUuid(lId);
+			
+		}
+		
+		if ( mKeys.contains(MODULE_ID) ) {
+			
+			
+			String mModuleId = vM.getProperty(MODULE_ID);
+			m.setModuleId(mModuleId);
+			
+		}
+		
+		if (mKeys.contains(EFFECTIVE_DATE)) {
+			
+
+			long effectivetime = vM.getProperty(EFFECTIVE_DATE);
+			
+			LOGGER.trace("Actual effective date when this member tied to given refset is  {} ", effectivetime);
+
+			m.setEffectiveTime(new DateTime(effectivetime));
+			
+		}
+		
+		if (mKeys.contains(PUBLISHED)) {
+			
+
+			Integer published = vM.getProperty(PUBLISHED);
+			
+			m.setPublished(published == 1 ? true : false);;
+			
+		}
+
+
+		
+		
+		if ( mKeys.contains(ACTIVE) ) {
+			
+			Integer isActive = vM.getProperty(ACTIVE);
+			m.setActive(isActive == 1 ? true : false);
+			
+		}
+		
+		
+		if ( mKeys.contains(EFFECTIVE_DATE) ) {
+			
+			long effectivetime = vM.getProperty(EFFECTIVE_DATE);
+			m.setEffectiveTime(new DateTime(effectivetime));
+			
+		}
+		
+		if ( mKeys.contains(MODIFIED_DATE) ) {
+			
+			long modified = vM.getProperty(MODIFIED_DATE);
+			m.setModifiedDate(new DateTime(modified));
+		}
+		
+		if ( mKeys.contains(MODIFIED_BY) ) {
+			
+			String modifiedby = vM.getProperty(MODIFIED_BY);
+			m.setModifiedBy(modifiedby);
+			
+		}
+		
+		if ( mKeys.contains(CREATED) ) {
+			
+			m.setCreated(new DateTime(vM.getProperty(CREATED)));
+		}
+		
+		if ( mKeys.contains(CREATED_BY) ) {
+			
+			String createdBy = vM.getProperty(CREATED_BY);
+			m.setCreatedBy(createdBy);
+			
+		}
+		
+		return m;
+	}
+
+
 	/** Utility method to create {@link MetaData} object from {@link Vertex} 
 	 * @param vertex
 	 * @return
@@ -460,4 +400,268 @@ public class RefsetConvertor {
 		
 		return md;
 	}
+
+
+	/**
+	 * @param ls
+	 * @return
+	 */
+	public static List<Refset> getHistoryRefsets(List<Edge> ls) {
+
+		List<Refset> history = new ArrayList<Refset>();
+
+		if(ls != null) {
+			
+			
+			for (Edge eR : ls) {
+				
+				Vertex vR = eR.getVertex(Direction.IN);
+				
+				Refset r = getRefset(vR);
+
+				LOGGER.trace("Adding history refset as {} ", r.toString());
+
+				history.add(r);
+			}
+		}
+		
+		Collections.sort(history);
+		return history;
+
+	}
+
+
+	/**
+	 * @param vR
+	 * @return
+	 */
+	private static Refset getRefset(Vertex vR) {
+
+		if (vR == null) {
+			
+			return null;
+		}
+		
+		Refset r = new Refset();
+		Set<String> keys = vR.getPropertyKeys();
+		
+		if ( keys.contains(CREATED) ) {
+		
+			r.setCreated(new DateTime(vR.getProperty(CREATED)));
+		}
+		
+		if ( keys.contains(CREATED_BY) ) {
+			
+			String createdBy = vR.getProperty(CREATED_BY);
+			r.setCreatedBy(createdBy);
+			
+		}
+		
+		
+		if ( keys.contains(DESC) ) {
+			
+			String description = vR.getProperty(DESC);
+
+			r.setDescription(description);
+			
+		}
+		
+		if ( keys.contains(EFFECTIVE_DATE) ) {
+			
+			r.setEffectiveTime(new DateTime(vR.getProperty(EFFECTIVE_DATE)));
+			
+		}
+		
+		if ( keys.contains(ID) ) {
+			
+			String id = vR.getProperty(ID);
+			
+			r.setUuid(id);
+		}
+		
+		if ( keys.contains(LANG_CODE) ) {
+			
+			String lang = vR.getProperty(LANG_CODE);
+			r.setLanguageCode(lang);
+			
+		}
+		
+		if ( keys.contains(MODULE_ID) ) {
+			
+			String moduleId = vR.getProperty(MODULE_ID);
+			
+			r.setModuleId(moduleId);
+			
+		}
+		
+		if ( keys.contains(PUBLISHED) ) {
+			
+			Integer published = vR.getProperty(PUBLISHED);
+			
+			r.setPublished(published == 1 ? true : false);
+			
+		}
+		
+		
+		if ( keys.contains(PUBLISHED_DATE) ) {
+			
+			r.setPublishedDate(new DateTime(vR.getProperty(PUBLISHED_DATE)));
+			
+		}
+		
+		
+		if ( keys.contains(SUPER_REFSET_TYPE_ID) ) {
+			
+			String superRefsetTypeId = vR.getProperty(SUPER_REFSET_TYPE_ID);
+			r.setSuperRefsetTypeId(superRefsetTypeId);
+			
+		}
+		
+
+		if ( keys.contains(TYPE_ID) ) {
+			
+			String typeId = vR.getProperty(TYPE_ID);
+			r.setTypeId(typeId);
+			
+		}
+
+		if ( keys.contains(MEMBER_TYPE_ID) ) {
+			
+			String memberTypeId = vR.getProperty(MEMBER_TYPE_ID);
+			r.setComponentTypeId(memberTypeId);
+			
+		}
+		
+		if ( keys.contains(MODIFIED_DATE) ) {
+			
+			
+			r.setModifiedDate(new DateTime(vR.getProperty(MODIFIED_DATE)));
+		}
+		
+		if ( keys.contains(MODIFIED_BY) ) {
+			
+			String modifiedBy = vR.getProperty(MODIFIED_BY);
+
+			r.setModifiedBy(modifiedBy);
+			
+		}
+		
+		if ( keys.contains(EXPECTED_RLS_DT) ) {
+			
+			r.setExpectedReleaseDate(new DateTime(vR.getProperty(EXPECTED_RLS_DT)));
+
+		}
+		
+		if ( keys.contains(SCTID) ) {
+			
+			String sctid = vR.getProperty(SCTID);
+
+			r.setSctId(sctid);
+
+		}
+		
+		if ( keys.contains(ACTIVE) ) {
+			
+			Integer active = vR.getProperty(ACTIVE);
+
+			r.setActive(active == 1 ? true : false);
+			
+		}
+		
+		if ( keys.contains(E_EFFECTIVE_TIME) ) {
+			
+			r.setEarliestEffectiveTime(new DateTime(vR.getProperty(E_EFFECTIVE_TIME)));
+
+		}
+		
+		if ( keys.contains(L_EFFECTIVE_TIME) ) {
+			
+			r.setLatestEffectiveTime(new DateTime(vR.getProperty(L_EFFECTIVE_TIME)));
+
+		}
+		
+		return r;
+
+	}
+	
+	protected static List<Member> getHistoryMembers(Iterable<Edge> eRs ) {
+		
+		List<Member> members = new ArrayList<Member>();
+
+		if(eRs != null) {
+			
+			
+			for (Edge eR : eRs) {
+				
+				Vertex vM = eR.getVertex(Direction.IN);
+				
+				Member m = getMember(vM);
+				
+				Set<String> eKeys = eR.getPropertyKeys();
+				if ( eKeys.contains(REFERENCE_COMPONENT_ID) ) {
+					
+					String referenceComponentId = eR.getProperty(REFERENCE_COMPONENT_ID);
+					m.setReferencedComponentId(referenceComponentId);
+					
+				}
+
+				LOGGER.trace("Adding member as {} ", m.toString());
+
+				members.add(m);
+			}
+		}
+		
+		Collections.sort(members);
+		return members;
+	}
+
+
+	/**
+	 * @param ls
+	 * @return
+	 */
+	public static List<Refset> getStateRefsets(List<Vertex> ls) {
+	
+		List<Refset> history = new ArrayList<Refset>();
+		if (ls != null && !ls.isEmpty()) {
+			
+			for (Vertex vR : ls) {
+				
+				Refset r = getRefset(vR);
+
+				LOGGER.trace("Adding history refset as {} ", r.toString());
+
+				history.add(r);
+
+			}
+		}
+		return history;
+	}
+
+
+	/**
+	 * @param fls
+	 * @return
+	 */
+	public static List<Member> getStateMembers(List<Vertex> fls) {
+		
+		List<Member> members = new ArrayList<Member>();
+
+		if(fls != null) {
+			
+			for (Vertex vM : fls) {
+							
+				Member m = getMember(vM);
+				LOGGER.trace("Adding member as {} ", m.toString());
+
+				members.add(m);
+			
+			}
+			
+		}
+		
+		Collections.sort(members);
+		return members;
+	}
+
 }

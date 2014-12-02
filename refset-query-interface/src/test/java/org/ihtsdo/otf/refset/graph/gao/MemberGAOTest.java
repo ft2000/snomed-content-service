@@ -137,7 +137,7 @@ public class MemberGAOTest {
 		
 		assertEquals(2, beforeSize);
 		
-		gao.removeMember("junit_1", "101");
+		gao.removeMember("junit_1", "101", "junit");
 		
 		Refset after = rGao.getRefset("junit_1");
 
@@ -149,31 +149,31 @@ public class MemberGAOTest {
 	@Test(expected = EntityNotFoundException.class)
 	public void removeMemberWhenNullReferenceComponentId() throws EntityNotFoundException, RefsetGraphAccessException {
 		
-		gao.removeMember("junit_1", null);
+		gao.removeMember("junit_1", null, "junit");
 	}
 	
 	@Test(expected = EntityNotFoundException.class)
 	public void removeMemberWhenEmptyReferenceComponentId() throws EntityNotFoundException, RefsetGraphAccessException {
 		
-		gao.removeMember("junit_1", "");
+		gao.removeMember("junit_1", "", "junit");
 	}
 	
 	@Test(expected = EntityNotFoundException.class)
 	public void removeMemberWhenNullRefsetId() throws EntityNotFoundException, RefsetGraphAccessException {
 		
-		gao.removeMember(null, "junit_1");
+		gao.removeMember(null, "junit_1", "junit");
 	}
 	
 	@Test(expected = EntityNotFoundException.class)
 	public void removeMemberWhenEmptyRefsetId() throws EntityNotFoundException, RefsetGraphAccessException {
 		
-		gao.removeMember("", "junit_1");
+		gao.removeMember("", "junit_1", "junit");
 	}
 	
 	private void addRefset() throws RefsetGraphAccessException {
 		
 		Refset r = new Refset();
-		r.setId("junit_1");
+		r.setUuid("junit_1");
 		r.setDescription("Junit");
 		
 		Member m = new Member();

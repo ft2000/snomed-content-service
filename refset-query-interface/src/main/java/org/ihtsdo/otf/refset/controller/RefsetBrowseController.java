@@ -52,14 +52,14 @@ public class RefsetBrowseController {
 	
 	@RequestMapping( method = RequestMethod.GET, produces = "application/json" )
 	@ApiOperation( value = "Retrieves list of existing refsets. By default it returns 10 refset and thereafter another 10 or desired range" )
-    public ResponseEntity<Result< Map<String, Object>>> getRefsets( @RequestParam( value = "page", defaultValue = "0" ) int from, 
-    		@RequestParam( value = "size", defaultValue = "10" ) int to ) throws Exception {
+    public ResponseEntity<Result< Map<String, Object>>> getRefsets( @RequestParam( value = "from", defaultValue = "0" ) int from, 
+    		@RequestParam( value = "to", defaultValue = "10" ) int to ) throws Exception {
 		
 		logger.debug("Existing refsets");
 
 		Result<Map<String, Object>> response = new Result<Map<String, Object>>();
 		Meta m = new Meta();
-		m.add( linkTo( methodOn( RefsetBrowseController.class ).getRefsets( from, to ) ).withSelfRel() );
+		m.add( linkTo( methodOn( RefsetBrowseController.class ).getRefsets( from, to ) ).withRel("Refsets"));
 		
 		response.setMeta(m);
 
@@ -87,7 +87,7 @@ public class RefsetBrowseController {
     }
 	
 	@RequestMapping( method = RequestMethod.GET, value = "/{refSetId}", produces = "application/json" )
-	@ApiOperation( value = "Api to get details of a refset for given refset id." )
+	@ApiOperation( value = "Api to get details of a refset for given refset uuid." )
     public ResponseEntity<Result< Map<String, Object>>> getRefsetDetails( @PathVariable( value = "refSetId" ) String refSetId ) throws Exception {
 		
 		logger.debug("Getting refset details");
@@ -96,7 +96,7 @@ public class RefsetBrowseController {
 		
 		Meta m = new Meta();
 
-		m.add( linkTo( methodOn( RefsetBrowseController.class, refSetId).getRefsetDetails(refSetId) ).withSelfRel() );
+		m.add( linkTo( methodOn( RefsetBrowseController.class, refSetId).getRefsetDetails(refSetId) ).withRel("Refset") );
 		response.setMeta(m);
 
 
@@ -155,7 +155,7 @@ public class RefsetBrowseController {
 
 		Result<Map<String, Object>> response = new Result<Map<String, Object>>();
 		Meta m = new Meta();
-		m.add( linkTo( methodOn( RefsetBrowseController.class ).getRefsetMembers( from, to, refsetId ) ).withSelfRel() );
+		m.add( linkTo( methodOn( RefsetBrowseController.class ).getRefsetMembers( from, to, refsetId ) ).withRel("Members") );
 		
 		response.setMeta(m);
 		
@@ -189,7 +189,7 @@ public class RefsetBrowseController {
 	
 	
 	@RequestMapping( method = RequestMethod.GET, value = "/{refSetId}/header", produces = "application/json")
-	@ApiOperation( value = "Api to get details of a refset excluding members for given refset id." )
+	@ApiOperation( value = "Api to get details of a refset excluding members for given refset uuid." )
     public ResponseEntity<Result< Map<String, Object>>> getRefsetHeader( @PathVariable( value = "refSetId" ) String refSetId ) throws Exception {
 		
 		logger.debug("Getting refset details");
@@ -198,7 +198,7 @@ public class RefsetBrowseController {
 		
 		Meta m = new Meta();
 
-		m.add( linkTo( methodOn( RefsetBrowseController.class, refSetId).getRefsetDetails(refSetId) ).withSelfRel() );
+		m.add( linkTo( methodOn( RefsetBrowseController.class, refSetId).getRefsetDetails(refSetId) ).withRel("RefsetHeader") );
 		response.setMeta(m);
 
 

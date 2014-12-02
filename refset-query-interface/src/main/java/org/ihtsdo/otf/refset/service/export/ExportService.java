@@ -27,8 +27,7 @@ import org.supercsv.cellprocessor.constraint.UniqueHashCode;
 import org.supercsv.cellprocessor.ift.CellProcessor;
 import org.supercsv.io.ICsvListWriter;
 /**
- * @author Episteme Partners
- *
+ * Service to support RF2 export of simple refset
  */
 @Service
 public class ExportService {
@@ -42,26 +41,26 @@ public class ExportService {
 	private ConceptLookupService lService;
 
 	
-	public  void getRF2Payload(ICsvListWriter lWriter, String refsetId) throws ExportServiceException, EntityNotFoundException {
+	public  void getRF2Payload(ICsvListWriter lWriter, String refsetUuId) throws ExportServiceException, EntityNotFoundException {
 		
-		LOGGER.debug("Exporting refset for refsetid {}", refsetId);
+		LOGGER.debug("Exporting refset {}", refsetUuId);
 		
 		if (lWriter == null) {
 			
 			throw new ExportServiceException("No output writer available");
 		}
 		
-		if (StringUtils.isEmpty(refsetId)) {
+		if (StringUtils.isEmpty(refsetUuId)) {
 			
 			throw new ExportServiceException("Invalid request");
 
 		}
 
 		try {
-			//TODO header has to come from refset descriptor for now hard code
+			//TODO header has to come from refset descriptor. For now hard code
 			//http://supercsv.sourceforge.net/examples_writing.html. 
 			
-			Refset r = bService.getRefset(refsetId);
+			Refset r = bService.getRefset(refsetUuId);
 			
             final CellProcessor[] processors = getProcessors();
             /**
@@ -72,20 +71,14 @@ public class ExportService {
 			            
 
             lWriter.writeHeader(header);
-
-               
-            /*final List<Object> refset = Arrays.asList(new Object[] { r.getId(), getDate(r.getEffectiveTime()), r.isActive()
-                		, r.getModuleId(), r.getSuperRefsetTypeId(), r.getLanguageCode(), r.getTypeId(), r.getDescription()});
-
-            lWriter.write(refset, processors);*/
 			
 			List<Member> ms = r.getMembers();
-
+			String refsetId = StringUtils.isEmpty(r.getSctId()) ? r.getUuid() : r.getSctId();
 			for (Member m : ms) {
 								
 				String active = m.isActive() ? "1" : "0";
-				List<Object> concept = Arrays.asList(new Object[] { m.getId(), Utility.getDate(m.getEffectiveTime()), active
-                		, r.getModuleId(), r.getId(), m.getReferencedComponentId()});
+				List<Object> concept = Arrays.asList(new Object[] { m.getUuid(), Utility.getDate(m.getEffectiveTime()), active
+                		, r.getModuleId(), refsetId, m.getReferencedComponentId()});
 
 				lWriter.write(concept, processors);
 				

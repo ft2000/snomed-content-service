@@ -11,6 +11,9 @@ import com.thinkaurelius.titan.core.TitanFactory;
 import com.thinkaurelius.titan.core.TitanGraph;
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.GraphFactory;
+import com.tinkerpop.blueprints.util.wrappers.event.EventGraph;
+import com.tinkerpop.blueprints.util.wrappers.event.EventTransactionalGraph;
+import com.tinkerpop.blueprints.util.wrappers.event.listener.ConsoleGraphChangedListener;
 import com.tinkerpop.frames.FramedTransactionalGraph;
 
 
@@ -91,7 +94,7 @@ public class RefsetGraphFactory {
 	
 	public static void rollback(Graph g) {
 		
-		LOGGER.trace("rollback {}", g);
+		LOGGER.debug("rollback {}", g);
 
 		if (g instanceof TitanGraph) {
 			
@@ -104,6 +107,15 @@ public class RefsetGraphFactory {
 				@SuppressWarnings("unchecked")
 				FramedTransactionalGraph<TitanGraph> framedTransactionalGraph = (FramedTransactionalGraph<TitanGraph>)g;
 				framedTransactionalGraph.rollback();
+			}
+
+		} else if (g instanceof EventTransactionalGraph) {
+			
+			if (g != null) {
+				
+				@SuppressWarnings("unchecked")
+				EventTransactionalGraph<TitanGraph> etg = (EventTransactionalGraph<TitanGraph>)g;
+				etg.rollback();
 			}
 
 		} else {
@@ -126,18 +138,55 @@ public class RefsetGraphFactory {
 			if (g != null) {
 				
 				@SuppressWarnings("unchecked")
-				FramedTransactionalGraph<TitanGraph> framedTransactionalGraph = (FramedTransactionalGraph<TitanGraph>)g;
-				framedTransactionalGraph.commit();
+				FramedTransactionalGraph<TitanGraph> ftg = (FramedTransactionalGraph<TitanGraph>)g;
+				ftg.commit();
+			}
+
+		} else if (g instanceof EventTransactionalGraph) {
+			
+			if (g != null) {
+				
+				@SuppressWarnings("unchecked")
+				EventTransactionalGraph<TitanGraph> etg = (EventTransactionalGraph<TitanGraph>)g;
+				etg.commit();
 			}
 
 		} else {
 			
-			LOGGER.trace("Not committing unknown graph {}", g);
+			LOGGER.debug("Not committing unknown graph {}", g);
 
 		}
   
 
 		
+	}
+	
+	/** Returns a transactional {@link TitanGraph} 
+	 * @return
+	 */
+	public EventGraph<TitanGraph> getEventGraph() {
+		
+		if (this.tg == null) {
+			
+	        LOGGER.info("Create new instance of graph");
+
+			this.tg = TitanFactory.open(config);
+		}
+		
+		if (this.tg == null) {
+			
+			throw new IllegalArgumentException("Graph not initialized, please check provide confiuration");
+		}
+		TitanGraph tg =  this.tg;
+        LOGGER.trace("Returning Transactional Graph {}", tg);
+        EventGraph<TitanGraph> eg = new EventTransactionalGraph<TitanGraph>(tg);
+        if (LOGGER.isDebugEnabled()) {
+			
+            eg.addListener(new ConsoleGraphChangedListener(eg.getBaseGraph()));
+
+		}
+        return eg;
+        
 	}
 	
 

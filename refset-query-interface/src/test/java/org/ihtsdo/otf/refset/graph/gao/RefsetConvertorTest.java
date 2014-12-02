@@ -52,8 +52,8 @@ public class RefsetConvertorTest {
 		
 		r = new Refset();
 		m = new Member();
-		r.setId(UUID.randomUUID().toString());
-		m.setId(UUID.randomUUID().toString());
+		r.setUuid(UUID.randomUUID().toString());
+		m.setUuid(UUID.randomUUID().toString());
 
 		gR = mock(GRefset.class);
 		
@@ -103,7 +103,7 @@ public class RefsetConvertorTest {
 		assertEquals(CREATED_BY, r.getCreatedBy());
 		assertEquals(DESCRIPTION, r.getDescription());
 		assertEquals(MODULE_ID, r.getModuleId());
-		assertEquals(ID, r.getId());
+		assertEquals(ID, r.getUuid());
 		assertNotNull(r.getCreated());
 		assertNotNull(r.getEffectiveTime());
 	}

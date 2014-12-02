@@ -236,16 +236,16 @@ public interface GRefset extends VertexFrame {
 	public void setModifiedBy(String modifiedBy);
 
 	/**
-	 * @return the id
+	 * @return the sctId
 	 */
-	@Property( value = "sctdId")
-	public String getSctdId();
+	@Property( value = "sctId")
+	public String getSctId();
 
 	/**
 	 * @param id the id to set
 	 */
-	@Property( value = "sctdId")
-	public void setSctdId(String id);
+	@Property( value = "sctId")
+	public void setSctId(String sctId);
 	
 	/**
 	 * @return the id
@@ -258,5 +258,29 @@ public interface GRefset extends VertexFrame {
 	 */
 	@Property( value = "noOfMembers")
 	public void setNoOfMembers(Long noOfMembers);
+	
+	/**
+	 * @return the earliestEffectiveTime
+	 */
+	@Property( value = "earliestEffectiveTime")
+	public long getEarliestEffectiveTime();
+
+	/**
+	 * @param earliestEffectiveTime the earliestEffectiveTime to set
+	 */
+	@Property( value = "earliestEffectiveTime")
+	public void setEarliestEffectiveTime(long earliestEffectiveTime);
+	
+	/**
+	 * @return the latestEffectiveTime
+	 */
+	@Property( value = "latestEffectiveTime")
+	public long getLatestEffectiveTime();
+
+	/**
+	 * @param latestEffectiveTime the latestEffectiveTime to set
+	 */
+	@Property( value = "latestEffectiveTime")
+	public void setLatestEffectiveTime(long latestEffectiveTime);
 
 }

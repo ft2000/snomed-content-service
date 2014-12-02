@@ -7,6 +7,7 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 import java.io.InputStream;
+import java.nio.file.AccessDeniedException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.zip.GZIPInputStream;
@@ -16,6 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.ihtsdo.otf.refset.common.Meta;
 import org.ihtsdo.otf.refset.common.Result;
 import org.ihtsdo.otf.refset.controller.RefsetBrowseController;
+import org.ihtsdo.otf.refset.security.User;
 import org.ihtsdo.otf.refset.service.upload.ImportService;
 import org.ihtsdo.otf.refset.service.upload.Rf2VerificationService;
 import org.slf4j.Logger;
@@ -25,6 +27,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -73,7 +77,7 @@ public class RefsetImportController {
 		
 		
 		//call import service
-		Map<String, String> outcome = iService.importFile(is, refsetId);
+		Map<String, String> outcome = iService.importFile(is, refsetId, getUserDetails().getUsername());
 	    
 	    is.close();
 		
@@ -96,7 +100,7 @@ public class RefsetImportController {
 		} 		
 		
 		//call import service
-		Map<String, String> outcome = iService.importFile(is, refsetId);
+		Map<String, String> outcome = iService.importFile(is, refsetId, getUserDetails().getUsername());
 	    is.close();
 	    		
 		
@@ -121,6 +125,18 @@ public class RefsetImportController {
 		
 		return new ResponseEntity<Result<Map<String,Object>>>(result, HttpStatus.OK);
 
+	}
+	
+	private UserDetails getUserDetails() throws AccessDeniedException {
+		Object auth = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		
+		if (auth instanceof User) {
+			
+			UserDetails user = (UserDetails) auth;
+			return user;
+		}
+		
+		throw new AccessDeniedException("");
 	}
 
 	

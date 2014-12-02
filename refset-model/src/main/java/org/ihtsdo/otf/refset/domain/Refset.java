@@ -29,6 +29,10 @@ public class Refset extends BaseObj implements Comparable<Refset> {
 	
 	private long totalNoOfMembers;
 	
+	private DateTime earliestEffectiveTime;
+	
+	private DateTime latestEffectiveTime;
+	
 	
 	/**
 	 * @return the typeId
@@ -103,7 +107,7 @@ public class Refset extends BaseObj implements Comparable<Refset> {
 		   
 	   Refset r = (Refset)input;
 	   
-	   return ( this.id == r.id && this.created.equals(r.getCreated()));
+	   return ( this.uuid == r.uuid && this.created.equals(r.getCreated()));
 	   
    }
    
@@ -113,7 +117,7 @@ public class Refset extends BaseObj implements Comparable<Refset> {
    @Override
    public int hashCode() {
 	   // TODO Auto-generated method stub
-	   return (id + created).hashCode();
+	   return (uuid + created).hashCode();
    }
    
    @Override
@@ -121,9 +125,10 @@ public class Refset extends BaseObj implements Comparable<Refset> {
 	   
 	   return String.format( "Refset [id - %s, created - %s, createdBy - %s, description - %s, "
 	   		+ "effectiveTime - %s,  isPublished - %s, languageCode - %s, members - %s, moduleId - %s, publishedDate - %s "
-	   		+ "superRefsetTypeId - %s, type - %s, typeId - %s, description - %s]", this.id, this.created, this.createdBy, this.description,
+	   		+ "superRefsetTypeId - %s, type - %s, typeId - %s, description - %s, latestEffectiveTime - %s,"
+	   		+ " earliestEffectiveTime -%s ]", this.uuid, this.created, this.createdBy, this.description,
 	   		this.effectiveTime, this.published, this.languageCode, this.members, this.moduleId, this.publishedDate,
-	   		this.superRefsetTypeId, this.type, this.typeId, this.description );
+	   		this.superRefsetTypeId, this.type, this.typeId, this.description, this.earliestEffectiveTime, this.latestEffectiveTime );
    }
 
 
@@ -182,6 +187,34 @@ public class Refset extends BaseObj implements Comparable<Refset> {
 		int outcome = this.created.compareTo(o.getCreated());
 				
 		return outcome;
+	}
+
+	/**
+	 * @return the earliestEffectiveTime
+	 */
+	public DateTime getEarliestEffectiveTime() {
+		return earliestEffectiveTime;
+	}
+
+	/**
+	 * @param earliestEffectiveTime the earliestEffectiveTime to set
+	 */
+	public void setEarliestEffectiveTime(DateTime earliestEffectiveTime) {
+		this.earliestEffectiveTime = earliestEffectiveTime;
+	}
+
+	/**
+	 * @return the latestEffectiveTime
+	 */
+	public DateTime getLatestEffectiveTime() {
+		return latestEffectiveTime;
+	}
+
+	/**
+	 * @param latestEffectiveTime the latestEffectiveTime to set
+	 */
+	public void setLatestEffectiveTime(DateTime latestEffectiveTime) {
+		this.latestEffectiveTime = latestEffectiveTime;
 	}
 
 

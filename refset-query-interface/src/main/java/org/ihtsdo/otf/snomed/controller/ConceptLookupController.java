@@ -37,7 +37,7 @@ import com.wordnik.swagger.annotations.ApiOperation;
  *
  */
 @RestController
-@Api(value="Concept details look up service", description="Service to lookup concept details", position = 3)
+@Api(value="Concept details look up service", description="Service to lookup concept details", position = 6)
 @RequestMapping("/v1.0/snomed")
 public class ConceptLookupController {
 	

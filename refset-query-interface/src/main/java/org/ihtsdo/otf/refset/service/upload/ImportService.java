@@ -21,6 +21,6 @@ import org.ihtsdo.otf.refset.exception.RefsetServiceException;
  */
 public interface ImportService {
 	
-	public Map<String, String> importFile(InputStream is, String refsetId) throws RefsetServiceException, EntityNotFoundException;
+	public Map<String, String> importFile(InputStream is, String refsetId, String user) throws RefsetServiceException, EntityNotFoundException;
 
 }
