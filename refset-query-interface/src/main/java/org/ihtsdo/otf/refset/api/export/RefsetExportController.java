@@ -26,8 +26,7 @@ import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 
 /**
- * @author Episteme Partners
- *
+ *Controller to support download of a RF2 file refset
  */
 @RestController
 @Api(value="RefsetExport", description="Service export refset and their members in RF2 format", position = 3)
@@ -52,9 +51,12 @@ public class RefsetExportController {
 
 	    final ICsvListWriter csvWriter = new CsvListWriter(resp.getWriter(), RF2_PREF);
  
-        eService.getRF2Payload(csvWriter, refsetId);
+	    eService.getRF2Payload(csvWriter, refsetId);
+
+	    csvWriter.close();
+
         
-        csvWriter.close();
+        
      
         return;
     }
