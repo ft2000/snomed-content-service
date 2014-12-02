@@ -38,7 +38,7 @@
 	<logger name="org.ihtsdo.otf" level="debug" />
 		
 			
-	<logger name="com.tinkerpop.blueprints" level="debug" />
+	<logger name="com.tinkerpop.blueprints" level="INFO" />
 		
 	<logger name="com.thinkaurelius.titan.diskstorage.es" level="info" />
 	<logger name="com.thinkaurelius.titan.diskstorage.cassandra" level="info" />
@@ -66,7 +66,7 @@
 	</logger>		
 
 	<!-- Root Logger -->
-	<root level="info">
+	<root level="INFO">
 		<appender-ref ref="file" />
 	</root>
 	

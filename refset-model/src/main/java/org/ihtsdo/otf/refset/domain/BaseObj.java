@@ -43,7 +43,7 @@ public class BaseObj {
 	
 	protected boolean active;
 
-	protected String id;
+	protected String uuid;
 
 	protected boolean published;
 	
@@ -114,14 +114,14 @@ public class BaseObj {
 	/**
 	 * @return the id
 	 */
-	public String getId() {
-		return id;
+	public String getUuid() {
+		return uuid;
 	}
 	/**
 	 * @param id the id to set
 	 */
-	public void setId(String id) {
-		this.id = id;
+	public void setUuid(String id) {
+		this.uuid = id;
 	}
 	
    /**

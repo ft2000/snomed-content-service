@@ -5,6 +5,7 @@ package org.ihtsdo.otf.refset.graph.gao;
 
 import static org.ihtsdo.otf.refset.domain.RGC.*;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,7 +20,7 @@ import org.ihtsdo.otf.refset.graph.RefsetGraphAccessException;
 import org.ihtsdo.otf.refset.graph.RefsetGraphFactory;
 import org.ihtsdo.otf.refset.graph.schema.GMember;
 import org.ihtsdo.otf.refset.graph.schema.GRefset;
-import org.ihtsdo.otf.refset.service.upload.Rf2Refset;
+import org.ihtsdo.otf.refset.service.upload.Rf2Record;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,13 +33,17 @@ import com.thinkaurelius.titan.core.TitanGraph;
 import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Vertex;
+import com.tinkerpop.blueprints.util.wrappers.event.EventGraph;
 import com.tinkerpop.frames.FramedGraphFactory;
 import com.tinkerpop.frames.FramedTransactionalGraph;
 import com.tinkerpop.gremlin.Tokens.T;
 import com.tinkerpop.gremlin.java.GremlinPipeline;
 
 /**Graph Access component to do CRUD operation on underlying Refset graph
- * @author Episteme Partners
+ * Operation in this class supports
+ * 1. New Refset Creation
+ * 2. Deletion of a refset
+ * 3. Update an existing refset
  *
  */
 @Repository
@@ -51,8 +56,6 @@ public class RefsetAdminGAO {
 	private MemberGAO mGao;
 	
 	private RefsetGAO rGao;
-	
-
 
 	private static FramedGraphFactory fgf = new FramedGraphFactory();
 
@@ -68,16 +71,14 @@ public class RefsetAdminGAO {
 
 		TitanGraph g = null;
 		MetaData md = r.getMetaData();
-		FramedTransactionalGraph<TitanGraph> tg = null;
+		EventGraph<TitanGraph> tg = null;
 		
 		try {
-			
-			g = factory.getTitanGraph();
-			
-			tg = fgf.create(g);
+						
+			tg = factory.getEventGraph();
 			
 
-			final Vertex rV = addRefsetNode(r, tg);	
+			final Vertex rV = addRefsetNode(r, fgf.create(tg.getBaseGraph()));	
 			
 			
 			/*if members exist then add members*/
@@ -94,6 +95,9 @@ public class RefsetAdminGAO {
 					/*Add this member to refset*/
 					Edge e = tg.addEdge(null, mV, rV, "members");
 					e.setProperty(REFERENCE_COMPONENT_ID, m.getReferencedComponentId());
+					long start = r.getEffectiveTime() != null ? r.getEffectiveTime().getMillis() : new DateTime().getMillis();
+					e.setProperty(START, start);
+					e.setProperty(END, Long.MAX_VALUE);
 
 					LOGGER.debug("Added relationship as edge from {} to {}", mV.getId(), rV.getId());
 				}
@@ -115,7 +119,7 @@ public class RefsetAdminGAO {
 			
 			RefsetGraphFactory.rollback(tg);
 
-			LOGGER.error("Error during graph ineraction", e);
+			LOGGER.error("Error during graph interaction", e);
 			
 			throw new RefsetGraphAccessException(e.getMessage(), e);
 			
@@ -145,10 +149,10 @@ public class RefsetAdminGAO {
 
 		try {
 			
-			rV = rGao.getRefsetVertex(r.getId(), tg);
+			rV = rGao.getRefsetVertex(r.getUuid(), tg);
 			
 			LOGGER.debug("Refset {} already exist, not adding");
-
+			
 			
 		} catch (EntityNotFoundException e) {
 			
@@ -170,7 +174,7 @@ public class RefsetAdminGAO {
 				gr.setEffectiveTime(r.getEffectiveTime().getMillis());
 
 			}
-			gr.setId(r.getId());
+			gr.setId(r.getUuid());
 			gr.setLanguageCode(r.getLanguageCode());
 			gr.setModuleId(r.getModuleId());
 			
@@ -202,7 +206,7 @@ public class RefsetAdminGAO {
 			}
 			if (!StringUtils.isEmpty(r.getSctId())) {
 				
-				gr.setSctdId(r.getSctId());
+				gr.setSctId(r.getSctId());
 
 			}
 			gr.setType(VertexType.refset.toString());
@@ -219,11 +223,12 @@ public class RefsetAdminGAO {
 
 	/** Removes a {@link Refset} if it is not yet published
 	 * or update as inactive in  graph
+	 * @param user 
 	 * @param r {@link Refset}
 	 * @throws RefsetGraphAccessException
 	 * @throws EntityNotFoundException 
 	 */
-	public void removeRefset(String refsetId) throws RefsetGraphAccessException, EntityNotFoundException {
+	public void removeRefset(String refsetId, String user) throws RefsetGraphAccessException, EntityNotFoundException {
 		
 		LOGGER.debug("removeRefset  {} ", refsetId);
 		
@@ -233,15 +238,17 @@ public class RefsetAdminGAO {
 			
 		}
 
-		FramedTransactionalGraph<TitanGraph> g = null;
+		EventGraph<TitanGraph> g = null;
 		
 		try {
 			
-			g = fgf.create(factory.getTitanGraph());
+			g = factory.getEventGraph();
+	        g.addListener(new RefsetHeaderChangeListener(g.getBaseGraph(), user));
+
+			Vertex refset = rGao.getRefsetVertex(refsetId, fgf.create(g.getBaseGraph()));
 			
-			Vertex refset = rGao.getRefsetVertex(refsetId, g);
-			
-			Integer published = refset.getProperty(PUBLISHED);
+			// removing this check as delete is needed for any state 
+			/**Integer published = refset.getProperty(PUBLISHED);
 			
 			
 			if (published == 1) {
@@ -254,8 +261,9 @@ public class RefsetAdminGAO {
 				
 				g.removeVertex(refset);
 
-			}
-
+			}*/
+			
+			g.removeVertex(refset);
 			
 			RefsetGraphFactory.commit(g);
 			
@@ -289,20 +297,19 @@ public class RefsetAdminGAO {
 		
 		LOGGER.debug("Updating refset {}", r);
 
-		TitanGraph g = null;
+		EventGraph<TitanGraph> g = null;
 		MetaData md = r.getMetaData();
 		
 		try {
 			
-			g = factory.getTitanGraph();
+			g = factory.getEventGraph();
 			
-			FramedTransactionalGraph<TitanGraph> tg = fgf.create(g);
-
-			final Vertex rV = updateRefsetNode(r, tg);	
+			
+			final Vertex rV = updateRefsetNode(r, g);	
 			
 			LOGGER.debug("Updating members");
 
-			/*if members exist then add members*/
+			/*if members exist then update members*/
 			List<Member> members = r.getMembers();
 			
 			if( !CollectionUtils.isEmpty(members) ) {
@@ -311,7 +318,7 @@ public class RefsetAdminGAO {
 					
 					LOGGER.debug("Updating member {}", m);
 
-					mGao.updateMemberNode(m, tg);
+					mGao.updateMemberNode(m, g);
 						
 				}
 
@@ -325,12 +332,11 @@ public class RefsetAdminGAO {
 			
 			LOGGER.debug("Commiting updated refset");
 
-			RefsetGraphFactory.commit(tg);
 			RefsetGraphFactory.commit(g);
 						
 		} catch(EntityNotFoundException e) {
 			
-			LOGGER.error("Error during graph ineraction", e);
+			LOGGER.error("Error during graph interaction", e);
 			RefsetGraphFactory.rollback(g);
 			
 			throw e;
@@ -339,7 +345,7 @@ public class RefsetAdminGAO {
 		catch (Exception e) {
 			
 			RefsetGraphFactory.rollback(g);			
-			LOGGER.error("Error during graph ineraction", e);
+			LOGGER.error("Error during graph interaction", e);
 			
 			throw new RefsetGraphAccessException(e.getMessage(), e);
 			
@@ -359,188 +365,230 @@ public class RefsetAdminGAO {
 	 * @throws RefsetGraphAccessException
 	 * @throws EntityNotFoundException 
 	 */
-	private Vertex updateRefsetNode(Refset r, FramedTransactionalGraph<TitanGraph> tg) throws RefsetGraphAccessException, EntityNotFoundException {
+	private Vertex updateRefsetNode(Refset r, EventGraph<TitanGraph> g) throws RefsetGraphAccessException, EntityNotFoundException {
 
 		LOGGER.debug("updateRefsetNode {}", r);
 
-		Object rVId = rGao.getRefsetVertex(r.getId(), tg);
+		Object rVId = rGao.getRefsetVertex(r.getUuid(), fgf.create(g.getBaseGraph()));
 		
-		GRefset rV = tg.getVertex(rVId, GRefset.class);
+        g.addListener(new RefsetHeaderChangeListener(g.getBaseGraph(), r.getModifiedBy()));
+
+		Vertex rV = g.getVertex(rVId);//, GRefset.class);
+		
+		
 		
 		if(rV == null) {
 			
 			throw new EntityNotFoundException("Can not find given refset to update");
 			
 		} 
+		//no update is allowed in inactive refset. Only allowed if refset is being made active simultaneously
+		if (Integer.valueOf(0).equals(rV.getProperty(ACTIVE)) && !r.isActive()) {
+			
+			throw new  EntityNotFoundException("No update is allowed for inactive refset. Re-activate and try again");
+		}
 		
-		rV.setDescription(r.getDescription());
+		String desc = r.getDescription();
+				
+		if (!StringUtils.isEmpty(desc)) {
+			
+			//rV.setDescription(r.getDescription());
+			rV.setProperty(DESC, desc);
+		}
 		
 		if (r.getEffectiveTime() != null) {
 			
-			rV.setEffectiveTime(r.getEffectiveTime().getMillis());
-
+			//rV.setEffectiveTime(r.getEffectiveTime().getMillis());
+			rV.setProperty(EFFECTIVE_DATE, r.getEffectiveTime().getMillis());
 		}
 		
 		String lang = r.getLanguageCode();
 
 		if (!StringUtils.isEmpty(lang)) {
 			
-			rV.setLanguageCode(lang);
-
+			//rV.setLanguageCode(lang);
+			rV.setProperty(LANG_CODE, lang);
 		}
 		
 		String moduleId = r.getModuleId();
 
 		if (!StringUtils.isEmpty(moduleId)) {
 			
-			rV.setModuleId(moduleId);
-
+			//rV.setModuleId(moduleId);
+			rV.setProperty(MODULE_ID, moduleId);
 		}
 		
 		Integer publishedFlag = r.isPublished() ? 1 : 0;
 
-		rV.setPublished(publishedFlag);
-		
+		//rV.setPublished(publishedFlag);
+		rV.setProperty(PUBLISHED, publishedFlag);
 		if (r.getPublishedDate() != null) {
 			
-			 rV.setPublishedDate(r.getPublishedDate().getMillis());
-
+			// rV.setPublishedDate(r.getPublishedDate().getMillis());
+			rV.setProperty(PUBLISHED_DATE, r.getPublishedDate().getMillis());
 		}
 		
 		String superRefsetTypeId = r.getSuperRefsetTypeId();
 
 		if (!StringUtils.isEmpty(superRefsetTypeId)) {
 			
-			rV.setSuperRefsetTypeId(superRefsetTypeId);
-
+			///rV.setSuperRefsetTypeId(superRefsetTypeId);
+			rV.setProperty(SUPER_REFSET_TYPE_ID, r.getSuperRefsetTypeId());
 		}
 
 		String compTypeId = r.getComponentTypeId();
 
 		if (!StringUtils.isEmpty(compTypeId)) {
 			
-			rV.setComponentTypeId(compTypeId);
-
+			//rV.setComponentTypeId(compTypeId);
+			rV.setProperty(MEMBER_TYPE_ID, compTypeId);
 		}
 		
 		Integer activeFlag = r.isActive() ? 1 : 0;
 
-		rV.setActive(activeFlag);
+		//rV.setActive(activeFlag);
+		rV.setProperty(ACTIVE, activeFlag);
 		
 		String typeId = r.getTypeId();
 
 		if (!StringUtils.isEmpty(typeId)) {
 			
-			rV.setTypeId(typeId);
-
+			//rV.setTypeId(typeId);
+			rV.setProperty(TYPE_ID, typeId);
 		}
 
-		rV.setModifiedBy(r.getModifiedBy());
-		rV.setModifiedDate(new DateTime().getMillis());
-
+		//rV.setModifiedBy(r.getModifiedBy());
+		//rV.setModifiedDate(new DateTime().getMillis());
+		rV.setProperty(MODIFIED_BY, r.getModifiedBy());
+		rV.setProperty(MODIFIED_DATE, new DateTime().getMillis());
 		DateTime ert = r.getExpectedReleaseDate();
 		if (ert != null) {
 			
-			rV.setExpectedReleaseDate(ert.getMillis());
-
+			//rV.setExpectedReleaseDate(ert.getMillis());
+			rV.setProperty(EXPECTED_RLS_DT, ert.getMillis());
 		}
 		
 		if (!StringUtils.isEmpty(r.getSctId())) {
 			
-			rV.setSctdId(r.getSctId());
-
+			//rV.setSctdId(r.getSctId());
+			rV.setProperty(SCTID, r.getSctId());
 		}
 
 		
 		LOGGER.debug("updateRefsetNode {} finished", rV);
 
-		return rV.asVertex();
+		return rV;//.asVertex();
 	}
 	
 	
-	/**Adds member and refset and their history.
+	/**Adds member and refset and their history.Used when importing a RF2 file
 	 * @param rf2rLst
 	 * @param refsetId 
 	 * @return
 	 * @throws EntityNotFoundException 
 	 * @throws RefsetGraphAccessException 
 	 */
-	public Map<String, String> addMembers(List<Rf2Refset> rf2rLst, String refsetId) throws EntityNotFoundException, RefsetGraphAccessException {
+	public Map<String, String> addMembers(List<Rf2Record> rf2rLst, String refsetId, String user) throws EntityNotFoundException, RefsetGraphAccessException {
 		
 		Map<String, String> outcome = new HashMap<String, String>();
 		
-		TitanGraph g = factory.getTitanGraph();
-		
+		EventGraph<TitanGraph> g = factory.getEventGraph();
+		g.addListener(new Rf2ImportMemberChangeListener(g.getBaseGraph(), user));
+		g.addListener(new EffectiveTimeChangeListener(g.getBaseGraph(), user));
+
 		try {
 			
-			Vertex rV = rGao.getRefsetVertex(refsetId, fgf.create(g));
+			Vertex rV = rGao.getRefsetVertex(refsetId, fgf.create(g.getBaseGraph()));
 
-			for (Rf2Refset r : rf2rLst) {
+			Map<String, String> descriptions = populateDescription(rf2rLst);
+			Map<String, Vertex> processed = new HashMap<String, Vertex>();
+			for (Rf2Record r : rf2rLst) {
 				
 				GRefset gr = fgf.create(g).frame(rV, GRefset.class);
 				if ( StringUtils.isEmpty(r.getRefsetId()) || !(r.getRefsetId().equals(gr.getId()) 
-						|| r.getRefsetId().equals(gr.getSctdId())) ) {
+						|| r.getRefsetId().equals(gr.getSctId())) || r.getEffectiveTime() == null) {
 					
 					String error = String.format("Member does not have valid refset id - %s", r.getRefsetId());
 					outcome.put(r.getReferencedComponentId(), error);
 					continue;
 				}
 			
-				String desc = rGao.getMemberDescription(r.getReferencedComponentId());
-				
-				if (StringUtils.isEmpty(desc)) {
+				if (StringUtils.isEmpty(descriptions.containsKey(r.getReferencedComponentId()))) {
 					
 					outcome.put(r.getReferencedComponentId(), "Unknown referenced component");
 					continue;
 				}
 				
-				rV.getEdges(Direction.OUT, "members");
-				GremlinPipeline<Vertex, Edge> pipe = new GremlinPipeline<Vertex, Edge>();			
-				pipe.start(rV).inE("members").has(REFERENCE_COMPONENT_ID, T.eq, r.getReferencedComponentId()).has(START, T.eq, r.getEffectiveTime().getMillis());
-				List<Edge> ls = pipe.toList();
 				
-				if(ls.isEmpty()) {
+				if(!processed.containsKey(r.getReferencedComponentId())) {
 					
 					//add this member
-					Vertex vM = g.addVertexWithLabel(g.getVertexLabel("GMember"));
+					Vertex vM = g.getBaseGraph().addVertexWithLabel(g.getBaseGraph().getVertexLabel("GMember"));
 					GMember mg = fgf.create(g).getVertex(vM.getId(), GMember.class);
 					
-					addMemberProperties(r, mg);
+					addMemberProperties(r, mg, VertexType.member);
 					
 					LOGGER.debug("Added Member as vertex to graph", mg.getId());
 					
 					Edge e = fgf.create(g).addEdge(null, mg.asVertex(), rV, "members");
 					e.setProperty(REFERENCE_COMPONENT_ID, r.getReferencedComponentId());
 					e.setProperty(START, r.getEffectiveTime().getMillis());
-					e.setProperty(END, new DateTime(Long.MAX_VALUE).getMillis());
+					e.setProperty(END, Long.MAX_VALUE);
+					
+					processed.put(r.getReferencedComponentId(), vM);
 					
 				} else {
 					
-					for (Edge edge : ls) {
+					//do a check if an existing member exist with some other state and lesser effective time
+					
+					Vertex vExistingMember = processed.get(r.getReferencedComponentId());
+
+					Member m = RefsetConvertor.getMember(vExistingMember);
+					if (m.getEffectiveTime().getMillis() == r.getEffectiveTime().getMillis()
+							&& (m.isActive() ? "1" : "0").equals(r.getActive())) {
 						
-						Long endTime = edge.getProperty(END);
-						Long expected = new DateTime(Long.MAX_VALUE).getMillis();
+						LOGGER.trace("Not adding this record as it already exist {}", r.getId());
+
+						//same record so do not re-import
+						outcome.put(r.getReferencedComponentId(), "Already exist, not imported again");
+						break;
 						
-						if (endTime == expected) {
+					} else if (m.getEffectiveTime().getMillis() < r.getEffectiveTime().getMillis()) {
+																		
+						//update a existing member vertex with start date
+						GMember mg = fgf.create(g).getVertex(vExistingMember.getId(), GMember.class);
+						addMemberProperties(r, mg, VertexType.member);
+						
+						LOGGER.trace("Updated Member vertex with new properties and new state {}", mg.getId());
+						Iterable<Edge> eMs = vExistingMember.getEdges(Direction.OUT, EdgeLabel.members.toString());
+						for (Edge edge : eMs) {
 							
-							//end this member
-							edge.setProperty(END, r.getEffectiveTime().getMillis());
-							
-							//add new member vertex with new end date
-							Vertex vM = g.addVertexWithLabel(g.getVertexLabel("GMember"));
-							GMember mg = fgf.create(g).getVertex(vM.getId(), GMember.class);
-							
-							addMemberProperties(r, mg);
-							
-							LOGGER.debug("Added Member as vertex to graph with new state", mg.getId());
-							
-							Edge e = fgf.create(g).addEdge(null, mg.asVertex(), rV, "members");
-							e.setProperty(REFERENCE_COMPONENT_ID, r.getReferencedComponentId());
-							e.setProperty(START, r.getEffectiveTime().getMillis());
-							e.setProperty(END, expected.longValue());
+							edge.setProperty(REFERENCE_COMPONENT_ID, r.getReferencedComponentId());
+							edge.setProperty(START, r.getEffectiveTime().getMillis());
+							edge.setProperty(END, Long.MAX_VALUE);
+
 						}
 						
+					} else if (m.getEffectiveTime().getMillis() > r.getEffectiveTime().getMillis()) {
+													
+						//add a new member vertex with Long.MAX_VALUE end date
+						Vertex vM = g.getBaseGraph().addVertexWithLabel(g.getBaseGraph().getVertexLabel("GMember"));
+
+						//GMember mg = fgf.create(g).getVertex(vM.getId(), GMember.class);
+						GMember mg = fgf.create(g).getVertex(vM.getId(), GMember.class);
+						addMemberProperties(r, mg, VertexType.hMember);
+						
+						LOGGER.trace("Added Member as vertex to graph with new state {}", mg.getId());
+						
+						//Edge e = fgf.create(g).addEdge(null, mg.asVertex(), rV, EdgeLabel.hasState.toString());
+						Edge e = vExistingMember.addEdge(EdgeLabel.hasState.toString(), vM);
+						e.setProperty(REFERENCE_COMPONENT_ID, r.getReferencedComponentId());
+						e.setProperty(START, r.getEffectiveTime().getMillis());
+						e.setProperty(END, r.getEffectiveTime().getMillis());
+						
 					}
+				
+
 				}
 
 			}
@@ -555,7 +603,7 @@ public class RefsetAdminGAO {
 		} catch (Exception e) {
 			
 			RefsetGraphFactory.rollback(g);			
-			LOGGER.error("Error during graph ineraction", e);
+			LOGGER.error("Error during graph interaction", e);
 			
 			throw new RefsetGraphAccessException(e.getMessage(), e);
 			
@@ -568,7 +616,33 @@ public class RefsetAdminGAO {
 		return outcome;
 	}
 	
-	private GMember addMemberProperties(Rf2Refset r, GMember mg) {
+	/**
+	 * @param rf2rLst
+	 * @return
+	 * @throws RefsetGraphAccessException 
+	 */
+	private Map<String, String> populateDescription(List<Rf2Record> rf2rLst) throws RefsetGraphAccessException {
+
+		Map<String, String> descriptions = new HashMap<String, String>();
+		
+		if (rf2rLst == null || rf2rLst.isEmpty()) {
+			
+			return descriptions;
+		}
+		List<String> rcIds = new ArrayList<String>();
+		
+		for (Rf2Record record : rf2rLst) {
+			
+			rcIds.add(record.getReferencedComponentId());
+			
+		}
+		descriptions = rGao.getMembersDescription(rcIds);
+
+		return descriptions;
+	}
+
+
+	private GMember addMemberProperties(Rf2Record r, GMember mg, VertexType type) {
 		Integer activeFlag = "1".equals(r.getActive()) ? 1 : 0;
 
 		mg.setActive(activeFlag);
@@ -587,7 +661,7 @@ public class RefsetAdminGAO {
 		
 		//everything in RF2 is published already hence make it published
 		mg.setPublished(1);
-		mg.setType(VertexType.member.toString());
+		mg.setType(type.toString());
 		
 		return mg;
 	}

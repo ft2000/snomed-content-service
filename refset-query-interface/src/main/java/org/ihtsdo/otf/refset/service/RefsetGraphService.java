@@ -133,6 +133,27 @@ public class RefsetGraphService implements RefsetBrowseService {
 			throw new RefsetServiceException(e.getMessage());
 		}
 	}
+	
+	
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.otf.refset.service.RefsetBrowseService#getRefset(java.lang.String)
+	 */
+	@Override
+	public Refset getRefsetForExport(String refsetId) throws RefsetServiceException, EntityNotFoundException {
+
+		LOGGER.debug("getRefset for {}", refsetId);
+
+		try {
+			
+			return gao.getRefset(refsetId);
+			
+		} catch (RefsetGraphAccessException e) {
+
+			LOGGER.error("Error in graph db call", e);
+			throw new RefsetServiceException(e.getMessage());
+			
+		}
+	}
 
 
 

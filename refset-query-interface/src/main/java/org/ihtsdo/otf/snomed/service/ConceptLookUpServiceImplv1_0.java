@@ -11,8 +11,10 @@
 */
 package org.ihtsdo.otf.snomed.service;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
@@ -38,7 +40,7 @@ import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Vertex;
 
 /**
- * @author Episteme Partners
+ * Service to look up Terminology data.
  *
  */
 public class ConceptLookUpServiceImplv1_0 implements ConceptLookupService {
@@ -66,23 +68,75 @@ public class ConceptLookUpServiceImplv1_0 implements ConceptLookupService {
 		try {
 			
 			
-			g = factory.getReadOnlyGraph();
+			g = factory.getReadOnlyGraph();			
 			
-			for (String id : conceptIds) {
+			/**/
+			List<String> idLst = new ArrayList<String>();
+			idLst.addAll(conceptIds);
+
+			int length = idLst.size()/1024;
+			int to = idLst.size() > 1024 ? 1024 : conceptIds.size();
+			int from = 0;
+			for (int i = 0; i < length+1; i++) {
 				
-				try {
+				LOGGER.debug("getting concept description from {} to {} ", from, to);
+				List<String> subList = idLst.subList(from, to);
+				
+				String ids = org.apache.commons.lang.StringUtils.join(subList, " OR ");
+				Iterable<Result<Vertex>> vs = g.indexQuery("concept","v.sctid:" + ids).vertices();
+				for (Result<Vertex> r : vs) {
+									
+					Vertex v = r.getElement();
 					
-					Concept c = getConcept(id);
-					concepts.put(id, c);
+					Object sctid = v.getProperty(Properties.sctid.toString());
+					Object label = v.getProperty(Properties.title.toString());
+					if (sctid != null && label != null && idLst.contains(sctid.toString())) {
+						
+						Concept c = new Concept();
+						
+						c.setId(sctid.toString());
+						
+						Long effectiveTime = v.getProperty(Properties.effectiveTime.toString());
+						
+						if (effectiveTime != null) {
+							
+							c.setEffectiveTime(new DateTime(effectiveTime));
+
+						}
+						
+						String status = v.getProperty(Properties.status.toString());
+						boolean active = "1".equals(status) ? true : false;
+						c.setActive(active);
+						
+						c.setLabel(label.toString());
+						
+						Iterable<Edge> es = v.getEdges(Direction.OUT, Relationship.hasModule.toString());
+						
+						for (Edge edge : es) {
+
+							Vertex vE = edge.getVertex(Direction.IN);
+							
+							if (vE != null) {
+								
+								String moduleId = vE.getProperty(Properties.sctid.toString());
+								c.setModule(moduleId);
+								break;
+
+							}
+
+						}
+						concepts.put(sctid.toString(), c);
+					}
 					
-				} catch (EntityNotFoundException e) {
-
-					concepts.put(id, null);
-
 				}
+				
+				//to run next loop if required
+				from = to > idLst.size() ? idLst.size() : to;
+				to = (to + 1024) > idLst.size() ? idLst.size() : to+1024;
+
 
 			}
-			
+
 			RefsetGraphFactory.commit(g);
 			
 		} catch (Exception e) {

@@ -9,18 +9,12 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.ihtsdo.otf.refset.service.upload;
+package org.ihtsdo.otf.refset.graph.gao;
 
-import java.io.InputStream;
-import java.util.Map;
-
-import org.ihtsdo.otf.refset.exception.EntityNotFoundException;
-import org.ihtsdo.otf.refset.exception.RefsetServiceException;
 /**
  *
  */
-public interface ImportService {
-	
-	public Map<String, String> importFile(InputStream is, String refsetId, String user) throws RefsetServiceException, EntityNotFoundException;
+public enum EdgeLabel {
 
+	hasState, members
 }

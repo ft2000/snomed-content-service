@@ -56,5 +56,14 @@ public interface RefsetBrowseService {
 	 */
 	public Refset getRefsetHeader(String refSetId) throws RefsetServiceException, EntityNotFoundException ;
 
+	/**
+	 * @param refsetId
+	 * @return
+	 * @throws RefsetServiceException
+	 * @throws EntityNotFoundException
+	 */
+	Refset getRefsetForExport(String refsetId) throws RefsetServiceException,
+			EntityNotFoundException;
+
 
 }

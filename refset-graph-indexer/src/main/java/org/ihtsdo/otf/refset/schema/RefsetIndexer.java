@@ -50,8 +50,9 @@ public class RefsetIndexer {
 			s.printIndexes();
 			s.printSchema();
 			break;
+			
 		case update:
-			s.update(args[2]);
+			s.updateMixedIndex();
 			break;
 
 		default:

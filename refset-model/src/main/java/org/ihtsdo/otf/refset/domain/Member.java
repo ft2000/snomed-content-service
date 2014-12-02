@@ -29,7 +29,7 @@ public class Member extends BaseObj implements Comparable<Member>{
 
 	   Member m = (Member)input;
 	   
-	   return ( this.id == m.id )
+	   return ( this.uuid == m.uuid )
 			   && ( this.referencedComponentId == m.referencedComponentId ) 
 			   && ( this.moduleId == m.moduleId )
 			   && (this.active == m.active);
@@ -42,7 +42,7 @@ public class Member extends BaseObj implements Comparable<Member>{
    @Override
    public int hashCode() {
 
-	   return (this.id 
+	   return (this.uuid 
 			   + this.referencedComponentId 
 			   + this.moduleId
 			   + new Boolean(this.active)).hashCode();
@@ -52,7 +52,7 @@ public class Member extends BaseObj implements Comparable<Member>{
    public String toString() {
 	   
 	   return String.format( "Member [id - %s, referencedComponentId - %s, moduleId - %s, isActive - %s "
-	   		+ "effectiveTime - %s, description - %s]", this.id, this.referencedComponentId, this.moduleId, 
+	   		+ "effectiveTime - %s, description - %s]", this.uuid, this.referencedComponentId, this.moduleId, 
 	   		this.active, this.effectiveTime, this.description);
 	   
    }

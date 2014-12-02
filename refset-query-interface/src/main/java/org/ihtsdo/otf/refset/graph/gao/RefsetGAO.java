@@ -2,14 +2,17 @@
  * 
  */
 package org.ihtsdo.otf.refset.graph.gao;
-import static org.ihtsdo.otf.refset.domain.RGC.TYPE;
 import static org.ihtsdo.otf.refset.domain.RGC.DESC;
+import static org.ihtsdo.otf.refset.domain.RGC.END;
 import static org.ihtsdo.otf.refset.domain.RGC.ID;
 import static org.ihtsdo.otf.refset.domain.RGC.PUBLISHED;
+import static org.ihtsdo.otf.refset.domain.RGC.TYPE;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Resource;
 
@@ -36,8 +39,7 @@ import com.tinkerpop.frames.FramedGraphFactory;
 import com.tinkerpop.frames.FramedTransactionalGraph;
 import com.tinkerpop.gremlin.java.GremlinPipeline;
 
-/**Refset Graph Access component to retrieve refsets 
- * @author Episteme Partners
+/**Refset Graph Access component to retrieve {@link Refset}s and its {@link Member} 
  *
  */
 @Repository
@@ -136,10 +138,8 @@ public class RefsetGAO {
 				throw new EntityNotFoundException("No Refset found for given id ");
 			
 			List<Member> ms = r.getMembers();
-			for (Member m : ms) {
 			
-				m.setDescription(getMemberDescription(m.getReferencedComponentId()));
-			}
+			populateMemberDescription(ms);
 			
 		} catch(EntityNotFoundException e) {
 		
@@ -152,7 +152,7 @@ public class RefsetGAO {
 		} catch (Exception e) {
 			
 			RefsetGraphFactory.rollback(g);			
-			LOGGER.error("Error getting refset for {}", id, e);
+			LOGGER.error("Error getting refset for", id, e);
 			throw new RefsetGraphAccessException(e.getMessage(), e);
 
 		} finally {
@@ -164,6 +164,41 @@ public class RefsetGAO {
 
 	}
 	
+	/**
+	 * @param ms
+	 * @throws RefsetGraphAccessException 
+	 */
+	private void populateMemberDescription(List<Member> ms) throws RefsetGraphAccessException {
+		
+		if (ms == null || ms.isEmpty()) {
+			
+			return;
+		}
+		List<String> rcIds = new ArrayList<String>();
+		
+		for (Member member : ms) {
+			
+			rcIds.add(member.getReferencedComponentId());
+			
+		}
+		Map<String, String> descriptions = getMembersDescription(rcIds);
+		for (Member m : ms) {
+		
+			if(descriptions.containsKey(m.getReferencedComponentId())) {
+				
+				m.setDescription(descriptions.get(m.getReferencedComponentId()));
+			}
+		}
+		
+	}
+
+
+
+	/**
+	 * @param published
+	 * @return
+	 * @throws RefsetGraphAccessException
+	 */
 	public List<Refset> getRefSets(boolean published) throws RefsetGraphAccessException {
 		
 		TitanGraph g = null;
@@ -196,7 +231,7 @@ public class RefsetGAO {
 		} catch (Exception e) {
 			
 			RefsetGraphFactory.rollback(g);			
-			LOGGER.error("Error during graph ineraction", e);
+			LOGGER.error("Error during graph interaction", e);
 			throw new RefsetGraphAccessException(e.getMessage(), e);
 
 		} finally {
@@ -239,7 +274,7 @@ public class RefsetGAO {
 		} catch (Exception e) {
 			
 			RefsetGraphFactory.rollback(g);
-			LOGGER.error("Error during graph ineraction ", e);
+			LOGGER.error("Error during graph interaction ", e);
 			throw new RefsetGraphAccessException(e.getMessage(), e);
 
 		} finally {
@@ -254,6 +289,11 @@ public class RefsetGAO {
 		return md;
 	}
 	
+	/**
+	 * @param referenceComponentId
+	 * @return
+	 * @throws RefsetGraphAccessException
+	 */
 	protected String getMemberDescription(String referenceComponentId) throws RefsetGraphAccessException  {
 		
 		LOGGER.debug("getting member description for {} ", referenceComponentId);
@@ -399,7 +439,7 @@ public class RefsetGAO {
 			
 			//get required members as per range
 			GremlinPipeline<Vertex, Edge> pipe = new GremlinPipeline<Vertex, Edge>();			
-			pipe.start(vR.asVertex()).inE("members").range(from, to);
+			pipe.start(vR.asVertex()).inE(EdgeLabel.members.toString()).has(END, Long.MAX_VALUE).range(from, to);
 			List<Edge> ls = pipe.toList();
 
 			if (r != null) {
@@ -415,11 +455,8 @@ public class RefsetGAO {
 			RefsetGraphFactory.commit(g);
 			
 			//populate descriptions
-			List<Member> ms = r.getMembers();
-			for (Member m : ms) {
-			
-				m.setDescription(getMemberDescription(m.getReferencedComponentId()));
-			}
+			populateMemberDescription(r.getMembers());
+
 			
 			LOGGER.debug("Returning refset {} ", r);
 
@@ -470,7 +507,7 @@ public class RefsetGAO {
 			GRefset vR = vRs.iterator().next();
 
 			GremlinPipeline<Vertex, Long> pipe = new GremlinPipeline<Vertex, Long>();
-			long totalNoOfMembers = pipe.start(vR.asVertex()).inE("members").count();
+			long totalNoOfMembers = pipe.start(vR.asVertex()).inE(EdgeLabel.members.toString()).has(END, Long.MAX_VALUE).count();
 			
 			LOGGER.debug("total members {}", totalNoOfMembers);
 			
@@ -510,16 +547,14 @@ public class RefsetGAO {
 			
 			if (published) {
 								
-				pipe.V().has(PUBLISHED, 1).has(TYPE, VertexType.refset.toString()).store().range(from, to);
+				pipe.V().has(PUBLISHED, 1).has(TYPE, VertexType.refset.toString()).range(from, to);
 
 				
 			} else {
 				
-				pipe.V(TYPE, VertexType.refset.toString()).store().range(from, to);
+				pipe.V(TYPE, VertexType.refset.toString()).range(from, to);
 
 			}
-			
-
 			
 			List<Vertex> vs = pipe.toList();
 			FramedGraph<TitanGraph> fg = fgf.create(g);
@@ -529,7 +564,7 @@ public class RefsetGAO {
 				
 				GRefset gR = fg.getVertex(rV.getId(), GRefset.class);
 				GremlinPipeline<Vertex, Long> mPipe = new GremlinPipeline<Vertex, Long>();
-				long noOfMembers = mPipe.start(rV).inE("members").count();
+				long noOfMembers = mPipe.start(rV).inE(EdgeLabel.members.toString()).has(END, Long.MAX_VALUE).count();
 				gR.setNoOfMembers(noOfMembers);
 				ls.add(gR);
 				
@@ -552,10 +587,85 @@ public class RefsetGAO {
 		}
 	
 		
-		LOGGER.debug("Returning {} refsets  ", (refsets == null ? 0 : refsets.size()));
+		LOGGER.debug("Returning {} refsets  ", (refsets != null ? refsets.size() : 0));
 
 		return refsets;
 
+	}
+	
+	
+	/** Returns {@link Map} of referenceComponentId as key and their description as value
+	 * @param referenceComponentId
+	 * @return
+	 * @throws RefsetGraphAccessException
+	 */
+	protected Map<String, String> getMembersDescription(List<String> rcIds) throws RefsetGraphAccessException  {
+		
+		LOGGER.trace("getting members description for {} ", rcIds);
+
+		Map<String, String> descMap = new HashMap<String, String>();
+		
+		if (rcIds == null || rcIds.isEmpty()) {
+			
+			return descMap;
+		}
+
+		TitanGraph g = null;
+		try {
+				
+				g = sgFactory.getReadOnlyGraph();
+
+				//max OR clause can be 1024 so send in 1024 at max in one call
+				int length = rcIds.size()/1024;
+				int to = rcIds.size() > 1024 ? 1024 : rcIds.size();
+				int from = 0;
+				for (int i = 0; i < length+1; i++) {
+					
+					LOGGER.debug("getting members description from {} to {} ", from, to);
+
+					List<String> subList = rcIds.subList(from, to);
+					
+					String ids = org.apache.commons.lang.StringUtils.join(subList, " OR ");
+					Iterable<Result<Vertex>> vs = g.indexQuery("concept","v.sctid:" + ids).vertices();
+					for (Result<Vertex> r : vs) {
+										
+						Vertex v = r.getElement();
+						
+						Object sctid = v.getProperty(Properties.sctid.toString());
+						Object label = v.getProperty(Properties.title.toString());
+						if (sctid != null && label != null && rcIds.contains(sctid.toString())) {
+							
+							descMap.put(sctid.toString(), label.toString());
+
+						}
+						
+					}
+					
+					//to run next loop if required
+					from = to > rcIds.size() ? rcIds.size() : to;
+					to = (to + 1024) > rcIds.size() ? rcIds.size() : to+1024;
+
+
+				}
+				
+
+				RefsetGraphFactory.commit(g);
+		
+		} catch (Exception e) {
+			
+			RefsetGraphFactory.rollback(g);
+
+			LOGGER.error("Error duing concept details fetch", e);
+			
+			throw new RefsetGraphAccessException(e.getMessage(), e);
+			
+		} finally {
+			
+			RefsetGraphFactory.shutdown(g);
+
+		}
+		
+		return descMap;
 	}
 
 }

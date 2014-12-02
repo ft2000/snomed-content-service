@@ -14,9 +14,10 @@ package org.ihtsdo.otf.refset.service.upload;
 import org.joda.time.DateTime;
 
 /**
- *
+ *This class reflect a record in RF2 file. At moment is only applicable for simple refsets.
+ *However it can be made baseclass for other refset types
  */
-public class Rf2Refset {
+public class Rf2Record {
 	
 	private String id;
 	private DateTime effectiveTime;

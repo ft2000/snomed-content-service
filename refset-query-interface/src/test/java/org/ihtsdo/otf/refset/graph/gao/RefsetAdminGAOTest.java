@@ -157,7 +157,7 @@ public class RefsetAdminGAOTest {
 
 		aGao.addRefset(rs.get(0));
 
-		aGao.removeRefset(new Refset().getId());
+		aGao.removeRefset(new Refset().getUuid(), "junit");
 
 	}
 	
@@ -175,9 +175,9 @@ public class RefsetAdminGAOTest {
 		int i = 0;
 		for (Refset r : rs.subList(0, 2)) {
 			
-			aGao.addRefset(data.getRefSet(r.getId()));
+			aGao.addRefset(data.getRefSet(r.getUuid()));
 			
-			assertEquals(true, gao.getRefset(r.getId()) != null);
+			assertEquals(true, gao.getRefset(r.getUuid()) != null);
 			i++;
 		}
 
@@ -188,7 +188,7 @@ public class RefsetAdminGAOTest {
 
 		assertEquals(0, result.get(0).getMembers().size());
 		
-		Refset r = gao.getRefset(result.get(0).getId());
+		Refset r = gao.getRefset(result.get(0).getUuid());
 		
 		assertEquals(300, r.getMembers().size());
 		
@@ -199,16 +199,16 @@ public class RefsetAdminGAOTest {
 		
 		Refset input = rs.get(0);
 
-		aGao.addRefset(data.getRefSet(input.getId()));
+		aGao.addRefset(data.getRefSet(input.getUuid()));
 
-		Refset r = gao.getRefset(input.getId());
+		Refset r = gao.getRefset(input.getUuid());
 		
 		assertNotNull(r);
 		
 		r.setDescription("Junit Update");
 		aGao.updateRefset(r);
 		
-		Refset rUpdated = gao.getRefset(input.getId());
+		Refset rUpdated = gao.getRefset(input.getUuid());
 
 		
 		MetaData rm = r.getMetaData();

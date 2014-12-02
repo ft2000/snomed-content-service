@@ -31,6 +31,11 @@ public final class RGC {
 	public static final String EXPECTED_RLS_DT = "expectedReleaseDate";
 	public static final String START = "start";
 	public static final String END = "end";
+	
+	public static final String E_EFFECTIVE_TIME = "earliestEffectiveTime";
+	public static final String L_EFFECTIVE_TIME = "latestEffectiveTime";
+
+	
 
 
 
