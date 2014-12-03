@@ -10,6 +10,7 @@ import org.ihtsdo.otf.refset.domain.Refset;
 import org.ihtsdo.otf.refset.exception.EntityNotFoundException;
 import org.ihtsdo.otf.refset.exception.RefsetServiceException;
 import org.ihtsdo.otf.refset.graph.RefsetGraphAccessException;
+import org.ihtsdo.otf.refset.graph.gao.RefsetExportGAO;
 import org.ihtsdo.otf.refset.graph.gao.RefsetGAO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,7 +18,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
- * @author Episteme Partners
+ * This service supports 
+ * 1. Refset retrieval  
+ * 2. Member retrieval
+ * 3. Refset Header retrieval
+ * 4. Data retrieval for export
+ * Roughly all read operation required by APIs
  *
  */
 @Service(value = "browseGraphService")
@@ -27,6 +33,9 @@ public class RefsetGraphService implements RefsetBrowseService {
 	
 	@Autowired
 	private RefsetGAO gao;
+	
+	@Autowired
+	private RefsetExportGAO export;
 
 	/* (non-Javadoc)
 	 * @see org.ihtsdo.otf.refset.service.RefsetBrowseService#getRefsets(java.lang.Integer, java.lang.Integer)
@@ -141,11 +150,11 @@ public class RefsetGraphService implements RefsetBrowseService {
 	@Override
 	public Refset getRefsetForExport(String refsetId) throws RefsetServiceException, EntityNotFoundException {
 
-		LOGGER.debug("getRefset for {}", refsetId);
+		LOGGER.debug("getRefsetForExport for {}", refsetId);
 
 		try {
 			
-			return gao.getRefset(refsetId);
+			return export.getRefset(refsetId);
 			
 		} catch (RefsetGraphAccessException e) {
 

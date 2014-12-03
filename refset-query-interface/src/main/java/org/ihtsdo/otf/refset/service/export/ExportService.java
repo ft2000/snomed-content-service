@@ -60,7 +60,7 @@ public class ExportService {
 			//TODO header has to come from refset descriptor. For now hard code
 			//http://supercsv.sourceforge.net/examples_writing.html. 
 			
-			Refset r = bService.getRefset(refsetUuId);
+			Refset r = bService.getRefsetForExport(refsetUuId);
 			
             final CellProcessor[] processors = getProcessors();
             /**

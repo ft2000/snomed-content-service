@@ -36,8 +36,6 @@ import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.util.wrappers.event.EventGraph;
 import com.tinkerpop.frames.FramedGraphFactory;
 import com.tinkerpop.frames.FramedTransactionalGraph;
-import com.tinkerpop.gremlin.Tokens.T;
-import com.tinkerpop.gremlin.java.GremlinPipeline;
 
 /**Graph Access component to do CRUD operation on underlying Refset graph
  * Operation in this class supports
