@@ -22,6 +22,10 @@ import static org.ihtsdo.otf.refset.domain.RGC.START;
 import static org.ihtsdo.otf.refset.domain.RGC.END;
 import static org.ihtsdo.otf.refset.domain.RGC.E_EFFECTIVE_TIME;
 import static org.ihtsdo.otf.refset.domain.RGC.L_EFFECTIVE_TIME;
+import static org.ihtsdo.otf.refset.domain.RGC.PARENT_ID;
+
+import java.util.Arrays;
+import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.ihtsdo.otf.snomed.domain.Properties;
@@ -558,6 +562,12 @@ public class RefsetSchema {
 			mgmt.makePropertyKey(L_EFFECTIVE_TIME).dataType(Long.class).make();
 			
 		}
+		if (!mgmt.containsRelationType(PARENT_ID)) {
+
+			LOGGER.debug("Creating Property {}", PARENT_ID);
+			mgmt.makePropertyKey(PARENT_ID).dataType(String.class).make();
+			
+		}
 
 	}
 	
@@ -695,10 +705,23 @@ public class RefsetSchema {
 			if (giRefset != null) {
 			
 				LOGGER.debug("Updating Index  {}" , "Refset mixed index");
-				mgmt.addIndexKey(giRefset, mgmt.getPropertyKey(E_EFFECTIVE_TIME), 
-						Parameter.of(MAPPED, Properties.earliestEffectiveTime.toString()));
-				mgmt.addIndexKey(giRefset, mgmt.getPropertyKey(L_EFFECTIVE_TIME), 
-						Parameter.of(MAPPED, Properties.latestEffectiveTime.toString()));
+				
+				PropertyKey[] keys = giRefset.getFieldKeys();
+				
+				List<PropertyKey> existingProp = Arrays.asList(keys);
+				
+				if (!existingProp.contains(mgmt.getPropertyKey(E_EFFECTIVE_TIME))) {
+
+					mgmt.addIndexKey(giRefset, mgmt.getPropertyKey(E_EFFECTIVE_TIME), 
+							Parameter.of(MAPPED, Properties.earliestEffectiveTime.toString()));
+
+				}
+				if (!existingProp.contains(mgmt.getPropertyKey(L_EFFECTIVE_TIME))) {
+
+					mgmt.addIndexKey(giRefset, mgmt.getPropertyKey(L_EFFECTIVE_TIME), 
+							Parameter.of(MAPPED, Properties.latestEffectiveTime.toString()));
+
+				}
 			}
 			
 			
@@ -706,12 +729,32 @@ public class RefsetSchema {
 			TitanGraphIndex giMember = mgmt.getGraphIndex(MixedIndex.Member.toString());
 	
 			if (giMember != null) {
+				
 				LOGGER.debug("Updating Index  {}" , "Member mixed index");
+
+				PropertyKey[] keys = giMember.getFieldKeys();
+				
+				List<PropertyKey> existingProp = Arrays.asList(keys);
+				
+				if (!existingProp.contains(mgmt.getPropertyKey(EFFECTIVE_DATE))) {
 					
-				mgmt.addIndexKey(giMember, mgmt.getPropertyKey(EFFECTIVE_DATE), 
-						Parameter.of(MAPPED, Properties.effectiveTime.toString()));
-				mgmt.addIndexKey(giMember, mgmt.getPropertyKey(DESC), 
-						Parameter.of(MAPPED, Properties.title.toString()));
+					mgmt.addIndexKey(giMember, mgmt.getPropertyKey(EFFECTIVE_DATE), 
+							Parameter.of(MAPPED, Properties.effectiveTime.toString()));
+
+				}
+				if (!existingProp.contains(mgmt.getPropertyKey(DESC))) {
+
+					mgmt.addIndexKey(giMember, mgmt.getPropertyKey(DESC), 
+							Parameter.of(MAPPED, Properties.title.toString()));
+
+				}
+				
+				if (!existingProp.contains(mgmt.getPropertyKey(PARENT_ID))) {
+
+					mgmt.addIndexKey(giMember, mgmt.getPropertyKey(PARENT_ID), 
+							Parameter.of(MAPPED, Properties.parentId.toString()));
+
+				}
 	
 			}
 			
