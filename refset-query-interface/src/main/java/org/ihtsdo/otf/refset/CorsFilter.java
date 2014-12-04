@@ -33,7 +33,7 @@ public class CorsFilter implements Filter {
 		response.addHeader(ACCESS_CONTROL_ALLOW_HEADERS, "X-REFSET-PRE-AUTH-USERNAME");
 		response.addHeader(ACCESS_CONTROL_ALLOW_HEADERS, "X-REFSET-PRE-AUTH-TOKEN");
 		response.addHeader(ACCESS_CONTROL_ALLOW_HEADERS, "Content-Type");
-		response.addHeader("Access-Control-Expose-Headers", "Content-Disposition");
+		response.addHeader(ACCESS_CONTROL_EXPOSE_HEADERS, "Content-Disposition");
 		response.addHeader(ACCESS_CONTROL_ALLOW_HEADERS, "X-REQ-TIME");
 
 		chain.doFilter(req, res);
