@@ -33,6 +33,9 @@
 			
 	<bean id="refsetGraphFactory" class="org.ihtsdo.otf.refset.graph.RefsetGraphFactory" c:config-ref="refset.graph.titan.config" />
 
+	<bean id="searchServerUrl" class="java.lang.String">
+		<constructor-arg value="${searchServerUrl}" />
+	</bean>
 		
 
 </beans>

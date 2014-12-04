@@ -5,7 +5,9 @@ package org.ihtsdo.otf.refset.graph.gao;
 
 import static org.ihtsdo.otf.refset.domain.RGC.*;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -104,7 +106,7 @@ public class MemberGAO {
 	 * @throws RefsetGraphAccessException 
 	 * @throws EntityNotFoundException 
 	 */
-	protected Vertex addMemberNode(Member m, EventGraph<TitanGraph> eg) throws RefsetGraphAccessException, EntityNotFoundException {
+	protected Vertex addMemberNode(Member m, EventGraph<TitanGraph> eg, String refsetId) throws RefsetGraphAccessException, EntityNotFoundException {
 		
 		if (m == null || StringUtils.isEmpty(m.getReferencedComponentId())) {
 			
@@ -113,11 +115,10 @@ public class MemberGAO {
 		
 		LOGGER.debug("Adding member {}", m);
 		eg.addListener(new EffectiveTimeChangeListener(eg.getBaseGraph(), m.getModifiedBy()));
-		//Vertex mV = eg.getBaseGraph().addVertexWithLabel(eg.getBaseGraph().getVertexLabel("GMember"));
+		Vertex mVT = eg.getBaseGraph().addVertexWithLabel(eg.getBaseGraph().getVertexLabel("GMember"));
 		
-		Vertex mV = eg.addVertex(m.getUuid());
+		Vertex mV = eg.getVertex(mVT.getId());
 		//Vertex mg = eg.getVertex(vM.getId());//, GMember.class);
-		
 		Integer activeFlag = m.isActive() ? 1 : 0;
 
 		//mg.setActive(activeFlag);
@@ -151,6 +152,11 @@ public class MemberGAO {
 		//mg.setType(VertexType.member.toString());
 		mV.setProperty(TYPE, VertexType.member.toString());
 		
+		//description,refsetId(ie parentId) and reference component id is needed to provide search
+		mV.setProperty(REFERENCE_COMPONENT_ID, m.getReferencedComponentId());
+		
+		mV.setProperty(DESC, m.getDescription());
+		mV.setProperty(PARENT_ID, refsetId);
 		LOGGER.debug("Added Member as vertex to graph", mV.getId());
 		return mV;
 		
@@ -186,6 +192,16 @@ public class MemberGAO {
 
 			
 			//try adding all members and accumulate error/success
+			
+			List<String> rcIds = new ArrayList<String>();
+			
+			for (Member member : members) {
+				
+				rcIds.add(member.getReferencedComponentId());
+				
+			}
+			Map<String, String> descriptions = rGao.getMembersDescription(rcIds);
+
 
 			for (Member m : members) {
 		
@@ -201,8 +217,13 @@ public class MemberGAO {
 
 				} catch(EntityNotFoundException ex) {
 					
+					if(descriptions.containsKey(m.getReferencedComponentId())) {
+						
+						m.setDescription(descriptions.get(m.getReferencedComponentId()));
+					}
+
 					//add member
-					mV = addMemberNode(m, tg);
+					mV = addMemberNode(m, tg, refsetId);
 					
 					Edge e = tg.addEdge(null, mV, rV, "members");
 					e.setProperty(REFERENCE_COMPONENT_ID, m.getReferencedComponentId());

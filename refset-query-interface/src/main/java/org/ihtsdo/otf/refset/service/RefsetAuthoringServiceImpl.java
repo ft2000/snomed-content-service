@@ -18,6 +18,8 @@ import org.ihtsdo.otf.refset.graph.RefsetGraphAccessException;
 import org.ihtsdo.otf.refset.graph.gao.MemberGAO;
 import org.ihtsdo.otf.refset.graph.gao.RefsetAdminGAO;
 import org.ihtsdo.otf.refset.graph.gao.RefsetGAO;
+import org.ihtsdo.otf.snomed.domain.Concept;
+import org.ihtsdo.otf.snomed.exception.ConceptServiceException;
 import org.ihtsdo.otf.snomed.service.ConceptLookupService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -88,6 +90,11 @@ public class RefsetAuthoringServiceImpl implements RefsetAuthoringService {
 			
 			List<Member> members = new ArrayList<Member>();
 			m.setUuid(UUID.randomUUID().toString());
+			if(StringUtils.isEmpty(m.getDescription())) {
+				
+				Concept c = lService.getConcept(m.getReferencedComponentId());
+				m.setDescription(c.getLabel());
+			}
 			members.add(m);
 			
 			
@@ -111,6 +118,9 @@ public class RefsetAuthoringServiceImpl implements RefsetAuthoringService {
 			LOGGER.error("Error during service call", e);
 			throw new RefsetServiceException(e.getMessage());
 
+		} catch (ConceptServiceException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		
 
@@ -266,7 +276,7 @@ public class RefsetAuthoringServiceImpl implements RefsetAuthoringService {
 		try {			
 			
 			LOGGER.debug("Adding member {} to refset {}", members, refsetId);
-
+			
 			Map<String, String> outcome = mGao.addMembers(refsetId, members, user);
 			tOutcome.putAll(outcome);
 

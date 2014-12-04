@@ -3,15 +3,19 @@
  */
 package org.ihtsdo.otf.refset.common;
 
+import java.util.Map;
+
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
+import org.springframework.util.StringUtils;
 
 /**
- * @author Episteme Partners
- *
+ * Utility class to support common function required at various lavel
  */
 public class Utility {
+
+	private static final DateTimeFormatter YYYY_MM_DD_FORMATTER = DateTimeFormat.forPattern("yyyy-MM-dd");
 
 	/**Convert given {@link DateTime} in yyyyMMdd format
 	 * @param dt
@@ -29,6 +33,47 @@ public class Utility {
 		}
 
 		return null;
+	}
+	
+	/**{@link Result} container for response returned from controller
+	 * @return
+	 */
+	public static Result<Map<String, Object>> getResult() {
+		Result<Map<String, Object>> result = new Result<Map<String, Object>>();
+		Meta m = new Meta();
+		result.setMeta(m);
+		return result;
+	}
+	
+	/**To convert string date to {@link DateTime}
+	 * @param fromDate
+	 * @return
+	 */
+	public DateTime getFromDate(String fromDate, int daysOffset) {
+		
+		DateTime fromDt = new DateTime().minusDays(daysOffset);
+		if (!StringUtils.isEmpty(fromDate)) {
+			
+			fromDt = YYYY_MM_DD_FORMATTER.parseDateTime(fromDate);
+		}
+		
+		return fromDt;
+	}
+	
+	/**To convert string date to {@link DateTime}
+	 * @param toDate
+	 * @return
+	 */
+	public DateTime getToDate(String toDate) {
+		
+		DateTime toDt = new DateTime();
+		if (!StringUtils.isEmpty(toDate)) {
+			
+			toDt = YYYY_MM_DD_FORMATTER.parseDateTime(toDate);
+		}
+		
+		return toDt;
+
 	}
 	
 }

@@ -78,15 +78,31 @@ public class RefsetAdminGAO {
 
 			final Vertex rV = addRefsetNode(r, fgf.create(tg.getBaseGraph()));	
 			
+
 			
 			/*if members exist then add members*/
 			List<Member> members = r.getMembers();
+			/*populate descriptions*/
+			List<String> rcIds = new ArrayList<String>();
+			
+			for (Member member : members) {
+				
+				rcIds.add(member.getReferencedComponentId());
+				
+			}
+			Map<String, String> descriptions = rGao.getMembersDescription(rcIds);
+			
 			int i = 0;
 			if( !CollectionUtils.isEmpty(members) ) {
 				
 				for (Member m : members) {
 					
-					Vertex mV = mGao.addMemberNode(m, tg);
+					if(descriptions.containsKey(m.getReferencedComponentId())) {
+						
+						m.setDescription(descriptions.get(m.getReferencedComponentId()));
+					}
+
+					Vertex mV = mGao.addMemberNode(m, tg, r.getUuid());
 					
 					LOGGER.debug("Adding relationship member is part of refset as edge {}, member index {}", mV.getId(), i++);
 
