@@ -63,7 +63,7 @@ public class SearchController {
 
 		Result<Map<String, Object>> r = Utility.getResult();
 
-		SearchResult<BaseObj> result = service.getSearchResult(query, from, to);
+		SearchResult<String> result = service.getSearchResult(query, from, to);
 		
 		Map<String, Object> data = new HashMap<String, Object>();
 		data.put("result", result);

@@ -3,7 +3,6 @@
  */
 package org.ihtsdo.otf.refset.service;
 
-import org.ihtsdo.otf.refset.domain.BaseObj;
 import org.ihtsdo.otf.refset.domain.SearchResult;
 import org.ihtsdo.otf.refset.exception.RefsetServiceException;
 import org.ihtsdo.otf.refset.graph.RefsetGraphAccessException;
@@ -36,7 +35,7 @@ public class RefsetSearchService {
 	 * @return
 	 * @throws RefsetServiceException
 	 */
-	public SearchResult<BaseObj> getSearchResult(String query, int from, int to) throws RefsetServiceException {
+	public SearchResult<String> getSearchResult(String query, int from, int to) throws RefsetServiceException {
 
 		LOGGER.debug("getSearchResult {}", query);
 		
