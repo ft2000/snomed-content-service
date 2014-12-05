@@ -14,12 +14,9 @@ package org.ihtsdo.otf.refset.graph.gao;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
 
 import javax.annotation.Resource;
 
-import org.ihtsdo.otf.refset.domain.BaseObj;
 import org.ihtsdo.otf.refset.domain.SearchResult;
 import org.ihtsdo.otf.refset.graph.RefsetGraphAccessException;
 import org.ihtsdo.otf.refset.graph.RefsetGraphFactory;
@@ -128,7 +125,9 @@ public class SearchGao {
 								}
 								
 							}
-							
+
+							//for now override total with number of records.TODO need something else 
+							result.setTotalNoOfResults(r.size());
 							result.setRecords(r);
 
 						}

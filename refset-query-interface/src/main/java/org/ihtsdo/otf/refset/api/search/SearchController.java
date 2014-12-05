@@ -19,7 +19,6 @@ import java.util.Map;
 
 import org.ihtsdo.otf.refset.common.Result;
 import org.ihtsdo.otf.refset.common.Utility;
-import org.ihtsdo.otf.refset.domain.BaseObj;
 import org.ihtsdo.otf.refset.domain.SearchResult;
 import org.ihtsdo.otf.refset.service.RefsetSearchService;
 import org.slf4j.Logger;
