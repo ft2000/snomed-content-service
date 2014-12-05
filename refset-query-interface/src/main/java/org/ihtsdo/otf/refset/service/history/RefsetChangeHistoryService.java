@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.ihtsdo.otf.refset.service;
+package org.ihtsdo.otf.refset.service.history;
 
 import java.util.Map;
 

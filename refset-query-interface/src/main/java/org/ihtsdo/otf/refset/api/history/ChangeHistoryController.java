@@ -22,7 +22,7 @@ import org.ihtsdo.otf.refset.common.Result;
 import org.ihtsdo.otf.refset.domain.ChangeRecord;
 import org.ihtsdo.otf.refset.domain.Member;
 import org.ihtsdo.otf.refset.domain.Refset;
-import org.ihtsdo.otf.refset.service.RefsetChangeHistoryService;
+import org.ihtsdo.otf.refset.service.history.RefsetChangeHistoryService;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;

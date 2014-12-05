@@ -20,7 +20,7 @@ import java.util.Map;
 import org.ihtsdo.otf.refset.common.Result;
 import org.ihtsdo.otf.refset.common.Utility;
 import org.ihtsdo.otf.refset.domain.SearchResult;
-import org.ihtsdo.otf.refset.service.RefsetSearchService;
+import org.ihtsdo.otf.refset.service.search.RefsetSearchService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

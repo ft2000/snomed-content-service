@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.ihtsdo.otf.refset.service;
+package org.ihtsdo.otf.refset.service.search;
 
 import org.ihtsdo.otf.refset.domain.SearchResult;
 import org.ihtsdo.otf.refset.exception.RefsetServiceException;
