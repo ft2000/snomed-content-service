@@ -23,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.supercsv.cellprocessor.Optional;
+import org.supercsv.cellprocessor.constraint.NotNull;
 import org.supercsv.cellprocessor.constraint.UniqueHashCode;
 import org.supercsv.cellprocessor.ift.CellProcessor;
 import org.supercsv.io.ICsvListWriter;
@@ -102,12 +103,12 @@ public class ExportService {
 	private CellProcessor[] getProcessors() {
         
         final CellProcessor[] processors = new CellProcessor[] { 
-                new UniqueHashCode(), // id 
+                new NotNull(), // id 
                 new Optional(), 
-                new Optional(), 
-                new Optional(), 
-                new Optional(), 
-                new Optional(), 
+                new NotNull(), 
+                new NotNull(), 
+                new NotNull(), 
+                new NotNull(), 
         };
         
         return processors;

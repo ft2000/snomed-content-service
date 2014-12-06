@@ -417,7 +417,7 @@ public class MemberGAO {
         tg.addListener(new EffectiveTimeChangeListener(tg.getBaseGraph(), m.getModifiedBy()));
 
 		LOGGER.debug("Updating member {}", m);
-		Iterable<Vertex> vr = tg.query().has(TYPE, VertexType.member.toString()).has(ID, m.getUuid()).has(END, Long.MAX_VALUE).limit(1).vertices();
+		Iterable<Vertex> vr = tg.query().has(TYPE, VertexType.member.toString()).has(ID, m.getUuid()).limit(1).vertices();
 
 		if (vr != null ) {
 			
@@ -425,19 +425,21 @@ public class MemberGAO {
 				
 				//mg = tg.getVertex(v.getId());//, GMember.class);
 				LOGGER.debug("Updating member {} and vertex {} ", m, v);
-				if(Integer.valueOf(1).equals(v.getProperty(PUBLISHED))) {
+				/*if(Integer.valueOf(1).equals(v.getProperty(PUBLISHED))) {
 					
 					throw new EntityNotFoundException("Member can not be updated once published");
-				}
+				}*/
 				Integer activeFlag = m.isActive() ? 1 : 0;
 
 				v.setProperty(ACTIVE, activeFlag);
-				DateTime et = m.getEffectiveTime();
+				
+				/*DateTime et = m.getEffectiveTime();
 				if ( et != null) {
 					
 					//mg.setEffectiveTime(et.getMillis());
 					v.setProperty(EFFECTIVE_DATE, et.getMillis());
-				}
+				}*/
+				
 				v.setProperty(MODIFIED_BY, m.getModifiedBy());
 				v.setProperty(MODIFIED_DATE, new DateTime().getMillis());
 				//mg.setModifiedBy(m.getModifiedBy());
@@ -450,10 +452,13 @@ public class MemberGAO {
 
 				}
 				
-				Integer publishedFlag = m.isPublished() ? 1 : 0;
-
+				//Integer publishedFlag = m.isPublished() ? 1 : 0;
+				
+				//in current implementation during member update  we can only update member as not published with no effective date
+				//TODO this will change once we have release service talking to refset.
+				v.removeProperty(EFFECTIVE_DATE);
 				//mg.setPublished(publishedFlag);
-				v.setProperty(PUBLISHED, publishedFlag);
+				v.setProperty(PUBLISHED, 0);
 				
 				//mV = mg;//mg.asVertex();
 				LOGGER.debug("Updated Member as vertex to graph", v.getId());	

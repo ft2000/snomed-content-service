@@ -26,7 +26,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -54,7 +53,6 @@ public class SearchController {
 	@RequestMapping( method = RequestMethod.GET, value = "/search",  produces = "application/json", consumes = "application/json")
 	@ApiOperation( value = "Get a member history ",
 			notes = "This api searches desired text and returns a paginated list of refset uuid")
-	@PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<Result< Map<String, Object>>> getSearchResults( @RequestParam(value = "q") String query,
     		@RequestParam(required = false, defaultValue = "0") int from, @RequestParam(required = false, defaultValue = "10") int to) throws Exception {
 		

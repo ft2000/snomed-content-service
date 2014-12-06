@@ -23,6 +23,7 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.StringUtils;
 
 import com.thinkaurelius.titan.core.TitanGraph;
 import com.tinkerpop.blueprints.Direction;
@@ -109,7 +110,7 @@ public class RefsetExportGAO {
 						
 							Member hm = RefsetConvertor.getMember(vHm);
 							LOGGER.debug("Adding historical state of member & its detail {} ", hm);
-
+							merge(hm, m);
 							r.getMembers().add(hm);
 
 						}
@@ -149,6 +150,25 @@ public class RefsetExportGAO {
 	}
 
 	
+	/**
+	 * @param hm
+	 * @param m
+	 */
+	private void merge(Member hm, Member m) {
+		
+		if(StringUtils.isEmpty(hm.getModuleId())) {
+			
+			hm.setModuleId(m.getModuleId());
+		}
+		
+		if(StringUtils.isEmpty(hm.getReferencedComponentId())) {
+			
+			hm.setReferencedComponentId(m.getReferencedComponentId());
+		}
+		
+	}
+
+
 	/**
 	 * @param factory the factory to set
 	 */
