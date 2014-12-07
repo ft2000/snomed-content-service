@@ -112,6 +112,7 @@ public class RefsetExportGAO {
 							LOGGER.debug("Adding historical state of member & its detail {} ", hm);
 							merge(hm, m);
 							r.getMembers().add(hm);
+							break;
 
 						}
 						break;

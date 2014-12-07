@@ -67,6 +67,8 @@ public class MemberChangeListener implements GraphChangedListener {
 	public void vertexPropertyChanged(Vertex cV, String key,
 			Object oldValue, Object setValue) {
 		
+		
+		LOGGER.debug("vertexPropertyChanged");
 
         Object type = cV.getProperty(TYPE);
 
@@ -76,14 +78,13 @@ public class MemberChangeListener implements GraphChangedListener {
 		}
 
         try {
-			
-        	if (!(oldValue != null && oldValue.equals(setValue) 
-            		|| setValue != null && setValue.equals(oldValue)
-            		|| setValue == oldValue)) {
+			//vertex can not have an null value for a property so ignore any changes to non existing old value
+        	if (oldValue != null && setValue != null 
+        			&& !setValue.equals(oldValue)) {
 				
         		createHistoryMemberNode(cV.getId());
                 
-                LOGGER.debug("Adding old {} value - {}  to history refset vertex {}", key, oldValue);
+                LOGGER.debug("Adding old {} value - {}  to history refset vertex", key, oldValue);
 
         		Vertex hV = g.getVertex(historyVertexIds.get(cV.getId()));
         		hV.setProperty(key, oldValue);
@@ -95,7 +96,7 @@ public class MemberChangeListener implements GraphChangedListener {
         	
         } catch (Exception e) {
 			
-            LOGGER.debug("Error during change state capture", e);
+            LOGGER.debug("Error during member state change capture", e);
 
 			RefsetGraphFactory.rollback(g);
 			
@@ -137,11 +138,11 @@ public class MemberChangeListener implements GraphChangedListener {
 	@Override
 	public void vertexPropertyRemoved(Vertex cV, String key,
 			Object removedValue) {
-
+		LOGGER.debug("vertexPropertyChanged");
 
 		Object type = cV.getProperty(TYPE);
 
-        if (!VertexType.member.toString().equals(type)) {
+        if (!VertexType.member.toString().equals(type) || removedValue == null) {
 			
         	return;
 		}
@@ -149,7 +150,7 @@ public class MemberChangeListener implements GraphChangedListener {
 			
         	createHistoryMemberNode(cV.getId());
 
-    		LOGGER.debug("Adding removed {} value - {}  to history refset vertex {}", key, removedValue);
+    		LOGGER.debug("Adding {} - value - {}  to history refset vertex", key, removedValue);
     		
     		Vertex hV = g.getVertex(historyVertexIds.get(cV.getId()));
     		hV.setProperty(key, removedValue);
