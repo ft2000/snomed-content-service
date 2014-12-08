@@ -37,8 +37,17 @@ public class RefsetAuthenticationProvider implements AuthenticationProvider {
 
 	
 	private RestTemplate rt;
+
+	private boolean authenticationEnabled;
 	
 	
+	/**
+	 * @param authenticationEnabled the authenticationEnabled to set
+	 */
+	public void setAuthenticationEnabled(boolean authenticationEnabled) {
+		this.authenticationEnabled = authenticationEnabled;
+	}
+
 	@Override
 	public Authentication authenticate(Authentication authentication)
 			throws AuthenticationException {
@@ -86,6 +95,22 @@ public class RefsetAuthenticationProvider implements AuthenticationProvider {
 
 		
 		User user = getUser();
+		
+		if (!authenticationEnabled) {
+			
+			user.setAuthenticated(true);
+			Collection<RefsetRole> roles = new ArrayList<RefsetRole>();			        
+	        RefsetRole role = new RefsetRole();
+	        role.setAuthority(ROLE_USER);
+	        roles.add(role);
+			user.setAuthorities(roles);
+			if (!StringUtils.isEmpty(userName)) {
+				
+				user.setUsername(userName);
+
+			}
+			return user;
+		}
         
         MultiValueMap<String, String> params = new LinkedMultiValueMap<String, String>();
         params.add("username", userName);
@@ -117,7 +142,7 @@ public class RefsetAuthenticationProvider implements AuthenticationProvider {
 			user.setPassword(token);
 			//now check if user has access to Refset app.
 			params = new LinkedMultiValueMap<String, String>();
-	        params.add("username", "pnema");
+	        params.add("username", userName);
 	        params.add("queryName", "getUserApps");
 
 			LOGGER.debug("Calling authentication service with URL {}, User {} and Parameters {} ", otfServiceUrl, userName);

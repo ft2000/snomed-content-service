@@ -18,6 +18,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
 import org.ihtsdo.otf.refset.exception.EntityNotFoundException;
@@ -90,7 +91,7 @@ public class ImportRF2Service implements ImportService {
         			
         			Rf2Record rf2r = new Rf2Record();
         			
-        			rf2r.setId(columns[0]);
+        			rf2r.setId(UUID.randomUUID().toString());//generate refset tool uuid instead of using RF2 file. otherwise it will create problem in duplicate import
         			rf2r.setEffectiveTime(fmt.parseDateTime(columns[1]));
         			rf2r.setActive(columns[2]);
         			rf2r.setModuleId(columns[3]);

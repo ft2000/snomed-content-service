@@ -140,6 +140,8 @@ public class RefsetGraphFactory {
 				@SuppressWarnings("unchecked")
 				FramedTransactionalGraph<TitanGraph> ftg = (FramedTransactionalGraph<TitanGraph>)g;
 				ftg.commit();
+				LOGGER.trace("commit {}", g);
+
 			}
 
 		} else if (g instanceof EventTransactionalGraph) {
@@ -149,6 +151,8 @@ public class RefsetGraphFactory {
 				@SuppressWarnings("unchecked")
 				EventTransactionalGraph<TitanGraph> etg = (EventTransactionalGraph<TitanGraph>)g;
 				etg.commit();
+				LOGGER.trace("commit {}", g);
+
 			}
 
 		} else {

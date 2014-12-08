@@ -13,8 +13,8 @@
 	
 	<sec:http create-session="stateless" auto-config="false" 
 				security-context-repository-ref="refset.securityContextRepository"
-				entry-point-ref="refset.authenticationEntryPoint" >
-		<sec:intercept-url pattern="/v1.0/**" access="ROLE_USER, ROLE_ANONYMOUS" />
+				entry-point-ref="refset.authenticationEntryPoint">
+		<sec:intercept-url pattern="v14.0/" access="ROLE_USER, ROLE_ANONYMOUS"/>
 		<sec:custom-filter ref="refset.cors" position="FIRST"/>
 		<sec:access-denied-handler ref="refset.accessDeniedHandler" />
 	</sec:http>
@@ -29,6 +29,7 @@
 	<bean id="refset.authenticationProvider" class="org.ihtsdo.otf.refset.security.RefsetAuthenticationProvider" 
 			p:otfServiceUrl="${refset.otf.service.url}"
 			p:rt-ref="refset.auth.RestTemplate" 
+			p:authenticationEnabled="${authenticationEnabled}"
 		/>
 	
  	<sec:global-method-security authentication-manager-ref="org.springframework.security.authenticationManager" 

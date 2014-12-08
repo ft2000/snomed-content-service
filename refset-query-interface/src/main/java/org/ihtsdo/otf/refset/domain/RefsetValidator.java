@@ -42,6 +42,9 @@ public class RefsetValidator implements Validator {
         ValidationUtils.rejectIfEmpty(e, "typeId", "Refset type id is mandatory");
         ValidationUtils.rejectIfEmpty(e, "active", "Active Flag is mandatory");
         ValidationUtils.rejectIfEmpty(e, "componentTypeId", "Refset members type id is mandatory");
+        ValidationUtils.rejectIfEmpty(e, "description", "Refset description is mandatory");
+        ValidationUtils.rejectIfEmpty(e, "languageCode", "Refset language is mandatory");
+        ValidationUtils.rejectIfEmpty(e, "published", "Indication of Refset is published or not is mandatory");
 
 	}
 

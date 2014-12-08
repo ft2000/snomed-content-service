@@ -34,6 +34,8 @@ public final class RGC {
 	
 	public static final String E_EFFECTIVE_TIME = "earliestEffectiveTime";
 	public static final String L_EFFECTIVE_TIME = "latestEffectiveTime";
+	
+	public static final String PARENT_ID = "parentId";
 
 	
 

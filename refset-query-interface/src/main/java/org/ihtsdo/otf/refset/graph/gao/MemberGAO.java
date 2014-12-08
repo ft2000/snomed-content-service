@@ -5,7 +5,9 @@ package org.ihtsdo.otf.refset.graph.gao;
 
 import static org.ihtsdo.otf.refset.domain.RGC.*;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -104,7 +106,7 @@ public class MemberGAO {
 	 * @throws RefsetGraphAccessException 
 	 * @throws EntityNotFoundException 
 	 */
-	protected Vertex addMemberNode(Member m, EventGraph<TitanGraph> eg) throws RefsetGraphAccessException, EntityNotFoundException {
+	protected Vertex addMemberNode(Member m, EventGraph<TitanGraph> eg, String refsetId) throws RefsetGraphAccessException, EntityNotFoundException {
 		
 		if (m == null || StringUtils.isEmpty(m.getReferencedComponentId())) {
 			
@@ -113,11 +115,10 @@ public class MemberGAO {
 		
 		LOGGER.debug("Adding member {}", m);
 		eg.addListener(new EffectiveTimeChangeListener(eg.getBaseGraph(), m.getModifiedBy()));
-		//Vertex mV = eg.getBaseGraph().addVertexWithLabel(eg.getBaseGraph().getVertexLabel("GMember"));
+		Vertex mVT = eg.getBaseGraph().addVertexWithLabel(eg.getBaseGraph().getVertexLabel("GMember"));
 		
-		Vertex mV = eg.addVertex(m.getUuid());
+		Vertex mV = eg.getVertex(mVT.getId());
 		//Vertex mg = eg.getVertex(vM.getId());//, GMember.class);
-		
 		Integer activeFlag = m.isActive() ? 1 : 0;
 
 		//mg.setActive(activeFlag);
@@ -151,6 +152,11 @@ public class MemberGAO {
 		//mg.setType(VertexType.member.toString());
 		mV.setProperty(TYPE, VertexType.member.toString());
 		
+		//description,refsetId(ie parentId) and reference component id is needed to provide search
+		mV.setProperty(REFERENCE_COMPONENT_ID, m.getReferencedComponentId());
+		
+		mV.setProperty(DESC, m.getDescription());
+		mV.setProperty(PARENT_ID, refsetId);
 		LOGGER.debug("Added Member as vertex to graph", mV.getId());
 		return mV;
 		
@@ -186,6 +192,16 @@ public class MemberGAO {
 
 			
 			//try adding all members and accumulate error/success
+			
+			List<String> rcIds = new ArrayList<String>();
+			
+			for (Member member : members) {
+				
+				rcIds.add(member.getReferencedComponentId());
+				
+			}
+			Map<String, String> descriptions = rGao.getMembersDescription(rcIds);
+
 
 			for (Member m : members) {
 		
@@ -201,8 +217,13 @@ public class MemberGAO {
 
 				} catch(EntityNotFoundException ex) {
 					
+					if(descriptions.containsKey(m.getReferencedComponentId())) {
+						
+						m.setDescription(descriptions.get(m.getReferencedComponentId()));
+					}
+
 					//add member
-					mV = addMemberNode(m, tg);
+					mV = addMemberNode(m, tg, refsetId);
 					
 					Edge e = tg.addEdge(null, mV, rV, "members");
 					e.setProperty(REFERENCE_COMPONENT_ID, m.getReferencedComponentId());
@@ -396,7 +417,7 @@ public class MemberGAO {
         tg.addListener(new EffectiveTimeChangeListener(tg.getBaseGraph(), m.getModifiedBy()));
 
 		LOGGER.debug("Updating member {}", m);
-		Iterable<Vertex> vr = tg.query().has(TYPE, VertexType.member.toString()).has(ID, m.getUuid()).has(END, Long.MAX_VALUE).limit(1).vertices();
+		Iterable<Vertex> vr = tg.query().has(TYPE, VertexType.member.toString()).has(ID, m.getUuid()).limit(1).vertices();
 
 		if (vr != null ) {
 			
@@ -404,19 +425,21 @@ public class MemberGAO {
 				
 				//mg = tg.getVertex(v.getId());//, GMember.class);
 				LOGGER.debug("Updating member {} and vertex {} ", m, v);
-				if(Integer.valueOf(1).equals(v.getProperty(PUBLISHED))) {
+				/*if(Integer.valueOf(1).equals(v.getProperty(PUBLISHED))) {
 					
 					throw new EntityNotFoundException("Member can not be updated once published");
-				}
+				}*/
 				Integer activeFlag = m.isActive() ? 1 : 0;
 
 				v.setProperty(ACTIVE, activeFlag);
-				DateTime et = m.getEffectiveTime();
+				
+				/*DateTime et = m.getEffectiveTime();
 				if ( et != null) {
 					
 					//mg.setEffectiveTime(et.getMillis());
 					v.setProperty(EFFECTIVE_DATE, et.getMillis());
-				}
+				}*/
+				
 				v.setProperty(MODIFIED_BY, m.getModifiedBy());
 				v.setProperty(MODIFIED_DATE, new DateTime().getMillis());
 				//mg.setModifiedBy(m.getModifiedBy());
@@ -429,10 +452,13 @@ public class MemberGAO {
 
 				}
 				
-				Integer publishedFlag = m.isPublished() ? 1 : 0;
-
+				//Integer publishedFlag = m.isPublished() ? 1 : 0;
+				
+				//in current implementation during member update  we can only update member as not published with no effective date
+				//TODO this will change once we have release service talking to refset.
+				v.removeProperty(EFFECTIVE_DATE);
 				//mg.setPublished(publishedFlag);
-				v.setProperty(PUBLISHED, publishedFlag);
+				v.setProperty(PUBLISHED, 0);
 				
 				//mV = mg;//mg.asVertex();
 				LOGGER.debug("Updated Member as vertex to graph", v.getId());	
