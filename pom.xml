@@ -22,7 +22,7 @@
 
 	<groupId>org.ihtsdo.otf</groupId>
 	<artifactId>snomed-content-service</artifactId>
-    <version>1.0.3</version>
+    <version>1.0.4</version>
     <packaging>pom</packaging>
     <name>Snomed Content Service</name>
     <description>Snomed Content Service - Refset tool</description>
