@@ -356,7 +356,7 @@ public class RefsetGAO {
 			g = rgFactory.getReadOnlyGraph();
 
 			//TODO upgrade this search with status and effective date
-			Iterable<GRefset> vs = fgf.create(g).getVertices(DESC, description, GRefset.class);//g.query().has(DESC, description).limit(1).vertices();
+			Iterable<Vertex> vs = g.query().has(DESC, description).has(TYPE, VertexType.refset.toString()).limit(1).vertices();
 			
 			if (vs != null && vs.iterator() != null && vs.iterator().hasNext()) {
 				
