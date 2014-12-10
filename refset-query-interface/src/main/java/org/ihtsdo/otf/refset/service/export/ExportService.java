@@ -79,7 +79,7 @@ public class ExportService {
 								
 				String active = m.isActive() ? "1" : "0";
 				List<Object> concept = Arrays.asList(new Object[] { m.getUuid(), Utility.getDate(m.getEffectiveTime()), active
-                		, r.getModuleId(), refsetId, m.getReferencedComponentId()});
+                		, m.getModuleId(), refsetId, m.getReferencedComponentId()});
 
 				lWriter.write(concept, processors);
 				
