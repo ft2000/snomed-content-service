@@ -65,10 +65,10 @@ public class ExportService {
 			
             final CellProcessor[] processors = getProcessors();
             /**
-             * id	effectiveTime	active	moduleId	refSetId	referencedComponentId
+             * id	effectiveTime	active	moduleId	refsetId	referencedComponentId
              */
 			final String[] header = new String[] { "id", "effectiveTime", "active"
-            		, "moduleId", "refSetId", "referencedComponentId"};
+            		, "moduleId", "refsetId", "referencedComponentId"};
 			            
 
             lWriter.writeHeader(header);
