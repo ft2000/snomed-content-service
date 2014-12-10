@@ -45,7 +45,7 @@ public class RefsetExportController {
 		
 		logger.debug("Exporting an existing refset {} in rf2 format", refsetId);
 		resp.setHeader("content-type", "application/csv;charset=UTF-8");
-	    resp.setHeader("Content-Disposition", "attachment; filename=\"rel2_Refset_SimpleDelta_INT_" + Utility.getDate(new DateTime()) + ".rf2\"");
+	    resp.setHeader("Content-Disposition", "attachment; filename=\"rel2_Refset_SimpleDelta_INT_" + Utility.getDate(new DateTime()) + ".txt\"");
 	    
 	    final CsvPreference RF2_PREF = new CsvPreference.Builder('"', '\t', "\r\n").build();
 
