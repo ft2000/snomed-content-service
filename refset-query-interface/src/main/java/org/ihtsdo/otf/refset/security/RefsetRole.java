@@ -13,7 +13,7 @@ public class RefsetRole implements GrantedAuthority {
 
 	
 	private static final long serialVersionUID = 1L;
-	String role;
+	private String role;	
 	
 	protected RefsetRole() {
 		// TODO Auto-generated constructor stub
@@ -27,5 +27,7 @@ public class RefsetRole implements GrantedAuthority {
 	public void setAuthority(String role) {
 		this.role = role;
 	}
+	
+	
 
 }

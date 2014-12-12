@@ -3,11 +3,14 @@
  */
 package org.ihtsdo.otf.refset.common;
 
+import java.nio.file.AccessDeniedException;
 import java.util.Map;
 
+import org.ihtsdo.otf.refset.security.User;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.StringUtils;
 
 /**
@@ -74,6 +77,22 @@ public class Utility {
 		
 		return toDt;
 
+	}
+	
+	/**
+	 * @return
+	 * @throws AccessDeniedException
+	 */
+	public static User getUserDetails() throws AccessDeniedException {
+		Object auth = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		
+		if (auth instanceof User) {
+			
+			User user = (User) auth;
+			return user;
+		}
+		
+		throw new AccessDeniedException("User lacks required authorization");
 	}
 	
 }
