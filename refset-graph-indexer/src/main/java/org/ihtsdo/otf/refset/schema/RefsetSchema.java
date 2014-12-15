@@ -17,7 +17,7 @@ import static org.ihtsdo.otf.refset.domain.RGC.TYPE;
 import static org.ihtsdo.otf.refset.domain.RGC.TYPE_ID;
 import static org.ihtsdo.otf.refset.domain.RGC.SCTID;
 import static org.ihtsdo.otf.refset.domain.RGC.MEMBER_TYPE_ID;
-import static org.ihtsdo.otf.refset.domain.RGC.EXPECTED_RLS_DT;
+import static org.ihtsdo.otf.refset.domain.RGC.EXPECTED_PUBLISH_DATE;
 import static org.ihtsdo.otf.refset.domain.RGC.START;
 import static org.ihtsdo.otf.refset.domain.RGC.END;
 import static org.ihtsdo.otf.refset.domain.RGC.E_EFFECTIVE_TIME;
@@ -447,10 +447,10 @@ public class RefsetSchema {
 			
 		} 
 		
-		if (!mgmt.containsRelationType(EXPECTED_RLS_DT)) {
+		if (!mgmt.containsRelationType(EXPECTED_PUBLISH_DATE)) {
 			
-			LOGGER.debug("Creating Property {}", EXPECTED_RLS_DT);
-			mgmt.makePropertyKey(EXPECTED_RLS_DT).dataType(String.class).make();
+			LOGGER.debug("Creating Property {}", EXPECTED_PUBLISH_DATE);
+			mgmt.makePropertyKey(EXPECTED_PUBLISH_DATE).dataType(Long.class).make();
 
 		} 
 		
@@ -632,8 +632,6 @@ public class RefsetSchema {
 						Parameter.of(MAPPED, Properties.referenceComponentId.toString()))
 				.addKey(mgmt.getPropertyKey(SCTID), 
 						Parameter.of(MAPPED, Properties.sctid.toString()))
-				.addKey(mgmt.getPropertyKey(EXPECTED_RLS_DT), 
-						Parameter.of(MAPPED, EXPECTED_RLS_DT))
 				.addKey(mgmt.getPropertyKey(SUPER_REFSET_TYPE_ID), 
 						Parameter.of(MAPPED, SUPER_REFSET_TYPE_ID))
 				.addKey(mgmt.getPropertyKey(TYPE), 
@@ -733,6 +731,14 @@ public class RefsetSchema {
 							Parameter.of(MAPPED, Properties.latestEffectiveTime.toString()));
 
 				}
+				
+				if (!existingProp.contains(mgmt.getPropertyKey(EXPECTED_PUBLISH_DATE))) {
+
+				
+					mgmt.addIndexKey(giRefset, mgmt.getPropertyKey(EXPECTED_PUBLISH_DATE), 
+						Parameter.of(MAPPED, EXPECTED_PUBLISH_DATE));
+				}
+
 			}
 			
 			
@@ -766,6 +772,8 @@ public class RefsetSchema {
 							Parameter.of(MAPPED, Properties.parentId.toString()));
 
 				}
+				
+				
 	
 			}
 			
