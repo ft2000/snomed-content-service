@@ -45,13 +45,16 @@ public final class TokenResponseWrapper extends
 		 Authentication auth = ctx.getAuthentication();
 		 if (isUserHasRole(auth)) {
 			 
-			 UserDetails uDetails = (UserDetails)auth.getPrincipal();
+			 User uDetails = (User)auth.getPrincipal();
 			 String userId = uDetails.getUsername();
 			 String password = uDetails.getPassword();
 			 String info = userId  + ":" + password;
 			 Token token = service.allocateToken(info);
-			 LOGGER.trace("Setting {} as {}", X_REFSET_TOKEN, token.getKey());
-			 addHeader(X_REFSET_TOKEN, token.getKey());
+			 String key = token.getKey();
+			 uDetails.setToken(key);
+
+			 LOGGER.trace("Setting {} as {}", X_REFSET_TOKEN, key);
+			 addHeader(X_REFSET_TOKEN, key);
 		 }
 		
 	}

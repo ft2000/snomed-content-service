@@ -19,8 +19,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.token.Token;
+import org.springframework.security.core.token.TokenService;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -51,6 +53,7 @@ public class RefsetIdentityService implements UserDetailsService {
 	
 	private RestTemplate rt;
 
+	TokenService service;
 
 
 	/* (non-Javadoc)
@@ -130,6 +133,13 @@ public class RefsetIdentityService implements UserDetailsService {
 				}
 			}
 			user.setAuthorities(roles);
+
+			if (isUserHasRole(user)) {
+				
+				 String info = userName  + ":" + token;
+				 Token key = service.allocateToken(info);
+				 user.setToken(key.getKey());
+			}
 
 
 		} catch (Exception e) {
@@ -246,6 +256,29 @@ public class RefsetIdentityService implements UserDetailsService {
 
 		return auth;
 	}
+	
+	
+	private boolean isUserHasRole(User auth) {
+		
+		boolean isUserHasRole = false;
+		
+		if (auth!=null && auth.isAuthenticated()) {
+			
+			 Collection<? extends GrantedAuthority> roles = auth.getAuthorities();
+			 for (GrantedAuthority role : roles) {
+				
+				 isUserHasRole = "ROLE_USER".equals(role.getAuthority()) ? true : false;
+				 
+				 if (isUserHasRole) {
+					
+					 break;
+				}
+			}
+
+		}
+		
+		return isUserHasRole;
+	}
 
 
 	/**
@@ -260,6 +293,15 @@ public class RefsetIdentityService implements UserDetailsService {
 	 */
 	public void setRt(RestTemplate rt) {
 		this.rt = rt;
+	}
+
+
+
+	/**
+	 * @param service the service to set
+	 */
+	public void setService(TokenService service) {
+		this.service = service;
 	}
 
 }

@@ -16,6 +16,8 @@
 				entry-point-ref="refset.authenticationEntryPoint"
 				use-expressions="true" request-matcher="ciRegex">
 		<sec:custom-filter ref="refset.cors" position="FIRST"/>
+		<sec:custom-filter ref="refset.token" after="SECURITY_CONTEXT_FILTER"/>
+		
 		<sec:access-denied-handler ref="refset.accessDeniedHandler" />
 		<sec:custom-filter ref="refset.exceptionTranslationFilter" after="FIRST"/>
 		<sec:intercept-url pattern="/v1.0/refsets/search*" access="permitAll"/>
@@ -32,6 +34,7 @@
   		<property name="authenticationEntryPoint" ref="refset.authenticationEntryPoint"/>
   		<property name="accessDeniedHandler" ref="refset.accessDeniedHandler"/>
 	</bean>
+	<bean id="refset.token" class="org.ihtsdo.otf.refset.TokenFilter" />
 	
 	<bean id="refset.cors" class="org.ihtsdo.otf.refset.CorsFilter" />
 	<!-- bean id="refset.lb.reqResponseFilter" class="ch.qos.logback.access.servlet.TeeFilter"/-->
@@ -77,5 +80,6 @@
  	
  	<bean id="refset.identityService" class="org.ihtsdo.otf.refset.security.RefsetIdentityService" 
  			p:otfServiceUrl="${refset.otf.service.url}"
-			p:rt-ref="refset.auth.RestTemplate" />
+			p:rt-ref="refset.auth.RestTemplate" 
+			p:service-ref="refset.tokenService"/>
 </beans>

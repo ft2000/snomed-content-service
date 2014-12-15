@@ -71,7 +71,7 @@ public class RefsetSecurityContextRepository implements
 		if (ctx == null) {
 			
 			ctx = SecurityContextHolder.createEmptyContext();
-			rh.setResponse(new TokenResponseWrapper(response, false, service));
+			rh.setResponse(new TokenResponseWrapper(response, true, service));
 			
 		}
 		
@@ -85,7 +85,7 @@ public class RefsetSecurityContextRepository implements
 	public void saveContext(SecurityContext context,
 			HttpServletRequest request, HttpServletResponse response) {
 		
-		new TokenResponseWrapper(response, false, service).saveContext(context);
+		new TokenResponseWrapper(response, true, service).saveContext(context);
 		
 	}
 

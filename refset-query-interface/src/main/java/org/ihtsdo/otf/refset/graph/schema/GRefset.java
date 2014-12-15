@@ -17,16 +17,16 @@ public interface GRefset extends VertexFrame {
 	
 	
 	/**
-	 * @return the created
+	 * @return the expectedPublishDate
 	 */
-	@Property( value = "expectedReleaseDate")
-	public long getExpectedReleaseDate();
+	@Property( value = "expectedPublishDate")
+	public long getExpectedPublishDate();
 
 	/**
-	 * @param expectedReleaseDate the expectedReleaseDate to set
+	 * @param expectedPublishDate the expectedPublishDate to set
 	 */
-	@Property( value = "expectedReleaseDate")
-	public void setExpectedReleaseDate(long expectedReleaseDate);
+	@Property( value = "expectedPublishDate")
+	public void setExpectedPublishDate(long expectedPublishDate);
 	
 	/**
 	 * @return the releasedDate

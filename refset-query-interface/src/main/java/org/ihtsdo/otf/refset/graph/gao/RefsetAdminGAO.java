@@ -230,7 +230,7 @@ public class RefsetAdminGAO {
 		
 			if( ert != null) {
 				
-				gr.setExpectedReleaseDate(ert.getMillis());
+				gr.setExpectedPublishDate(ert.getMillis());
 			}
 			if (!StringUtils.isEmpty(r.getSctId())) {
 				
@@ -493,7 +493,7 @@ public class RefsetAdminGAO {
 		if (ert != null) {
 			
 			//rV.setExpectedReleaseDate(ert.getMillis());
-			rV.setProperty(EXPECTED_RLS_DT, ert.getMillis());
+			rV.setProperty(EXPECTED_PUBLISH_DATE, ert.getMillis());
 		}
 		
 		if (!StringUtils.isEmpty(r.getSctId())) {

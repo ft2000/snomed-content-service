@@ -32,11 +32,28 @@ public class User implements UserDetails {
 	private String middlename;
 	private String email;
 	private String surname;
+	
+	//TODO this is work around to send in body. But ideally it should fo as response header
+	private String token;
 
 	
 
 
 	
+
+	/**
+	 * @return the token
+	 */
+	public String getToken() {
+		return token;
+	}
+
+	/**
+	 * @param token the token to set
+	 */
+	public void setToken(String token) {
+		this.token = token;
+	}
 
 	protected User() {
 		
