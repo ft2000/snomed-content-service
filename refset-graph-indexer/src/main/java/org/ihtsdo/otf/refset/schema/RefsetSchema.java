@@ -266,6 +266,17 @@ public class RefsetSchema {
 			.addKey(mgmt.getPropertyKey(END))
 			.buildCompositeIndex();
 		}
+		
+		TitanGraphIndex bySctIdType = mgmt.getGraphIndex(CompositeIndex.bySctIdType.toString());
+		
+		if (bySctIdType == null) {
+		
+			LOGGER.debug("Creating Index  {}" , CompositeIndex.bySctIdType);
+			mgmt.buildIndex(CompositeIndex.bySctIdType.toString(), Vertex.class)
+			.addKey(mgmt.getPropertyKey(TYPE))
+			.addKey(mgmt.getPropertyKey(SCTID))
+			.buildCompositeIndex();
+		}
 
 		
 	}

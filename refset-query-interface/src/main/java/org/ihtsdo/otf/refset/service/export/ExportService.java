@@ -78,8 +78,10 @@ public class ExportService {
 			for (Member m : ms) {
 								
 				String active = m.isActive() ? "1" : "0";
-				List<Object> concept = Arrays.asList(new Object[] { m.getUuid(), Utility.getDate(m.getEffectiveTime()), active
-                		, m.getModuleId(), refsetId, m.getReferencedComponentId()});
+				Object[] rf2Record = new Object[] { m.getUuid(), Utility.getDate(m.getEffectiveTime()), active
+                		, m.getModuleId(), refsetId, m.getReferencedComponentId()};
+				
+				List<Object> concept = Arrays.asList(rf2Record);
 
 				lWriter.write(concept, processors);
 				

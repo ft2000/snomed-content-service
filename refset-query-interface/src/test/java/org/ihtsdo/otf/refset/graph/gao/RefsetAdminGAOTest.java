@@ -13,6 +13,7 @@ import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.MapConfiguration;
 import org.ihtsdo.otf.refset.domain.MetaData;
 import org.ihtsdo.otf.refset.domain.Refset;
+import org.ihtsdo.otf.refset.exception.EntityAlreadyExistException;
 import org.ihtsdo.otf.refset.exception.EntityNotFoundException;
 import org.ihtsdo.otf.refset.exception.RefsetServiceException;
 import org.ihtsdo.otf.refset.graph.RefsetGraphAccessException;
@@ -131,7 +132,7 @@ public class RefsetAdminGAOTest {
 	}
 
 	@Test
-	public void testAddRefset() throws RefsetServiceException, RefsetGraphAccessException, EntityNotFoundException {
+	public void testAddRefset() throws RefsetServiceException, RefsetGraphAccessException, EntityNotFoundException, EntityAlreadyExistException {
 		
 		aGao.addRefset(rs.get(0));
 		
@@ -142,7 +143,7 @@ public class RefsetAdminGAOTest {
 	}
 	
 	@Test
-	public void testAddRefsetAlreadyExist() throws RefsetServiceException, RefsetGraphAccessException, EntityNotFoundException {
+	public void testAddRefsetAlreadyExist() throws RefsetServiceException, RefsetGraphAccessException, EntityNotFoundException, EntityAlreadyExistException {
 
 		aGao.addRefset(rs.get(0));
 		aGao.addRefset(rs.get(0));
@@ -153,7 +154,7 @@ public class RefsetAdminGAOTest {
 	}
 	
 	@Test(expected = EntityNotFoundException.class)
-	public void testRemoveRefsetWhenNotExist() throws RefsetServiceException, RefsetGraphAccessException, EntityNotFoundException {
+	public void testRemoveRefsetWhenNotExist() throws RefsetServiceException, RefsetGraphAccessException, EntityNotFoundException, EntityAlreadyExistException {
 
 		aGao.addRefset(rs.get(0));
 
@@ -162,7 +163,7 @@ public class RefsetAdminGAOTest {
 	}
 	
 	@Test
-	public void testAddRefsetWithMember() throws RefsetServiceException, RefsetGraphAccessException, EntityNotFoundException {
+	public void testAddRefsetWithMember() throws RefsetServiceException, RefsetGraphAccessException, EntityNotFoundException, EntityAlreadyExistException {
 		
 		aGao.addRefset(data.getRefSet("450973005"));
 
@@ -170,7 +171,7 @@ public class RefsetAdminGAOTest {
 	}
 	
 	@Test
-	public void loadData() throws RefsetServiceException, RefsetGraphAccessException, EntityNotFoundException {
+	public void loadData() throws RefsetServiceException, RefsetGraphAccessException, EntityNotFoundException, EntityAlreadyExistException {
 		
 		int i = 0;
 		for (Refset r : rs.subList(0, 2)) {
@@ -195,7 +196,7 @@ public class RefsetAdminGAOTest {
 	}
 
 	@Test
-	public void testUpdateRefset() throws RefsetServiceException, RefsetGraphAccessException, EntityNotFoundException {		
+	public void testUpdateRefset() throws RefsetServiceException, RefsetGraphAccessException, EntityNotFoundException, EntityAlreadyExistException {		
 		
 		Refset input = rs.get(0);
 

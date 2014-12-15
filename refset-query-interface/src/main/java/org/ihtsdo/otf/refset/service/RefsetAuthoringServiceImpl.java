@@ -12,6 +12,7 @@ import java.util.UUID;
 
 import org.ihtsdo.otf.refset.domain.Member;
 import org.ihtsdo.otf.refset.domain.Refset;
+import org.ihtsdo.otf.refset.exception.EntityAlreadyExistException;
 import org.ihtsdo.otf.refset.exception.EntityNotFoundException;
 import org.ihtsdo.otf.refset.exception.RefsetServiceException;
 import org.ihtsdo.otf.refset.graph.RefsetGraphAccessException;
@@ -53,7 +54,7 @@ public class RefsetAuthoringServiceImpl implements RefsetAuthoringService {
 	 * @see org.ihtsdo.otf.refset.service.RefsetAdminService#addRefset(org.ihtsdo.otf.refset.domain.Refset)
 	 */
 	@Override
-	public String addRefset(Refset r) throws RefsetServiceException {
+	public String addRefset(Refset r) throws RefsetServiceException, EntityAlreadyExistException {
 		
 		LOGGER.debug("addrefset {}", r);
 		
@@ -76,7 +77,7 @@ public class RefsetAuthoringServiceImpl implements RefsetAuthoringService {
 	 */
 	@Override
 	public void addMember(String refsetId, Member m)
-			throws RefsetServiceException, EntityNotFoundException {
+			throws RefsetServiceException, EntityNotFoundException, EntityAlreadyExistException {
 		
 		LOGGER.debug("Adding member {} to refset {}", m, refsetId);
 

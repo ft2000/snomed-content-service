@@ -50,7 +50,7 @@ public final class TokenResponseWrapper extends
 			 String password = uDetails.getPassword();
 			 String info = userId  + ":" + password;
 			 Token token = service.allocateToken(info);
-			 LOGGER.debug("Setting {} as {}", X_REFSET_TOKEN, token.getKey());
+			 LOGGER.trace("Setting {} as {}", X_REFSET_TOKEN, token.getKey());
 			 addHeader(X_REFSET_TOKEN, token.getKey());
 		 }
 		

@@ -11,6 +11,7 @@ import org.apache.commons.configuration.ConfigurationException;
 import org.ihtsdo.otf.refset.common.TestGraph;
 import org.ihtsdo.otf.refset.domain.MetaData;
 import org.ihtsdo.otf.refset.domain.Refset;
+import org.ihtsdo.otf.refset.exception.EntityAlreadyExistException;
 import org.ihtsdo.otf.refset.exception.EntityNotFoundException;
 import org.ihtsdo.otf.refset.exception.RefsetServiceException;
 import org.ihtsdo.otf.refset.graph.RefsetGraphAccessException;
@@ -109,7 +110,7 @@ public class RefsetGAOTest {
 	
 	
 	@Test
-	public void testGetReftest() throws RefsetServiceException, RefsetGraphAccessException, EntityNotFoundException {
+	public void testGetReftest() throws RefsetServiceException, RefsetGraphAccessException, EntityNotFoundException, EntityAlreadyExistException {
 		Refset i = rs.get(0);
 		aGao.removeRefset(i.getUuid(), "junit");
 		aGao.addRefset(data.getRefSet(i.getUuid()));
@@ -138,7 +139,7 @@ public class RefsetGAOTest {
 	
 	
 	@Test
-	public void testGetMetaDataAfterGetttingRefset() throws RefsetServiceException, RefsetGraphAccessException, EntityNotFoundException {		
+	public void testGetMetaDataAfterGetttingRefset() throws RefsetServiceException, RefsetGraphAccessException, EntityNotFoundException, EntityAlreadyExistException {		
 		
 		Refset i = rs.get(0);
 		
@@ -158,7 +159,7 @@ public class RefsetGAOTest {
 	}
 	
 	@Test(expected = EntityNotFoundException.class)
-	public void testGetMetaDataInvalidId() throws RefsetServiceException, RefsetGraphAccessException, EntityNotFoundException {		
+	public void testGetMetaDataInvalidId() throws RefsetServiceException, RefsetGraphAccessException, EntityNotFoundException, EntityAlreadyExistException {		
 		
 		//make sure atleast one Refset exist in database to avoid schema exception
 		Refset input = rs.get(0);
@@ -171,7 +172,7 @@ public class RefsetGAOTest {
 	
 	
 	@Test(expected = EntityNotFoundException.class)
-	public void testGetReftestInvalidNodeId() throws RefsetServiceException, RefsetGraphAccessException, EntityNotFoundException {		
+	public void testGetReftestInvalidNodeId() throws RefsetServiceException, RefsetGraphAccessException, EntityNotFoundException, EntityAlreadyExistException {		
 		Refset input = rs.get(0);
 		
 		aGao.addRefset(data.getRefSet(input.getUuid()));//to avoid NPE when there is no class available of type Refset

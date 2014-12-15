@@ -252,9 +252,7 @@ public class RefsetAuthoringController {
 	@ApiOperation( value = "Add no of members in this call. It is required that member supplied is a valid member" )
 	@PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<Result< Map<String, Object>>> addMembers(@PathVariable(value = "refSetId") String refsetId, 
-    		@RequestBody( required = true) Set<Member> members, 
-    		@RequestHeader("X-REFSET-PRE-AUTH-TOKEN") String authToken, 
-    		@RequestHeader("X-REFSET-PRE-AUTH-USERNAME") String userName) throws Exception {
+    		@RequestBody( required = true) Set<Member> members) throws Exception {
 		
 		logger.debug("Adding member {} to refset {}", members, refsetId);
 

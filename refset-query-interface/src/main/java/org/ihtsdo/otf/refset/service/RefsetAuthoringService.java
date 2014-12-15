@@ -9,6 +9,7 @@ import java.util.Set;
 import org.ihtsdo.otf.refset.domain.Member;
 import org.ihtsdo.otf.refset.domain.MetaData;
 import org.ihtsdo.otf.refset.domain.Refset;
+import org.ihtsdo.otf.refset.exception.EntityAlreadyExistException;
 import org.ihtsdo.otf.refset.exception.EntityNotFoundException;
 import org.ihtsdo.otf.refset.exception.RefsetServiceException;
 
@@ -22,15 +23,17 @@ public interface RefsetAuthoringService {
 	 * @param r a {@link Refset}
 	 * @throws RefsetServiceException
 	 * @return a {@link Refset} object stored in graph with {@link MetaData}
+	 * @throws EntityAlreadyExistException 
 	 */
-	public String addRefset(Refset r) throws RefsetServiceException ;
+	public String addRefset(Refset r) throws RefsetServiceException, EntityAlreadyExistException ;
 	
 	/**Method to add a {@link Member} to given {@link Refset}.
 	 * @param refsetId
 	 * @throws RefsetServiceException
 	 * @throws EntityNotFoundException 
+	 * @throws EntityAlreadyExistException 
 	 */
-	public void addMember(String refsetId, Member m) throws RefsetServiceException, EntityNotFoundException ;
+	public void addMember(String refsetId, Member m) throws RefsetServiceException, EntityNotFoundException, EntityAlreadyExistException ;
 	
 	
 	/**Method to add a {@link Refset}
