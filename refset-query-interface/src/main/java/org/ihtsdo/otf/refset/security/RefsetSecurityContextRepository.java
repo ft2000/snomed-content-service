@@ -129,12 +129,6 @@ public class RefsetSecurityContextRepository implements
 					ctx.setAuthentication(auth);
 				}
 					
-			} catch (AccessDeniedException e) {
-				
-				/*perform authentication or simply say to user unauthorized?*/
-				LOGGER.error("Error during authentication {}", e);
-				throw new AccessDeniedException("User unauthorized");
-				
 			} catch (Exception e) {
 				
 				LOGGER.error("Error during authentication {}", e);//this may be the case when token key verification fails
