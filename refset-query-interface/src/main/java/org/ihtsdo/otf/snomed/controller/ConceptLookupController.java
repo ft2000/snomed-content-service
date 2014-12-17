@@ -16,7 +16,6 @@ import org.ihtsdo.otf.refset.common.Meta;
 import org.ihtsdo.otf.refset.common.Result;
 import org.ihtsdo.otf.refset.exception.EntityNotFoundException;
 import org.ihtsdo.otf.snomed.domain.Concept;
-import org.ihtsdo.otf.snomed.exception.ConceptServiceException;
 import org.ihtsdo.otf.snomed.service.ConceptLookupService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,7 +37,7 @@ import com.wordnik.swagger.annotations.ApiOperation;
  *
  */
 @RestController
-@Api(value="Concept details look up service", description="Service to lookup concept details", position = 3)
+@Api(value="Concept details look up service", description="Service to lookup concept details", position = 6)
 @RequestMapping("/v1.0/snomed")
 public class ConceptLookupController {
 	
@@ -53,7 +52,8 @@ public class ConceptLookupController {
 	@RequestMapping( method = RequestMethod.POST, value = "/concepts", produces = MediaType.APPLICATION_JSON_VALUE , 
 			consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ApiOperation( value = "Retrieves concept details for given concept ids in good faith ie all null or empty will be ignored" )
-    public ResponseEntity<Result< Map<String, Object>>> getConceptDetails( @RequestBody( required = true) Set<String> conceptIds ) {
+    public ResponseEntity<Result< Map<String, Object>>> getConceptDetails( 
+    		@RequestBody( required = true) Set<String> conceptIds ) throws Exception {
 		
 		logger.debug("getConceptDetails");
 
@@ -63,36 +63,26 @@ public class ConceptLookupController {
 		
 		response.setMeta(m);
 
-    	try {
-    		
-			Map<String, Concept> cs =  cService.getConcepts(conceptIds );
 
-			Map<String, Object> data = new HashMap<String, Object>();
-			data.put("concepts", cs);
-			m.setNoOfRecords(cs.size());
-			response.setData(data);
-			
-			m.setMessage(SUCESS);
-			m.setStatus(HttpStatus.OK);
+		
+		Map<String, Concept> cs =  cService.getConcepts(conceptIds );
 
-			return new ResponseEntity<Result<Map<String,Object>>>(response, HttpStatus.OK);
-			
-		} catch (ConceptServiceException e) {
-			
-			// TODO Filter error. Only Pass what is required
-			String message = String.format("Error occurred during service call : %s", e.getMessage());
-			logger.error(message);
-			m.setMessage(message); 
-			m.setStatus(HttpStatus.OK);
+		Map<String, Object> data = new HashMap<String, Object>();
+		data.put("concepts", cs);
+		response.setData(data);
+		
+		m.setMessage(SUCESS);
+		m.setStatus(HttpStatus.OK);
 
-			return new ResponseEntity<Result<Map<String,Object>>>(response, HttpStatus.OK);
-	    	
-		}         
+		return new ResponseEntity<Result<Map<String,Object>>>(response, HttpStatus.OK);
+		
+	
+         
     }
 	
 	@RequestMapping( method = RequestMethod.GET, value = "/concepts/{conceptId}", produces = "application/json" )
 	@ApiOperation( value = "Api to get details of a concept for given concept id." )
-    public ResponseEntity<Result< Map<String, Object>>> getConcept( @PathVariable( value = "conceptId") String conceptId ) {
+    public ResponseEntity<Result< Map<String, Object>>> getConcept( @PathVariable( value = "conceptId") String conceptId ) throws Exception {
 		
 		logger.debug("Getting concept details for {}", conceptId);
 
@@ -103,45 +93,32 @@ public class ConceptLookupController {
 		m.add( linkTo( methodOn( ConceptLookupController.class ).getConcept( conceptId ) ).withSelfRel() );
 		response.setMeta(m);
 
-    	try {
-    		
-			Concept c =  cService.getConcept(conceptId);
 
-			Map<String, Object> data = new HashMap<String, Object>();
-			data.put("concept", c);
-			
-			response.setData(data);
-			m.setMessage(SUCESS);
-			m.setStatus(HttpStatus.OK);
-			
-			return new ResponseEntity<Result<Map<String,Object>>>(response, HttpStatus.OK);
-			
-		} catch (ConceptServiceException e) {
-			
-			String message = String.format("Error occurred during service call : %s", e.getMessage());
-			logger.error(message);
-			m.setMessage(message); 
-			m.setStatus(HttpStatus.OK);
+		
+		Concept c =  cService.getConcept(conceptId);
 
-			return new ResponseEntity<Result<Map<String,Object>>>(response, HttpStatus.OK);
-	    	
-		} catch (EntityNotFoundException e) {
+		if (c == null) {
 			
-			String message = String.format("Error occurred during service call : %s", e.getMessage());
-			logger.error(message);
-			m.setMessage(message); 
-			m.setStatus(HttpStatus.NOT_FOUND);
+			throw new EntityNotFoundException("No data available for given id " + conceptId);
 			
-			return new ResponseEntity<Result<Map<String,Object>>>(response, HttpStatus.NOT_FOUND);
+		}
+		Map<String, Object> data = new HashMap<String, Object>();
+		data.put("concept", c);
+		
+		response.setData(data);
+		m.setMessage(SUCESS);
+		m.setStatus(HttpStatus.OK);
 
-		}       
+		return new ResponseEntity<Result<Map<String,Object>>>(response, HttpStatus.OK);
+		
+	     
     }
 	
 	
 	@RequestMapping( method = RequestMethod.GET, value = "/concepts", produces = "application/json" )
 	@ApiOperation( value = "Api to get paged list of concept ids available in the systems." )
-    public ResponseEntity<Result< Map<String, Object>>> getConceptIds( @RequestParam( value = "page", defaultValue = "1", required = false) int page, 
-    		@RequestParam( value = "size", defaultValue = "10", required = false) int size) {
+    public ResponseEntity<Result< Map<String, Object>>> getConceptIds( @RequestParam( value = "page", defaultValue = "0", required = false) int page, 
+    		@RequestParam( value = "size", defaultValue = "10", required = false) int size) throws Exception {
 		
 		logger.debug("Getting concept id list with offset as {} and limit as {}", page, size);
 
@@ -152,29 +129,20 @@ public class ConceptLookupController {
 		m.add( linkTo( methodOn( ConceptLookupController.class ).getConceptIds( page, size ) ).withSelfRel() );
 		response.setMeta(m);
 
-    	try {
-    		
-			Set<String> ids =  cService.getConceptIds(page, size);
 
-			Map<String, Object> data = new HashMap<String, Object>();
-			data.put("ids", ids);
-			
-			response.setData(data);
-			m.setMessage(SUCESS);
-			m.setStatus(HttpStatus.OK);
-			
-			return new ResponseEntity<Result<Map<String,Object>>>(response, HttpStatus.OK);
-			
-		} catch (ConceptServiceException e) {
-			
-			String message = String.format("Error occurred during service call : %s", e.getMessage());
-			logger.error(message);
-			m.setMessage(message); 
-			m.setStatus(HttpStatus.OK);
+		
+		Set<String> ids =  cService.getConceptIds(page, size);
 
-			return new ResponseEntity<Result<Map<String,Object>>>(response, HttpStatus.OK);
-	    	
-		}       
+		Map<String, Object> data = new HashMap<String, Object>();
+		data.put("ids", ids);
+		
+		response.setData(data);
+		m.setMessage(SUCESS);
+		m.setStatus(HttpStatus.OK);
+
+		return new ResponseEntity<Result<Map<String,Object>>>(response, HttpStatus.OK);
+		
+	      
     }
 	
 }

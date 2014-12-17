@@ -1,0 +1,15 @@
+-- Role: snomed
+
+-- DROP ROLE snomed;
+CREATE ROLE snomed LOGIN
+   PASSWORD 'snomed'
+  NOSUPERUSER INHERIT CREATEDB NOCREATEROLE NOREPLICATION;
+
+-- Schema: bid
+
+-- DROP SCHEMA bid;
+
+CREATE SCHEMA snomed
+  AUTHORIZATION snomed;
+
+GRANT ALL ON SCHEMA snomed TO snomed;

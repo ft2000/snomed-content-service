@@ -60,7 +60,7 @@ public class ResponseTest {
 			r.setCreatedBy( "Junit Author - " + i );
 			r.setDescription( "Junit Refset" );
 			r.setEffectiveTime( new DateTime() );
-			r.setId( "2000000" + i + 10 );
+			r.setUuid( "2000000" + i + 10 );
 			
 			rs.add(r);
 			

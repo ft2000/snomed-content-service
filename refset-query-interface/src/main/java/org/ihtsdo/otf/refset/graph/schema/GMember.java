@@ -3,7 +3,6 @@
  */
 package org.ihtsdo.otf.refset.graph.schema;
 
-import com.tinkerpop.frames.Incidence;
 import com.tinkerpop.frames.Property;
 import com.tinkerpop.frames.VertexFrame;
 
@@ -16,13 +15,13 @@ public interface GMember extends VertexFrame {
 	/**
 	 * @return the effectiveTime
 	 */
-	@Incidence( label = "effectiveTime")
+	@Property( value = "effectiveDate")
 	public long getEffectiveTime();
 	
 	/**
 	 * @param effectiveTime the effectiveTime to set
 	 */
-	@Incidence( label = "effectiveTime")
+	@Property( value = "effectiveDate")
 	public void setEffectiveTime(long effectiveTime);
 	
 	/**
@@ -52,36 +51,95 @@ public interface GMember extends VertexFrame {
 	 * @return the isActive
 	 */
 	@Property(value = "active")
-	public boolean isActive();
+	public Integer getActive();
 	
 	/**
 	 * @param isActive the isActive to set
 	 */
 	@Property(value = "active")
-	public void setActive(boolean isActive);
+	public void setActive(Integer isActive);
 	/**
 	 * @return the referenceComponentId
 	 */
-	@Property(value = "referenceComponentId")
-	public String getReferenceComponentId();
+	@Property(value = "referencedComponentId")
+	public String getReferencedComponentId();
 	/**
 	 * @param referenceComponentId the referenceComponentId to set
 	 */
-	@Property(value = "referenceComponentId")
-	public void setReferenceComponentId(String referenceComponentId);
+	@Property(value = "referencedComponentId")
+	public void setReferencedComponentId(String referenceComponentId);
 	
 	/**
 	 * @return the published
 	 */
 	@Property(value = "published")
-	public boolean isPublished();
+	public Integer getPublished();
 	
 	/**
 	 * @param published the published to set
 	 */
 	@Property(value = "published")
-	public void setPublished(boolean isPublished);
+	public void setPublished(Integer isPublished);
+	
+	/**
+	 * @return the modifiedDate
+	 */
+	@Property( value = "modifiedDate")
+	public long getModifiedDate();
+
+	/**
+	 * @param modifiedDate the modifiedDate to set
+	 */
+	@Property( value = "modifiedDate")
+	public void setModifiedDate(long modifiedDate);
 	
 
+	/**
+	 * @return the created
+	 */
+	@Property( value = "created")
+	public long getCreated();
+
+	/**
+	 * @param modifiedDate the created to set
+	 */
+	@Property( value = "created")
+	public void setCreated(long created);
+
+	/**
+	 * @return the modifiedBy
+	 */
+	@Property( value = "modifiedBy")
+	public String getModifiedBy();
+
+	/**
+	 * @param modifiedBy the modifiedBy to set
+	 */
+	@Property( value = "modifiedBy")
+	public void setModifiedBy(String modifiedBy);
+
+	/**
+	 * @return the createdBy
+	 */
+	@Property( value = "createdBy")
+	public String getCreateBy();
+
+	/**
+	 * @param createdBy the createdBy to set
+	 */
+	@Property( value = "createdBy")
+	public void setCreateBy(String createdBy);
+
+	/**
+	 * @param type
+	 */
+	@Property( value = "type")
+	public void setType(String type);
+	
+	/**
+	 * @param type
+	 */
+	@Property( value = "type")
+	public void getType();
    
 }

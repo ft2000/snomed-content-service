@@ -11,3 +11,6 @@ release.properties
 .classpath
 /.springBeans
 /logs/
+/target/
+/target/
+/bin/

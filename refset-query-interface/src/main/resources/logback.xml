@@ -9,11 +9,10 @@
 	      <Pattern>%d{ISO8601} [%thread] %-5level %logger{36} - %msg%n</Pattern>
 	    </layout>
 	    <filter class="ch.qos.logback.classic.filter.LevelFilter">
-	      <level>INFO</level>
+	      <level>ERROR</level>
 	      <onMatch>ACCEPT</onMatch>
 	      <onMismatch>DENY</onMismatch>
 	    </filter>
-    
       </appender>
 	  
 	  
@@ -36,13 +35,13 @@
 			    <!-- read for access log - http://logback.qos.ch/manual/layouts.html#AccessPatternLayout -->
 		
 	<!-- Application Loggers -->
-	<logger name="org.ihtsdo.refset" level="debug" />
+	<logger name="org.ihtsdo.otf" level="debug" />
 		
 			
-	<logger name="com.tinkerpop.blueprints" level="debug" />
+	<logger name="com.tinkerpop.blueprints" level="INFO" />
 		
 	<logger name="com.thinkaurelius.titan.diskstorage.es" level="info" />
-	<logger name="com.thinkaurelius.titan.diskstorage.cassandra" level="error" />
+	<logger name="com.thinkaurelius.titan.diskstorage.cassandra" level="info" />
 		
 	<!-- 3rdparty Loggers -->
 	<logger name="org.springframework.core" level="info" />
@@ -64,15 +63,11 @@
 
 	<logger name="com.mangofactory" level="error" >
 			<appender-ref ref="file" />
-	</logger>
-	
-	<logger name="org.apache.camel" level="error" />
-		
+	</logger>		
 
 	<!-- Root Logger -->
-	<root level="debug">
+	<root level="INFO">
 		<appender-ref ref="file" />
-		<appender-ref ref="console" />
 	</root>
 	
 </configuration>

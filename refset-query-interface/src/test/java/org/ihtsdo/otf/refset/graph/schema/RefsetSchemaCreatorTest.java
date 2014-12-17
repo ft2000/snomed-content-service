@@ -3,13 +3,8 @@
  */
 package org.ihtsdo.otf.refset.graph.schema;
 
-import static org.junit.Assert.*;
-
-import java.io.File;
-
-import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
-import org.apache.commons.configuration.PropertiesConfiguration;
+import org.ihtsdo.otf.refset.schema.RefsetSchema;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -41,14 +36,9 @@ public class RefsetSchemaCreatorTest {
 	@Test
 	public void testCreateRefsetSchema() throws ConfigurationException {
 
-		Configuration config = new PropertiesConfiguration(new File("src/main/resources/titan-graph-es-dev.properties"));
+		RefsetSchema sg = new RefsetSchema("src/test/resources/titan-graph-es-junit.properties");
 		
-		/*create schema*/
-		
-		RefsetSchemaCreator sg = new RefsetSchemaCreator();
-		sg.setConfig(config);
-
-		//sg.createRefsetSchema();
+		sg.createSchema();
 	}
 
 }

@@ -17,7 +17,19 @@ public interface GRefset extends VertexFrame {
 	
 	
 	/**
-	 * @return the created
+	 * @return the expectedPublishDate
+	 */
+	@Property( value = "expectedPublishDate")
+	public long getExpectedPublishDate();
+
+	/**
+	 * @param expectedPublishDate the expectedPublishDate to set
+	 */
+	@Property( value = "expectedPublishDate")
+	public void setExpectedPublishDate(long expectedPublishDate);
+	
+	/**
+	 * @return the releasedDate
 	 */
 	@Property( value = "created")
 	public long getCreated();
@@ -166,25 +178,109 @@ public interface GRefset extends VertexFrame {
 	 * @return the isPublished
 	 */
 	@Property( value = "published")
-	public boolean isPublished();
+	public Integer getPublished();
 
 	/**
 	 * @param isPublished the isPublished to set
 	 */
 	@Property( value = "published")
-	public void setPublished(boolean isPublished);
+	public void setPublished(Integer isPublished);
 	
 	
 	/**
 	 * @return the active
 	 */
 	@Property( value = "active")
-	public boolean isActive();
+	public Integer getActive();
 
 	/**
 	 * @param active the active to set
 	 */
 	@Property( value = "active")
-	public void setActive(boolean active);
+	public void setActive(Integer active);
+	
+	/**
+	 * @return the componentTypeId
+	 */
+	@Property( value = "componentTypeId")
+	public String getComponentTypeId();
+
+	/**
+	 * @param componentTypeId the componentTypeId to set
+	 */
+	@Property( value = "componentTypeId")
+	public void setComponentTypeId(String componentTypeId);
+	
+	/**
+	 * @return the modifiedDate
+	 */
+	@Property( value = "modifiedDate")
+	public long getModifiedDate();
+
+	/**
+	 * @param modifiedDate the modifiedDate to set
+	 */
+	@Property( value = "modifiedDate")
+	public void setModifiedDate(long modifiedDate);
+	
+	/**
+	 * @return the modifiedBy
+	 */
+	@Property( value = "modifiedBy")
+	public String getModifiedBy();
+
+	/**
+	 * @param modifiedBy the modifiedBy to set
+	 */
+	@Property( value = "modifiedBy")
+	public void setModifiedBy(String modifiedBy);
+
+	/**
+	 * @return the sctId
+	 */
+	@Property( value = "sctId")
+	public String getSctId();
+
+	/**
+	 * @param id the id to set
+	 */
+	@Property( value = "sctId")
+	public void setSctId(String sctId);
+	
+	/**
+	 * @return the id
+	 */
+	@Property( value = "noOfMembers")
+	public Long getNoOfMembers();
+
+	/**
+	 * @param id the id to set
+	 */
+	@Property( value = "noOfMembers")
+	public void setNoOfMembers(Long noOfMembers);
+	
+	/**
+	 * @return the earliestEffectiveTime
+	 */
+	@Property( value = "earliestEffectiveTime")
+	public long getEarliestEffectiveTime();
+
+	/**
+	 * @param earliestEffectiveTime the earliestEffectiveTime to set
+	 */
+	@Property( value = "earliestEffectiveTime")
+	public void setEarliestEffectiveTime(long earliestEffectiveTime);
+	
+	/**
+	 * @return the latestEffectiveTime
+	 */
+	@Property( value = "latestEffectiveTime")
+	public long getLatestEffectiveTime();
+
+	/**
+	 * @param latestEffectiveTime the latestEffectiveTime to set
+	 */
+	@Property( value = "latestEffectiveTime")
+	public void setLatestEffectiveTime(long latestEffectiveTime);
 
 }

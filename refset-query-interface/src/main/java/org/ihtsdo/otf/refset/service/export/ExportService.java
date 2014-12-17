@@ -5,40 +5,29 @@ package org.ihtsdo.otf.refset.service.export;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import javax.annotation.Resource;
 
+import org.ihtsdo.otf.refset.common.Utility;
 import org.ihtsdo.otf.refset.domain.Member;
 import org.ihtsdo.otf.refset.domain.Refset;
 import org.ihtsdo.otf.refset.exception.EntityNotFoundException;
 import org.ihtsdo.otf.refset.exception.ExportServiceException;
 import org.ihtsdo.otf.refset.exception.RefsetServiceException;
 import org.ihtsdo.otf.refset.service.RefsetBrowseService;
-import org.ihtsdo.otf.snomed.domain.Concept;
-import org.ihtsdo.otf.snomed.exception.ConceptServiceException;
 import org.ihtsdo.otf.snomed.service.ConceptLookupService;
-import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
-import org.supercsv.cellprocessor.FmtBool;
 import org.supercsv.cellprocessor.Optional;
-import org.supercsv.cellprocessor.constraint.UniqueHashCode;
+import org.supercsv.cellprocessor.constraint.NotNull;
 import org.supercsv.cellprocessor.ift.CellProcessor;
 import org.supercsv.io.ICsvListWriter;
 /**
- * @author Episteme Partners
- *
+ * Service to support RF2 export of simple refset
  */
 @Service
 public class ExportService {
@@ -52,62 +41,51 @@ public class ExportService {
 	private ConceptLookupService lService;
 
 	
-	public  void getRF2Payload(ICsvListWriter lWriter, String refsetId) throws ExportServiceException, EntityNotFoundException {
+	public  void getRF2Payload(ICsvListWriter lWriter, String refsetUuId) throws ExportServiceException, EntityNotFoundException {
 		
-		LOGGER.debug("Exporting refset for refsetid {}", refsetId);
+		LOGGER.debug("Exporting refset {}", refsetUuId);
 		
 		if (lWriter == null) {
 			
 			throw new ExportServiceException("No output writer available");
 		}
 		
-		if (StringUtils.isEmpty(refsetId)) {
+		if (StringUtils.isEmpty(refsetUuId)) {
 			
 			throw new ExportServiceException("Invalid request");
 
 		}
 
 		try {
-			//TODO header has to come from refset descriptor for now hard code
+			//TODO header has to come from refset descriptor. For now hard code
 			//http://supercsv.sourceforge.net/examples_writing.html. 
 			
-			Refset r = bService.getRefset(refsetId);
+			Refset r = bService.getRefsetForExport(refsetUuId);
 			
             final CellProcessor[] processors = getProcessors();
-
+            /**
+             * id	effectiveTime	active	moduleId	refsetId	referencedComponentId
+             */
 			final String[] header = new String[] { "id", "effectiveTime", "active"
-            		, "moduleId", "referenceComponentId", "languageCode", "typeId", "description"};
+            		, "moduleId", "refsetId", "referencedComponentId"};
 			            
 
             lWriter.writeHeader(header);
-
-               
-            final List<Object> refset = Arrays.asList(new Object[] { r.getId(), getDate(r.getEffectiveTime()), r.isActive()
-                		, r.getModuleId(), r.getSuperRefsetTypeId(), r.getLanguageCode(), r.getTypeId(), r.getDescription()});
-
-            lWriter.write(refset, processors);
-            
-            Map<String, String> refConceptIds = getConceptIds(r);
 			
-			Collection<String> conceptIds = refConceptIds.values();
-			if (conceptIds != null && !conceptIds.isEmpty()) {
+			List<Member> ms = r.getMembers();
+			String refsetId = StringUtils.isEmpty(r.getSctId()) ? r.getUuid() : r.getSctId();
+			for (Member m : ms) {
+								
+				String active = m.isActive() ? "1" : "0";
+				Object[] rf2Record = new Object[] { m.getUuid(), Utility.getDate(m.getEffectiveTime()), active
+                		, m.getModuleId(), refsetId, m.getReferencedComponentId()};
 				
-				Set<String> values = new HashSet<String>(conceptIds);
-				Map<String, Concept> cs = lService.getConcepts(values);
+				List<Object> concept = Arrays.asList(rf2Record);
+
+				lWriter.write(concept, processors);
 				
-				List<Member> ms = r.getMembers();
-
-				for (Member m : ms) {
-					
-					Concept c = cs.get(m.getReferenceComponentId());
-					
-					List<Object> concept = Arrays.asList(new Object[] { m.getId(), getDate(m.getEffectiveTime()), c.isActive()
-	                		, c.getModule(), c.getId(), r.getLanguageCode(), c.getType(), c.getLabel()});
-
-					lWriter.write(concept, processors);
-					
-				}
 			}
+		
            			
 		} catch (RefsetServiceException e) {
 
@@ -115,12 +93,6 @@ public class ExportService {
 			
 			throw new ExportServiceException("Error in refset retrievel during refset export");
 			
-		} catch (ConceptServiceException e) {
-
-			LOGGER.error("Error during concept lookup {}", e);
-			
-			throw new ExportServiceException("Error in concept lookup during refset export");
-
 		} catch (IOException e) {
 			
 			throw new ExportServiceException("Error in csv parsing in export");
@@ -129,53 +101,18 @@ public class ExportService {
 		
 	}
 	
-	private Map<String, String> getConceptIds(Refset r) {
-		
-		Map<String, String> ids = new HashMap<String, String>();
-		
-		List<Member> ms = r.getMembers();
-		
-		for (Member m : ms) {
-			
-			ids.put(m.getId(), m.getReferenceComponentId());
-			
-		}
-		
-		
-		return ids;
-		
-	}
-	
 	private CellProcessor[] getProcessors() {
         
         final CellProcessor[] processors = new CellProcessor[] { 
-                new UniqueHashCode(), // id 
+                new NotNull(), // id 
                 new Optional(), 
-                new Optional(new FmtBool("0", "1")), // active
-                new Optional(), 
-                new Optional(), 
-                new Optional(), 
-                new Optional(), 
-                new Optional(), 
+                new NotNull(), 
+                new NotNull(), 
+                new NotNull(), 
+                new NotNull(), 
         };
         
         return processors;
 	}
-	
-	private String getDate(DateTime dt) {
-		
-		if(dt != null) {
-			
-			DateTimeFormatter fmt = DateTimeFormat.forPattern("yyyyMMdd");
-			String date = dt.toString(fmt);
-			
-			return date;
-
-		}
-
-		return null;
-	}
-	
-	
 	
 }

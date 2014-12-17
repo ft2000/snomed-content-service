@@ -39,7 +39,17 @@ public class RefsetSecurityContextRepository implements
 	private AuthenticationManager mgr;
 	
 	
+	private RefsetIdentityService iService;
 	
+	
+	
+	/**
+	 * @param iService the iService to set
+	 */
+	public void setiService(RefsetIdentityService iService) {
+		this.iService = iService;
+	}
+
 	public RefsetSecurityContextRepository(AuthenticationManager mgr, TokenService service) {
 		
 		this.mgr = mgr;
@@ -61,7 +71,7 @@ public class RefsetSecurityContextRepository implements
 		if (ctx == null) {
 			
 			ctx = SecurityContextHolder.createEmptyContext();
-			rh.setResponse(new TokenResponseWrapper(response, false, service));
+			rh.setResponse(new TokenResponseWrapper(response, true, service));
 			
 		}
 		
@@ -75,7 +85,7 @@ public class RefsetSecurityContextRepository implements
 	public void saveContext(SecurityContext context,
 			HttpServletRequest request, HttpServletResponse response) {
 		
-		new TokenResponseWrapper(response, false, service).saveContext(context);
+		new TokenResponseWrapper(response, true, service).saveContext(context);
 		
 	}
 
@@ -94,49 +104,43 @@ public class RefsetSecurityContextRepository implements
 		
 		
 		String tokenKey = req.getHeader(X_REFSET_TOKEN);
+
 		if (!StringUtils.isEmpty(tokenKey)) {
 			
+			LOGGER.debug("Using token {}", tokenKey);
+
 			final Token token;
 			try {
 				
 				token = service.verifyToken(tokenKey);
 				
 				if (token != null) {
-					
-					//set details in Authentication objects
-					String info = token.getExtendedInformation();
-					String [] details = StringUtils.split(info, ":");
 
-					final User user = new User();
-					user.setPassword(details[1]);
-					user.setUsername(details[0]);
-					//need to do authentication every time as we are not storing user details
-					Authentication auth = mgr.authenticate(new UsernamePasswordAuthenticationToken(user, details[1]));
 					ctx = SecurityContextHolder.createEmptyContext();
+					Authentication auth = iService.getPrincipal(token);
 					ctx.setAuthentication(auth);
 					
 					 
 				} else {
 					
 					//do the authentication again;
-					Authentication auth = mgr.authenticate(new UsernamePasswordAuthenticationToken(getUser(req), getToken(req)));
+					Authentication auth = mgr.authenticate(new UsernamePasswordAuthenticationToken(getUser(req), getPassword(req)));
 					ctx = SecurityContextHolder.createEmptyContext();
 					ctx.setAuthentication(auth);
 				}
 					
 			} catch (Exception e) {
 				
-				/*perform authentication or simply say to user unauthorized?*/
-				LOGGER.error("Error during authentication {}", e);
-				throw new AccessDeniedException("Unable to complete access check, try after some time");
-				
+				LOGGER.error("Error during authentication {}", e);//this may be the case when token key verification fails
+				throw new AccessDeniedException("User unauthorized try refreshing supplied user details and try again");
 			}
 			
 		} else {
 			
-			
+			LOGGER.debug("Performing login as no existing auth token {}");
+
 			//do the authentication again;
-			Authentication auth = mgr.authenticate(new UsernamePasswordAuthenticationToken(getUser(req), getToken(req)));
+			Authentication auth = mgr.authenticate(new UsernamePasswordAuthenticationToken(getUser(req), getPassword(req)));
 			ctx = SecurityContextHolder.createEmptyContext();
 			ctx.setAuthentication(auth);
 			
@@ -145,7 +149,7 @@ public class RefsetSecurityContextRepository implements
 		return ctx;
 	}
 	
-	private String getToken(HttpServletRequest req) {
+	private String getPassword(HttpServletRequest req) {
 		
 		return req.getHeader(preAuthTokenKey);
 	}

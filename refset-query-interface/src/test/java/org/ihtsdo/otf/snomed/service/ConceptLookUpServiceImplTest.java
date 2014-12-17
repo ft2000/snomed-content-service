@@ -10,11 +10,16 @@ import static org.junit.Assert.assertNotNull;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.configuration.Configuration;
+import org.ihtsdo.otf.refset.common.TestGraph;
 import org.ihtsdo.otf.refset.exception.EntityNotFoundException;
+import org.ihtsdo.otf.refset.graph.RefsetGraphFactory;
 import org.ihtsdo.otf.snomed.domain.Concept;
 import org.ihtsdo.otf.snomed.exception.ConceptServiceException;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
@@ -23,7 +28,7 @@ import org.junit.Test;
  */
 public class ConceptLookUpServiceImplTest {
 	
-	private ConceptLookUpServiceImpl service;
+	private ConceptLookUpServiceImplv1_0 service;
 
 	/**
 	 * @throws java.lang.Exception
@@ -31,10 +36,29 @@ public class ConceptLookUpServiceImplTest {
 	@Before
 	public void setUp() throws Exception {
 		
-		service = new ConceptLookUpServiceImpl();
+		service = new ConceptLookUpServiceImplv1_0();
 		
-		service.setRepositoryConfig("src/test/resources/titan-graph-es-junit.properties");
+		//service.setRepositoryConfig("src/test/resources/titan-graph-es-junit.properties");
+		Configuration config = TestGraph.getTestGraphConfig();
+		
+		RefsetGraphFactory sf = new RefsetGraphFactory(config);
+		
+		service.setFactory(sf);
+		service.setConfig(config);
 	}
+	
+	@BeforeClass
+	public static void initialize() {
+		
+		TestGraph.createTestSnomedGraphSchema();
+	}
+	
+	@AfterClass
+	public static void cleanup() {
+		
+		TestGraph.deleteGraph();
+	}
+	
 
 	/**
 	 * @throws java.lang.Exception

@@ -1,25 +1,22 @@
 package org.ihtsdo.otf.refset.graph.gao;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.MapConfiguration;
 import org.ihtsdo.otf.refset.domain.Member;
-import org.ihtsdo.otf.refset.domain.MetaData;
 import org.ihtsdo.otf.refset.domain.Refset;
+import org.ihtsdo.otf.refset.exception.EntityAlreadyExistException;
 import org.ihtsdo.otf.refset.exception.EntityNotFoundException;
-import org.ihtsdo.otf.refset.exception.RefsetServiceException;
 import org.ihtsdo.otf.refset.graph.RefsetGraphAccessException;
 import org.ihtsdo.otf.refset.graph.RefsetGraphFactory;
-import org.ihtsdo.otf.refset.graph.gao.RefsetGAO;
-import org.ihtsdo.otf.refset.graph.schema.RefsetSchemaCreator;
+import org.ihtsdo.otf.refset.schema.RefsetSchema;
 import org.ihtsdo.otf.refset.service.RefsetBrowseServiceStubData;
 import org.joda.time.DateTime;
 import org.junit.After;
@@ -52,9 +49,7 @@ public class MemberGAOTest {
 	
 	@Autowired
 	private RefsetBrowseServiceStubData data;
-	
-	private List<Refset> rs;
-	
+		
 	private RefsetGraphFactory f;
 	
 	@Before
@@ -72,14 +67,13 @@ public class MemberGAOTest {
 		
 		/*create schema*/
 		
-		RefsetSchemaCreator sg = new RefsetSchemaCreator();
-		sg.setConfig(config);
+		RefsetSchema sg = new RefsetSchema("src/test/resources/titan-graph-es-junit.properties");
 		
-		sg.createRefsetSchema();
+		sg.createSchema();
 		
 		rGao = new RefsetGAO();
 		f = new RefsetGraphFactory(config);
-		rGao.setFactory(f);
+		rGao.setRGFactory(f);
 			
 		
 		gao = new MemberGAO();
@@ -135,7 +129,7 @@ public class MemberGAOTest {
 	}
 	
 	@Test
-	public void removeMember() throws EntityNotFoundException, RefsetGraphAccessException {
+	public void removeMember() throws EntityNotFoundException, RefsetGraphAccessException, EntityAlreadyExistException {
 		addRefset();
 		
 		Refset before = rGao.getRefset("junit_1");
@@ -144,7 +138,7 @@ public class MemberGAOTest {
 		
 		assertEquals(2, beforeSize);
 		
-		gao.removeMember("junit_1", "101");
+		gao.removeMember("junit_1", "101", "junit");
 		
 		Refset after = rGao.getRefset("junit_1");
 
@@ -156,38 +150,38 @@ public class MemberGAOTest {
 	@Test(expected = EntityNotFoundException.class)
 	public void removeMemberWhenNullReferenceComponentId() throws EntityNotFoundException, RefsetGraphAccessException {
 		
-		gao.removeMember("junit_1", null);
+		gao.removeMember("junit_1", null, "junit");
 	}
 	
 	@Test(expected = EntityNotFoundException.class)
 	public void removeMemberWhenEmptyReferenceComponentId() throws EntityNotFoundException, RefsetGraphAccessException {
 		
-		gao.removeMember("junit_1", "");
+		gao.removeMember("junit_1", "", "junit");
 	}
 	
 	@Test(expected = EntityNotFoundException.class)
 	public void removeMemberWhenNullRefsetId() throws EntityNotFoundException, RefsetGraphAccessException {
 		
-		gao.removeMember(null, "junit_1");
+		gao.removeMember(null, "junit_1", "junit");
 	}
 	
 	@Test(expected = EntityNotFoundException.class)
 	public void removeMemberWhenEmptyRefsetId() throws EntityNotFoundException, RefsetGraphAccessException {
 		
-		gao.removeMember("", "junit_1");
+		gao.removeMember("", "junit_1", "junit");
 	}
 	
-	private void addRefset() throws RefsetGraphAccessException {
+	private void addRefset() throws RefsetGraphAccessException, EntityAlreadyExistException {
 		
 		Refset r = new Refset();
-		r.setId("junit_1");
+		r.setUuid("junit_1");
 		r.setDescription("Junit");
 		
 		Member m = new Member();
-		m.setReferenceComponentId("101");
+		m.setReferencedComponentId("101");
 
 		Member m_1 = new Member();
-		m_1.setReferenceComponentId("102");
+		m_1.setReferencedComponentId("102");
 
 		List<Member> members = new ArrayList<Member>();
 		members.add(m);

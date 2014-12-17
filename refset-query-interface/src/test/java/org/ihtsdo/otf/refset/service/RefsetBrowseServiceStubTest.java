@@ -12,7 +12,6 @@ import java.util.Map;
 import javax.annotation.Resource;
 
 import org.ihtsdo.otf.refset.domain.Refset;
-import org.ihtsdo.otf.refset.domain.RefsetType;
 import org.ihtsdo.otf.refset.exception.RefsetServiceException;
 import org.joda.time.DateTime;
 import org.junit.After;
@@ -45,13 +44,12 @@ public class RefsetBrowseServiceStubTest {
 		
 		MockitoAnnotations.initMocks(this);
 		
-		when(refset.getId()).thenReturn("Junit_1");
+		when(refset.getUuid()).thenReturn("Junit_1");
 		when(refset.getDescription()).thenReturn("Junit Refset"); 
 		when(refset.getModuleId()).thenReturn("Junit_module_1");
 		when(refset.getMembers()).thenReturn(null);
 		when(refset.getCreated()).thenReturn(new DateTime());
 		when(refset.getCreatedBy()).thenReturn("Junit author");
-		when(refset.getType()).thenReturn(RefsetType.simple);
 
 		dataService.setCsv(csvs);
 
@@ -70,7 +68,7 @@ public class RefsetBrowseServiceStubTest {
 				
 		Refset result = service.getRefset("junit-1");
 		
-		assertEquals(refset.getId(), result.getId());
+		assertEquals(refset.getUuid(), result.getUuid());
 		assertEquals(refset.getModuleId(), result.getModuleId());
 
 	}

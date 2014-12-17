@@ -4,30 +4,46 @@
 package org.ihtsdo.otf.refset.graph.gao;
 
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
-import java.util.Map;
 import java.util.UUID;
 
 import org.ihtsdo.otf.refset.domain.Member;
 import org.ihtsdo.otf.refset.domain.Refset;
-import org.ihtsdo.otf.refset.graph.gao.RefsetConvertor;
-import org.joda.time.DateTime;
+import org.ihtsdo.otf.refset.graph.schema.GMember;
+import org.ihtsdo.otf.refset.graph.schema.GRefset;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.tinkerpop.blueprints.Direction;
+import com.tinkerpop.blueprints.Edge;
+import com.tinkerpop.blueprints.Vertex;
 /**
  * @author Episteme Partners
  *
  */
 public class RefsetConvertorTest {
 	
+	private static final String COMP_TYPE_ID = "junitComponentId";
+
+	private static final String ID = "junitId";
+
+	private static final String CREATED_BY = "junit";
+
+	private static final String DESCRIPTION = "junit test";
+
+	private static final String LANG = "en_US";
+
+	private static final String MODULE_ID = "junitModuleId";
 	
 	private Refset r;
 	
 	private Member m;
 	
+	private GRefset gR;
 
+	Iterable<GMember> members;
 	/**
 	 * @throws java.lang.Exception
 	 */
@@ -36,9 +52,35 @@ public class RefsetConvertorTest {
 		
 		r = new Refset();
 		m = new Member();
-		r.setId(UUID.randomUUID().toString());
-		m.setId(UUID.randomUUID().toString());
+		r.setUuid(UUID.randomUUID().toString());
+		m.setUuid(UUID.randomUUID().toString());
 
+		gR = mock(GRefset.class);
+		
+		when(gR.getActive()).thenReturn(1);
+		when(gR.getComponentTypeId()).thenReturn(COMP_TYPE_ID);
+		when(gR.getId()).thenReturn(ID);
+		when(gR.getCreated()).thenReturn(System.currentTimeMillis());
+		when(gR.getCreatedBy()).thenReturn(CREATED_BY);
+		when(gR.getDescription()).thenReturn(DESCRIPTION);
+		when(gR.getEffectiveTime()).thenReturn(System.currentTimeMillis());
+		when(gR.getLanguageCode()).thenReturn(LANG);
+		
+		Iterable<GMember> members = mock(Iterable.class);
+
+		when(gR.getMembers()).thenReturn(members);
+		
+		when(gR.getModuleId()).thenReturn(MODULE_ID);
+		when(gR.getPublished()).thenReturn(1);
+		
+		Vertex v = mock(Vertex.class);
+		
+		when(gR.asVertex()).thenReturn(v);
+		
+		Iterable<Edge> edge = mock(Iterable.class);
+		when(v.getEdges(any(Direction.class), anyString())).thenReturn(edge);
+		
+		
 	}
 
 	/**
@@ -46,95 +88,25 @@ public class RefsetConvertorTest {
 	 */
 	@After
 	public void tearDown() throws Exception {
-	}
-
-	/**
-	 * Test method for {@link org.ihtsdo.otf.refset.graph.gao.RefsetConvertor#getRefsetProperties(org.ihtsdo.otf.refset.domain.Refset)}.
-	 */
-	@Test
-	public void testGetRefsetPropertiesOnlyId() {
-		
-		Map<String, Object> props = RefsetConvertor.getRefsetProperties(r);
-		
-		assertNotNull(props);
-		assertEquals(2, props.size());
-
-
-	}
-	
-	/**
-	 * Test method for {@link org.ihtsdo.otf.refset.graph.gao.RefsetConvertor#getRefsetProperties(org.ihtsdo.otf.refset.domain.Refset)}.
-	 */
-	@Test
-	public void testGetRefsetPropertiesWithCreated() {
-		r = new Refset();
-		r.setId(UUID.randomUUID().toString());
-		r.setCreated(new DateTime());
-		Map<String, Object> props = RefsetConvertor.getRefsetProperties(r);
-		
-		assertNotNull(props);
-		assertEquals(3, props.size());
-
-	}
-	
-	/**
-	 * Test method for {@link org.ihtsdo.otf.refset.graph.gao.RefsetConvertor#getRefsetProperties(org.ihtsdo.otf.refset.domain.Refset)}.
-	 */
-	@Test
-	public void testGetRefsetPropertiesWithEffectiveDate() {
-		r = new Refset();
-		r.setId(UUID.randomUUID().toString());
-		r.setEffectiveTime(new DateTime());
-		Map<String, Object> props = RefsetConvertor.getRefsetProperties(r);
-		
-		assertNotNull(props);
-		assertEquals(3, props.size());
-
-	}
-	
-	/**
-	 * Test method for {@link org.ihtsdo.otf.refset.graph.gao.RefsetConvertor#getRefsetProperties(org.ihtsdo.otf.refset.domain.Refset)}.
-	 */
-	@Test
-	public void testGetRefsetPropertiesWithDescription() {
-		r = new Refset();
-		r.setId(UUID.randomUUID().toString());
-		r.setEffectiveTime(new DateTime());
-		r.setDescription("Hi there");
-		Map<String, Object> props = RefsetConvertor.getRefsetProperties(r);
-		
-		assertNotNull(props);
-		assertEquals(4, props.size());
 		
 	}
 	
-	/**
-	 * Test method for {@link org.ihtsdo.otf.refset.graph.gao.RefsetConvertor#getMemberProperties(org.ihtsdo.otf.refset.domain.Member)}.
-	 */
+	
 	@Test
-	public void testGetMemberProperties() {
+	public void testConvert2Refset() {
 		
-		Map<String, Object> props = RefsetConvertor.getMemberProperties(m);
+		Refset r = RefsetConvertor.convert2Refset(gR);
 		
-		assertNotNull(props);
-		assertEquals(2, props.size());
-
+		assertEquals(COMP_TYPE_ID, r.getComponentTypeId());
+		
+		assertEquals(LANG, r.getLanguageCode());
+		assertEquals(CREATED_BY, r.getCreatedBy());
+		assertEquals(DESCRIPTION, r.getDescription());
+		assertEquals(MODULE_ID, r.getModuleId());
+		assertEquals(ID, r.getUuid());
+		assertNotNull(r.getCreated());
+		assertNotNull(r.getEffectiveTime());
 	}
 
-	/**
-	 * Test method for {@link org.ihtsdo.otf.refset.graph.gao.RefsetConvertor#getMemberProperties(org.ihtsdo.otf.refset.domain.Member)}.
-	 */
-	@Test
-	public void testGetMemberPropertiesWithEffectiveDate() {
-		
-		m = new Member();
-		m.setId(UUID.randomUUID().toString());
-		m.setEffectiveTime(new DateTime());
-		Map<String, Object> props = RefsetConvertor.getMemberProperties(m);
-		
-		assertNotNull(props);
-		assertEquals(3, props.size());
-
-	}
 
 }

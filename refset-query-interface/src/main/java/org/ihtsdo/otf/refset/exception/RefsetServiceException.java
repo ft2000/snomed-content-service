@@ -12,6 +12,11 @@ public class RefsetServiceException extends Exception {
 	/**
 	 * 
 	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
+	 * 
+	 */
 	public RefsetServiceException() {
 		// TODO Auto-generated constructor stub
 	}

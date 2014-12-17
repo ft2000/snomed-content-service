@@ -11,7 +11,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 /**Used to get user details so that these can be used in 
  * Refset authoring
- * @author Episteme Partners
  *
  */
 public class User implements UserDetails {
@@ -26,9 +25,35 @@ public class User implements UserDetails {
 	private Collection<? extends GrantedAuthority> authorities;
 	
 	private boolean authenticated;
+	
+	private boolean enabled;
+	
+	private String givenname;
+	private String middlename;
+	private String email;
+	private String surname;
+	
+	//TODO this is work around to send in body. But ideally it should fo as response header
+	private String token;
+
+	
 
 
 	
+
+	/**
+	 * @return the token
+	 */
+	public String getToken() {
+		return token;
+	}
+
+	/**
+	 * @param token the token to set
+	 */
+	public void setToken(String token) {
+		this.token = token;
+	}
 
 	protected User() {
 		
@@ -94,7 +119,12 @@ public class User implements UserDetails {
 	@Override
 	public boolean isEnabled() {
 
-		return true;
+		return this.enabled;
+	}
+	
+	public void setEnabled(boolean enbled) {
+
+		this.enabled = enbled;
 	}
 	
 	public void setAuthorities(Collection<? extends GrantedAuthority> roles) {
@@ -113,5 +143,61 @@ public class User implements UserDetails {
 	 */
 	public void setAuthenticated(boolean authenticated) {
 		this.authenticated = authenticated;
+	}
+
+	/**
+	 * @return the givenname
+	 */
+	public String getGivenname() {
+		return givenname;
+	}
+
+	/**
+	 * @param givenname the givenname to set
+	 */
+	public void setGivenname(String givenname) {
+		this.givenname = givenname;
+	}
+
+	/**
+	 * @return the middlename
+	 */
+	public String getMiddlename() {
+		return middlename;
+	}
+
+	/**
+	 * @param middlename the middlename to set
+	 */
+	public void setMiddlename(String middlename) {
+		this.middlename = middlename;
+	}
+
+	/**
+	 * @return the email
+	 */
+	public String getEmail() {
+		return email;
+	}
+
+	/**
+	 * @param email the email to set
+	 */
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
+	/**
+	 * @return the surname
+	 */
+	public String getSurname() {
+		return surname;
+	}
+
+	/**
+	 * @param surname the surname to set
+	 */
+	public void setSurname(String surname) {
+		this.surname = surname;
 	}
 }

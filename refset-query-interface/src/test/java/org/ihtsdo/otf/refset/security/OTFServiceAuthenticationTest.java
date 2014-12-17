@@ -4,10 +4,6 @@
 package org.ihtsdo.otf.refset.security;
 
 import static org.junit.Assert.*;
-
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -17,6 +13,8 @@ import org.springframework.util.Assert;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
+
+import com.fasterxml.jackson.databind.JsonNode;
 
 /**
  * @author Episteme Partners
@@ -56,10 +54,10 @@ public class OTFServiceAuthenticationTest {
         final User user = new User(); 
         		
 		try {
-			JSONObject obj = rt.postForObject(OTF_SERVICE_URL, params, JSONObject.class);
-			JSONObject userObj = obj.getJSONObject("user");
-			String userName = userObj.getString("name");
-			String status = userObj.getString("status");
+			JsonNode obj = rt.postForObject(OTF_SERVICE_URL, params, JsonNode.class);
+			JsonNode userObj = obj.get("user");
+			String userName = userObj.findValue("name").asText();
+			String status = userObj.findValue("status").asText();
 			Assert.notNull(status, "Status can not be empty");
 			user.setUsername(userName);
 			
@@ -70,18 +68,23 @@ public class OTFServiceAuthenticationTest {
 	        params.add("username", "pnema");
 	        params.add("queryName", "getUserApps");
 
-	        JSONObject appJson = rt.postForObject(OTF_SERVICE_URL, params, JSONObject.class);
+	        JsonNode appJson = rt.postForObject(OTF_SERVICE_URL, params, JsonNode.class);
 			
 	        assertNotNull(appJson);
 	        
-	        JSONArray apps = appJson.getJSONArray("apps");
+	        JsonNode apps = appJson.get("apps");
 	        
-	        for (Object object : apps) {
-				System.out.println(object);
+	        if (apps.isArray()) {
+			
+		        for (Object object : apps) {
+					System.out.println(object);
+				}
+
+
 			}
 
-
 		} catch (Exception e) {
+			
 			e.printStackTrace();
 
 		}
