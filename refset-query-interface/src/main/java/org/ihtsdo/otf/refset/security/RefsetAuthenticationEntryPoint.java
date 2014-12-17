@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.ihtsdo.otf.refset.common.Meta;
 import org.ihtsdo.otf.refset.common.Result;
+import org.ihtsdo.otf.refset.error.ErrorInfo;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.AuthenticationException;
@@ -54,8 +55,10 @@ public class RefsetAuthenticationEntryPoint implements AuthenticationEntryPoint 
 		Meta meta = new Meta();
 		meta.setMessage(e.getMessage());
 		meta.setStatus(HttpStatus.UNAUTHORIZED);
+		ErrorInfo errorInfo = new ErrorInfo(e.getMessage(), Integer.toString(org.apache.commons.httpclient.HttpStatus.SC_UNAUTHORIZED));
+		meta.setErrorInfo(errorInfo);
 		result.setMeta(meta);
-		
+
 		
         PrintWriter out = res.getWriter();
         

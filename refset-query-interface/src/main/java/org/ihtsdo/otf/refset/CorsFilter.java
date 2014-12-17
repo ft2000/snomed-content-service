@@ -35,6 +35,8 @@ public class CorsFilter implements Filter {
 		response.addHeader(ACCESS_CONTROL_ALLOW_HEADERS, "Content-Type");
 		response.addHeader(ACCESS_CONTROL_EXPOSE_HEADERS, "Content-Disposition");
 		response.addHeader(ACCESS_CONTROL_ALLOW_HEADERS, "X-REQ-TIME");
+		response.addHeader(ACCESS_CONTROL_ALLOW_HEADERS, "X-REFSET-AUTH-TOKEN");
+		response.addHeader(ACCESS_CONTROL_EXPOSE_HEADERS, "X-REFSET-AUTH-TOKEN");//need to send too
 
 		chain.doFilter(req, res);
 

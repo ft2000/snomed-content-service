@@ -13,11 +13,28 @@
 	
 	<sec:http create-session="stateless" auto-config="false" 
 				security-context-repository-ref="refset.securityContextRepository"
-				entry-point-ref="refset.authenticationEntryPoint">
-		<sec:intercept-url pattern="v14.0/" access="ROLE_USER, ROLE_ANONYMOUS"/>
+				entry-point-ref="refset.authenticationEntryPoint"
+				use-expressions="true" request-matcher="ciRegex">
 		<sec:custom-filter ref="refset.cors" position="FIRST"/>
+		<sec:custom-filter ref="refset.token" after="SECURITY_CONTEXT_FILTER"/>
+		
 		<sec:access-denied-handler ref="refset.accessDeniedHandler" />
+		<sec:custom-filter ref="refset.exceptionTranslationFilter" after="FIRST"/>
+		<sec:intercept-url pattern="/v1.0/refsets/search*" access="permitAll"/>
+		<sec:intercept-url pattern="/v1.0/refsets/*" access="isAuthenticated()" />
+		<sec:intercept-url pattern="/v1.0/snomed/*" access="permitAll"/>
+		<sec:intercept-url pattern="/v1.0/refsets/getUserDetails" access="isAuthenticated()"/>
+		<sec:intercept-url pattern="/logout" access="permitAll"/>
+		
 	</sec:http>
+	
+	
+	<bean id="refset.exceptionTranslationFilter"
+     	class="org.springframework.security.web.access.ExceptionTranslationFilter">
+  		<property name="authenticationEntryPoint" ref="refset.authenticationEntryPoint"/>
+  		<property name="accessDeniedHandler" ref="refset.accessDeniedHandler"/>
+	</bean>
+	<bean id="refset.token" class="org.ihtsdo.otf.refset.TokenFilter" />
 	
 	<bean id="refset.cors" class="org.ihtsdo.otf.refset.CorsFilter" />
 	<!-- bean id="refset.lb.reqResponseFilter" class="ch.qos.logback.access.servlet.TeeFilter"/-->
@@ -27,9 +44,7 @@
 	</sec:authentication-manager>
 	
 	<bean id="refset.authenticationProvider" class="org.ihtsdo.otf.refset.security.RefsetAuthenticationProvider" 
-			p:otfServiceUrl="${refset.otf.service.url}"
-			p:rt-ref="refset.auth.RestTemplate" 
-			p:authenticationEnabled="${authenticationEnabled}"
+			p:service-ref="refset.identityService"
 		/>
 	
  	<sec:global-method-security authentication-manager-ref="org.springframework.security.authenticationManager" 
@@ -40,10 +55,11 @@
 			c:mgr-ref="org.springframework.security.authenticationManager" c:service-ref="refset.tokenService" 
 			p:preAuthTokenKey="${refset.pre.auth.token}" 
 			p:userKey="${refset.pre.auth.user}" 
+			p:iService-ref="refset.identityService"
 		/>
 	
 	<bean id="refset.tokenService" class="org.springframework.security.core.token.KeyBasedPersistenceTokenService" 
-			p:secureRandom-ref="refset.secureRandom" p:serverSecret="refset" p:serverInteger="101" 
+			p:secureRandom-ref="refset.secureRandom" p:serverSecret="refset" p:serverInteger="3" 
 		/>
 		
 	<bean id="refset.authenticationEntryPoint" class="org.ihtsdo.otf.refset.security.RefsetAuthenticationEntryPoint" 
@@ -61,4 +77,9 @@
  	<bean name="refset.secureRandom" class="java.security.SecureRandom" />
  	
  	<bean id="refset.accessDeniedHandler" class="org.ihtsdo.otf.refset.security.RefsetAccessDeniedHandler" />
+ 	
+ 	<bean id="refset.identityService" class="org.ihtsdo.otf.refset.security.RefsetIdentityService" 
+ 			p:otfServiceUrl="${refset.otf.service.url}"
+			p:rt-ref="refset.auth.RestTemplate" 
+			p:service-ref="refset.tokenService"/>
 </beans>

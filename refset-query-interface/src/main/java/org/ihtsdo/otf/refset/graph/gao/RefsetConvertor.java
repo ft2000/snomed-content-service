@@ -8,7 +8,7 @@ import static org.ihtsdo.otf.refset.domain.RGC.CREATED;
 import static org.ihtsdo.otf.refset.domain.RGC.CREATED_BY;
 import static org.ihtsdo.otf.refset.domain.RGC.DESC;
 import static org.ihtsdo.otf.refset.domain.RGC.EFFECTIVE_DATE;
-import static org.ihtsdo.otf.refset.domain.RGC.EXPECTED_RLS_DT;
+import static org.ihtsdo.otf.refset.domain.RGC.EXPECTED_PUBLISH_DATE;
 import static org.ihtsdo.otf.refset.domain.RGC.ID;
 import static org.ihtsdo.otf.refset.domain.RGC.LANG_CODE;
 import static org.ihtsdo.otf.refset.domain.RGC.MEMBER_TYPE_ID;
@@ -196,9 +196,9 @@ public class RefsetConvertor {
 			
 		}
 		
-		if ( keys.contains(EXPECTED_RLS_DT) ) {
+		if ( keys.contains(EXPECTED_PUBLISH_DATE) ) {
 			
-			r.setExpectedReleaseDate(new DateTime(vR.getExpectedReleaseDate()));
+			r.setExpectedReleaseDate(new DateTime(vR.getExpectedPublishDate()));
 
 		}
 		
@@ -546,9 +546,9 @@ public class RefsetConvertor {
 			
 		}
 		
-		if ( keys.contains(EXPECTED_RLS_DT) ) {
+		if ( keys.contains(EXPECTED_PUBLISH_DATE) ) {
 			
-			r.setExpectedReleaseDate(new DateTime(vR.getProperty(EXPECTED_RLS_DT)));
+			r.setExpectedReleaseDate(new DateTime(vR.getProperty(EXPECTED_PUBLISH_DATE)));
 
 		}
 		

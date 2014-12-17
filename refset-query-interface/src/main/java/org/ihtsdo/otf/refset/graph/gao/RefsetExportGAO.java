@@ -2,11 +2,11 @@
  * 
  */
 package org.ihtsdo.otf.refset.graph.gao;
+import static org.ihtsdo.otf.refset.domain.RGC.EFFECTIVE_DATE;
 import static org.ihtsdo.otf.refset.domain.RGC.ID;
 import static org.ihtsdo.otf.refset.domain.RGC.PUBLISHED;
 import static org.ihtsdo.otf.refset.domain.RGC.REFERENCE_COMPONENT_ID;
 import static org.ihtsdo.otf.refset.domain.RGC.TYPE;
-import static org.ihtsdo.otf.refset.domain.RGC.EFFECTIVE_DATE;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -76,7 +76,7 @@ public class RefsetExportGAO {
 				.has(TYPE, VertexType.member.toString());
 			
 			List<Vertex> vMs = pipe.toList();
-			
+
 			for (Vertex vM : vMs) {
 				
 				//check effective time. To be eligible for export Member effective time greater than > latest effective time or empty
@@ -104,18 +104,21 @@ public class RefsetExportGAO {
 						
 						//check if this member also has a history state.
 						GremlinPipeline<Vertex, Vertex> mPipe = new GremlinPipeline<Vertex, Vertex>(g);
-						mPipe.start(vM).outE(EdgeLabel.hasState.toString()).inV().has(TYPE, VertexType.hMember.toString()).has(PUBLISHED, 1);
+						mPipe.start(vM).outE(EdgeLabel.hasState.toString()).inV().has(TYPE, VertexType.hMember.toString()).has(PUBLISHED, 1).range(0, 1);
 						Iterable<Vertex> vHms = mPipe.toList();
 						for (Vertex vHm : vHms) {
 						
 							Member hm = RefsetConvertor.getMember(vHm);
-							LOGGER.debug("Adding historical state of member & its detail {} ", hm);
-							merge(hm, m);
-							r.getMembers().add(hm);
-							break;
+							Member merged = merge(hm, m);
+							LOGGER.debug("Adding historical state of member & its detail {} ", merged);
+							if (!r.getMembers().contains(merged)) {
+								
+								r.getMembers().add(merged);
+								break;
+
+							}
 
 						}
-						break;
 
 					}
 
@@ -155,7 +158,7 @@ public class RefsetExportGAO {
 	 * @param hm
 	 * @param m
 	 */
-	private void merge(Member hm, Member m) {
+	private Member merge(Member hm, Member m) {
 		
 		if(StringUtils.isEmpty(hm.getModuleId())) {
 			
@@ -166,6 +169,8 @@ public class RefsetExportGAO {
 			
 			hm.setReferencedComponentId(m.getReferencedComponentId());
 		}
+		
+		return hm;
 		
 	}
 

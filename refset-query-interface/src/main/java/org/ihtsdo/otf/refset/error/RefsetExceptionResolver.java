@@ -8,6 +8,7 @@ import java.util.Set;
 
 import org.ihtsdo.otf.refset.common.Meta;
 import org.ihtsdo.otf.refset.common.Result;
+import org.ihtsdo.otf.refset.exception.EntityAlreadyExistException;
 import org.ihtsdo.otf.refset.exception.EntityNotFoundException;
 import org.ihtsdo.otf.refset.exception.ExportServiceException;
 import org.ihtsdo.otf.refset.exception.InvalidServiceException;
@@ -54,6 +55,24 @@ public class RefsetExceptionResolver {
 
 		return response;
 	} 
+	
+	@ResponseStatus(value = HttpStatus.FOUND)
+	@ExceptionHandler(EntityAlreadyExistException.class)
+	@ResponseBody Result<Map<String, Object>> handleEntityAlreadyExistException(EntityAlreadyExistException e) {
+		
+		LOGGER.error("Exception details \n", e);
+		ErrorInfo errorInfo = new ErrorInfo(e.getMessage(), "302");
+
+		Meta m = new Meta();
+		m.setStatus(HttpStatus.FOUND);
+		m.setMessage(e.getMessage());
+		m.setErrorInfo(errorInfo);
+
+		response.setMeta(m);
+
+		return response;
+	} 
+
 	
 	@ResponseStatus(value = HttpStatus.NOT_FOUND)
 	@ExceptionHandler(InvalidServiceException.class)

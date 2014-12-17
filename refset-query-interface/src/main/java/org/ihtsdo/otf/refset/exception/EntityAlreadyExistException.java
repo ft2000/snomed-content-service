@@ -9,15 +9,30 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.ihtsdo.otf.refset.schema;
+package org.ihtsdo.otf.refset.exception;
 
 /**
  *
  */
-public enum CompositeIndex {
+public class EntityAlreadyExistException extends Exception {
 
-	bySctId, bySctIdStatus, byDescription, byIdAndCreatedBy, byId, byIdAndCreated, byIdAndModified, 
-	byRefComponentId, byPublished, byType, byIdAndEndAndStartDate, byIdAndStartDate, byIdAndEndDate,
-	byEndDateAndPublished, byEndDateAndType, bySctIdType
-	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
+	 * 
+	 */
+	public EntityAlreadyExistException() {
+	}
+
+	/**
+	 * @param message
+	 */
+	public EntityAlreadyExistException(String message) {
+		
+		super(message);
+
+	}
 }

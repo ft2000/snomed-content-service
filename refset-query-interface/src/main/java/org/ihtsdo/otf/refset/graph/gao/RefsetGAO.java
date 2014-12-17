@@ -7,6 +7,7 @@ import static org.ihtsdo.otf.refset.domain.RGC.END;
 import static org.ihtsdo.otf.refset.domain.RGC.ID;
 import static org.ihtsdo.otf.refset.domain.RGC.PUBLISHED;
 import static org.ihtsdo.otf.refset.domain.RGC.TYPE;
+import static org.ihtsdo.otf.refset.domain.RGC.SCTID;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -667,5 +668,48 @@ public class RefsetGAO {
 		
 		return descMap;
 	}
+	
+	/**Retrieves a {@link Refset} vertex for given {@link Refset#getSctId()}
+	 * @param sctId - SCTID of a refset
+	 * @param tg {@link TitanGraph}
+	 * @return boolean false if this sctId does not exist otherwise true
+	 * @throws RefsetGraphAccessException
+	 * @throws EntityNotFoundException 
+	 */
+	protected boolean isSctIdExist(String sctId, TitanGraph tg) throws RefsetGraphAccessException, EntityNotFoundException {
+		
+		LOGGER.debug("isSctIdExist for given refset sct id {}", sctId);
+
+		boolean isSctIdExist = false;
+		if (StringUtils.isEmpty(sctId)) {
+			
+			return isSctIdExist;
+			
+		}
+
+		
+		try {
+			Iterable<Vertex> vRs = tg.query().has(TYPE, VertexType.refset.toString()).has(SCTID, sctId).limit(1).vertices();
+
+			if ( vRs.iterator().hasNext() ) {
+				
+				isSctIdExist = true;
+
+				LOGGER.debug("Refset exist for given sctid {}", sctId);
+
+			}
+						
+		} catch (Exception e) {
+			
+			LOGGER.error("Error refset lookup for refset sctid {}", sctId, e);
+			throw new RefsetGraphAccessException(e.getMessage(), e);
+
+		}
+
+		
+		return isSctIdExist;
+
+	}
+
 
 }
