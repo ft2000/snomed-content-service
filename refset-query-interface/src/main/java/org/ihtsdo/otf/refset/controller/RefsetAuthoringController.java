@@ -221,9 +221,7 @@ public class RefsetAuthoringController {
 	@RequestMapping( method = RequestMethod.DELETE, value = "/delete/{refsetId}",  produces = "application/json", consumes = "application/json")
 	@ApiOperation( value = "Remove a unpublished refset, it will delete refset as well as its members" )
 	@PreAuthorize("hasRole('ROLE_USER')")
-    public ResponseEntity<Result< Map<String, Object>>> removeRefset( @PathVariable String refsetId, 
-    		@RequestHeader("X-REFSET-PRE-AUTH-TOKEN") String authToken, 
-    		@RequestHeader("X-REFSET-PRE-AUTH-USERNAME") String userName) throws Exception {
+    public ResponseEntity<Result< Map<String, Object>>> removeRefset( @PathVariable String refsetId) throws Exception {
 		
 		logger.debug("Removing an existing refsets {}", refsetId);
 
