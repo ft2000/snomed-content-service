@@ -29,10 +29,11 @@ public class Member extends BaseObj implements Comparable<Member>{
 
 	   Member m = (Member)input;
 	   
-	   return ( this.uuid == m.uuid )
+	   boolean outcome = ( this.uuid == m.uuid )
 			   && ( this.referencedComponentId == m.referencedComponentId ) 
 			   && ( this.moduleId == m.moduleId )
 			   && (this.active == m.active);
+	   return outcome;
 	   
    }
    
@@ -42,7 +43,7 @@ public class Member extends BaseObj implements Comparable<Member>{
    @Override
    public int hashCode() {
 
-	   return (this.uuid 
+	   return 31 * (this.uuid 
 			   + this.referencedComponentId 
 			   + this.moduleId
 			   + new Boolean(this.active)).hashCode();

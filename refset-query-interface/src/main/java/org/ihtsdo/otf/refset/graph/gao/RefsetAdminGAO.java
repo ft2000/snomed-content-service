@@ -15,6 +15,7 @@ import javax.annotation.Resource;
 import org.ihtsdo.otf.refset.domain.Member;
 import org.ihtsdo.otf.refset.domain.MetaData;
 import org.ihtsdo.otf.refset.domain.Refset;
+import org.ihtsdo.otf.refset.exception.EntityAlreadyExistException;
 import org.ihtsdo.otf.refset.exception.EntityNotFoundException;
 import org.ihtsdo.otf.refset.graph.RefsetGraphAccessException;
 import org.ihtsdo.otf.refset.graph.RefsetGraphFactory;
@@ -61,9 +62,10 @@ public class RefsetAdminGAO {
 	/**
 	 * @param r a {@link Refset} with or without members
 	 * @throws RefsetGraphAccessException
+	 * @throws EntityAlreadyExistException 
 	 * @throws EntityNotFoundException 
 	 */
-	public MetaData addRefset(Refset r) throws RefsetGraphAccessException {
+	public MetaData addRefset(Refset r) throws RefsetGraphAccessException, EntityAlreadyExistException {
 		
 		LOGGER.debug("Adding refset {}", r);
 
@@ -75,7 +77,11 @@ public class RefsetAdminGAO {
 						
 			tg = factory.getEventGraph();
 			
-
+			if (rGao.isSctIdExist(r.getSctId(), tg.getBaseGraph())) {
+				
+				throw new EntityAlreadyExistException("Refset with same sctid already exist");
+				
+			}
 			final Vertex rV = addRefsetNode(r, fgf.create(tg.getBaseGraph()));	
 			
 
@@ -129,6 +135,14 @@ public class RefsetAdminGAO {
 
 			RefsetGraphFactory.commit(tg);
 						
+		} catch (EntityAlreadyExistException e) {
+			
+			RefsetGraphFactory.rollback(tg);
+
+			LOGGER.error("Error during graph interaction", e);
+			
+			throw e;
+			
 		} catch (Exception e) {
 			
 			RefsetGraphFactory.rollback(tg);
@@ -216,7 +230,7 @@ public class RefsetAdminGAO {
 		
 			if( ert != null) {
 				
-				gr.setExpectedReleaseDate(ert.getMillis());
+				gr.setExpectedPublishDate(ert.getMillis());
 			}
 			if (!StringUtils.isEmpty(r.getSctId())) {
 				
@@ -479,7 +493,7 @@ public class RefsetAdminGAO {
 		if (ert != null) {
 			
 			//rV.setExpectedReleaseDate(ert.getMillis());
-			rV.setProperty(EXPECTED_RLS_DT, ert.getMillis());
+			rV.setProperty(EXPECTED_PUBLISH_DATE, ert.getMillis());
 		}
 		
 		if (!StringUtils.isEmpty(r.getSctId())) {

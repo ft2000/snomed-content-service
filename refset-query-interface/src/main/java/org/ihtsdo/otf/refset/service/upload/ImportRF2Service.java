@@ -91,7 +91,7 @@ public class ImportRF2Service implements ImportService {
         			
         			Rf2Record rf2r = new Rf2Record();
         			
-        			rf2r.setId(UUID.randomUUID().toString());//generate refset tool uuid instead of using RF2 file. otherwise it will create problem in duplicate import
+        			rf2r.setId(columns[0]);//Per Robert preserve uuid. No need to generate refset tool uuid instead of using RF2 file.
         			rf2r.setEffectiveTime(fmt.parseDateTime(columns[1]));
         			rf2r.setActive(columns[2]);
         			rf2r.setModuleId(columns[3]);

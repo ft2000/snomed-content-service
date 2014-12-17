@@ -12,6 +12,7 @@ import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.MapConfiguration;
 import org.ihtsdo.otf.refset.domain.Member;
 import org.ihtsdo.otf.refset.domain.Refset;
+import org.ihtsdo.otf.refset.exception.EntityAlreadyExistException;
 import org.ihtsdo.otf.refset.exception.EntityNotFoundException;
 import org.ihtsdo.otf.refset.graph.RefsetGraphAccessException;
 import org.ihtsdo.otf.refset.graph.RefsetGraphFactory;
@@ -128,7 +129,7 @@ public class MemberGAOTest {
 	}
 	
 	@Test
-	public void removeMember() throws EntityNotFoundException, RefsetGraphAccessException {
+	public void removeMember() throws EntityNotFoundException, RefsetGraphAccessException, EntityAlreadyExistException {
 		addRefset();
 		
 		Refset before = rGao.getRefset("junit_1");
@@ -170,7 +171,7 @@ public class MemberGAOTest {
 		gao.removeMember("", "junit_1", "junit");
 	}
 	
-	private void addRefset() throws RefsetGraphAccessException {
+	private void addRefset() throws RefsetGraphAccessException, EntityAlreadyExistException {
 		
 		Refset r = new Refset();
 		r.setUuid("junit_1");

@@ -24,7 +24,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.supercsv.cellprocessor.Optional;
 import org.supercsv.cellprocessor.constraint.NotNull;
-import org.supercsv.cellprocessor.constraint.UniqueHashCode;
 import org.supercsv.cellprocessor.ift.CellProcessor;
 import org.supercsv.io.ICsvListWriter;
 /**
@@ -65,10 +64,10 @@ public class ExportService {
 			
             final CellProcessor[] processors = getProcessors();
             /**
-             * id	effectiveTime	active	moduleId	refSetId	referencedComponentId
+             * id	effectiveTime	active	moduleId	refsetId	referencedComponentId
              */
 			final String[] header = new String[] { "id", "effectiveTime", "active"
-            		, "moduleId", "refSetId", "referencedComponentId"};
+            		, "moduleId", "refsetId", "referencedComponentId"};
 			            
 
             lWriter.writeHeader(header);
@@ -78,8 +77,10 @@ public class ExportService {
 			for (Member m : ms) {
 								
 				String active = m.isActive() ? "1" : "0";
-				List<Object> concept = Arrays.asList(new Object[] { m.getUuid(), Utility.getDate(m.getEffectiveTime()), active
-                		, r.getModuleId(), refsetId, m.getReferencedComponentId()});
+				Object[] rf2Record = new Object[] { m.getUuid(), Utility.getDate(m.getEffectiveTime()), active
+                		, m.getModuleId(), refsetId, m.getReferencedComponentId()};
+				
+				List<Object> concept = Arrays.asList(rf2Record);
 
 				lWriter.write(concept, processors);
 				
