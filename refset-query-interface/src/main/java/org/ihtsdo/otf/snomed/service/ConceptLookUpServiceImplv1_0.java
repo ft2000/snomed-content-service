@@ -117,7 +117,7 @@ public class ConceptLookUpServiceImplv1_0 implements ConceptLookupService {
 							if (vE != null) {
 								
 								String moduleId = vE.getProperty(Properties.sctid.toString());
-								c.setModule(moduleId);
+								c.setModuleId(moduleId);
 								break;
 
 							}
@@ -211,7 +211,7 @@ public class ConceptLookUpServiceImplv1_0 implements ConceptLookupService {
 					if (vE != null) {
 						
 						String moduleId = vE.getProperty(Properties.sctid.toString());
-						c.setModule(moduleId);
+						c.setModuleId(moduleId);
 						break;
 
 					}
