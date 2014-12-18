@@ -19,7 +19,9 @@ import static org.ihtsdo.otf.refset.domain.RGC.PUBLISHED;
 import static org.ihtsdo.otf.refset.domain.RGC.PUBLISHED_DATE;
 import static org.ihtsdo.otf.refset.domain.RGC.REFERENCE_COMPONENT_ID;
 import static org.ihtsdo.otf.refset.domain.RGC.SCTID;
+import static org.ihtsdo.otf.refset.domain.RGC.START;
 import static org.ihtsdo.otf.refset.domain.RGC.SUPER_REFSET_TYPE_ID;
+import static org.ihtsdo.otf.refset.domain.RGC.TYPE;
 import static org.ihtsdo.otf.refset.domain.RGC.TYPE_ID;
 import static org.ihtsdo.otf.refset.domain.RGC.END;
 import static org.ihtsdo.otf.refset.domain.RGC.E_EFFECTIVE_TIME;
@@ -42,6 +44,8 @@ import org.springframework.util.StringUtils;
 import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Vertex;
+import com.tinkerpop.gremlin.Tokens.T;
+import com.tinkerpop.gremlin.java.GremlinPipeline;
 
 /**
  * @author Episteme Partners
@@ -274,7 +278,15 @@ public class RefsetConvertor {
 				}
 
 				
-
+				//populate memberHasPublishedState flag as "0" or "1" "0" (for if this member has not been published any time) 
+				//and 1 (if this member has been published before). this is used to show that this member has previous states
+				String memberPublishedState = populateMemberPublishedStateFlag(vM);
+				m.setMemberHasPublishedState(memberPublishedState);
+				
+				//populate memberHasPendingEdit flag as "0" or "1" "0" if this has no unpublished details. 1 has unpublished details
+				String memberHasPendingEdit = m.isPublished() ? "0" : "1"; 
+				
+				m.setMemberHasPendingEdit(memberHasPendingEdit);
 
 				LOGGER.trace("Adding member as {} ", m.toString());
 
@@ -285,9 +297,37 @@ public class RefsetConvertor {
 		Collections.sort(members);
 		return members;
 	}
+
+
+	/**
+	 * @param vM
+	 */
+	private static String populateMemberPublishedStateFlag(Vertex vM) {
+
+		//EdgeLabel.members.toString()).outV()
+		//.has(ID, T.eq, id).outE(EdgeLabel.hasState.toString())
+		//.has(END, T.lte, toDate.getMillis())
+		//.has(START, T.gte, fromDate.getMillis())
+		//.inV().has(ACTIVE).has(TYPE, VertexType.hMember.toString()
+		
+		if (vM != null) {
 			
-	
-	
+			final GremlinPipeline<Vertex, Vertex> fPipe = new GremlinPipeline<Vertex, Vertex>();			
+			fPipe.start(vM).outE(EdgeLabel.hasState.toString())
+				.inV().has(ACTIVE).has(TYPE, VertexType.hMember.toString());
+			List<Vertex> fls = fPipe.toList();
+			if (!fls.isEmpty()) {
+				
+				return "1";
+				
+			}
+		}
+		
+		return "0";
+
+	}
+
+
 	/**
 	 * @param vM
 	 */

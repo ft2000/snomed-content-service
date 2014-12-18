@@ -18,6 +18,7 @@ import org.ihtsdo.otf.refset.domain.Member;
 import org.ihtsdo.otf.refset.exception.EntityNotFoundException;
 import org.ihtsdo.otf.refset.graph.RefsetGraphAccessException;
 import org.ihtsdo.otf.refset.graph.RefsetGraphFactory;
+import org.ihtsdo.otf.snomed.service.ConceptLookupService;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,8 +40,21 @@ import com.tinkerpop.frames.FramedGraphFactory;
 @Repository
 public class MemberGAO {
 	
+	private static final Logger LOGGER = LoggerFactory.getLogger(MemberGAO.class);
+
+	private static FramedGraphFactory fgf = new FramedGraphFactory();
 	
 	private RefsetGAO rGao;
+	private ConceptLookupService conceptService;
+
+	
+	/**
+	 * @param conceptService the conceptService to set
+	 */
+	@Autowired
+	public void setConceptService(ConceptLookupService conceptService) {
+		this.conceptService = conceptService;
+	}
 	
 	/**
 	 * @param rGao the rGao to set
@@ -50,11 +64,9 @@ public class MemberGAO {
 		this.rGao = rGao;
 	}
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(MemberGAO.class);
+
 		
 	private RefsetGraphFactory factory;
-
-	private static FramedGraphFactory fgf = new FramedGraphFactory();
 	
 	/**Retrieves a {@link Member} node id for given {@link Member#getReferenceComponentId()}
 	 * @param rcId
@@ -75,7 +87,7 @@ public class MemberGAO {
 
 			//TODO upgrade this search with status and effective date
 			@SuppressWarnings("unchecked")
-			Iterable<Vertex> vr = tg.query().has(ID, id).has(TYPE, VertexType.member.toString()).has(END, Long.MAX_VALUE).limit(1).vertices();
+			Iterable<Vertex> vr = tg.query().has(ID, id).has(TYPE, VertexType.member.toString()).limit(1).vertices();
 			
 			for (Vertex v : vr) {
 				
@@ -92,7 +104,7 @@ public class MemberGAO {
 		}
 		
 		if(result == null) 
-			throw new EntityNotFoundException("Record does not exist");
+			throw new EntityNotFoundException("Member does not exist");
 		
 		return result;
 
@@ -200,7 +212,7 @@ public class MemberGAO {
 				rcIds.add(member.getReferencedComponentId());
 				
 			}
-			Map<String, String> descriptions = rGao.getMembersDescription(rcIds);
+			Map<String, String> descriptions = conceptService.getMembersDescription(rcIds);
 
 
 			for (Member m : members) {

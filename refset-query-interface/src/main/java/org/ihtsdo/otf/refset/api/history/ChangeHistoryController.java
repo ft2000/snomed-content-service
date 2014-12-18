@@ -252,6 +252,30 @@ public class ChangeHistoryController {
 
 		return new ResponseEntity<Result<Map<String,Object>>>(r, HttpStatus.OK);
     }
+	
+	@RequestMapping( method = RequestMethod.GET, value = "{refsetId}/{memberId}/allStates",  produces = "application/json", consumes = "application/json")
+	@ApiOperation( value = "Get all previous states of a member", 
+		notes = "This api call retrieves all previous published state of a member for given member uuid provided in api path")
+	@PreAuthorize("hasRole('ROLE_USER')")
+    public ResponseEntity<Result< Map<String, Object>>> getMemberStateHistory( @PathVariable String memberId, @PathVariable String refsetId) throws Exception {
+		
+		logger.debug("geting member's all previous state history for member id {}", memberId);
+
+		Result<Map<String, Object>> r = getResult();
+
+		ChangeRecord<Member> history = service.getMemberStateHistory(memberId, refsetId);
+		
+		Map<String, Object> data = new HashMap<String, Object>();
+		data.put("history", history);
+		r.getMeta().add( linkTo( methodOn( ChangeHistoryController.class ).getMemberStateHistory(memberId, refsetId)).withRel("All previous Member states"));
+
+		r.setData(data);
+
+		r.getMeta().setMessage(SUCCESS);
+		r.getMeta().setStatus(HttpStatus.OK);
+
+		return new ResponseEntity<Result<Map<String,Object>>>(r, HttpStatus.OK);
+    }
 
 	
 	/**To convert string date to {@link DateTime}

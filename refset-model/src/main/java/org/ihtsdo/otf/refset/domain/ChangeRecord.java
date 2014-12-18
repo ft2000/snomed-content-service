@@ -36,13 +36,13 @@ public class ChangeRecord<T> {
 	/**
 	 * @return the records
 	 */
-	public List<T> getRecord() {
+	public List<T> getRecords() {
 		return records;
 	}
 	/**
 	 * @param records the records to set
 	 */
-	public void setRecord(List<T> records) {
+	public void setRecords(List<T> records) {
 		this.records = records;
 	}
 	

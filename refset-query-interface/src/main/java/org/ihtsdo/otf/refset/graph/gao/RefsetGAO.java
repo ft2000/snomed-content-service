@@ -6,14 +6,15 @@ import static org.ihtsdo.otf.refset.domain.RGC.DESC;
 import static org.ihtsdo.otf.refset.domain.RGC.END;
 import static org.ihtsdo.otf.refset.domain.RGC.ID;
 import static org.ihtsdo.otf.refset.domain.RGC.PUBLISHED;
-import static org.ihtsdo.otf.refset.domain.RGC.TYPE;
 import static org.ihtsdo.otf.refset.domain.RGC.SCTID;
+import static org.ihtsdo.otf.refset.domain.RGC.TYPE;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.Resource;
 
@@ -24,15 +25,17 @@ import org.ihtsdo.otf.refset.exception.EntityNotFoundException;
 import org.ihtsdo.otf.refset.graph.RefsetGraphAccessException;
 import org.ihtsdo.otf.refset.graph.RefsetGraphFactory;
 import org.ihtsdo.otf.refset.graph.schema.GRefset;
-import org.ihtsdo.otf.snomed.domain.Properties;
+import org.ihtsdo.otf.snomed.domain.Concept;
+import org.ihtsdo.otf.snomed.exception.ConceptServiceException;
+import org.ihtsdo.otf.snomed.service.ConceptLookupService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
 import com.google.common.collect.Iterables;
 import com.thinkaurelius.titan.core.TitanGraph;
-import com.thinkaurelius.titan.core.TitanIndexQuery.Result;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.frames.FramedGraph;
@@ -49,13 +52,23 @@ public class RefsetGAO {
 	private static final Logger LOGGER = LoggerFactory.getLogger(RefsetGAO.class);
 		
 	private RefsetGraphFactory rgFactory;//refset graph factory	
-	private RefsetGraphFactory sgFactory;//snomed graph factory	
 
 
 	private static FramedGraphFactory fgf = new FramedGraphFactory();
 
+	private ConceptLookupService conceptService;
 
 	
+
+
+	/**
+	 * @param conceptService the conceptService to set
+	 */
+	@Autowired
+	public void setConceptService(ConceptLookupService conceptService) {
+		this.conceptService = conceptService;
+	}
+
 
 
 	/**Retrieves a {@link Refset} vertex for given {@link Refset#getId()}
@@ -168,26 +181,31 @@ public class RefsetGAO {
 	/**
 	 * @param ms
 	 * @throws RefsetGraphAccessException 
+	 * @throws ConceptServiceException 
 	 */
-	private void populateMemberDescription(List<Member> ms) throws RefsetGraphAccessException {
+	private void populateMemberDescription(List<Member> ms) throws RefsetGraphAccessException, ConceptServiceException {
 		
 		if (ms == null || ms.isEmpty()) {
 			
 			return;
 		}
-		List<String> rcIds = new ArrayList<String>();
+		Set<String> rcIds = new HashSet<String>();
 		
 		for (Member member : ms) {
 			
 			rcIds.add(member.getReferencedComponentId());
 			
 		}
-		Map<String, String> descriptions = getMembersDescription(rcIds);
+		
+		Map<String, Concept> concepts = conceptService.getConcepts(rcIds);
 		for (Member m : ms) {
 		
-			if(descriptions.containsKey(m.getReferencedComponentId())) {
+			if(concepts.containsKey(m.getReferencedComponentId())) {
 				
-				m.setDescription(descriptions.get(m.getReferencedComponentId()));
+				Concept c = concepts.get(m.getReferencedComponentId());
+				
+				m.setDescription(c.getLabel());
+				m.setReferencedComponent(c);
 			}
 		}
 		
@@ -290,59 +308,6 @@ public class RefsetGAO {
 		return md;
 	}
 	
-	/**
-	 * @param referenceComponentId
-	 * @return
-	 * @throws RefsetGraphAccessException
-	 */
-	protected String getMemberDescription(String referenceComponentId) throws RefsetGraphAccessException  {
-		
-		LOGGER.debug("getting member description for {} ", referenceComponentId);
-
-		String label = "";
-
-		if (StringUtils.isEmpty(referenceComponentId)) {
-			
-			return label;
-		}
-
-		TitanGraph g = null;
-		try {
-			
-			
-				
-				g = sgFactory.getReadOnlyGraph();
-
-				Iterable<Result<Vertex>> vs = g.indexQuery("concept","v.sctid:" + referenceComponentId).vertices();
-				for (Result<Vertex> r : vs) {
-									
-					Vertex v = r.getElement();
-					
-					label = v.getProperty(Properties.title.toString());
-					break;
-					
-				}
-
-				
-				RefsetGraphFactory.commit(g);
-		
-		} catch (Exception e) {
-			
-			RefsetGraphFactory.rollback(g);
-
-			LOGGER.error("Error duing concept details fetch", e);
-			
-			throw new RefsetGraphAccessException(e.getMessage(), e);
-			
-		} finally {
-			
-			RefsetGraphFactory.shutdown(g);
-
-		}
-		
-		return label;
-	}
-	
 	
 	/**validates a given description if it exist in the system
 	 * @return if given description exist then true otherwise false
@@ -393,15 +358,6 @@ public class RefsetGAO {
 	public  void setRGFactory(RefsetGraphFactory factory) {
 		
 		this.rgFactory = factory;
-	}
-	
-	/**
-	 * @param factory the factory to set
-	 */
-	@Resource(name = "snomedGraphFactory")
-	public  void setSGFactory(RefsetGraphFactory factory) {
-		
-		this.sgFactory = factory;
 	}
 
 
@@ -459,7 +415,7 @@ public class RefsetGAO {
 			populateMemberDescription(r.getMembers());
 
 			
-			LOGGER.debug("Returning refset {} ", r);
+			LOGGER.trace("Returning {} ", r);//it prints large output hence trace
 
 			
 		} catch (Exception e) {
@@ -594,81 +550,6 @@ public class RefsetGAO {
 
 	}
 	
-	
-	/** Returns {@link Map} of referenceComponentId as key and their description as value
-	 * @param referenceComponentId
-	 * @return
-	 * @throws RefsetGraphAccessException
-	 */
-	protected Map<String, String> getMembersDescription(List<String> rcIds) throws RefsetGraphAccessException  {
-		
-		LOGGER.trace("getting members description for {} ", rcIds);
-
-		Map<String, String> descMap = new HashMap<String, String>();
-		
-		if (rcIds == null || rcIds.isEmpty()) {
-			
-			return descMap;
-		}
-
-		TitanGraph g = null;
-		try {
-				
-				g = sgFactory.getReadOnlyGraph();
-
-				//max OR clause can be 1024 so send in 1024 at max in one call
-				int length = rcIds.size()/1024;
-				int to = rcIds.size() > 1024 ? 1024 : rcIds.size();
-				int from = 0;
-				for (int i = 0; i < length+1; i++) {
-					
-					LOGGER.debug("getting members description from {} to {} ", from, to);
-
-					List<String> subList = rcIds.subList(from, to);
-					
-					String ids = org.apache.commons.lang.StringUtils.join(subList, " OR ");
-					Iterable<Result<Vertex>> vs = g.indexQuery("concept","v.sctid:" + ids).vertices();
-					for (Result<Vertex> r : vs) {
-										
-						Vertex v = r.getElement();
-						
-						Object sctid = v.getProperty(Properties.sctid.toString());
-						Object label = v.getProperty(Properties.title.toString());
-						if (sctid != null && label != null && rcIds.contains(sctid.toString())) {
-							
-							descMap.put(sctid.toString(), label.toString());
-
-						}
-						
-					}
-					
-					//to run next loop if required
-					from = to > rcIds.size() ? rcIds.size() : to;
-					to = (to + 1024) > rcIds.size() ? rcIds.size() : to+1024;
-
-
-				}
-				
-
-				RefsetGraphFactory.commit(g);
-		
-		} catch (Exception e) {
-			
-			RefsetGraphFactory.rollback(g);
-
-			LOGGER.error("Error duing concept details fetch", e);
-			
-			throw new RefsetGraphAccessException(e.getMessage(), e);
-			
-		} finally {
-			
-			RefsetGraphFactory.shutdown(g);
-
-		}
-		
-		return descMap;
-	}
-	
 	/**Retrieves a {@link Refset} vertex for given {@link Refset#getSctId()}
 	 * @param sctId - SCTID of a refset
 	 * @param tg {@link TitanGraph}
@@ -710,6 +591,7 @@ public class RefsetGAO {
 		return isSctIdExist;
 
 	}
+	
 
 
 }

@@ -22,6 +22,7 @@ import org.ihtsdo.otf.refset.graph.RefsetGraphFactory;
 import org.ihtsdo.otf.refset.graph.schema.GMember;
 import org.ihtsdo.otf.refset.graph.schema.GRefset;
 import org.ihtsdo.otf.refset.service.upload.Rf2Record;
+import org.ihtsdo.otf.snomed.service.ConceptLookupService;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,6 +38,7 @@ import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.util.wrappers.event.EventGraph;
 import com.tinkerpop.frames.FramedGraphFactory;
 import com.tinkerpop.frames.FramedTransactionalGraph;
+import com.tinkerpop.gremlin.java.GremlinPipeline;
 
 /**Graph Access component to do CRUD operation on underlying Refset graph
  * Operation in this class supports
@@ -49,16 +51,17 @@ import com.tinkerpop.frames.FramedTransactionalGraph;
 public class RefsetAdminGAO {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(RefsetAdminGAO.class);
-		
+	private static FramedGraphFactory fgf = new FramedGraphFactory();
+
 	private RefsetGraphFactory factory;
 	
 	private MemberGAO mGao;
 	
 	private RefsetGAO rGao;
+	
+	private ConceptLookupService conceptService;
 
-	private static FramedGraphFactory fgf = new FramedGraphFactory();
-
-
+	
 	/**
 	 * @param r a {@link Refset} with or without members
 	 * @throws RefsetGraphAccessException
@@ -96,7 +99,7 @@ public class RefsetAdminGAO {
 				rcIds.add(member.getReferencedComponentId());
 				
 			}
-			Map<String, String> descriptions = rGao.getMembersDescription(rcIds);
+			Map<String, String> descriptions = conceptService.getMembersDescription(rcIds);
 			
 			int i = 0;
 			if( !CollectionUtils.isEmpty(members) ) {
@@ -290,6 +293,14 @@ public class RefsetAdminGAO {
 				g.removeVertex(refset);
 
 			}*/
+			
+			GremlinPipeline<Vertex, Vertex> removePipeline = new GremlinPipeline<Vertex, Vertex>();
+			
+			removePipeline.start(refset).inE(EdgeLabel.members.toString()).outV().outE(EdgeLabel.hasState.toString()).inV().remove();//all history member vertex
+			removePipeline.reset();
+			
+			removePipeline.start(refset).inE(EdgeLabel.members.toString()).outV().remove();//all member vertex
+			removePipeline.reset();
 			
 			g.removeVertex(refset);
 			
@@ -664,7 +675,7 @@ public class RefsetAdminGAO {
 			rcIds.add(record.getReferencedComponentId());
 			
 		}
-		descriptions = rGao.getMembersDescription(rcIds);
+		descriptions = conceptService.getMembersDescription(rcIds);
 
 		return descriptions;
 	}
@@ -718,6 +729,14 @@ public class RefsetAdminGAO {
 	@Autowired
 	public void setRefsetGao(RefsetGAO rGao) {
 		this.rGao = rGao;
+	}
+	
+	/**
+	 * @param conceptService the conceptService to set
+	 */
+	@Autowired
+	public void setConceptService(ConceptLookupService conceptService) {
+		this.conceptService = conceptService;
 	}
 
 }

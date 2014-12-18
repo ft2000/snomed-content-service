@@ -19,8 +19,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.apache.commons.configuration.Configuration;
 import org.ihtsdo.otf.refset.exception.EntityNotFoundException;
+import org.ihtsdo.otf.refset.graph.RefsetGraphAccessException;
 import org.ihtsdo.otf.refset.graph.RefsetGraphFactory;
 import org.ihtsdo.otf.snomed.domain.Concept;
 import org.ihtsdo.otf.snomed.domain.Properties;
@@ -46,9 +46,7 @@ import com.tinkerpop.blueprints.Vertex;
 public class ConceptLookUpServiceImplv1_0 implements ConceptLookupService {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(ConceptLookUpServiceImplv1_0.class);
-	
-	private Configuration config;
-	
+		
 	private RefsetGraphFactory factory;
 
 
@@ -332,12 +330,138 @@ public class ConceptLookUpServiceImplv1_0 implements ConceptLookupService {
 
 		return Collections.unmodifiableMap(types);
 	}
-
-	/**
-	 * @param config the config to set
+	
+	
+	/**returns referenceComponentDescription for given referenceComponentId
+	 * @param referenceComponentId
+	 * @return
+	 * @throws RefsetGraphAccessException
 	 */
-	public void setConfig(Configuration config) {
-		this.config = config;
+	@Override
+	@Cacheable(value = { "referenceComponentDescription" })
+	public String getMemberDescription(String referenceComponentId) throws RefsetGraphAccessException  {
+		
+		LOGGER.debug("getting member description for {} ", referenceComponentId);
+
+		String label = "";
+
+		if (StringUtils.isEmpty(referenceComponentId)) {
+			
+			return label;
+		}
+
+		TitanGraph g = null;
+		try {
+			
+			
+				
+				g = factory.getReadOnlyGraph();
+
+				Iterable<Result<Vertex>> vs = g.indexQuery("concept","v.sctid:" + referenceComponentId).vertices();
+				for (Result<Vertex> r : vs) {
+									
+					Vertex v = r.getElement();
+					
+					label = v.getProperty(Properties.title.toString());
+					break;
+					
+				}
+
+				
+				RefsetGraphFactory.commit(g);
+		
+		} catch (Exception e) {
+			
+			RefsetGraphFactory.rollback(g);
+
+			LOGGER.error("Error duing concept details fetch", e);
+			
+			throw new RefsetGraphAccessException(e.getMessage(), e);
+			
+		} finally {
+			
+			RefsetGraphFactory.shutdown(g);
+
+		}
+		
+		return label;
+	}
+
+	
+	/** Returns {@link Map} of referenceComponentId as key and their description as value
+	 * @param referenceComponentId
+	 * @return
+	 * @throws RefsetGraphAccessException
+	 */
+	@Override
+	@Cacheable(value = { "referenceComponentDescriptions" })
+	public Map<String, String> getMembersDescription(List<String> rcIds) throws RefsetGraphAccessException  {
+		
+		LOGGER.trace("getting members description for {} ", rcIds);
+
+		Map<String, String> descMap = new HashMap<String, String>();
+		
+		if (rcIds == null || rcIds.isEmpty()) {
+			
+			return descMap;
+		}
+
+		TitanGraph g = null;
+		try {
+				
+				g = factory.getReadOnlyGraph();
+
+				//max OR clause can be 1024 so send in 1024 at max in one call
+				int length = rcIds.size()/1024;
+				int to = rcIds.size() > 1024 ? 1024 : rcIds.size();
+				int from = 0;
+				for (int i = 0; i < length+1; i++) {
+					
+					LOGGER.debug("getting members description from {} to {} ", from, to);
+
+					List<String> subList = rcIds.subList(from, to);
+					
+					String ids = org.apache.commons.lang.StringUtils.join(subList, " OR ");
+					Iterable<Result<Vertex>> vs = g.indexQuery("concept","v.sctid:" + ids).vertices();
+					for (Result<Vertex> r : vs) {
+										
+						Vertex v = r.getElement();
+						
+						Object sctid = v.getProperty(Properties.sctid.toString());
+						Object label = v.getProperty(Properties.title.toString());
+						if (sctid != null && label != null && rcIds.contains(sctid.toString())) {
+							
+							descMap.put(sctid.toString(), label.toString());
+
+						}
+						
+					}
+					
+					//to run next loop if required
+					from = to > rcIds.size() ? rcIds.size() : to;
+					to = (to + 1024) > rcIds.size() ? rcIds.size() : to+1024;
+
+
+				}
+				
+
+				RefsetGraphFactory.commit(g);
+		
+		} catch (Exception e) {
+			
+			RefsetGraphFactory.rollback(g);
+
+			LOGGER.error("Error duing concept details fetch", e);
+			
+			throw new RefsetGraphAccessException(e.getMessage(), e);
+			
+		} finally {
+			
+			RefsetGraphFactory.shutdown(g);
+
+		}
+		
+		return descMap;
 	}
 	
 	/**

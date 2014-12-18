@@ -8,6 +8,7 @@ import java.util.Map;
 import org.ihtsdo.otf.refset.domain.ChangeRecord;
 import org.ihtsdo.otf.refset.domain.Member;
 import org.ihtsdo.otf.refset.domain.Refset;
+import org.ihtsdo.otf.refset.exception.EntityNotFoundException;
 import org.ihtsdo.otf.refset.exception.RefsetServiceException;
 import org.ihtsdo.otf.refset.graph.RefsetGraphAccessException;
 import org.ihtsdo.otf.refset.graph.gao.HistoryGao;
@@ -184,5 +185,27 @@ public class RefsetChangeHistoryService {
 			LOGGER.error("Error in graph db call", e);
 			throw new RefsetServiceException(e.getMessage());
 		}
+	}
+	
+	/**
+	 * @param memberId
+	 * @return
+	 * @throws RefsetServiceException 
+	 * @throws EntityNotFoundException 
+	 */
+	public ChangeRecord<Member> getMemberStateHistory(String memberId, String refsetId) throws RefsetServiceException, EntityNotFoundException {
+		
+		LOGGER.debug("getMemberStateHistory all");
+		
+		try {
+			
+			return gao.getMemberStateHistory(memberId, refsetId);
+			
+		} catch (RefsetGraphAccessException e) {
+			
+			LOGGER.error("Error in graph db call", e);
+			throw new RefsetServiceException(e.getMessage());
+		}
+
 	}
 }

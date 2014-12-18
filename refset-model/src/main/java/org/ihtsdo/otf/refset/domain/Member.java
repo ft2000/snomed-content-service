@@ -1,11 +1,18 @@
 package org.ihtsdo.otf.refset.domain;
 
+import org.ihtsdo.otf.snomed.domain.Concept;
+
 
 public class Member extends BaseObj implements Comparable<Member>{
 	
 	
 	
 	private String referencedComponentId;
+	private String memberHasPublishedState;
+	private String memberHasPendingEdit;
+	
+	//to get the current state of referenced component
+	private Concept referencedComponent;
 
 	/**
 	 * @return the referenceComponentId
@@ -21,7 +28,44 @@ public class Member extends BaseObj implements Comparable<Member>{
 	}
 	
 
-   @Override 
+   /**
+	 * @return the memberHasPublishedState
+	 */
+	public String getMemberHasPublishedState() {
+		return memberHasPublishedState;
+	}
+	/**
+	 * @param memberHasPublishedState the memberHasPublishedState to set
+	 */
+	public void setMemberHasPublishedState(String memberHasPublishedState) {
+		this.memberHasPublishedState = memberHasPublishedState;
+	}
+	/**
+	 * @return the memberHasPendingEdit
+	 */
+	public String getMemberHasPendingEdit() {
+		return memberHasPendingEdit;
+	}
+	/**
+	 * @param memberHasPendingEdit the memberHasPendingEdit to set
+	 */
+	public void setMemberHasPendingEdit(String memberHasPendingEdit) {
+		this.memberHasPendingEdit = memberHasPendingEdit;
+	}
+/**
+	 * @return the referencedComponent
+	 */
+	public Concept getReferencedComponent() {
+		return referencedComponent;
+	}
+	/**
+	 * @param referencedComponent the referencedComponent to set
+	 */
+	public void setReferencedComponent(
+			Concept referencedComponent) {
+		this.referencedComponent = referencedComponent;
+	}
+@Override 
    public boolean equals(Object input) {
 		   
 	   if ( this == input ) return true;

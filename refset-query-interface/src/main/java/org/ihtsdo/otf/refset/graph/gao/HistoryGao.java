@@ -13,6 +13,7 @@ package org.ihtsdo.otf.refset.graph.gao;
 
 import static org.ihtsdo.otf.refset.domain.RGC.END;
 import static org.ihtsdo.otf.refset.domain.RGC.ID;
+import static org.ihtsdo.otf.refset.domain.RGC.REFERENCE_COMPONENT_ID;
 import static org.ihtsdo.otf.refset.domain.RGC.TYPE;
 import static org.ihtsdo.otf.refset.domain.RGC.START;
 import static org.ihtsdo.otf.refset.domain.RGC.ACTIVE;
@@ -20,6 +21,7 @@ import static org.ihtsdo.otf.refset.domain.RGC.ACTIVE;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.Resource;
 
@@ -33,6 +35,7 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.StringUtils;
 
 import com.thinkaurelius.titan.core.TitanGraph;
 import com.tinkerpop.blueprints.Direction;
@@ -58,7 +61,7 @@ public class HistoryGao {
 		
 		this.f = factory;
 	}
-	
+
 	/**
 	 * @param refsetId
 	 * @param from
@@ -105,7 +108,7 @@ public class HistoryGao {
 				List<Member> ms = RefsetConvertor.getHistoryMembers(mhls);
 				ChangeRecord<Member> cr = new ChangeRecord<Member>();
 				String rcId = e.getProperty(ID);
-				cr.setRecord(ms);
+				cr.setRecords(ms);
 				history.put(rcId, cr);
 
 				
@@ -171,7 +174,7 @@ public class HistoryGao {
 			List<Edge> fls = fPipe.toList();
 
 			List<Member> ms = RefsetConvertor.getHistoryMembers(fls);
-			history.setRecord(ms);
+			history.setRecords(ms);
 
 		} catch (Exception e) {
 			
@@ -231,7 +234,7 @@ public class HistoryGao {
 			List<Edge> ls = rPipe.toList();
 			List<Refset> rs = RefsetConvertor.getHistoryRefsets(ls);
 
-			history.setRecord(rs);
+			history.setRecords(rs);
 
 		} catch (Exception e) {
 			
@@ -296,7 +299,7 @@ public class HistoryGao {
 				List<Member> ms = RefsetConvertor.getHistoryMembers(mhls);
 				ChangeRecord<Member> cr = new ChangeRecord<Member>();
 				String rcId = e.getProperty(ID);
-				cr.setRecord(ms);
+				cr.setRecords(ms);
 				history.put(rcId, cr);
 
 				
@@ -359,7 +362,7 @@ public class HistoryGao {
 			List<Vertex> ls = rPipe.toList();
 			List<Refset> rs = RefsetConvertor.getStateRefsets(ls);
 
-			history.setRecord(rs);
+			history.setRecords(rs);
 
 		} catch (Exception e) {
 			
@@ -425,8 +428,113 @@ public class HistoryGao {
 			List<Vertex> fls = fPipe.toList();
 
 			List<Member> ms = RefsetConvertor.getStateMembers(fls);
-			history.setRecord(ms);
+			history.setRecords(ms);
 
+		} catch (Exception e) {
+			
+			RefsetGraphFactory.rollback(g);			
+			LOGGER.error("Error getting member state history", e);
+			throw new RefsetGraphAccessException(e.getMessage(), e);
+			
+		} finally {
+			
+			RefsetGraphFactory.shutdown(g);
+		}
+	
+		
+		LOGGER.debug("Returning {} ", history);
+
+	
+		return history;
+
+	}
+	
+	/**
+	 * @param memberId
+	 * @return {@link ChangeRecord}
+	 */
+	public ChangeRecord<Member> getMemberStateHistory(String memberId, String refsetId) throws RefsetGraphAccessException, EntityNotFoundException {
+		
+		Object[] criteria = {memberId, refsetId};
+		
+		LOGGER.debug("Getting member history for criteria {}", criteria);
+
+		ChangeRecord<Member> history = new ChangeRecord<Member>();
+		
+		TitanGraph g = null;
+		
+		try {
+			
+			g = f.getReadOnlyGraph();			
+			Iterable<Vertex> vRs = g.query().has(TYPE, VertexType.refset.toString()).has(ID, refsetId).limit(1).vertices();
+
+			
+			if (!vRs.iterator().hasNext()) {
+				
+				throw new EntityNotFoundException("Refset does not exist for given refset id " + refsetId);
+			} 
+			
+			Vertex vR = vRs.iterator().next();
+			
+			GremlinPipeline<Vertex, Vertex> pipe = new GremlinPipeline<Vertex, Vertex>(g);
+			
+			pipe.start(vR).inE(EdgeLabel.members.toString()).outV()
+				.has(ID, memberId)
+				.has(TYPE, VertexType.member.toString());
+			
+			List<Vertex> vMs = pipe.toList();
+			
+			for (Vertex vM : vMs) {
+				
+				Member currentMember = RefsetConvertor.getMember(vM);
+				
+				Iterable<Edge> edges = vM.getEdges(Direction.OUT, EdgeLabel.members.toString());
+				for (Edge edge : edges) {
+					
+					Set<String> eKeys = edge.getPropertyKeys();
+					if ( eKeys.contains(REFERENCE_COMPONENT_ID) ) {
+						
+						String referenceComponentId = edge.getProperty(REFERENCE_COMPONENT_ID);
+						currentMember.setReferencedComponentId(referenceComponentId);
+						
+					}
+				}
+				 
+
+				GremlinPipeline<Vertex, Vertex> fPipe = new GremlinPipeline<Vertex, Vertex>();			
+				fPipe.start(vM).outE(EdgeLabel.hasState.toString())
+					.inV().has(ACTIVE).has(TYPE, VertexType.hMember.toString());
+				
+				List<Vertex> fls = fPipe.toList();
+
+				List<Member> ms = RefsetConvertor.getStateMembers(fls);
+				
+				//we need to get missing data from existing member detail. TODO create full details during state creation
+				for (Member m : ms) {
+					
+					if (StringUtils.isEmpty(m.getModuleId())) {
+						
+						m.setModuleId(currentMember.getModuleId());
+					}
+					
+					if (StringUtils.isEmpty(m.getReferencedComponentId())) {
+						
+						m.setReferencedComponentId(currentMember.getReferencedComponentId());
+					}
+									
+				}
+				
+				history.setRecords(ms);
+			}
+			
+
+		} catch (EntityNotFoundException e) { 
+		
+			RefsetGraphFactory.rollback(g);			
+			LOGGER.error("Error getting member state history", e);
+
+			throw e;
+			
 		} catch (Exception e) {
 			
 			RefsetGraphFactory.rollback(g);			

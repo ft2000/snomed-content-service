@@ -3,15 +3,16 @@
  */
 package org.ihtsdo.otf.snomed.service;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.ihtsdo.otf.refset.exception.EntityNotFoundException;
+import org.ihtsdo.otf.refset.graph.RefsetGraphAccessException;
 import org.ihtsdo.otf.snomed.domain.Concept;
 import org.ihtsdo.otf.snomed.exception.ConceptServiceException;
 
 /**
- * @author Episteme Partners
  *
  */
 public interface ConceptLookupService {
@@ -47,6 +48,22 @@ public interface ConceptLookupService {
 	 * @throws ConceptServiceException
 	 */
 	public Map<String, String> getTypes(String parentId) throws ConceptServiceException ;
+
+	/**
+	 * @param referenceComponentId
+	 * @return
+	 * @throws RefsetGraphAccessException
+	 */
+	String getMemberDescription(String referenceComponentId)
+			throws RefsetGraphAccessException;
+
+	/**
+	 * @param rcIds
+	 * @return
+	 * @throws RefsetGraphAccessException
+	 */
+	Map<String, String> getMembersDescription(List<String> rcIds)
+			throws RefsetGraphAccessException;
 
 
 }

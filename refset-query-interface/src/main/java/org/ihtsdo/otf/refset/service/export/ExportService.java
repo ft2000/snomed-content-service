@@ -17,6 +17,7 @@ import org.ihtsdo.otf.refset.exception.ExportServiceException;
 import org.ihtsdo.otf.refset.exception.RefsetServiceException;
 import org.ihtsdo.otf.refset.service.RefsetBrowseService;
 import org.ihtsdo.otf.snomed.service.ConceptLookupService;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -77,7 +78,9 @@ public class ExportService {
 			for (Member m : ms) {
 								
 				String active = m.isActive() ? "1" : "0";
-				Object[] rf2Record = new Object[] { m.getUuid(), Utility.getDate(m.getEffectiveTime()), active
+				DateTime et = m.getEffectiveTime() != null ? m.getEffectiveTime() : r.getExpectedReleaseDate();
+				
+				Object[] rf2Record = new Object[] { m.getUuid(), Utility.getDate(et), active
                 		, m.getModuleId(), refsetId, m.getReferencedComponentId()};
 				
 				List<Object> concept = Arrays.asList(rf2Record);

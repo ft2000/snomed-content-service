@@ -107,7 +107,7 @@ public class RefsetSecurityContextRepository implements
 
 		if (!StringUtils.isEmpty(tokenKey)) {
 			
-			LOGGER.debug("Using token {}", tokenKey);
+			LOGGER.trace("Using token {}", tokenKey);
 
 			final Token token;
 			try {

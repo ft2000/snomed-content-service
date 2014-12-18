@@ -44,7 +44,6 @@ public class ConceptLookUpServiceImplTest {
 		RefsetGraphFactory sf = new RefsetGraphFactory(config);
 		
 		service.setFactory(sf);
-		service.setConfig(config);
 	}
 	
 	@BeforeClass

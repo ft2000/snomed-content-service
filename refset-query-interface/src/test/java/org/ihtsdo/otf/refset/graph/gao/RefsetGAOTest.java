@@ -77,8 +77,7 @@ public class RefsetGAOTest {
 		
 		f = new RefsetGraphFactory(config);
 		gao.setRGFactory(f);
-		gao.setSGFactory(f);
-
+		
 		aGao = new RefsetAdminGAO();
 		aGao.setFactory(f);
 		
