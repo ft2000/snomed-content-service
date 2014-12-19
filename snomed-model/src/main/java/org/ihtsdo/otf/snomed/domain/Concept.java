@@ -11,12 +11,19 @@
 */
 package org.ihtsdo.otf.snomed.domain;
 
+import java.io.Serializable;
+
 import org.joda.time.DateTime;
 /**
  *
  */
-public class Concept {
+public class Concept implements Serializable {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	protected DateTime modified;
 	
 	protected String modifiedBy;
@@ -36,6 +43,8 @@ public class Concept {
 	protected String id;
 	
 	protected String caseSignificanceId;
+
+	private String label;
 	
 	
 
@@ -160,6 +169,24 @@ public class Concept {
 	 */
 	public void setVersion(String version) {
 		this.version = version;
+	}
+	
+	
+	
+	/**
+	 * @param label
+	 */
+	public String getLabel() {
+		// TODO Auto-generated method stub
+		return label;
+	}
+	
+	/**
+	 * @param label
+	 */
+	public void setLabel(String label) {
+		// TODO Auto-generated method stub
+		this.label = label;
 	}
 
 }

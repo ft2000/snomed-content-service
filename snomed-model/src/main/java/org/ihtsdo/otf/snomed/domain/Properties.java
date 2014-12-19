@@ -19,5 +19,6 @@ public enum Properties {
 	effectiveTime, title, sctid, created, createdBy, modifiedDate, 
 	modifiedBy, status, languageCode, group, typeId, moduleId, modifierId, 
 	characteristic, characteristicId, inferred, stated, additional, qualifying,
-	referenceComponentId, sid, publishedDate, published, earliestEffectiveTime, latestEffectiveTime, parentId
+	referenceComponentId, sid, publishedDate, published, earliestEffectiveTime, 
+	latestEffectiveTime, parentId, type, end, start
 }
