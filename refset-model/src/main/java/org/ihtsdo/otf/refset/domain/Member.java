@@ -10,11 +10,11 @@ public class Member extends BaseObj implements Comparable<Member>{
 	private String referencedComponentId;
 	
 	//to indicate if member has been published any time.
-	private String memberHasPublishedState;
+	private Integer memberHasPublishedState;
 	//to indicate member has pending publish details
-	private String memberHasPendingEdit;
+	private Integer memberHasPendingEdit;
 	//to indicate member has any published state history
-	private String memberHasPublishedStateHistory;
+	private Integer memberHasPublishedStateHistory;
 
 	
 	//to get the current state of referenced component
@@ -37,25 +37,25 @@ public class Member extends BaseObj implements Comparable<Member>{
    /**
 	 * @return the memberHasPublishedState
 	 */
-	public String getMemberHasPublishedState() {
+	public Integer getMemberHasPublishedState() {
 		return memberHasPublishedState;
 	}
 	/**
 	 * @param memberHasPublishedState the memberHasPublishedState to set
 	 */
-	public void setMemberHasPublishedState(String memberHasPublishedState) {
+	public void setMemberHasPublishedState(Integer memberHasPublishedState) {
 		this.memberHasPublishedState = memberHasPublishedState;
 	}
 	/**
 	 * @return the memberHasPendingEdit
 	 */
-	public String getMemberHasPendingEdit() {
+	public Integer getMemberHasPendingEdit() {
 		return memberHasPendingEdit;
 	}
 	/**
 	 * @param memberHasPendingEdit the memberHasPendingEdit to set
 	 */
-	public void setMemberHasPendingEdit(String memberHasPendingEdit) {
+	public void setMemberHasPendingEdit(Integer memberHasPendingEdit) {
 		this.memberHasPendingEdit = memberHasPendingEdit;
 	}
 /**
@@ -74,14 +74,14 @@ public class Member extends BaseObj implements Comparable<Member>{
 /**
 	 * @return the memberHasPublishedStateHistory
 	 */
-	public String getMemberHasPublishedStateHistory() {
+	public Integer getMemberHasPublishedStateHistory() {
 		return memberHasPublishedStateHistory;
 	}
 	/**
 	 * @param memberHasPublishedStateHistory the memberHasPublishedStateHistory to set
 	 */
 	public void setMemberHasPublishedStateHistory(
-			String memberHasPublishedStateHistory) {
+			Integer memberHasPublishedStateHistory) {
 		this.memberHasPublishedStateHistory = memberHasPublishedStateHistory;
 	}
 @Override 
