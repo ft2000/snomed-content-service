@@ -8,8 +8,14 @@ public class Member extends BaseObj implements Comparable<Member>{
 	
 	
 	private String referencedComponentId;
+	
+	//to indicate if member has been published any time.
 	private String memberHasPublishedState;
+	//to indicate member has pending publish details
 	private String memberHasPendingEdit;
+	//to indicate member has any published state history
+	private String memberHasPublishedStateHistory;
+
 	
 	//to get the current state of referenced component
 	private Concept referencedComponent;
@@ -64,6 +70,19 @@ public class Member extends BaseObj implements Comparable<Member>{
 	public void setReferencedComponent(
 			Concept referencedComponent) {
 		this.referencedComponent = referencedComponent;
+	}
+/**
+	 * @return the memberHasPublishedStateHistory
+	 */
+	public String getMemberHasPublishedStateHistory() {
+		return memberHasPublishedStateHistory;
+	}
+	/**
+	 * @param memberHasPublishedStateHistory the memberHasPublishedStateHistory to set
+	 */
+	public void setMemberHasPublishedStateHistory(
+			String memberHasPublishedStateHistory) {
+		this.memberHasPublishedStateHistory = memberHasPublishedStateHistory;
 	}
 @Override 
    public boolean equals(Object input) {
