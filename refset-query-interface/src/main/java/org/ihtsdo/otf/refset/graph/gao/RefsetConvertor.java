@@ -19,7 +19,6 @@ import static org.ihtsdo.otf.refset.domain.RGC.PUBLISHED;
 import static org.ihtsdo.otf.refset.domain.RGC.PUBLISHED_DATE;
 import static org.ihtsdo.otf.refset.domain.RGC.REFERENCE_COMPONENT_ID;
 import static org.ihtsdo.otf.refset.domain.RGC.SCTID;
-import static org.ihtsdo.otf.refset.domain.RGC.START;
 import static org.ihtsdo.otf.refset.domain.RGC.SUPER_REFSET_TYPE_ID;
 import static org.ihtsdo.otf.refset.domain.RGC.TYPE;
 import static org.ihtsdo.otf.refset.domain.RGC.TYPE_ID;
@@ -44,7 +43,6 @@ import org.springframework.util.StringUtils;
 import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Vertex;
-import com.tinkerpop.gremlin.Tokens.T;
 import com.tinkerpop.gremlin.java.GremlinPipeline;
 
 /**
@@ -280,13 +278,16 @@ public class RefsetConvertor {
 				
 				//populate memberHasPublishedState flag as "0" or "1" "0" (for if this member has not been published any time) 
 				//and 1 (if this member has been published before). this is used to show that this member has previous states
-				String memberPublishedState = populateMemberPublishedStateFlag(vM);
-				m.setMemberHasPublishedState(memberPublishedState);
+				String memberPublishedHistory = populateMemberPublishedStateHistoryFlag(vM);
+				String memberHashPublishedState = m.isPublished() ? "1" : memberPublishedHistory;
+				m.setMemberHasPublishedState(memberHashPublishedState);
 				
 				//populate memberHasPendingEdit flag as "0" or "1" "0" if this has no unpublished details. 1 has unpublished details
 				String memberHasPendingEdit = m.isPublished() ? "0" : "1"; 
 				
 				m.setMemberHasPendingEdit(memberHasPendingEdit);
+				
+				m.setMemberHasPublishedStateHistory(memberPublishedHistory);
 
 				LOGGER.trace("Adding member as {} ", m.toString());
 
@@ -302,7 +303,7 @@ public class RefsetConvertor {
 	/**
 	 * @param vM
 	 */
-	private static String populateMemberPublishedStateFlag(Vertex vM) {
+	private static String populateMemberPublishedStateHistoryFlag(Vertex vM) {
 
 		//EdgeLabel.members.toString()).outV()
 		//.has(ID, T.eq, id).outE(EdgeLabel.hasState.toString())
