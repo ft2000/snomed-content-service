@@ -278,12 +278,12 @@ public class RefsetConvertor {
 				
 				//populate memberHasPublishedState flag as "0" or "1" "0" (for if this member has not been published any time) 
 				//and 1 (if this member has been published before). this is used to show that this member has previous states
-				String memberPublishedHistory = populateMemberPublishedStateHistoryFlag(vM);
-				String memberHashPublishedState = m.isPublished() ? "1" : memberPublishedHistory;
+				Integer memberPublishedHistory = populateMemberPublishedStateHistoryFlag(vM);
+				Integer memberHashPublishedState = m.isPublished() ? 1 : memberPublishedHistory;
 				m.setMemberHasPublishedState(memberHashPublishedState);
 				
 				//populate memberHasPendingEdit flag as "0" or "1" "0" if this has no unpublished details. 1 has unpublished details
-				String memberHasPendingEdit = m.isPublished() ? "0" : "1"; 
+				Integer memberHasPendingEdit = m.isPublished() ? 0 : 1; 
 				
 				m.setMemberHasPendingEdit(memberHasPendingEdit);
 				
@@ -303,7 +303,7 @@ public class RefsetConvertor {
 	/**
 	 * @param vM
 	 */
-	private static String populateMemberPublishedStateHistoryFlag(Vertex vM) {
+	private static Integer populateMemberPublishedStateHistoryFlag(Vertex vM) {
 
 		//EdgeLabel.members.toString()).outV()
 		//.has(ID, T.eq, id).outE(EdgeLabel.hasState.toString())
@@ -319,12 +319,12 @@ public class RefsetConvertor {
 			List<Vertex> fls = fPipe.toList();
 			if (!fls.isEmpty()) {
 				
-				return "1";
+				return 1;
 				
 			}
 		}
 		
-		return "0";
+		return 0;
 
 	}
 
