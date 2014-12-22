@@ -531,7 +531,7 @@ public class RefsetAdminGAO {
 		Map<String, String> outcome = new HashMap<String, String>();
 		
 		EventGraph<TitanGraph> g = factory.getEventGraph();
-		g.addListener(new Rf2ImportMemberChangeListener(g.getBaseGraph(), user));
+		//g.addListener(new Rf2ImportMemberChangeListener(g.getBaseGraph(), user));
 		g.addListener(new EffectiveTimeChangeListener(g.getBaseGraph(), user));
 
 		try {
@@ -582,19 +582,42 @@ public class RefsetAdminGAO {
 					Vertex vExistingMember = processed.get(r.getReferencedComponentId());
 
 					Member m = RefsetConvertor.getMember(vExistingMember);
-					if (m.getEffectiveTime().getMillis() == r.getEffectiveTime().getMillis()
+					
+					long existingEt = m.getEffectiveTime().getMillis();
+					
+					if (existingEt == r.getEffectiveTime().getMillis()
 							&& (m.isActive() ? "1" : "0").equals(r.getActive())) {
 						
 						LOGGER.trace("Not adding this record as it already exist {}", r.getId());
 
 						//same record so do not re-import
 						outcome.put(r.getReferencedComponentId(), "Already exist, not imported again");
-						break;
 						
-					} else if (m.getEffectiveTime().getMillis() < r.getEffectiveTime().getMillis()) {
+					} else if (existingEt < r.getEffectiveTime().getMillis()) {
 																		
+						//copy existing vertex to history vertex
+						Vertex vMh = g.getBaseGraph().addVertexWithLabel(g.getBaseGraph().getVertexLabel("GMember"));
+						
+						//then refresh with new property
 						//update a existing member vertex with start date
 						GMember mg = fgf.create(g).getVertex(vExistingMember.getId(), GMember.class);
+						vMh.setProperty(PUBLISHED, mg.getPublished());
+						vMh.setProperty(ACTIVE, mg.getActive());
+						vMh.setProperty(ID, mg.getId());
+						vMh.setProperty(EFFECTIVE_DATE, mg.getEffectiveTime());
+						vMh.setProperty(MODULE_ID, mg.getModuleId());
+						vMh.setProperty(TYPE, VertexType.hMember.toString());
+						vMh.setProperty(CREATED, mg.getCreated());
+						vMh.setProperty(CREATED_BY, mg.getCreateBy());
+						vMh.setProperty(MODIFIED_BY, mg.getModifiedBy());
+						vMh.setProperty(MODIFIED_DATE, mg.getModifiedDate());
+						
+						Edge e = vExistingMember.addEdge(EdgeLabel.hasState.toString(), vMh);
+						e.setProperty(REFERENCE_COMPONENT_ID, r.getReferencedComponentId());
+						e.setProperty(START, mg.getEffectiveTime());
+						e.setProperty(END, r.getEffectiveTime().getMillis());
+
+						
 						addMemberProperties(r, mg, VertexType.member);
 						
 						LOGGER.trace("Updated Member vertex with new properties and new state {}", mg.getId());
@@ -607,7 +630,7 @@ public class RefsetAdminGAO {
 
 						}
 						
-					} else if (m.getEffectiveTime().getMillis() > r.getEffectiveTime().getMillis()) {
+					} else if (existingEt > r.getEffectiveTime().getMillis()) {
 													
 						//add a new member vertex with Long.MAX_VALUE end date
 						Vertex vM = g.getBaseGraph().addVertexWithLabel(g.getBaseGraph().getVertexLabel("GMember"));
