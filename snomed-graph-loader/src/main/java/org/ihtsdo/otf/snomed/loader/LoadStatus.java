@@ -9,13 +9,12 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.ihtsdo.otf.snomed.schema;
+package org.ihtsdo.otf.snomed.loader;
 
 /**
- *
+ *Enums to indicate status of loading at various stages
  */
-public enum CompositeIndex {
+public enum LoadStatus {
 
-	bySctId, bySctIdStatus, conceptBySctId, byDescription, relation, bySctIdAndEffectiveTime, bySctIdAndType, edgeBySctIdAndEffectiveTime, edgeBySctIdAndType
-	
+	IN_PROGRESS, FINISHED, FAILED, IN_COMPLETE,
 }

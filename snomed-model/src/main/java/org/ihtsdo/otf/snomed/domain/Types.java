@@ -17,6 +17,6 @@ package org.ihtsdo.otf.snomed.domain;
 public enum Types {
 
 	concept, description, relationship, module, definition, caseSensitive, type, modifier,
-	hConcept, hDescription, hRelationship, hModule, hDefinition, hCaseSensitive, hType, hModifier
+	hConcept, hDescription, hRelationship, hModule, hDefinition , hModifier
 
 }

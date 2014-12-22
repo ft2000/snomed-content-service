@@ -16,5 +16,5 @@ package org.ihtsdo.otf.refset.graph.gao;
  */
 public enum EdgeLabel {
 
-	hasState, members
+	hasState, members, hasDescription
 }

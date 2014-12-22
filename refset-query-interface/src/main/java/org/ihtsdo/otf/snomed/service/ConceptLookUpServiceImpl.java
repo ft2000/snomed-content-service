@@ -19,34 +19,34 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+import javax.annotation.Resource;
+
 import org.ihtsdo.otf.refset.domain.ChangeRecord;
 import org.ihtsdo.otf.refset.exception.EntityNotFoundException;
 import org.ihtsdo.otf.refset.graph.RefsetGraphAccessException;
 import org.ihtsdo.otf.refset.graph.RefsetGraphFactory;
+import org.ihtsdo.otf.refset.graph.gao.EdgeLabel;
 import org.ihtsdo.otf.snomed.domain.Concept;
 import org.ihtsdo.otf.snomed.domain.Properties;
-import org.ihtsdo.otf.snomed.domain.Relationship;
 import org.ihtsdo.otf.snomed.exception.ConceptServiceException;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.util.StringUtils;
 
 import com.thinkaurelius.titan.core.TitanGraph;
 import com.thinkaurelius.titan.core.TitanIndexQuery.Result;
 import com.tinkerpop.blueprints.Direction;
-import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Vertex;
 
 /**
  * Service to look up Terminology data.
  *
  */
-public class ConceptLookUpServiceImplv1_0 implements ConceptLookupService {
+public class ConceptLookUpServiceImpl implements ConceptLookupService {
 	
-	private static final Logger LOGGER = LoggerFactory.getLogger(ConceptLookUpServiceImplv1_0.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(ConceptLookUpServiceImpl.class);
 		
 	private RefsetGraphFactory factory;
 
@@ -91,39 +91,7 @@ public class ConceptLookUpServiceImplv1_0 implements ConceptLookupService {
 					Object label = v.getProperty(Properties.title.toString());
 					if (sctid != null && label != null && idLst.contains(sctid.toString())) {
 						
-						Concept c = new Concept();
-						
-						c.setId(sctid.toString());
-						
-						Long effectiveTime = v.getProperty(Properties.effectiveTime.toString());
-						
-						if (effectiveTime != null) {
-							
-							c.setEffectiveTime(new DateTime(effectiveTime));
-
-						}
-						
-						String status = v.getProperty(Properties.status.toString());
-						boolean active = "1".equals(status) ? true : false;
-						c.setActive(active);
-						
-						c.setLabel(label.toString());
-						
-						Iterable<Edge> es = v.getEdges(Direction.OUT, Relationship.hasModule.toString());
-						
-						for (Edge edge : es) {
-
-							Vertex vE = edge.getVertex(Direction.IN);
-							
-							if (vE != null) {
-								
-								String moduleId = vE.getProperty(Properties.sctid.toString());
-								c.setModuleId(moduleId);
-								break;
-
-							}
-
-						}
+						Concept c = convertToConcept(v);
 						concepts.put(sctid.toString(), c);
 					}
 					
@@ -179,46 +147,9 @@ public class ConceptLookUpServiceImplv1_0 implements ConceptLookupService {
 			
 			Iterable<Vertex> vs = g.getVertices(Properties.sctid.toString(), conceptId);
 
-			for (Vertex r : vs) {
+			for (Vertex v : vs) {
 				
-				Concept c = new Concept();
-
-				Vertex v = r;
-				
-				String sctId = v.getProperty(Properties.sctid.toString());
-				c.setId(sctId);
-				
-				Long effectiveTime = v.getProperty(Properties.effectiveTime.toString());
-				
-				if (effectiveTime != null) {
-					
-					c.setEffectiveTime(new DateTime(effectiveTime));
-
-				}
-				
-				String status = v.getProperty(Properties.status.toString());
-				boolean active = "1".equals(status) ? true : false;
-				c.setActive(active);
-				
-				String label = v.getProperty(Properties.title.toString());
-				c.setLabel(label);
-				
-				Iterable<Edge> es = v.getEdges(Direction.OUT, Relationship.hasModule.toString());
-				
-				for (Edge edge : es) {
-
-					Vertex vE = edge.getVertex(Direction.IN);
-					
-					if (vE != null) {
-						
-						String moduleId = vE.getProperty(Properties.sctid.toString());
-						c.setModuleId(moduleId);
-						break;
-
-					}
-
-				}
-				
+				Concept c = convertToConcept(v);
 				RefsetGraphFactory.commit(g);
 
 				return c;
@@ -465,33 +396,267 @@ public class ConceptLookUpServiceImplv1_0 implements ConceptLookupService {
 		return descMap;
 	}
 	
+	
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.otf.snomed.service.ConceptLookupService#getConcepts(java.util.List)
+	 */
+	@Override
+	@Cacheable(value = { "conceptsHistory" })
+	public Map<String, ChangeRecord<Concept>> getConceptHistory(Set<String> conceptIds)
+			throws ConceptServiceException {
+
+		LOGGER.debug("getting concepts details for {}", conceptIds);
+		
+		Map<String, ChangeRecord<Concept>> concepts = new HashMap<String, ChangeRecord<Concept>>();
+		
+		TitanGraph g = null;
+		try {
+			
+			
+			g = factory.getReadOnlyGraph();			
+			
+			/**/
+			List<String> idLst = new ArrayList<String>();
+			idLst.addAll(conceptIds);
+
+			int length = idLst.size()/1024;
+			int to = idLst.size() > 1024 ? 1024 : conceptIds.size();
+			int from = 0;
+			for (int i = 0; i < length+1; i++) {
+				
+				LOGGER.debug("getting concept description from {} to {} ", from, to);
+				List<String> subList = idLst.subList(from, to);
+				
+				String ids = org.apache.commons.lang.StringUtils.join(subList, " OR ");
+				Iterable<Result<Vertex>> vs = g.indexQuery("concept","v.sctid:" + ids).vertices();
+				for (Result<Vertex> r : vs) {
+									
+					Vertex v = r.getElement();
+					
+					Object sctid = v.getProperty(Properties.sctid.toString());
+					Object label = v.getProperty(Properties.title.toString());
+					if (sctid != null && label != null && idLst.contains(sctid.toString())) {
+						ChangeRecord<Concept> cr = new ChangeRecord<Concept>();
+						List<Concept> cLst = new ArrayList<Concept>();
+						//TODO more work required
+						Concept c = convertToConcept(v);
+						cLst.add(c);
+						
+						concepts.put(sctid.toString(), cr);
+					}
+					
+				}
+				
+				//to run next loop if required
+				from = to > idLst.size() ? idLst.size() : to;
+				to = (to + 1024) > idLst.size() ? idLst.size() : to+1024;
+
+
+			}
+
+			RefsetGraphFactory.commit(g);
+			
+		} catch (Exception e) {
+			
+			LOGGER.error("Error duing concept details for concept map fetch", e);
+			RefsetGraphFactory.rollback(g);
+
+			throw new ConceptServiceException(e);
+			
+		} finally {
+			
+			RefsetGraphFactory.shutdown(g);
+			
+		}
+		
+		LOGGER.debug("returning total {} concepts ", concepts.size());
+
+		return Collections.unmodifiableMap(concepts);
+	}
+	
+	
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.otf.snomed.service.ConceptLookupService#getConcept(java.lang.String)
+	 */
+	@Override
+	@Cacheable(value = { "conceptHistory" })
+	public ChangeRecord<Concept> getConceptHistory(String conceptId) throws ConceptServiceException,
+			EntityNotFoundException {
+		
+		LOGGER.debug("getting concept details and history for {} ", conceptId);
+
+		if (StringUtils.isEmpty(conceptId)) {
+			
+			throw new EntityNotFoundException(String.format("Invalid concept id", conceptId));
+		}
+		
+		TitanGraph g = null;
+		
+		try {
+			
+			g = factory.getReadOnlyGraph();
+			Iterable<Vertex> vs = g.getVertices(Properties.sctid.toString(), conceptId);
+
+			for (Vertex v : vs) {
+								
+				ChangeRecord<Concept> cr = getHistory(v);
+				return cr;
+			}
+
+			RefsetGraphFactory.commit(g);
+		} catch (Exception e) {
+			
+			LOGGER.error("Error duing concept details fetch", e);
+			RefsetGraphFactory.rollback(g);
+
+			throw new ConceptServiceException(e);
+			
+		} finally {
+			
+			RefsetGraphFactory.shutdown(g);
+		}
+		
+		throw new EntityNotFoundException(String.format("Concept details not available for given concept id %s", conceptId));
+
+
+	}
+
+
+	
+	/**
+	 * @param v
+	 * @return
+	 */
+	private ChangeRecord<Concept> getHistory(Vertex v) {
+		ChangeRecord<Concept> cr = new ChangeRecord<Concept>();
+		
+		if (v != null) {
+			
+			Concept c = convertToConcept(v);
+			cr.getRecords().add(c);
+			Iterable<Vertex> vHcs = v.getVertices(Direction.OUT, EdgeLabel.hasState.toString());
+
+			Map<DateTime, String> descriptions = getHistoryDescription(v);
+			
+			//now populate all history concept and use above map to populate title
+			for (Vertex vHc : vHcs) {
+				
+				Concept hc = convertToConcept(vHc);
+				
+				DateTime et = hc.getEffectiveTime();
+				LOGGER.debug("Effective time {} ", et);
+
+				if (descriptions.containsKey(et)) {
+					
+					hc.setLabel(descriptions.get(hc.getEffectiveTime()));
+				}
+				
+				cr.getRecords().add(hc);
+
+			}
+		}
+		
+		return cr;
+	}
+
+	/**
+	 * @param v
+	 * @return
+	 */
+	private Map<DateTime, String> getHistoryDescription(Vertex v) {
+		Map<DateTime, String> desc = new HashMap<DateTime, String>();
+		
+		if (v != null) {
+			
+			Iterable<Vertex> vDs = v.getVertices(Direction.OUT, EdgeLabel.hasDescription.toString());
+			for (Vertex vD : vDs) {
+				//only interested in fsn description not synonyms or any other type of description .
+				//so check description vertex which has 900000000000003001 typedid for history label.
+				Object typeId = vD.getProperty(Properties.typeId.toString());
+				if ("900000000000003001".equals(typeId)) {
+					
+					Iterable<Vertex> vHDs = vD.getVertices(Direction.OUT, EdgeLabel.hasState.toString());
+					
+					for (Vertex vHD : vHDs) {
+						
+						Object et = vHD.getProperty(Properties.effectiveTime.toString());
+						Object title = vHD.getProperty(Properties.title.toString());
+						
+						LOGGER.debug("Effective time {} & title {} ", et, title);
+
+						if (et != null && title != null ) {
+							
+							desc.put(new DateTime(et), title.toString());
+							
+						}
+					}
+
+				}
+			}
+		}
+
+		LOGGER.debug("Total {} history description records", desc.size());
+
+		return desc;
+	}
+
 	/**
 	 * @param factory the factory to set
 	 */
-	@Autowired
+	@Resource(name = "snomedGraphFactory")
 	public  void setFactory(RefsetGraphFactory factory) {
 		
 		this.factory = factory;
 	}
+	
+	
+	private Concept convertToConcept(Vertex v) {
+		if (v == null) {
+			
+			return null;
+		}
+		
+		Set<String> keys = v.getPropertyKeys();
+		Concept c = new Concept();
 
-	/* (non-Javadoc)
-	 * @see org.ihtsdo.otf.snomed.service.ConceptLookupService#getConceptHistory(java.util.Set)
-	 */
-	@Override
-	public Map<String, ChangeRecord<Concept>> getConceptHistory(Set<String> conceptIds)
-			throws ConceptServiceException {
-		// TODO Auto-generated method stub
-		return null;
-	}
+		if (keys.contains(Properties.effectiveTime.toString())) {
+			
+			Long effectiveTime = v.getProperty(Properties.effectiveTime.toString());
+			c.setEffectiveTime(new DateTime(effectiveTime));
+		}
+	
+		if (keys.contains(Properties.moduleId.toString())) {
+			
+			String moduleId = v.getProperty(Properties.moduleId.toString());
+			c.setModuleId(moduleId);
 
-	/* (non-Javadoc)
-	 * @see org.ihtsdo.otf.snomed.service.ConceptLookupService#getConceptHistory(java.lang.String)
-	 */
-	@Override
-	public ChangeRecord<Concept> getConceptHistory(String conceptId)
-			throws ConceptServiceException, EntityNotFoundException {
-		// TODO Auto-generated method stub
-		return null;
+		}
+		
+		if (keys.contains(Properties.sctid.toString())) {
+
+			String sctid = v.getProperty(Properties.sctid.toString());
+
+			c.setId(sctid);
+
+		}
+		
+		if (keys.contains(Properties.status.toString())) {
+
+			String status = v.getProperty(Properties.status.toString());
+			boolean active = "1".equals(status) ? true : false;
+			c.setActive(active);
+
+		}
+		
+		if (keys.contains(Properties.title.toString())) {
+
+			String title = v.getProperty(Properties.title.toString());
+
+			c.setLabel(title);
+
+		}
+		
+		return c;
 	}
 
 }

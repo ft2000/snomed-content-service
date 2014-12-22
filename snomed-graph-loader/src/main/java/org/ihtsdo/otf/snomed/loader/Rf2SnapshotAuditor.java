@@ -16,7 +16,7 @@ import static org.ihtsdo.otf.snomed.loader.RF2ImportHelper.vMap;
 import static org.ihtsdo.otf.snomed.loader.RF2ImportHelper.getVertex;
 import static org.ihtsdo.otf.snomed.loader.RF2ImportHelper.processCaseSinificance;
 import static org.ihtsdo.otf.snomed.loader.RF2ImportHelper.processModule;
-import static org.ihtsdo.otf.snomed.loader.RF2ImportHelper.processType;
+import static org.ihtsdo.otf.snomed.loader.RF2ImportHelper.processTypeId;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -296,7 +296,7 @@ public class Rf2SnapshotAuditor {
 		vD.addEdge(Relationship.hasCaseSignificance.toString(), vCs);
 
 		//type
-		Vertex vT = processType(g, desc.getTypeId());
+		Vertex vT = processTypeId(g, desc.getTypeId());
 		vD.addEdge(Relationship.hasType.toString(), vT);
 
 		//concept

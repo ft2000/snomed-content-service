@@ -297,10 +297,9 @@ public class RefsetAdminGAO {
 			GremlinPipeline<Vertex, Vertex> removePipeline = new GremlinPipeline<Vertex, Vertex>();
 			
 			removePipeline.start(refset).inE(EdgeLabel.members.toString()).outV().outE(EdgeLabel.hasState.toString()).inV().remove();//all history member vertex
-			removePipeline.reset();
 			
+			removePipeline = new GremlinPipeline<Vertex, Vertex>();
 			removePipeline.start(refset).inE(EdgeLabel.members.toString()).outV().remove();//all member vertex
-			removePipeline.reset();
 			
 			g.removeVertex(refset);
 			

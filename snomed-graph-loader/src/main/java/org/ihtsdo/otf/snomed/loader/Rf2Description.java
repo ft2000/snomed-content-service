@@ -21,7 +21,7 @@ public class Rf2Description extends Rf2Base {
 	private String typeId;
 	private String term;
 	private String caseSignificanceId;
-	
+
 	/**
 	 * @return the conceptId
 	 */

@@ -23,7 +23,7 @@ public class SnomedSchema {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		
-		if (args != null & args.length != 2) {
+		if (args != null & args.length < 2) {
 			
 			System.err.println("Invalid input. Titan db configuration file with abosolute path is required to create Snomed Graph schema "
 					+ "and required operation ie index or schema or print (to print schema and indexes) is mandatory");
@@ -37,7 +37,17 @@ public class SnomedSchema {
 		switch (Operation.valueOf(args[1])) {
 		
 		case index:
-			s.createIndex(null);//default index name
+
+			String indexName = null;
+			
+			if (args.length > 2) {
+				
+				indexName = args[2];
+
+			} 
+			
+			s.createIndex(indexName);//default index name
+
 			s.printIndexes();
 			break;
 			

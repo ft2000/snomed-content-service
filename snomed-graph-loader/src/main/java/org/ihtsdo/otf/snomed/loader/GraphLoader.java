@@ -72,6 +72,39 @@ public class GraphLoader {
 			
 			switch (LoadType.valueOf(type)) {
 			
+			
+			
+			case full:
+				Rf2FullFeedLoader fLoader = new Rf2FullFeedLoader(g);
+				if (!StringUtils.isBlank(cli.getOptionValue("bSize"))) {
+					
+					fLoader.setBufferSize(Integer.parseInt(cli.getOptionValue("bSize")));
+
+				}
+
+				FileType[] ffTypes = FileType.values();
+				
+				for (int i = 0; i < ffTypes.length; i++) {
+					
+					if (!ffTypes[i].equals(FileType.nt)) {
+						
+						FileType fType = ffTypes[i];
+						LOGGER.info("Loading file type {}", fType.toString());
+						String file = cli.getOptionValue(fType.toString());
+						LOGGER.info("Loading file  {}", file);
+
+						if (!StringUtils.isBlank(file)) {
+							
+							fLoader.load(file);
+
+						}
+
+					}
+				}
+				
+				break;
+
+			
 			case snapshot:
 				Rf2SnapshotLoader loader = new Rf2SnapshotLoader(g);
 				if (!StringUtils.isBlank(cli.getOptionValue("bSize"))) {
@@ -176,7 +209,9 @@ public class GraphLoader {
 
 		validate(type, message);
 		
-		if (!type.equalsIgnoreCase(LoadType.snapshot.toString()) && !type.equalsIgnoreCase(LoadType.audit.toString())) {
+		if (!type.equalsIgnoreCase(LoadType.snapshot.toString()) 
+				&& !type.equalsIgnoreCase(LoadType.audit.toString())
+				&& !type.equalsIgnoreCase(LoadType.full.toString())) {
 			
 			message = type + " data load is not supported yet";
 			

@@ -27,6 +27,10 @@ public class Rf2Base {
 	private DateTime modifiedDate;
 	private String modifiedBy;
 	
+	//type to know description/relationship/concept/refset etc. Only used at the backend
+	private String vertexType;
+
+	
 	/**
 	 * @return the id
 	 */
@@ -123,7 +127,16 @@ public class Rf2Base {
 	public void setLoadedBy(String loadedBy) {
 		this.loadedBy = loadedBy;
 	}
-
-
-
+	/**
+	 * @return the type
+	 */
+	public String getVertexType() {
+		return vertexType;
+	}
+	/**
+	 * @param type the type to set
+	 */
+	public void setVertexType(String type) {
+		this.vertexType = type;
+	}
 }

@@ -11,9 +11,15 @@
 */
 package org.ihtsdo.otf.snomed.loader;
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileReader;
+import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.zip.GZIPInputStream;
 
+import org.apache.commons.lang3.StringUtils;
 import org.ihtsdo.otf.snomed.domain.DescriptionType;
 import org.ihtsdo.otf.snomed.domain.Properties;
 import org.ihtsdo.otf.snomed.domain.Relationship;
@@ -21,7 +27,10 @@ import org.ihtsdo.otf.snomed.domain.Types;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.thinkaurelius.titan.core.TitanException;
 import com.thinkaurelius.titan.core.TitanGraph;
+import com.tinkerpop.blueprints.Direction;
+import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Vertex;
 
 /**
@@ -35,6 +44,7 @@ public class RF2ImportHelper {
 	protected static Map<String, DescriptionType> descMap = new HashMap<String, DescriptionType>();
 	protected static Map<String, Properties> characteristicsMap = new HashMap<String, Properties>();
 	protected static Map<String, Relationship> relTypeMap = new HashMap<String, Relationship>();
+
 	static {
 		descMap.put("900000000000013009", DescriptionType.synonym);
 		descMap.put("900000000000550004", DescriptionType.definition);
@@ -168,7 +178,7 @@ public class RF2ImportHelper {
 	 * @param typeId
 	 * @return
 	 */
-	protected static Vertex processType(TitanGraph g, String typeId) {
+	protected static Vertex processTypeId(TitanGraph g, String typeId) {
 
 		long start = System.currentTimeMillis();
 		Vertex v = null;
@@ -233,6 +243,238 @@ public class RF2ImportHelper {
 
 		return v;
 	}
+	
+	/**
+	 * @param rowNumber
+	 * @param bufferSize
+	 * @param g
+	 */
+	protected static void commit(int rowNumber, int bufferSize, TitanGraph g) {
+		
+		
+        if (rowNumber % bufferSize == 0) {
+        	
+    		LOGGER.info("Committing running transaction");
+            try {
+                g.commit();
+                beginTx(g);                
+                LOGGER.info("Total concept processed {}", rowNumber);
+
+            } catch (TitanException e) {
+            	
+                LOGGER.error("Error commiting transaction, retrying {}, {}", rowNumber, e);
+
+            	e.printStackTrace();
+            	try {
+					
+                	g.commit();//retry
+                    beginTx(g);                
+                    LOGGER.info("Total concept processed {}", rowNumber);
+
+				} catch (TitanException e2) {
+					e2.printStackTrace();
+                    LOGGER.error("Error commiting transaction during retry {}, {}", e, rowNumber);
+
+					throw e2;
+				}
+
+            }
+        }
+    }
+	
+	/**
+	 * @param g
+	 */
+	protected static void beginTx(TitanGraph g) {
+        
+		LOGGER.info("Starting a new transaction");
+		try {
+			Thread.sleep(1000);
+			LOGGER.info("Sleep done");
+
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        g.buildTransaction().enableBatchLoading();
+        g.newTransaction();
+        vMap = new HashMap<String, Vertex>();//refresh map as vertex are stale after commit
+	}
+	
+	/**Get a vertex associated with a sctid and given effective time
+	 * @param g
+	 * @param sctid
+	 * @return
+	 */
+	protected static Vertex getVertexByIdEffectiveTime(TitanGraph g, Rf2Base rf2Base) {
+
+		//check to if given sctid and effective time exist.
+		Iterable<Vertex> vs = g.query()
+					.has(Properties.sctid.toString(), rf2Base.getId())
+					.has(Properties.effectiveTime.toString(), rf2Base.getEffectiveTime().getMillis()).vertices();
+
+		for (Vertex vertex : vs) {
+			
+			LOGGER.trace("getVertex - returning vertex as {} ", vertex);
+			return vertex;
+		}
+
+		return null;
+	}
+	
+	/**Get a vertex associated with a sctid and give type
+	 * @param g
+	 * @param sctid
+	 * @return
+	 */
+	protected static Iterable<Vertex> getVertexByIdType(TitanGraph g, String sctId, String type) {
+
+		//check to if given sctid and effective time exist.
+		Iterable<Vertex> vs = g.query()
+					.has(Properties.sctid.toString(), sctId)
+					.has(Properties.type.toString(), type).vertices();
+
+		return vs;
+	}
+	
+	
+	/**Get a edge associated with a sctid and given effective time
+	 * @param g
+	 * @param sctid
+	 * @return
+	 */
+	protected static Edge getEdgeByIdEffectiveTime(TitanGraph g, Rf2Relationship rel) {
+
+		//check to if given sctid and effective time exist.
+		Iterable<Edge> es = g.query()
+					.has(Properties.sctid.toString(), rel.getId())
+					.has(Properties.effectiveTime.toString(), rel.getEffectiveTime().getMillis()).edges();
+
+		for (Edge e : es) {
+			
+			String sourceId = e.getVertex(Direction.OUT) != null ? (String)e.getVertex(Direction.OUT).getProperty(Properties.sctid.toString()) : null;
+			String destinationId = e.getVertex(Direction.IN) != null ? (String)e.getVertex(Direction.IN).getProperty(Properties.sctid.toString()) : null;
+
+			if(rel.getSourceId().equals(sourceId) && rel.getDestinationId().equals(destinationId)) {
+				
+				LOGGER.trace("getEdgeByIdEffectiveTime - returning edge as {} ", e);
+				return e;
+
+			}
+		}
+
+		return null;
+	}
+	
+	/**Get a edge associated with a sctid and given effective time
+	 * @param g
+	 * @param sctid
+	 * @return
+	 */
+	protected static Iterable<Edge> getEdgeByIdType(TitanGraph g, String sctid, String type) {
+
+		//check to if given sctid and effective time exist.
+		Iterable<Edge> es = g.query()
+					.has(Properties.sctid.toString(), sctid)
+					.has(Properties.type.toString(), type).edges();
+		return es;
+	}
+	
+	/**
+	 * @param millis
+	 * @return
+	 */
+	protected static boolean isHistoryEdge(TitanGraph g, Rf2Relationship rel) {
+
+		//get the nearest existing effective time to current effective time
+		Long currentEt = rel.getEffectiveTime().getMillis();
+
+		//check to if given sctid and effective time exist.
+		Iterable<Edge> es = g.query()
+					.has(Properties.sctid.toString(), rel.getId())
+					.has(Properties.type.toString(), Types.relationship.toString())
+					.has(Properties.end.toString(), Long.MAX_VALUE).edges();
+		for (Edge edge : es) {
+			
+			Long existing = edge.getProperty(Properties.effectiveTime.toString());
+			if (currentEt.compareTo(existing) > 0) {
+				
+				return true;
+			}
+		}
+		return false;
+	
+				
+	}
+	
+	protected static boolean verifyTSV(String file) throws Exception {
+		
+		LOGGER.debug("verifyTSV Verifying file");
+		if (StringUtils.isBlank(file)) {
+			
+			throw new IllegalArgumentException("Please check, input file is mandatory");
+			
+		}
+		
+		BufferedReader reader = null;
+		
+		try {
+			
+			if(file.endsWith(".gz")) {
+				
+		        reader = new BufferedReader(new InputStreamReader(new GZIPInputStream(new FileInputStream(file)), "utf-8"));
+		        
+			} else {
+				
+				reader = new BufferedReader(new FileReader(file));
+			}
+			
+			LOGGER.debug("Starting to load file {}", file);
+	        
+	        String line;
+
+	        int noOfColumn = 0;
+	        	        
+	        while( (line = reader.readLine()) != null ) {
+	        	
+            	
+	        	String [] column = line.split("\t");
+	        	if (noOfColumn == 0) {
+					
+		        	noOfColumn = column.length;
+		        	//going forward every line in file should match header length
+				}
+	        	
+	        	if ( !(noOfColumn == column.length && ( noOfColumn == 5 
+	        			|| noOfColumn == 9 
+	        			|| noOfColumn == 10))) {
+
+	        		LOGGER.debug("Check line ={} ", line);
+
+	        		throw new IllegalArgumentException("Supplied tsv file does not conform to concept or description or relationship rf file. "
+	        				+ "data within check, input file is mandatory");
+				}
+	        	
+	        }
+	        
+	        
+	        
+		} catch (Exception e) {
+			
+			throw e;
+		} finally {
+			
+			if (reader != null) {
+				
+				reader.close();
+			}
+		}
+
+		return true;
+		
+	}
+	
+
 	
 	
 }

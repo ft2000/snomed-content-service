@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.ihtsdo.otf.refset.domain.ChangeRecord;
 import org.ihtsdo.otf.refset.exception.EntityNotFoundException;
 import org.ihtsdo.otf.refset.graph.RefsetGraphAccessException;
 import org.ihtsdo.otf.snomed.domain.Concept;
@@ -64,6 +65,23 @@ public interface ConceptLookupService {
 	 */
 	Map<String, String> getMembersDescription(List<String> rcIds)
 			throws RefsetGraphAccessException;
+
+	/**
+	 * @param conceptIds
+	 * @return
+	 * @throws ConceptServiceException
+	 */
+	Map<String, ChangeRecord<Concept>> getConceptHistory(Set<String> conceptIds)
+			throws ConceptServiceException;
+
+	/**Gets concept's details and its history if available
+	 * @param conceptId
+	 * @return
+	 * @throws ConceptServiceException
+	 * @throws EntityNotFoundException
+	 */
+	ChangeRecord<Concept> getConceptHistory(String conceptId)
+			throws ConceptServiceException, EntityNotFoundException;
 
 
 }

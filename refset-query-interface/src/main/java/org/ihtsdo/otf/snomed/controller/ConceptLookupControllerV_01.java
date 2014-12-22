@@ -14,6 +14,7 @@ import javax.annotation.Resource;
 
 import org.ihtsdo.otf.refset.common.Meta;
 import org.ihtsdo.otf.refset.common.Result;
+import org.ihtsdo.otf.refset.domain.ChangeRecord;
 import org.ihtsdo.otf.refset.exception.EntityNotFoundException;
 import org.ihtsdo.otf.snomed.domain.Concept;
 import org.ihtsdo.otf.snomed.service.ConceptLookupService;
@@ -35,12 +36,12 @@ import com.wordnik.swagger.annotations.ApiOperation;
 /**
  *
  */
-@RestController
-@Api(value="Concept details look up service", description="Service to lookup concept details", position = 6)
-@RequestMapping("/v1.0/snomed")
-public class ConceptLookupController {
+@RestController(value = "terminologyDataController")
+@Api(value="Concept details look up service", description="Service to lookup concept details")
+@RequestMapping("/v2/snomed")
+public class ConceptLookupControllerV_01 {
 	
-	private static final Logger logger = LoggerFactory.getLogger(ConceptLookupController.class);
+	private static final Logger logger = LoggerFactory.getLogger(ConceptLookupControllerV_01.class);
 
 	private static final String SUCESS = "Success";
 
@@ -58,7 +59,7 @@ public class ConceptLookupController {
 
 		Result<Map<String, Object>> response = new Result<Map<String, Object>>();
 		Meta m = new Meta();
-		m.add( linkTo( methodOn( ConceptLookupController.class ).getConceptDetails( conceptIds) ).withSelfRel() );
+		m.add( linkTo( methodOn( ConceptLookupControllerV_01.class ).getConceptDetails( conceptIds) ).withSelfRel() );
 		
 		response.setMeta(m);
 
@@ -89,7 +90,7 @@ public class ConceptLookupController {
 		
 		Meta m = new Meta();
 
-		m.add( linkTo( methodOn( ConceptLookupController.class ).getConcept( conceptId ) ).withSelfRel() );
+		m.add( linkTo( methodOn( ConceptLookupControllerV_01.class ).getConcept( conceptId ) ).withSelfRel() );
 		response.setMeta(m);
 
 
@@ -125,7 +126,7 @@ public class ConceptLookupController {
 		
 		Meta m = new Meta();
 
-		m.add( linkTo( methodOn( ConceptLookupController.class ).getConceptIds( page, size ) ).withSelfRel() );
+		m.add( linkTo( methodOn( ConceptLookupControllerV_01.class ).getConceptIds( page, size ) ).withSelfRel() );
 		response.setMeta(m);
 
 
@@ -143,5 +144,41 @@ public class ConceptLookupController {
 		
 	      
     }
+	
+	
+	@RequestMapping( method = RequestMethod.GET, value = "/concept/{conceptId}/history", produces = "application/json" )
+	@ApiOperation( value = "Api to get details of a concept for given concept id." )
+    public ResponseEntity<Result< Map<String, Object>>> getConceptAndHistory( @PathVariable( value = "conceptId") String conceptId ) throws Exception {
+		
+		logger.debug("Getting concept details for {}", conceptId);
+
+		Result<Map<String, Object>> response = new Result<Map<String, Object>>();
+		
+		Meta m = new Meta();
+
+		m.add( linkTo( methodOn( ConceptLookupControllerV_01.class ).getConcept( conceptId ) ).withSelfRel() );
+		response.setMeta(m);
+
+
+		
+		ChangeRecord<Concept> cr =  cService.getConceptHistory(conceptId);
+
+		if (cr == null) {
+			
+			throw new EntityNotFoundException("No data available for given id " + conceptId);
+			
+		}
+		Map<String, Object> data = new HashMap<String, Object>();
+		data.put("history", cr);
+		
+		response.setData(data);
+		m.setMessage(SUCESS);
+		m.setStatus(HttpStatus.OK);
+
+		return new ResponseEntity<Result<Map<String,Object>>>(response, HttpStatus.OK);
+		
+	     
+    }
+
 	
 }

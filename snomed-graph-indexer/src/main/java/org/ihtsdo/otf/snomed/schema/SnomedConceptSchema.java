@@ -243,7 +243,52 @@ public class SnomedConceptSchema {
 			
 			}
 			
+			String caseSignificanceId = Properties.caseSignificanceId.toString();
+			if(!mgmt.containsRelationType(caseSignificanceId)) {
+				
+				LOGGER.debug("Creating property key {}" , caseSignificanceId);
 			
+				mgmt.makePropertyKey(caseSignificanceId).dataType(String.class).make();
+			
+			}
+			
+			String definitionStatusId = Properties.definitionStatusId.toString();
+			if(!mgmt.containsRelationType(definitionStatusId)) {
+				
+				LOGGER.debug("Creating property key {}" , definitionStatusId);
+			
+				mgmt.makePropertyKey(definitionStatusId).dataType(String.class).make();
+			
+			}
+			
+			
+			String start = Properties.start.toString();
+			if(!mgmt.containsRelationType(start)) {
+				
+				LOGGER.debug("Creating property key {}" , start);
+			
+				mgmt.makePropertyKey(start).dataType(Long.class).make();
+			
+			}
+			
+			String end = Properties.end.toString();
+			if(!mgmt.containsRelationType(end)) {
+				
+				LOGGER.debug("Creating property key {}" , end);
+			
+				mgmt.makePropertyKey(end).dataType(Long.class).make();
+			
+			}
+			
+			
+			String type = Properties.type.toString();
+			if(!mgmt.containsRelationType(type)) {
+				
+				LOGGER.debug("Creating property key {}" , type);
+			
+				mgmt.makePropertyKey(type).dataType(String.class).make();
+			
+			}
 			
 			
 			//make necessary labels
@@ -266,61 +311,44 @@ public class SnomedConceptSchema {
 			}
 			
 			String relationship = Types.relationship.toString();
-			if(!mgmt.containsVertexLabel(relationship)) {
+			if(!mgmt.containsRelationType(relationship)) {
 				
-				LOGGER.debug("Creating vertex label {}" , relationship);
+				LOGGER.debug("Creating edge label {}" , relationship);
 			
-				mgmt.makeVertexLabel(relationship).make();
+				mgmt.makeEdgeLabel(relationship).make();
 
 			}
 			
-			String module = Types.module.toString();
-			if(!mgmt.containsVertexLabel(module)) {
-				
-				LOGGER.debug("Creating vertex label {}" , module);
 			
-				mgmt.makeVertexLabel(module).make();
+			//make necessary history labels
+			String hConcept = Types.hConcept.toString();
+			if(!mgmt.containsVertexLabel(hConcept)) {
+				
+				LOGGER.debug("Creating vertex label {}" , hConcept);
+			
+				mgmt.makeVertexLabel(hConcept).make();
 
 			}
 			
+			String hDescription = Types.hDescription.toString();
+			if(!mgmt.containsVertexLabel(hDescription)) {
+				
+				LOGGER.debug("Creating vertex label {}" , hDescription);
+			
+				mgmt.makeVertexLabel(hDescription).make();
 
-			String definition = Types.definition.toString();
-			if(!mgmt.containsVertexLabel(definition)) {
-				
-				LOGGER.debug("Creating vertex label {}" , definition);
+			}
 			
-				mgmt.makeVertexLabel(definition).make();
+			String hRelationship = Types.hRelationship.toString();
+			if(!mgmt.containsRelationType(hRelationship)) {
+				
+				LOGGER.debug("Creating edge label {}" , hRelationship);
+			
+				mgmt.makeEdgeLabel(hRelationship).make();
 
-			}
+			}			
 			
-			String caseSensitive = Types.caseSensitive.toString();
 			
-			if(!mgmt.containsRelationType(caseSensitive)) {
-				
-				LOGGER.debug("Creating vertex label {}" , caseSensitive);
-			
-				mgmt.makeVertexLabel(caseSensitive).make();
-			
-			}
-			
-			String type = Types.type.toString();
-			
-			if(!mgmt.containsRelationType(type)) {
-				
-				LOGGER.debug("Creating vertex label {}" , type);
-			
-				mgmt.makeVertexLabel(type).make();
-			
-			}
-			
-			String modifier = Types.modifier.toString();
-			if(!mgmt.containsRelationType(modifier)) {
-				
-				LOGGER.debug("Creating vertex label {}" , modifier);
-			
-				mgmt.makeVertexLabel(modifier).make();
-			
-			}
 			
 			String fsn = DescriptionType.fsn.toString();
 			if(!mgmt.containsRelationType(fsn)) {
@@ -330,33 +358,7 @@ public class SnomedConceptSchema {
 				mgmt.makeEdgeLabel(fsn).make();
 
 			}
-			String hasModule = Relationship.hasModule.toString();
-			
-			if(!mgmt.containsRelationType(hasModule)) {
-						
-				LOGGER.debug("Creating edge label {}" , hasModule);
-			
-				mgmt.makeEdgeLabel(hasModule).make();
-			
-			}
-			
-			String hasCaseSignificance = Relationship.hasCaseSignificance.toString();
-			if(!mgmt.containsRelationType(hasCaseSignificance)) {
-				
-				LOGGER.debug("Creating edge label {}" , hasCaseSignificance);
-			
-				mgmt.makeEdgeLabel(hasCaseSignificance).make();
-			
-			}
-			
-			String hasType = Relationship.hasType.toString();
-			if(!mgmt.containsRelationType(hasType)) {
-				
-				LOGGER.debug("Creating edge label {}" , hasType);
-			
-				mgmt.makeEdgeLabel(hasType).make();
-			
-			}
+
 			
 			String ds = Relationship.ds.toString();
 			if(!mgmt.containsRelationType(ds)) {
@@ -439,16 +441,16 @@ public class SnomedConceptSchema {
 			}
 			
 			
-
 			
-			String hasModifier = Relationship.hasModifier.toString();
-			if(!mgmt.containsRelationType(hasModifier)) {
+			String hasState = Relationship.hasState.toString();
+			if(!mgmt.containsRelationType(hasState)) {
 				
-				LOGGER.debug("Creating edge label {}" , hasModifier);
+				LOGGER.debug("Creating edge label {}" , hasState);
 			
-				mgmt.makeEdgeLabel(hasModifier).make();
+				mgmt.makeEdgeLabel(hasState).make();
 			
 			}
+			
 			
 			
 			
@@ -464,14 +466,13 @@ public class SnomedConceptSchema {
 		    	
 		    }
 	    	
-	    	if(!mgmt.containsGraphIndex(Properties.sctid.toString())) {
+	    	if(!mgmt.containsGraphIndex(CompositeIndex.bySctIdAndType.toString())) {
 		    	
-				LOGGER.debug("Creating index on key {}" , Properties.sctid.toString());
+				LOGGER.debug("Creating index on key {}" , CompositeIndex.bySctIdAndType.toString());
 
-		    	mgmt.buildIndex(Properties.sctid.toString(), Vertex.class)
+		    	mgmt.buildIndex(CompositeIndex.bySctIdAndType.toString(), Vertex.class)
 		    	.addKey(mgmt.getPropertyKey(sctid))
-		    	.addKey(mgmt.getPropertyKey(effectiveTime))
-		    	.unique()
+		    	.addKey(mgmt.getPropertyKey(type))
 		    	.buildCompositeIndex();
 		    	
 		    }
@@ -484,6 +485,17 @@ public class SnomedConceptSchema {
 		    	.addKey(mgmt.getPropertyKey(sctid))
 		    	.addKey(mgmt.getPropertyKey(effectiveTime))
 		    	.indexOnly(mgmt.getVertexLabel(Types.concept.toString())).buildCompositeIndex();
+		    	
+		    }
+	    	
+	    	if(!mgmt.containsGraphIndex(CompositeIndex.bySctIdAndEffectiveTime.toString())) {
+		    	
+				LOGGER.debug("Creating index on key {}" , CompositeIndex.bySctIdAndEffectiveTime.toString());
+
+		    	mgmt.buildIndex(CompositeIndex.bySctIdAndEffectiveTime.toString(), Vertex.class)
+		    	.addKey(mgmt.getPropertyKey(sctid))
+		    	.addKey(mgmt.getPropertyKey(effectiveTime))
+		    	.buildCompositeIndex();
 		    	
 		    }
 	    	
@@ -522,6 +534,31 @@ public class SnomedConceptSchema {
 
 		    	mgmt.buildEdgeIndex(mgmt.getEdgeLabel(fsn), fsn, Direction.BOTH, Order.DESC, mgmt.getPropertyKey(Properties.title.toString()));
 
+		    }
+	    	
+	    	//to lookup relationship edge by sctid and effective time
+	    	
+	    	if(!mgmt.containsGraphIndex(CompositeIndex.edgeBySctIdAndEffectiveTime.toString())) {
+		    	
+				LOGGER.debug("Creating index on key {}" , CompositeIndex.edgeBySctIdAndEffectiveTime.toString());
+
+		    	mgmt.buildIndex(CompositeIndex.edgeBySctIdAndEffectiveTime.toString(), Edge.class)
+		    	.addKey(mgmt.getPropertyKey(sctid))
+		    	.addKey(mgmt.getPropertyKey(effectiveTime))
+		    	.buildCompositeIndex();
+		    	
+		    }
+	    	
+	    	
+	    	if(!mgmt.containsGraphIndex(CompositeIndex.edgeBySctIdAndType.toString())) {
+		    	
+				LOGGER.debug("Creating index on key {}" , CompositeIndex.edgeBySctIdAndType.toString());
+
+		    	mgmt.buildIndex(CompositeIndex.edgeBySctIdAndType.toString(), Edge.class)
+		    	.addKey(mgmt.getPropertyKey(sctid))
+		    	.addKey(mgmt.getPropertyKey(type))
+		    	.buildCompositeIndex();
+		    	
 		    }
 
 			mgmt.commit();
@@ -567,7 +604,7 @@ public class SnomedConceptSchema {
 	public void createIndex(String backingIndex) {
 		
 		
-		LOGGER.debug("Creating Snomed Index");
+		LOGGER.debug("Creating {} Index", backingIndex);
 		
 		if (StringUtils.isEmpty(backingIndex)) {
 			
@@ -579,21 +616,6 @@ public class SnomedConceptSchema {
 	    
 	    try {
 
-	    	
-	    	
-			String typeId = Properties.typeId.toString();
-			if(!mgmt.containsGraphIndex(typeId)) {
-		    	
-				LOGGER.debug("Creating index on key {}" , typeId);
-
-		    	mgmt.buildIndex(typeId, Edge.class).addKey(mgmt.getPropertyKey(typeId),
-	    				Parameter.of(MAPPED, Properties.typeId.toString())
-		    			).buildMixedIndex(backingIndex);
-		    	
-		    }
-	    		    	
-
-	    	
 	    	String isA = Relationship.isA.toString(); 
 	    	if(!mgmt.containsGraphIndex(isA)) {
 		    	
@@ -621,7 +643,8 @@ public class SnomedConceptSchema {
 	    				Parameter.of(MAPPED, Properties.modifiedBy.toString()))
 				.addKey(mgmt.getPropertyKey(Properties.characteristic.toString()),
 	    				Parameter.of(MAPPED, Properties.characteristic.toString()))
-	    		
+	    		.addKey(mgmt.getPropertyKey(Properties.type.toString()),
+	    				Parameter.of(MAPPED, Properties.type.toString()))
 	    		.buildMixedIndex(backingIndex);
 
 		    	
@@ -654,6 +677,8 @@ public class SnomedConceptSchema {
 	    				Parameter.of(MAPPED, Properties.modifiedBy.toString()))
 				.addKey(mgmt.getPropertyKey(Properties.characteristic.toString()),
 	    				Parameter.of(MAPPED, Properties.characteristic.toString()))
+	    		.addKey(mgmt.getPropertyKey(Properties.type.toString()),
+	    				Parameter.of(MAPPED, Properties.type.toString()))
 
 	    		.buildMixedIndex(backingIndex);		    	
 		    }
@@ -685,6 +710,9 @@ public class SnomedConceptSchema {
 	    				Parameter.of(MAPPED, Properties.modifiedBy.toString()))
 				.addKey(mgmt.getPropertyKey(Properties.characteristic.toString()),
 	    				Parameter.of(MAPPED, Properties.characteristic.toString()))
+	    		.addKey(mgmt.getPropertyKey(Properties.type.toString()),
+	    				Parameter.of(MAPPED, Properties.type.toString()))
+	    				
 	    		.buildMixedIndex(backingIndex);		    	
 		    	
 		    }
@@ -716,6 +744,8 @@ public class SnomedConceptSchema {
 	    				Parameter.of(MAPPED, Properties.modifiedBy.toString()))
 				.addKey(mgmt.getPropertyKey(Properties.characteristic.toString()),
 	    				Parameter.of(MAPPED, Properties.characteristic.toString()))
+	    		.addKey(mgmt.getPropertyKey(Properties.type.toString()),
+	    				Parameter.of(MAPPED, Properties.type.toString()))
 	    		.buildMixedIndex(backingIndex);		    	
 		    	
 		    }
@@ -739,8 +769,22 @@ public class SnomedConceptSchema {
 	    				Parameter.of(MAPPED, Properties.status.toString()))
 	    		.addKey(mgmt.getPropertyKey(Properties.languageCode.toString()),
 	    				Parameter.of(MAPPED, Properties.languageCode.toString()))
-
-	    		.buildMixedIndex(backingIndex);
+	    		.addKey(mgmt.getPropertyKey(Properties.type.toString()),
+	    				Parameter.of(MAPPED, Properties.type.toString()))
+				.addKey(mgmt.getPropertyKey(Properties.moduleId.toString()),
+	    				Parameter.of(MAPPED, Properties.moduleId.toString()))
+				.addKey(mgmt.getPropertyKey(Properties.caseSignificanceId.toString()),
+	    				Parameter.of(MAPPED, Properties.caseSignificanceId.toString()))
+				.addKey(mgmt.getPropertyKey(Properties.typeId.toString()),
+	    				Parameter.of(MAPPED, Properties.typeId.toString()))
+				.addKey(mgmt.getPropertyKey(Properties.created.toString()), 
+				Parameter.of(MAPPED, Properties.created.toString()))
+				
+				.addKey(mgmt.getPropertyKey(Properties.createdBy.toString()), 
+				Parameter.of(MAPPED, Properties.createdBy.toString()))
+	    				
+	    				
+				.buildMixedIndex(backingIndex);
 		    	
 		    }
 	    	
@@ -759,8 +803,18 @@ public class SnomedConceptSchema {
 		    				Parameter.of(MAPPED, Properties.status.toString()))
 		    		.addKey(mgmt.getPropertyKey(Properties.effectiveTime.toString()),
 		    				Parameter.of(MAPPED, Properties.effectiveTime.toString()))
-
-
+		    		.addKey(mgmt.getPropertyKey(Properties.type.toString()),
+		    				Parameter.of(MAPPED, Properties.type.toString()))
+    				.addKey(mgmt.getPropertyKey(Properties.moduleId.toString()),
+		    				Parameter.of(MAPPED, Properties.moduleId.toString()))
+		    		.addKey(mgmt.getPropertyKey(Properties.definitionStatusId.toString()),
+		    				Parameter.of(MAPPED, Properties.definitionStatusId.toString()))
+					.addKey(mgmt.getPropertyKey(Properties.created.toString()), 
+					Parameter.of(MAPPED, Properties.created.toString()))
+					
+					.addKey(mgmt.getPropertyKey(Properties.createdBy.toString()), 
+					Parameter.of(MAPPED, Properties.createdBy.toString()))
+		    				
 		    		.buildMixedIndex(backingIndex);
 		    	
 		    }
@@ -769,36 +823,166 @@ public class SnomedConceptSchema {
 	    	if(!mgmt.containsGraphIndex(relationship)) {
 		    	
 				LOGGER.debug("Creating index on vertex {}" , relationship);
-
-				mgmt.buildIndex(relationship, Vertex.class)
-	    		.indexOnly(mgmt.getVertexLabel(relationship))
+				mgmt.buildIndex(relationship, Edge.class)
+	    		.indexOnly(mgmt.getEdgeLabel(relationship))
 	    		.addKey(mgmt.getPropertyKey(Properties.sctid.toString()), 
 	    				Parameter.of(MAPPED, Properties.sctid.toString()))
+	    				
+				.addKey(mgmt.getPropertyKey(Properties.effectiveTime.toString()), 
+				Parameter.of(MAPPED, Properties.effectiveTime.toString()))
+				
+				.addKey(mgmt.getPropertyKey(Properties.status.toString()), 
+				Parameter.of(MAPPED, Properties.status.toString()))
+				
+				.addKey(mgmt.getPropertyKey(Properties.moduleId.toString()), 
+				Parameter.of(MAPPED, Properties.moduleId.toString()))
+				
+				.addKey(mgmt.getPropertyKey(Properties.group.toString()), 
+				Parameter.of(MAPPED, Properties.group.toString()))
+				
+				.addKey(mgmt.getPropertyKey(Properties.typeId.toString()), 
+				Parameter.of(MAPPED, Properties.typeId.toString()))
+				
+				.addKey(mgmt.getPropertyKey(Properties.characteristicId.toString()), 
+				Parameter.of(MAPPED, Properties.characteristicId.toString()))
+				
+				.addKey(mgmt.getPropertyKey(Properties.modifierId.toString()), 
+				Parameter.of(MAPPED, Properties.modifierId.toString()))
+				
+				.addKey(mgmt.getPropertyKey(Properties.created.toString()), 
+				Parameter.of(MAPPED, Properties.created.toString()))
+				
+				.addKey(mgmt.getPropertyKey(Properties.createdBy.toString()), 
+				Parameter.of(MAPPED, Properties.createdBy.toString()))
+				
+				.addKey(mgmt.getPropertyKey(Properties.start.toString()), 
+				Parameter.of(MAPPED, Properties.start.toString()))
+				
+				.addKey(mgmt.getPropertyKey(Properties.end.toString()), 
+				Parameter.of(MAPPED, Properties.end.toString()))
+				
+	    		.addKey(mgmt.getPropertyKey(Properties.type.toString()),
+	    				Parameter.of(MAPPED, Properties.type.toString()))
+	    				
+	    				
 	    		.buildMixedIndex(backingIndex);
 		    }
-
-	    	//generic index
-	    	if(!mgmt.containsGraphIndex("bySctIdStatus")) {
-			    	
-				LOGGER.debug("Creating index on vertex {}" , "bySctIdStatus");
-
-				mgmt.buildIndex("bySctIdStatus", Vertex.class)
-	    		.addKey(mgmt.getPropertyKey(Properties.sctid.toString()))
-	    		.addKey(mgmt.getPropertyKey(Properties.status.toString()))
-	    		.buildCompositeIndex();
-		    }
-	    	String bySctIdTimeStatus = MixedIndex.bySctIdTimeStatus.toString();
-	    	if(!mgmt.containsGraphIndex(bySctIdTimeStatus)) {
+	    	
+	    	//history vertex
+	    	
+	    	String hDescription = Types.hDescription.toString(); 
+	    	if(!mgmt.containsGraphIndex(hDescription)) {
 		    	
-				LOGGER.debug("Creating index on vertex {}" , bySctIdTimeStatus);
+				LOGGER.debug("Creating index on vertex {}" , hDescription);
 
-				mgmt.buildIndex(bySctIdTimeStatus, Vertex.class)
-	    		.addKey(mgmt.getPropertyKey(Properties.sctid.toString()), 
+				mgmt.buildIndex(hDescription, Vertex.class)
+	    		.indexOnly(mgmt.getVertexLabel(hDescription))
+	    		.addKey(mgmt.getPropertyKey(Properties.sctid.toString()),
 	    				Parameter.of(MAPPED, Properties.sctid.toString()))
+	    		.addKey(mgmt.getPropertyKey(Properties.effectiveTime.toString()),
+	    				Parameter.of(MAPPED, Properties.effectiveTime.toString()))
+	    		.addKey(mgmt.getPropertyKey(Properties.title.toString()),
+	    				Parameter.of(MAPPED, Properties.title.toString()))
 	    		.addKey(mgmt.getPropertyKey(Properties.status.toString()),
 	    				Parameter.of(MAPPED, Properties.status.toString()))
-	    		.addKey(mgmt.getPropertyKey(Properties.effectiveTime.toString()), 
-	    				Parameter.of(MAPPED, Properties.effectiveTime.toString()))
+	    		.addKey(mgmt.getPropertyKey(Properties.languageCode.toString()),
+	    				Parameter.of(MAPPED, Properties.languageCode.toString()))
+	    		.addKey(mgmt.getPropertyKey(Properties.type.toString()),
+	    				Parameter.of(MAPPED, Properties.type.toString()))
+				.addKey(mgmt.getPropertyKey(Properties.moduleId.toString()),
+		    				Parameter.of(MAPPED, Properties.moduleId.toString()))
+	    		.addKey(mgmt.getPropertyKey(Properties.caseSignificanceId.toString()),
+		    				Parameter.of(MAPPED, Properties.caseSignificanceId.toString()))
+	    		.addKey(mgmt.getPropertyKey(Properties.typeId.toString()),
+		    				Parameter.of(MAPPED, Properties.typeId.toString()))
+				.addKey(mgmt.getPropertyKey(Properties.created.toString()), 
+				Parameter.of(MAPPED, Properties.created.toString()))
+				
+				.addKey(mgmt.getPropertyKey(Properties.createdBy.toString()), 
+				Parameter.of(MAPPED, Properties.createdBy.toString()))
+		    				
+		    				
+		    	.buildMixedIndex(backingIndex);
+		    	
+		    }
+	    	
+	    	String hConcept = Types.hConcept.toString(); 
+	    	if(!mgmt.containsGraphIndex(hConcept)) {
+		    	
+				LOGGER.debug("Creating index on vertex {}" , hConcept);
+
+		    	mgmt.buildIndex(hConcept, Vertex.class)
+		    		.indexOnly(mgmt.getVertexLabel(hConcept))
+		    		.addKey(mgmt.getPropertyKey(Properties.sctid.toString()),
+		    				Parameter.of(MAPPED, Properties.sctid.toString()))
+		    		.addKey(mgmt.getPropertyKey(Properties.title.toString()),
+		    				Parameter.of(MAPPED, Properties.title.toString()))
+		    		.addKey(mgmt.getPropertyKey(Properties.status.toString()),
+		    				Parameter.of(MAPPED, Properties.status.toString()))
+		    		.addKey(mgmt.getPropertyKey(Properties.effectiveTime.toString()),
+		    				Parameter.of(MAPPED, Properties.effectiveTime.toString()))
+		    		.addKey(mgmt.getPropertyKey(Properties.type.toString()),
+		    				Parameter.of(MAPPED, Properties.type.toString()))
+    				.addKey(mgmt.getPropertyKey(Properties.moduleId.toString()),
+		    				Parameter.of(MAPPED, Properties.moduleId.toString()))
+		    		.addKey(mgmt.getPropertyKey(Properties.definitionStatusId.toString()),
+		    				Parameter.of(MAPPED, Properties.definitionStatusId.toString()))
+					.addKey(mgmt.getPropertyKey(Properties.created.toString()), 
+					Parameter.of(MAPPED, Properties.created.toString()))
+					
+					.addKey(mgmt.getPropertyKey(Properties.createdBy.toString()), 
+					Parameter.of(MAPPED, Properties.createdBy.toString()))
+		    				
+		    				
+		    		.buildMixedIndex(backingIndex);
+		    	
+		    }
+	    	
+	    	String hRelationship = Types.hRelationship.toString(); 
+	    	if(!mgmt.containsGraphIndex(hRelationship)) {
+		    	
+				LOGGER.debug("Creating index on vertex {}" , hRelationship);
+
+				mgmt.buildIndex(hRelationship, Edge.class)
+	    		.indexOnly(mgmt.getEdgeLabel(hRelationship))
+	    		.addKey(mgmt.getPropertyKey(Properties.sctid.toString()), 
+	    				Parameter.of(MAPPED, Properties.sctid.toString()))
+	    				
+				.addKey(mgmt.getPropertyKey(Properties.effectiveTime.toString()), 
+				Parameter.of(MAPPED, Properties.effectiveTime.toString()))
+				
+				.addKey(mgmt.getPropertyKey(Properties.status.toString()), 
+				Parameter.of(MAPPED, Properties.status.toString()))
+				
+				.addKey(mgmt.getPropertyKey(Properties.moduleId.toString()), 
+				Parameter.of(MAPPED, Properties.moduleId.toString()))
+				
+				.addKey(mgmt.getPropertyKey(Properties.group.toString()), 
+				Parameter.of(MAPPED, Properties.group.toString()))
+				
+				.addKey(mgmt.getPropertyKey(Properties.typeId.toString()), 
+				Parameter.of(MAPPED, Properties.typeId.toString()))
+				
+				.addKey(mgmt.getPropertyKey(Properties.characteristicId.toString()), 
+				Parameter.of(MAPPED, Properties.characteristicId.toString()))
+				
+				.addKey(mgmt.getPropertyKey(Properties.modifierId.toString()), 
+				Parameter.of(MAPPED, Properties.modifierId.toString()))
+				
+				.addKey(mgmt.getPropertyKey(Properties.created.toString()), 
+				Parameter.of(MAPPED, Properties.created.toString()))
+				
+				.addKey(mgmt.getPropertyKey(Properties.createdBy.toString()), 
+				Parameter.of(MAPPED, Properties.createdBy.toString()))
+				
+				.addKey(mgmt.getPropertyKey(Properties.start.toString()), 
+				Parameter.of(MAPPED, Properties.start.toString()))
+				
+				.addKey(mgmt.getPropertyKey(Properties.end.toString()), 
+				Parameter.of(MAPPED, Properties.end.toString()))
+				
+	    		.addKey(mgmt.getPropertyKey(Properties.type.toString()),
+	    				Parameter.of(MAPPED, Properties.type.toString()))
 	    		.buildMixedIndex(backingIndex);
 		    }
 

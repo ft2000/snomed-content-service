@@ -20,5 +20,5 @@ public enum Properties {
 	modifiedBy, status, languageCode, group, typeId, moduleId, modifierId, 
 	characteristic, characteristicId, inferred, stated, additional, qualifying,
 	referenceComponentId, sid, publishedDate, published, earliestEffectiveTime, 
-	latestEffectiveTime, parentId, type, end, start
+	latestEffectiveTime, parentId, type, end, start, definitionStatusId, caseSignificanceId
 }

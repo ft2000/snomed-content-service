@@ -11,6 +11,8 @@
 */
 package org.ihtsdo.otf.snomed.loader;
 
+import org.joda.time.DateTime;
+
 
 /**
  *
@@ -23,6 +25,8 @@ public class Rf2Relationship extends Rf2Base {
 	private String typeId;
 	private String characteristicTypeId;
 	private String modifierId;
+	private DateTime start;
+	private DateTime end;
 	
 
 	/**
@@ -96,6 +100,30 @@ public class Rf2Relationship extends Rf2Base {
 	 */
 	public void setModifierId(String modifierId) {
 		this.modifierId = modifierId;
+	}
+	/**
+	 * @return the start
+	 */
+	public DateTime getStart() {
+		return start;
+	}
+	/**
+	 * @param start the start to set
+	 */
+	public void setStart(DateTime start) {
+		this.start = start;
+	}
+	/**
+	 * @return the end
+	 */
+	public DateTime getEnd() {
+		return end;
+	}
+	/**
+	 * @param end the end to set
+	 */
+	public void setEnd(DateTime end) {
+		this.end = end;
 	}
 
 

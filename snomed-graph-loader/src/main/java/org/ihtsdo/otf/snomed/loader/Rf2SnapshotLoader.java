@@ -20,7 +20,7 @@ import static org.ihtsdo.otf.snomed.loader.RF2ImportHelper.processCaseSinificanc
 import static org.ihtsdo.otf.snomed.loader.RF2ImportHelper.processDefinitionStatus;
 import static org.ihtsdo.otf.snomed.loader.RF2ImportHelper.processModifier;
 import static org.ihtsdo.otf.snomed.loader.RF2ImportHelper.processModule;
-import static org.ihtsdo.otf.snomed.loader.RF2ImportHelper.processType;
+import static org.ihtsdo.otf.snomed.loader.RF2ImportHelper.processTypeId;
 
 import java.io.FileInputStream;
 import java.io.FileReader;
@@ -333,7 +333,7 @@ public class Rf2SnapshotLoader {
 		vD.addEdge(Relationship.hasCaseSignificance.toString(), vCs);
 
 		//type
-		Vertex vT = processType(g, desc.getTypeId());
+		Vertex vT = processTypeId(g, desc.getTypeId());
 		vD.addEdge(Relationship.hasType.toString(), vT);
 
 		//concept
@@ -380,7 +380,7 @@ public class Rf2SnapshotLoader {
 		g.addEdge(rel.getModuleId(), vR, vM, Relationship.hasModule.toString());
 
 		//type
-		Vertex vT = processType(g, rel.getTypeId());
+		Vertex vT = processTypeId(g, rel.getTypeId());
 		g.addEdge(rel.getTypeId(), vR, vT, Relationship.hasType.toString());
 		
 		//modifier
