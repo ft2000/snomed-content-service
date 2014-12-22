@@ -28,7 +28,7 @@ import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.util.wrappers.event.listener.GraphChangedListener;
 
 /**
- *Effective time change listener to keep track of {@link Member} effective so that
+ *Effective time change listener to keep track of {@link Member} effective time so that
  *a desired value can be assigned to {@link Refset#setEarliestEffectiveTime() and Refset#setLatestEffectiveTime()}
  */
 public class EffectiveTimeChangeListener implements GraphChangedListener {

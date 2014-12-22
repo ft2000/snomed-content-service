@@ -86,6 +86,14 @@ public class Rf2ImportMemberChangeListener implements GraphChangedListener {
 
         		Vertex hV = g.getVertex(historyVertexIds.get(cV.getId()));
         		hV.setProperty(key, oldValue);
+        		//also add published flag if not added earlier.
+        		if(!PUBLISHED.equals(key) 
+        				&& hV.getProperty(PUBLISHED) == null
+        				&& cV.getProperty(PUBLISHED) != null) {
+        			
+        			hV.setProperty(PUBLISHED, cV.getProperty(PUBLISHED));
+        			
+        		}
         		//add relation if does not exist already
         		addStateRelation(hV, cV);
         		RefsetGraphFactory.commit(g);

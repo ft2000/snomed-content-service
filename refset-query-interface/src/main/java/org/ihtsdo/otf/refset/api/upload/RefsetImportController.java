@@ -58,7 +58,7 @@ public class RefsetImportController {
 	@PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<Result< Map<String, Object>>> importRF2Multipart( @RequestParam("file") MultipartFile file, @PathVariable String refsetId) throws Exception {
 		
-		logger.debug("Importing an existing refset {} in rf2 format");
+		logger.debug("Importing an existing refset {} in rf2 format", refsetId);
 
 		//call verify service
 		final InputStream is;
