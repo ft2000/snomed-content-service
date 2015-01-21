@@ -39,4 +39,12 @@ public class HomeController {
 		return "home";
 	}
 	
+	@RequestMapping( method = RequestMethod.GET, value = "/getDiffReport")
+	public String getRefsetDiffReport() throws Exception {
+		
+		logger.debug("Display refset diff report ui");
+
+		return "diffreport";
+    }
+	
 }

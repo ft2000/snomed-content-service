@@ -23,6 +23,7 @@ import static org.ihtsdo.otf.refset.domain.RGC.END;
 import static org.ihtsdo.otf.refset.domain.RGC.E_EFFECTIVE_TIME;
 import static org.ihtsdo.otf.refset.domain.RGC.L_EFFECTIVE_TIME;
 import static org.ihtsdo.otf.refset.domain.RGC.PARENT_ID;
+import static org.ihtsdo.otf.refset.domain.RGC.LOCK;
 
 import java.util.Arrays;
 import java.util.List;
@@ -577,6 +578,13 @@ public class RefsetSchema {
 
 			LOGGER.debug("Creating Property {}", PARENT_ID);
 			mgmt.makePropertyKey(PARENT_ID).dataType(String.class).make();
+			
+		}
+		
+		if (!mgmt.containsRelationType(LOCK)) {
+
+			LOGGER.debug("Creating Property {}", LOCK);
+			mgmt.makePropertyKey(LOCK).dataType(Integer.class).make();
 			
 		}
 

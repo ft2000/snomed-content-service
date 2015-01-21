@@ -11,6 +11,7 @@ import org.ihtsdo.otf.refset.domain.MetaData;
 import org.ihtsdo.otf.refset.domain.Refset;
 import org.ihtsdo.otf.refset.exception.EntityAlreadyExistException;
 import org.ihtsdo.otf.refset.exception.EntityNotFoundException;
+import org.ihtsdo.otf.refset.exception.LockingException;
 import org.ihtsdo.otf.refset.exception.RefsetServiceException;
 
 /**Service to support {@link Refset} authoring
@@ -46,8 +47,9 @@ public interface RefsetAuthoringService {
 	/**Method to add a {@link Member} to given {@link Refset}.
 	 * @param refsetId
 	 * @throws RefsetServiceException
+	 * @throws LockingException 
 	 */
-	public void remove(String refsetId, String user) throws RefsetServiceException, EntityNotFoundException ;
+	public void remove(String refsetId, String user) throws RefsetServiceException, EntityNotFoundException, LockingException ;
 	
 	
 	/**Method to add a list of {@link Member}s to given {@link Refset}.

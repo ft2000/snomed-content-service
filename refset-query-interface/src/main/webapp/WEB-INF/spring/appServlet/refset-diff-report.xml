@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.0.xsd">
+		
+		
+		
+		
+		<bean id="dataSource"
+	        class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+	        <property name="driverClassName" value="com.mysql.jdbc.Driver" />
+	        <property name="url" value="jdbc:mysql://localhost:3306/refset" />
+	        <property name="username" value="${mysql.user}" />
+	        <property name="password" value="${mysql.password}" />
+	    </bean>
+	    
+	    
+	    <bean id="template" class="org.springframework.jdbc.core.JdbcTemplate">
+	    	<property name="dataSource" ref="dataSource" />
+	    </bean>
+	    
+	    <util:map id="createTables" key-type="java.lang.String" value-type="java.lang.String">
+	    
+	    	<entry key="octmap"> 
+	    		<value>
+	    			<![CDATA[
+	    				create table if not exists octmap_replaceme(
+					   id varchar(36) not null,
+					   effectivetime char(8),
+					   active char(1),
+					   moduleid varchar(18),
+					   refsetid varchar(18),
+					   referencedcomponentid varchar(18),
+						key idx_id(id),
+						key idx_effectivetime(effectivetime),
+						key idx_active(active),
+						key idx_moduleid(moduleid),
+						key idx_refsetid(refsetid),
+						key idx_referencedcomponentid(referencedcomponentid)
+					) engine=myisam default charset=utf8;
+					]]>
+	    		</value>
+	    	</entry>
+			<entry key="octmapfull"> 
+	    		<value>
+	    			<![CDATA[
+					create table if not exists octmapfull_replaceme(
+					   id varchar(36) not null,
+					   effectivetime char(8),
+					   active char(1),
+					   moduleid varchar(18),
+					   refsetid varchar(18),
+					   referencedcomponentid varchar(18),
+						key idx_id(id),
+						key idx_effectivetime(effectivetime),
+						key idx_active(active),
+						key idx_moduleid(moduleid),
+						key idx_refsetid(refsetid),
+						key idx_referencedcomponentid(referencedcomponentid)
+					) engine=myisam default charset=utf8;
+					]]>
+	    		</value>
+	    	</entry>
+	    	
+			<entry key="refsetids"> 
+	    		<value>
+	    			<![CDATA[
+					create table refsetids_replaceme(
+						id varchar(36) not null,
+						descrip varchar(300),
+						key idx_id(id),
+						key idx_descrip(descrip)
+					) engine=myisam default charset=utf8;
+					]]>
+	    		</value>
+	    	</entry>	    
+	    		    
+	    </util:map>
+	    
+  	    <util:map id="dropTables" key-type="java.lang.String" value-type="java.lang.String">
+	    
+	    	<entry key="octmap"> 
+	    		<value>
+	    			<![CDATA[ drop table if exists octmap_replaceme;]]>
+	    		</value>
+	    	</entry>
+	    	<entry key="octmapfull"> 
+	    		<value>
+	    			<![CDATA[ drop table if exists octmapfull_replaceme;]]>
+	    		</value>
+	    	</entry>
+	    	<entry key="refsetids"> 
+	    		<value>
+	    			<![CDATA[ drop table if exists refsetids_replaceme;]]>
+	    		</value>
+	    	</entry>	    		    	
+	    	
+	    	</util:map>
+	    
+	    <bean id="diffReport" name="diffReport" class="java.lang.String">
+	    	<constructor-arg> <value>
+	    	
+	    	<![CDATA[ 
+	    			select a.referencedcomponentid as referencedcomponentid, d4.term as d4term, a.refsetid as arefsetid, f.descrip as descrip, b.active as active, 
+	    			c.valueid as valueid, d.term as dterm, e.refsetid as erefsetid, reasonTable.reasondesc as reasondesc, 
+	    			e.targetcomponentid as targetcomponentid, reasonTable3.reasondesc3 as reasondesc3
+	    			from octmap_replaceme a 
+					join janconcept_releaseDate b on a.referencedcomponentid = b.id and b.active = '0'
+					join attrvalue_releaseDate c on c.referencedcomponentid = a.referencedcomponentid
+					join descr_releaseDate d on d.conceptd = c.valueid and d.typeid = '900000000000003001'
+					join associationrefset_releaseDate e on e.referencedcomponentid = b.id
+					join (select distinct d2.conceptd refsetSCTID, d2.term reasonDesc
+	      				from descr_releaseDate d2, associationrefset_releaseDate e2
+	      			where e2.refsetId = d2.conceptd and d2.typeid = '900000000000003001') reasonTable on reasonTable.refsetSCTID = e.refsetid
+					join refsetids_replaceme f on f.id = a.refsetid
+					join (select distinct d3.conceptd refsetSCTID, d3.term reasonDesc3
+	      			from descr_releaseDate d3, associationrefset_releaseDate e3
+	      				where e3.targetcomponentId = d3.conceptd and d3.typeid = '900000000000003001' and d3.active = '1') 
+	      				reasonTable3 on reasonTable3.refsetSCTID = e.targetcomponentid
+					join descr2_releaseDate d4 on d4.conceptid = b.id and d4.typeid = '900000000000003001' and d4.active = '1';
+					]]>
+	    	</value></constructor-arg>
+	    </bean>
+ </beans>

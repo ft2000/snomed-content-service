@@ -14,6 +14,7 @@ import org.ihtsdo.otf.refset.domain.Member;
 import org.ihtsdo.otf.refset.domain.Refset;
 import org.ihtsdo.otf.refset.exception.EntityAlreadyExistException;
 import org.ihtsdo.otf.refset.exception.EntityNotFoundException;
+import org.ihtsdo.otf.refset.exception.LockingException;
 import org.ihtsdo.otf.refset.exception.RefsetServiceException;
 import org.ihtsdo.otf.refset.graph.RefsetGraphAccessException;
 import org.ihtsdo.otf.refset.graph.gao.MemberGAO;
@@ -170,17 +171,31 @@ public class RefsetAuthoringServiceImpl implements RefsetAuthoringService {
 
 	@Override
 	public void remove(String refsetId, String user) throws RefsetServiceException,
-			EntityNotFoundException {
+			EntityNotFoundException, LockingException {
 		
 		LOGGER.debug("remove refset {}", refsetId);
 
 		try {
 			 
+			adminGao.lock(refsetId);
+			
 			adminGao.removeRefset(refsetId, user);
 			
 		} catch (RefsetGraphAccessException e) {
 			
+			try {
+				
+				adminGao.removeLock(refsetId);
+				
+			} catch (RefsetGraphAccessException e1) {
+				
+				LOGGER.error("Lock on refset {} can not be removed. "
+						+ "One has to manually remove to that lock ie delete lock property on this refset", refsetId, e1);
+
+			}
+			
 			LOGGER.error("Error during service call", e);
+			
 			throw new RefsetServiceException(e.getMessage());
 			
 		}

@@ -36,6 +36,9 @@ public final class RGC {
 	public static final String L_EFFECTIVE_TIME = "latestEffectiveTime";
 	
 	public static final String PARENT_ID = "parentId";
+	
+	public static final String LOCK = "lock"; //used in write lock. This is to handle long running transaction.
+
 
 	
 

@@ -17,6 +17,7 @@ import org.ihtsdo.otf.refset.domain.MetaData;
 import org.ihtsdo.otf.refset.domain.Refset;
 import org.ihtsdo.otf.refset.exception.EntityAlreadyExistException;
 import org.ihtsdo.otf.refset.exception.EntityNotFoundException;
+import org.ihtsdo.otf.refset.exception.LockingException;
 import org.ihtsdo.otf.refset.graph.RefsetGraphAccessException;
 import org.ihtsdo.otf.refset.graph.RefsetGraphFactory;
 import org.ihtsdo.otf.refset.graph.schema.GMember;
@@ -725,6 +726,57 @@ public class RefsetAdminGAO {
 		mg.setType(type.toString());
 		
 		return mg;
+	}
+	
+	
+	/**Lock a refset for other thread from deletion
+	 * @param id
+	 * @throws LockingException 
+	 * @throws EntityNotFoundException 
+	 * @throws RefsetGraphAccessException 
+	 */
+	public void lock(String refsetId) throws LockingException, RefsetGraphAccessException, EntityNotFoundException {
+
+		TitanGraph g = factory.getTitanGraph();
+		Vertex rV = rGao.getRefsetVertex(refsetId, fgf.create(g));
+		Object lock = rV.getProperty(LOCK);
+		
+		if (lock == null) {
+			
+			rV.setProperty(LOCK, 1);
+			g.commit();
+			
+		} else {
+			
+			throw new LockingException("Refset is locked by another user for deletion. Try after sometime");
+
+		}
+		
+	}
+	
+	/**Lock a refset for other thread from deletion
+	 * @param id
+	 * @throws LockingException 
+	 * @throws EntityNotFoundException 
+	 * @throws RefsetGraphAccessException 
+	 */
+	public void removeLock(String refsetId) throws LockingException, RefsetGraphAccessException, EntityNotFoundException {
+
+		TitanGraph g = factory.getTitanGraph();
+		Vertex rV = rGao.getRefsetVertex(refsetId, fgf.create(g));
+		Object lock = rV.getProperty(LOCK);
+		
+		if (lock != null) {
+			
+			rV.removeProperty(LOCK);
+			g.commit();
+			
+		} else {
+			
+			throw new LockingException("Refset is locked by another user for deletion. Try after sometime");
+
+		}
+		
 	}
 	
 	
