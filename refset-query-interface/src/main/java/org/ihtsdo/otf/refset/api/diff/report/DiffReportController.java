@@ -14,16 +14,19 @@ package org.ihtsdo.otf.refset.api.diff.report;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.ihtsdo.otf.refset.exception.ValidationException;
 import org.ihtsdo.otf.refset.service.diffreport.DiffReportRecord;
@@ -32,6 +35,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -54,28 +58,32 @@ public class DiffReportController {
 	private static final String OCTMAP = "octmap";
 	private static final String OCTMAP_FULL = "octmapfull";
 	private static final String REFSET_IDS = "refsetids";
+	private static final List<String> validReleaseDates = new ArrayList<String>();
+	
+	static {
+		
+		validReleaseDates.add("20150131");
+		validReleaseDates.add("20140131");
+		validReleaseDates.add("20140731");
+
+		
+	}
 	
 	@Autowired
 	private DiffReportService service;
 	
 	@RequestMapping( method = RequestMethod.POST, value = "/generateDiffReport",  
-			produces = {MediaType.APPLICATION_OCTET_STREAM_VALUE})
+			produces = {MediaType.APPLICATION_OCTET_STREAM_VALUE, MediaType.APPLICATION_JSON_VALUE})
 	@ApiOperation( value = "Generate a refset diff report",
 			notes = "This api call generates refset diff report in xlsx foramt based on following input files"
-					+ "1. Concept snapshot e.g sct2_Concept_Snapshot_INT_20150131.txt"
-					+ "2. Refset full file e.g. Refset_GPFPSimpleFull_INT_20140930.txt"
-					+ "3. Concept full file e.g. sct2_Concept_Full_INT_20150131.txt"
-					+ "4. Refset attribute value full file e.g. der2_cRefset_AttributeValueFull_INT_20150131.txt"
-					+ "5. Description snapshot file e.g. sct2_Description_Snapshot-en_INT_20150131.txt"
-					+ "6. Association reference snapshot file e.g. der2_cRefset_AssociationReferenceSnapshot_INT_20150131.txt"
-					+ "7. Refset identifier file e.g. refset-identifiers.txt"
+					+ " \n 1. Refset simple full file e.g der2_Refset_GPFPSimpleSnapshot_INT_20140930.txt"
+					+ " \n 2. Refset simple snapshot file e.g. der2_Refset_SimpleFull_INT_20140731.txt"
 					)
 	public @ResponseBody String generate(
 			@RequestParam("file_refset_full") MultipartFile file_refset_full,
-			@RequestParam("file_refset_identifiers") MultipartFile file_refset_identifiers,
 			@RequestParam("file_refset_gpfp") MultipartFile file_refset_gpfp,
 			@RequestParam("releaseDate") String releaseDate,
-			HttpServletResponse resp) {
+			HttpServletResponse resp) throws IOException {
 		long suffix = System.currentTimeMillis();
 
 		String location = System.getProperty("catalina.home") + File.separator + "refset_diff_report_" + suffix;
@@ -86,32 +94,9 @@ public class DiffReportController {
 		OutputStream os = null;
 		try {
 			
-			if (!"20150131".equals(releaseDate)) {
+			if (!validReleaseDates.contains(releaseDate)) {
 				
 				throw new ValidationException("Please select correct release date");
-			}
-			
-			if(!file_refset_identifiers.isEmpty()) {
-				
-				//check if required headers are available
-				String [] headers = getHeaders(file_refset_identifiers);
-				
-				//above will never be null
-				if (headers.length == 2) {
-					
-					//write file to disk
-					writeFileToDisk(file_refset_identifiers, location);
-	                
-				} else {
-					
-					sb.append("Invalid refset identifier file. please check and try again \n");
-
-				}
-				
-			} else {
-				
-				sb.append("Invalid refset identifier file. please check and try again \n");
-
 			}
 			
 			
@@ -182,23 +167,26 @@ public class DiffReportController {
 				//load data
 				logger.debug("Loading data from {} temp files to db", location);
 
-				service.loadRefsetIdentifier(location + File.separator + file_refset_identifiers.getOriginalFilename(), "refsetids_"+suffix);
 				service.loadFileToTable(location + File.separator + file_refset_full.getOriginalFilename(), "octmapfull_"+suffix);
 				service.loadFileToTable(location + File.separator + file_refset_gpfp.getOriginalFilename(), "octmap_"+suffix);
+
+				//this is after above file upload
+				service.loadRefsetIdentifier(Long.toString(suffix), releaseDate);
 
 				logger.debug("Getting report data");
 
 				List<DiffReportRecord> drs = service.getDiffReportRecords(Long.toString(suffix), releaseDate);
-				
-				os = resp.getOutputStream();
-						
-				resp.setHeader("content-type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8");
-			    resp.setHeader("Content-Disposition", "attachment; filename=\"GPFP Report.xlsx\"");
+				String gFileName= "Refset_Diff_Report_"+ System.currentTimeMillis();
+				String absFileName = System.getProperty("catalina.home") + File.separator + "refset_diff_report_generated" + gFileName;
+
+				os = new FileOutputStream(new File(absFileName));;
 
 			    //generate report
 				logger.debug("Writing report");
 
 				service.writeDiffReport(drs, os);
+				
+				sb.append(gFileName);
 				
 			}
 			
@@ -253,12 +241,74 @@ public class DiffReportController {
 			}
 		}
 		
-		if (sb.toString().isEmpty()) {
-			
-			return "";
-		}
-
 		return sb.toString();
+    }
+	
+	
+	@RequestMapping( method = RequestMethod.GET, value = "/downloadDiffReport/{fileName}",  
+			produces = {MediaType.APPLICATION_OCTET_STREAM_VALUE, MediaType.APPLICATION_JSON_VALUE})
+	@ApiOperation( value = "Download a refset diff report",
+			notes = "Download a given file as refset diff report ")
+	public @ResponseBody String generate(@PathVariable(value = "fileName") String fileName,
+			HttpServletResponse resp) throws IOException {
+
+		String absFileName = System.getProperty("catalina.home") + File.separator + "refset_diff_report_generated" + fileName;
+
+		logger.debug("Downloading refset diff report for {}", absFileName);
+
+		OutputStream os = null;
+		try {
+			
+
+			
+			os = resp.getOutputStream();
+					
+			resp.setHeader("content-type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8");
+		    resp.setHeader("Content-Disposition", "attachment; filename=\"Refset Diff Report.xlsx\"");
+
+		    //generate report
+			logger.debug("downloading report");
+
+			
+			IOUtils.copy(new FileInputStream(new File(absFileName)), os);
+			
+			os.flush();
+			
+		} catch (Exception e) {
+			
+			logger.error("Exception in report generation", e);
+
+			return "Unknown error while downloading diff report";
+			
+		} finally {
+			
+			//remove directory
+			try {
+				
+				logger.debug("Removing temp files {}", absFileName);
+
+				FileUtils.forceDeleteOnExit(new File(absFileName));
+				
+			} catch (IOException e) {
+
+				logger.error("IO exception while deleting temp directory and files", e);
+			}
+			
+			
+			if (os != null) {
+				
+				try {
+					
+					os.close();
+					
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					logger.error("Error closing io resources ", e);
+				}
+			}
+		}
+		
+		return "";
     }
 	
 	
@@ -370,7 +420,6 @@ public class DiffReportController {
 				}
 			}
 		}
-		        
 
 	}
 		    

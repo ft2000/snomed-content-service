@@ -14,7 +14,7 @@ package org.ihtsdo.otf.refset.service.diffreport;
 /**
  *
  */
-public class DiffReportRecord {
+public class DiffReportRecord implements Comparable<DiffReportRecord>{
 
 	/**
 	 * Concept ID
@@ -195,6 +195,17 @@ public class DiffReportRecord {
 			String referenceComponentDescription) {
 		this.referenceComponentDescription = referenceComponentDescription;
 	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Comparable#compareTo(java.lang.Object)
+	 */
+	@Override
+	public int compareTo(DiffReportRecord o) {
+		// TODO Auto-generated method stub
+		return new Long(this.conceptId).compareTo(new Long(o.conceptId));
+	}
+
+
 	
 
 }
