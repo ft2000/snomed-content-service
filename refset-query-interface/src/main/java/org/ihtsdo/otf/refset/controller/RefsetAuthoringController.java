@@ -52,7 +52,7 @@ import com.wordnik.swagger.annotations.ApiOperation;
  *
  */
 @RestController
-@Api(value="RefsetAuthoring", description="Service to author refset and their member details", position = 1)
+@Api(value="Refset Authoring", description="Service to author refset and their member details", position = 1)
 @RequestMapping("/v1.0/refsets")
 public class RefsetAuthoringController {
 	
@@ -73,7 +73,7 @@ public class RefsetAuthoringController {
 	private RefsetValidator rValidator;
 
 	@RequestMapping( method = RequestMethod.POST, value = "/new",  produces = "application/json", consumes = "application/json")
-	@ApiOperation( value = "Add a Refset) " )
+	@ApiOperation( value = "Add a Refset", notes = "It adds a brand new refset to database" )
 	@PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<Result< Map<String, Object>>> addRefset( @RequestBody Refset r) throws Exception {
 		
@@ -132,7 +132,8 @@ public class RefsetAuthoringController {
 	
 	
 	@RequestMapping( method = RequestMethod.POST, value = "/{refSetId}/add/member", produces = "application/json", consumes = "application/json" )
-	@ApiOperation( value = "Shortcut method to add a member to an existing refset." )
+	@ApiOperation( value = "Shortcut method to add a member to an existing refset.", 
+		notes = "Adds a single member to refset identified by refset id in path")
 	@PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<Result< Map<String, Object>>> addMember(@PathVariable(value = "refSetId") String refsetId, 
     		@RequestBody( required = true) Member member) throws Exception {
@@ -170,7 +171,7 @@ public class RefsetAuthoringController {
     }
 	
 	@RequestMapping( method = RequestMethod.POST, value = "/update",  produces = "application/json", consumes = "application/json")
-	@ApiOperation( value = "Update a Refset" )
+	@ApiOperation( value = "Update a Refset", notes = "Updates an existing refset" )
 	@PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<Result< Map<String, Object>>> updateRefset( @RequestBody Refset r) throws Exception {
 		
@@ -218,7 +219,8 @@ public class RefsetAuthoringController {
 	
 	
 	@RequestMapping( method = RequestMethod.DELETE, value = "/delete/{refsetId}",  produces = "application/json", consumes = "application/json")
-	@ApiOperation( value = "Remove a unpublished refset, it will delete refset as well as its members" )
+	@ApiOperation( value = "Remove a unpublished refset", notes = "It deletes an existing refset identified by refset id in path "
+			+ ", it also delete refset members")
 	@PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<Result< Map<String, Object>>> removeRefset( @PathVariable String refsetId) throws Exception {
 		
@@ -246,7 +248,7 @@ public class RefsetAuthoringController {
 	
 	
 	@RequestMapping( method = RequestMethod.POST, value = "/{refSetId}/add/members", produces = "application/json", consumes = "application/json" )
-	@ApiOperation( value = "Add no of members in this call. It is required that member supplied is a valid member" )
+	@ApiOperation( value = "Add no of members in this call", notes = "Adds no of members in single call to a refset identified by refset id in path" )
 	@PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<Result< Map<String, Object>>> addMembers(@PathVariable(value = "refSetId") String refsetId, 
     		@RequestBody( required = true) Set<Member> members) throws Exception {
@@ -312,8 +314,10 @@ public class RefsetAuthoringController {
 		
 	}
 
-	@RequestMapping( method = RequestMethod.DELETE, value = "/delete/{refsetId}/member/{referenceComponentId}",  produces = "application/json", consumes = "application/json")
-	@ApiOperation( value = "Removes a member from refset" )
+	@RequestMapping( method = RequestMethod.DELETE, value = "/delete/{refsetId}/member/{referenceComponentId}", 
+			produces = "application/json", consumes = "application/json")
+	@ApiOperation( value = "Removes a member from refset", notes = "Removes  a member identified "
+			+ "by refserence component id of member from a refset" )
 	@PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<Result< Map<String, Object>>> removeMember( @PathVariable String refsetId,
     		@PathVariable String referenceComponentId) throws Exception {
@@ -340,7 +344,7 @@ public class RefsetAuthoringController {
     }
 	
 	@RequestMapping( method = RequestMethod.DELETE, value = "/delete/{refsetId}/members",  produces = "application/json", consumes = "application/json")
-	@ApiOperation( value = "Removes list of members from refset." )
+	@ApiOperation( value = "Removes list of members from refset.", notes = "Removes number of members from a refset for given reference component id" )
 	@PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<Result< Map<String, Object>>> removeMembers( @PathVariable String refsetId,
     		@RequestBody Set<String> referencedComponentIds) throws Exception {

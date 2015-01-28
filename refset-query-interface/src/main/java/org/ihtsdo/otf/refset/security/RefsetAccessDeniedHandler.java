@@ -41,7 +41,7 @@ public class RefsetAccessDeniedHandler implements AccessDeniedHandler {
 		meta.setMessage(e.getMessage());
 		meta.setStatus(HttpStatus.UNAUTHORIZED);
 		
-		ErrorInfo errorInfo = new ErrorInfo(e.getMessage(), Integer.toString(org.apache.commons.httpclient.HttpStatus.SC_UNAUTHORIZED));
+		ErrorInfo errorInfo = new ErrorInfo(e.getMessage(), Integer.toString(org.apache.http.HttpStatus.SC_UNAUTHORIZED));
 		meta.setErrorInfo(errorInfo);
 
 		result.setMeta(meta);

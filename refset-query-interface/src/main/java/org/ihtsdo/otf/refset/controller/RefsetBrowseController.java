@@ -38,7 +38,7 @@ import com.wordnik.swagger.annotations.ApiOperation;
  *
  */
 @RestController
-@Api(value="Refset retrieval", description="Service to retrieve existing refset and their member details" , position = 2)
+@Api(value="Refset", description="Service to retrieve existing refset and their member details" , position = 2)
 @RequestMapping("/v1.0/refsets")
 public class RefsetBrowseController {
 	
@@ -51,7 +51,10 @@ public class RefsetBrowseController {
 	private RefsetBrowseService bService;
 	
 	@RequestMapping( method = RequestMethod.GET, produces = "application/json" )
-	@ApiOperation( value = "Retrieves list of existing refsets. By default it returns 10 refset and thereafter another 10 or desired range" )
+	@ApiOperation( value = "Retrieves list of existing refsets", notes = "Returns existing refsets save their members. "
+			+ "If user is authorized then all refsets are returned however if user is not logged in then only "
+			+ "published refsets are returned. "
+			+ "By default it returns 10 refset and thereafter another 10 or desired range" )
     public ResponseEntity<Result< Map<String, Object>>> getRefsets( @RequestParam( value = "from", defaultValue = "0" ) int from, 
     		@RequestParam( value = "to", defaultValue = "10" ) int to ) throws Exception {
 		
@@ -87,7 +90,8 @@ public class RefsetBrowseController {
     }
 	
 	@RequestMapping( method = RequestMethod.GET, value = "/{refSetId}", produces = "application/json" )
-	@ApiOperation( value = "Api to get details of a refset for given refset uuid." )
+	@ApiOperation( value = "Api to get details of a refset for given refset uuid.", 
+		notes = "Return details of refset identified by refset id in path" )
     public ResponseEntity<Result< Map<String, Object>>> getRefsetDetails( @PathVariable( value = "refSetId" ) String refSetId ) throws Exception {
 		
 		logger.debug("Getting refset details");
@@ -121,7 +125,8 @@ public class RefsetBrowseController {
     }
 	
 	@RequestMapping( method = RequestMethod.GET, value = "checkDescription/{description}", produces = "application/json" )
-	@ApiOperation( value = "Api to check if provided description already exist in the system" )
+	@ApiOperation( value = "Api to check if provided description already exist in the system", notes = "It matches description "
+			+ "of existing refset to avoid duplicate descriptions " )
     public ResponseEntity<Result< Map<String, Object>>> isDescriptionExist( @PathVariable( value = "description" ) String description ) throws Exception {
 		
 		logger.debug("validating description {}", description);
@@ -146,7 +151,8 @@ public class RefsetBrowseController {
 	
 	
 	@RequestMapping( method = RequestMethod.GET, produces = "application/json", value = "/{refsetId}/members")
-	@ApiOperation( value = "Retrieves members of an existing refsets based on given range" )
+	@ApiOperation( value = "Retrieves members of an existing refsets", notes = "Retrieves members of existing refset identified "
+			+ "by refset id in the path and given range ")
     public ResponseEntity<Result< Map<String, Object>>> getRefsetMembers( @RequestParam( value = "from", defaultValue = "0" ) int from, 
     		@RequestParam( value = "to", defaultValue = "15" ) int to,  
     		@PathVariable( value = "refsetId" ) String refsetId) throws Exception {
@@ -189,7 +195,9 @@ public class RefsetBrowseController {
 	
 	
 	@RequestMapping( method = RequestMethod.GET, value = "/{refSetId}/header", produces = "application/json")
-	@ApiOperation( value = "Api to get details of a refset excluding members for given refset uuid." )
+	@ApiOperation( value = "Api to get details of a refset excluding members.", 
+		notes = "Get refset header details for given refset uuid. "
+				+ "A Lightweight service for user who are only intrested in getting refset details not their members" )
     public ResponseEntity<Result< Map<String, Object>>> getRefsetHeader( @PathVariable( value = "refSetId" ) String refSetId ) throws Exception {
 		
 		logger.debug("Getting refset details");

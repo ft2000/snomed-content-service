@@ -35,7 +35,7 @@ import com.wordnik.swagger.annotations.ApiOperation;
  *
  */
 @RestController
-@Api(value="User Logout service", description="Service to logout user")
+@Api(value="Authentication", description="Service to logout user")
 public class LogoutController {
 	
 	private static final Logger logger = LoggerFactory.getLogger(LogoutController.class);

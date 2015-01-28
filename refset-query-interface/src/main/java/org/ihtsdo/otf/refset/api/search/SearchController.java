@@ -38,7 +38,7 @@ import com.wordnik.swagger.annotations.ApiOperation;
  *
  */
 @RestController
-@Api(value="RefsetSearch", description="Service to search members for desired search criteria")
+@Api(value="Refset", description="Service to search members for desired search criteria")
 @RequestMapping("/v1.0/refsets")
 public class SearchController {
 	

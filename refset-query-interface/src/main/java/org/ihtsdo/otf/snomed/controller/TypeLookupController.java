@@ -27,11 +27,10 @@ import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 
 /**
- * @author Episteme Partners
  *
  */
 @RestController
-@Api(value="Type look up service", description="Service to lookup type name and id", position = 7)
+@Api(value="SNOMED")
 @RequestMapping("/v1.0/snomed")
 public class TypeLookupController {
 	

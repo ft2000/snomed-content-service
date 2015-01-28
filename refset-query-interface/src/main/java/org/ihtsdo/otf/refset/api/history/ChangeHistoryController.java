@@ -46,7 +46,7 @@ import com.wordnik.swagger.annotations.ApiOperation;
  *
  */
 @RestController
-@Api(value="RefsetChangeHistory", description="Service to get refset change history overtime", position = 5)
+@Api(value="Refset", description="Service to get refset change histories")
 @RequestMapping("/v1.0/refsets")
 public class ChangeHistoryController {
 	

@@ -29,7 +29,7 @@ import com.wordnik.swagger.annotations.ApiOperation;
  *Controller to support download of a RF2 file refset
  */
 @RestController
-@Api(value="RefsetExport", description="Service export refset and their members in RF2 format", position = 3)
+@Api(value="Refset", description="Service to export refset and its members in RF2 format", position = 3)
 @RequestMapping("/v1.0/refsets")
 public class RefsetExportController {
 	
@@ -39,7 +39,7 @@ public class RefsetExportController {
 	private ExportService eService;
 
 	@RequestMapping( method = RequestMethod.GET, value = "/{refsetId}/export", produces = {MediaType.APPLICATION_OCTET_STREAM_VALUE})
-	@ApiOperation( value = "Export a Refset in RF2 format" )
+	@ApiOperation( value = "Export a Refset in RF2 format", notes = "Export a refset of a given refset id in RF2 format" )
 	@PreAuthorize("hasRole('ROLE_USER')")
     public @ResponseBody void exportRF2( @PathVariable String refsetId, HttpServletResponse resp) throws Exception {
 		

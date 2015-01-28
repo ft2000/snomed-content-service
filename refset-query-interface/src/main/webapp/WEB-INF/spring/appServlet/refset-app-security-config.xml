@@ -59,7 +59,7 @@
 		/>
 	
 	<bean id="refset.tokenService" class="org.springframework.security.core.token.KeyBasedPersistenceTokenService" 
-			p:secureRandom-ref="refset.secureRandom" p:serverSecret="refset" p:serverInteger="3" 
+			p:secureRandom-ref="refset.secureRandom" p:serverSecret="${refset.secret}" p:serverInteger="3" 
 		/>
 		
 	<bean id="refset.authenticationEntryPoint" class="org.ihtsdo.otf.refset.security.RefsetAuthenticationEntryPoint" 

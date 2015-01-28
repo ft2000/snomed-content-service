@@ -39,7 +39,7 @@ import com.wordnik.swagger.annotations.ApiOperation;
  *
  */
 @RestController
-@Api(value="Refset User Authentication and Authorization", description="Service to authenticate & authorize user and get details of user")
+@Api(value="Authentication", description="Service to authenticate & authorize user and get details of user")
 @RequestMapping("/v1.0/refsets")
 public class UserController {
 	
@@ -54,11 +54,12 @@ public class UserController {
 	RefsetIdentityService service;
 	
 	@RequestMapping( method = RequestMethod.POST, value = "/getUserDetails",  produces = "application/json", consumes = "application/json")
-	@ApiOperation( value = "Authenticate a user for given username and password provided in request header and returns user details ",
-			notes = "This api call authenticate a user and also authorize a user for Refset app access. Pre-Auth tokens(X-REFSET-PRE-AUTH-USERNAME & X-REFSET-PRE-AUTH-TOKEN)"
+	@ApiOperation( value = "Authenticates a user for given username and password provided in request header and returns user details ",
+			notes = "This api call authenticates a user and also authorize a user for Refset app access. "
+					+ " Pre-Auth tokens(X-REFSET-PRE-AUTH-USERNAME & X-REFSET-PRE-AUTH-TOKEN)"
 					+ " supplied in request header, are being used for authentication/authorization. If successful"
-					+ " it returns an User details object and a authentication token X-REFSET-AUTH-TOKEN as part of response header"
-					+ " to be used in header of subsequent requests for API handshake")
+					+ " it returns an UserDetails object and a authentication token X-REFSET-AUTH-TOKEN as part of response header."
+					+ " X-REFSET-AUTH-TOKEN token can be used in header of subsequent requests for API handshake")
 	@PreAuthorize("hasRole('ROLE_USER')")
 	public ResponseEntity<Result< Map<String, Object>>> login() throws Exception {
 		

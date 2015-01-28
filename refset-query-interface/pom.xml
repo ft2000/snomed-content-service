@@ -41,8 +41,8 @@
 		<!-- using milestone-release as few security testing artifacts needed
 		http://spring.io/blog/2014/05/05/spring-security-4-0-0-m1-released -->
 		<org.springframework.security-version>3.2.5.RELEASE</org.springframework.security-version>
-		<org.webjars.swagger-ui-version>2.0.22</org.webjars.swagger-ui-version>
-		<com.mangofactory.swagger-springmvc-version>0.8.8</com.mangofactory.swagger-springmvc-version>
+		<org.webjars.swagger-ui-version>2.0.24</org.webjars.swagger-ui-version>
+		<com.mangofactory.swagger-springmvc-version>0.9.4</com.mangofactory.swagger-springmvc-version>
 		<!-- graph db -->
 		<com.tinkerpop.blueprints-version>2.5.0</com.tinkerpop.blueprints-version>
 		<com.thinkaurelius.titan-version>0.5.0</com.thinkaurelius.titan-version>
@@ -184,12 +184,6 @@
     		<artifactId>spring-security-test</artifactId>
 			<version>${org.springframework.security-version}</version>
   		</dependency-->
-		<!-- AspectJ -->
-		<dependency>
-			<groupId>org.aspectj</groupId>
-			<artifactId>aspectjrt</artifactId>
-			<version>${org.aspectj-version}</version>
-		</dependency>	
 		
 		<!-- Logging -->
 		<dependency>
@@ -203,13 +197,6 @@
 			<version>${org.slf4j-version}</version>
 			<scope>runtime</scope>
 		</dependency>
-
-		<!-- @Inject -->
-		<dependency>
-			<groupId>javax.inject</groupId>
-			<artifactId>javax.inject</artifactId>
-			<version>1</version>
-		</dependency>
 				
 		<!-- Servlet -->
 		<dependency>
@@ -222,7 +209,6 @@
 		    <groupId>javax.servlet</groupId>
 		    <artifactId>servlet-api</artifactId>
 		    <version>2.5</version>
-		    
 		    <scope>provided</scope>
 		</dependency>		
 		<dependency>
@@ -244,7 +230,6 @@
 					<artifactId>javax.servlet-api</artifactId>
 					<groupId>javax.servlet</groupId>
 				</exclusion>
-
 			</exclusions>			
 			
 		</dependency>
@@ -254,12 +239,7 @@
         	<artifactId>spring-hateoas</artifactId>
         	<version>0.15.0.RELEASE</version>
     	</dependency>
-		
-		<dependency>
-		  <groupId>org.hibernate</groupId>
-		  <artifactId>hibernate-validator-annotation-processor</artifactId>
-		  <version>4.1.0.Final</version>
-		</dependency>	
+    		
 		<!-- Test -->
 		<dependency>
 			<groupId>junit</groupId>
@@ -450,13 +430,7 @@
             <groupId>com.tinkerpop.gremlin</groupId>
             <artifactId>gremlin-java</artifactId>
 		   <version>${com.tinkerpop.blueprints-version}</version>
-        </dependency>
-        
-		<dependency>
-		   <groupId>com.tinkerpop.blueprints</groupId>
-		   <artifactId>blueprints-graph-sail</artifactId>
-		   <version>${com.tinkerpop.blueprints-version}</version>
-		</dependency> 
+        </dependency> 
 			
 		<dependency>
 		   <groupId>com.thinkaurelius.titan</groupId>
@@ -514,6 +488,8 @@
 		    <artifactId>poi-ooxml</artifactId>
 		    <version>3.11</version>
 		</dependency>
+		
+		
 	</dependencies>
 	
     <build>

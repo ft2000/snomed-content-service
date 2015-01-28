@@ -44,7 +44,7 @@ public class RefsetExceptionResolver {
 	@ResponseBody Result<Map<String, Object>> handleEntityNotFoundException(EntityNotFoundException e) {
 		
 		LOGGER.error("Exception details \n", e);
-		ErrorInfo errorInfo = new ErrorInfo(e.getMessage(), Integer.toString(org.apache.commons.httpclient.HttpStatus.SC_NOT_FOUND));
+		ErrorInfo errorInfo = new ErrorInfo(e.getMessage(), Integer.toString(org.apache.http.HttpStatus.SC_NOT_FOUND));
 
 		Meta m = new Meta();
 		m.setStatus(HttpStatus.NOT_FOUND);
@@ -80,7 +80,7 @@ public class RefsetExceptionResolver {
 		
 		LOGGER.error("Exception details \n", e);
 		
-		ErrorInfo errorInfo = new ErrorInfo(e.getMessage(), Integer.toString(org.apache.commons.httpclient.HttpStatus.SC_NOT_FOUND));
+		ErrorInfo errorInfo = new ErrorInfo(e.getMessage(), Integer.toString(org.apache.http.HttpStatus.SC_NOT_FOUND));
 	    
 		Meta m = new Meta();
 		m.setStatus(HttpStatus.NOT_FOUND);
@@ -166,7 +166,7 @@ public class RefsetExceptionResolver {
 
 		String message = StringUtils.isEmpty(e.getMessage()) ? "Unauthorized access, please check provided credentials in service call"  : e.getMessage();
 		
-		ErrorInfo errorInfo = new ErrorInfo(message, Integer.toString(org.apache.commons.httpclient.HttpStatus.SC_UNAUTHORIZED));
+		ErrorInfo errorInfo = new ErrorInfo(message, Integer.toString(org.apache.http.HttpStatus.SC_UNAUTHORIZED));
 	    
 		Meta m = new Meta();
 		m.setStatus(HttpStatus.UNAUTHORIZED);
@@ -206,7 +206,7 @@ public class RefsetExceptionResolver {
 			vFailures.put(key, errors);
 		}
 		
-		ErrorInfo errorInfo = new ErrorInfo(message, Integer.toString(org.apache.commons.httpclient.HttpStatus.SC_BAD_REQUEST), vFailures );
+		ErrorInfo errorInfo = new ErrorInfo(message, Integer.toString(org.apache.http.HttpStatus.SC_BAD_REQUEST), vFailures );
 	    
 		Meta m = new Meta();
 		m.setStatus(HttpStatus.BAD_REQUEST);
@@ -225,7 +225,7 @@ public class RefsetExceptionResolver {
 
 		String message = StringUtils.isEmpty(e.getMessage()) ? "Request does not conform to expected input. Please see error details and try again"  : e.getMessage();
 		
-		ErrorInfo errorInfo = new ErrorInfo(message, Integer.toString(org.apache.commons.httpclient.HttpStatus.SC_BAD_REQUEST));
+		ErrorInfo errorInfo = new ErrorInfo(message, Integer.toString(org.apache.http.HttpStatus.SC_BAD_REQUEST));
 	    
 		Meta m = new Meta();
 		m.setStatus(HttpStatus.BAD_REQUEST);
@@ -244,7 +244,7 @@ public class RefsetExceptionResolver {
 
 		String message = StringUtils.isEmpty(e.getMessage()) ? "Request does not conform to expected input. Please see error details and try again"  : e.getMessage();
 		
-		ErrorInfo errorInfo = new ErrorInfo(message, Integer.toString(org.apache.commons.httpclient.HttpStatus.SC_BAD_REQUEST));
+		ErrorInfo errorInfo = new ErrorInfo(message, Integer.toString(org.apache.http.HttpStatus.SC_BAD_REQUEST));
 	    
 		Meta m = new Meta();
 		m.setStatus(HttpStatus.BAD_REQUEST);

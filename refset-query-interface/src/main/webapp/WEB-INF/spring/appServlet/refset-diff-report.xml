@@ -11,7 +11,7 @@
 		<bean id="dataSource"
 	        class="org.springframework.jdbc.datasource.DriverManagerDataSource">
 	        <property name="driverClassName" value="com.mysql.jdbc.Driver" />
-	        <property name="url" value="jdbc:mysql://localhost:3306/refset" />
+	        <property name="url" value="jdbc:mysql://${mysql.host}:${mysql.port}/refset" />
 	        <property name="username" value="${mysql.user}" />
 	        <property name="password" value="${mysql.password}" />
 	    </bean>

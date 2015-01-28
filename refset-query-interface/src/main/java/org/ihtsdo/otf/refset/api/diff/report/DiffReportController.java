@@ -50,7 +50,7 @@ import com.wordnik.swagger.annotations.ApiOperation;
  *
  */
 @RestController
-@Api(value="Refset Diff Report", description="Service to create a diff report based on refset data")
+@Api(value="Refset", description="Service to generate a diff report based on refset and suggest release data")
 @RequestMapping("/v1.0/refsets")
 public class DiffReportController {
 
@@ -73,7 +73,7 @@ public class DiffReportController {
 	private DiffReportService service;
 	
 	@RequestMapping( method = RequestMethod.POST, value = "/generateDiffReport",  
-			produces = {MediaType.APPLICATION_OCTET_STREAM_VALUE, MediaType.APPLICATION_JSON_VALUE})
+			produces = {MediaType.APPLICATION_JSON_VALUE})
 	@ApiOperation( value = "Generate a refset diff report",
 			notes = "This api call generates refset diff report in xlsx foramt based on following input files"
 					+ " \n 1. Refset simple full file e.g der2_Refset_GPFPSimpleSnapshot_INT_20140930.txt"
@@ -248,7 +248,7 @@ public class DiffReportController {
 	@RequestMapping( method = RequestMethod.GET, value = "/downloadDiffReport/{fileName}",  
 			produces = {MediaType.APPLICATION_OCTET_STREAM_VALUE, MediaType.APPLICATION_JSON_VALUE})
 	@ApiOperation( value = "Download a refset diff report",
-			notes = "Download a given file as refset diff report ")
+			notes = "Download a given file as refset diff report in xlsx format")
 	public @ResponseBody String generate(@PathVariable(value = "fileName") String fileName,
 			HttpServletResponse resp) throws IOException {
 

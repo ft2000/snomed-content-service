@@ -36,7 +36,7 @@ import com.wordnik.swagger.annotations.ApiOperation;
  *
  */
 @RestController
-@Api(value="Concept details look up service", description="Service to lookup concept details", position = 6)
+@Api(value="SNOMED", description="Service to lookup concept details")
 @RequestMapping("/v1.0/snomed")
 public class ConceptLookupController {
 	
@@ -50,7 +50,7 @@ public class ConceptLookupController {
 	
 	@RequestMapping( method = RequestMethod.POST, value = "/concepts", produces = MediaType.APPLICATION_JSON_VALUE , 
 			consumes = MediaType.APPLICATION_JSON_VALUE)
-	@ApiOperation( value = "Retrieves concept details for given concept ids in good faith ie all null or empty will be ignored" )
+	@ApiOperation( value = "Retrieves concept details for given concept ids", notes = "Retrieves concept details for given concept ids " )
     public ResponseEntity<Result< Map<String, Object>>> getConceptDetails( 
     		@RequestBody( required = true) Set<String> conceptIds ) throws Exception {
 		
@@ -80,7 +80,7 @@ public class ConceptLookupController {
     }
 	
 	@RequestMapping( method = RequestMethod.GET, value = "/concepts/{conceptId}", produces = "application/json" )
-	@ApiOperation( value = "Api to get details of a concept for given concept id." )
+	@ApiOperation( value = "Api to get details of a concept for given concept id.", notes = "Api to get details of a concept for given concept id" )
     public ResponseEntity<Result< Map<String, Object>>> getConcept( @PathVariable( value = "conceptId") String conceptId ) throws Exception {
 		
 		logger.debug("Getting concept details for {}", conceptId);
@@ -115,7 +115,7 @@ public class ConceptLookupController {
 	
 	
 	@RequestMapping( method = RequestMethod.GET, value = "/concepts", produces = "application/json" )
-	@ApiOperation( value = "Api to get paged list of concept ids available in the systems." )
+	@ApiOperation( value = "Api to get paged list of concept ids available in the systems.", notes = "Gets list of concept ids for given list size" )
     public ResponseEntity<Result< Map<String, Object>>> getConceptIds( @RequestParam( value = "page", defaultValue = "0", required = false) int page, 
     		@RequestParam( value = "size", defaultValue = "10", required = false) int size) throws Exception {
 		

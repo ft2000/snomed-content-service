@@ -45,7 +45,7 @@
 	<beans:bean id="pObjectMapper"
 	    class="org.springframework.http.converter.json.Jackson2ObjectMapperFactoryBean"
 	    p:indentOutput="true" p:serializationInclusion-ref="NOT_EMPTY">
-	    <beans:property name="modulesToInstall" value="com.fasterxml.jackson.datatype.joda.JodaModule, org.ihtsdo.otf.refset.config.SwaggerModule" />
+	    <beans:property name="modulesToInstall" value="com.fasterxml.jackson.datatype.joda.JodaModule" />
 	    
 	</beans:bean>	
 	
@@ -77,7 +77,6 @@
 	
 	<context:component-scan base-package="org.ihtsdo.otf.refset" />
 	<context:component-scan base-package="org.ihtsdo.otf.snomed" />
-	<beans:bean class="com.mangofactory.swagger.configuration.SpringSwaggerConfig"/>	
 	
 	<beans:import resource="common-app-config.xml" />
 	<beans:import resource="spring-refset-browse-service-stub-data.xml" />

@@ -40,7 +40,7 @@ import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 
 @RestController
-@Api(value="RefsetImport", description="Service to import refset and their members in RF2 format", position = 4)
+@Api(value="Refset", description="Service to import refset and their members in RF2 format", position = 4)
 @RequestMapping("/v1.0/refsets")
 public class RefsetImportController {
 	
@@ -54,7 +54,8 @@ public class RefsetImportController {
 	private Rf2VerificationService vService;
 
 	@RequestMapping( method = RequestMethod.POST, value = "/{refsetId}/importMultipart", produces = {MediaType.APPLICATION_JSON_VALUE})
-	@ApiOperation( value = "Import a Refset in RF2 format" )
+	@ApiOperation( value = "Import a Refset in RF2 format", 
+		notes = "An authorized user can import a RF2 file using this service. It support multipart operation")
 	@PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<Result< Map<String, Object>>> importRF2Multipart( @RequestParam("file") MultipartFile file, @PathVariable String refsetId) throws Exception {
 		
@@ -85,11 +86,13 @@ public class RefsetImportController {
     }
 	/*needed as front end is not able support multipart upload*/
 	@RequestMapping( method = RequestMethod.POST, value = "/{refsetId}/import", produces = {MediaType.APPLICATION_JSON_VALUE})
-	@ApiOperation( value = "Import a Refset in RF2 format" )
+	@ApiOperation( value = "Import a Refset in RF2 format",
+		notes = "An authorized user can import a RF2 file using this service. It does not support multipart operation. "
+				+ "Current frontend of refset tool is using this service")
 	@PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<Result< Map<String, Object>>> importRF2(@PathVariable String refsetId, HttpServletRequest request) throws Exception {
 		
-		logger.debug("Importing an existing refset {} in rf2 format");
+		logger.debug("Importing an existing refset in rf2 format");
 		
 		//call verify service
 		final InputStream is = request.getInputStream();
