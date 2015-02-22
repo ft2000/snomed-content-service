@@ -53,7 +53,7 @@ public class LogoutController {
 			notes = "This api call just clears the current security context for X-REFSET-AUTH-TOKEN ")
     public ResponseEntity<Result< Map<String, Object>>> logout() throws Exception {
 		
-		logger.debug("logout user {}");
+		logger.debug("logout user");
 
 		Result<Map<String, Object>> r = Utility.getResult();
 		

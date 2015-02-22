@@ -202,7 +202,7 @@ public class DiffReportRecord implements Comparable<DiffReportRecord>{
 	@Override
 	public int compareTo(DiffReportRecord o) {
 		// TODO Auto-generated method stub
-		return new Long(this.conceptId).compareTo(new Long(o.conceptId));
+		return new Long(this.refsetId).compareTo(new Long(o.refsetId));
 	}
 
 

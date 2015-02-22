@@ -106,7 +106,9 @@
 		        	$("#progressbar").width(percentComplete + '%');
 	                $("#percent").html(percentComplete + '%');
 	                if (percentComplete == 100) {
-	                	$("#outcome").html("<font color='red'>Generating diff report..</font>");
+	                	$("#outcome").html("<font color='red'>Generating diff report.......</font>");
+		                $("#progressbar").width('0%');
+		                $("#percent").html('');
 
 	                }
 		        },
@@ -114,7 +116,9 @@
 		                
 	        		$("#progressbar").width('100%');
 	                $("#percent").html('100%');
-	                $("#outcome").html("<font color='red'>Generating diff report..</font>");
+	                $("#outcome").html("<font color='red'>Generating diff report......</font>");
+	                $("#progressbar").width('0%');
+	                $("#percent").html('');
 
 		        },
 		        complete : function(response) {
@@ -126,9 +130,9 @@
 		            }
 		            else if (response.responseText.indexOf('Refset_Diff_Report_') > -1){
 		            	
-			      		$("#outcome").html("<font color='red'> Report generation completed </font>");
-			      		var url=window.location.protocol + "//" + window.location.host + "/refset/v1.0/refsets/downloadDiffReport/" + response.responseText; 			            
-			      		window.open(url,'Download');
+			      		$("#outcome").html("<font color='red'> Report generation completed </font> ");
+			      		var url = window.location.protocol + "//" + window.location.host + "/refset/v1.0/refsets/downloadDiffReport/" + response.responseText; 			            
+			      		$("#outcome").html("<a href='" + url + "'>Download Generated Report</a>"); 
 
 		            } else {
 		            	
@@ -136,7 +140,7 @@
 
 		            }
 
-		        	setTimeout(function() { $("#progressbox").hide(); }, 5000);
+		        	//setTimeout(function() { $("#progressbox").hide(); }, 5000);
            	        
 		        },
 		        error : function() {

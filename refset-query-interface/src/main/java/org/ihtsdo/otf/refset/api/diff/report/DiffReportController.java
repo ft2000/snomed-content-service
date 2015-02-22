@@ -177,7 +177,7 @@ public class DiffReportController {
 
 				List<DiffReportRecord> drs = service.getDiffReportRecords(Long.toString(suffix), releaseDate);
 				String gFileName= "Refset_Diff_Report_"+ System.currentTimeMillis();
-				String absFileName = System.getProperty("catalina.home") + File.separator + "refset_diff_report_generated" + gFileName;
+				String absFileName = System.getProperty("catalina.home") + File.separator + "refset_diff_report_generated_" + gFileName;
 
 				os = new FileOutputStream(new File(absFileName));;
 
@@ -252,7 +252,13 @@ public class DiffReportController {
 	public @ResponseBody String generate(@PathVariable(value = "fileName") String fileName,
 			HttpServletResponse resp) throws IOException {
 
-		String absFileName = System.getProperty("catalina.home") + File.separator + "refset_diff_report_generated" + fileName;
+		/* file name coming with " added*/
+		if (fileName != null & (fileName.startsWith("\"") || fileName.endsWith("\""))) {
+			
+			fileName = fileName.replaceAll("\"", "");
+			
+		}
+		String absFileName = System.getProperty("catalina.home") + File.separator + "refset_diff_report_generated_" + fileName;
 
 		logger.debug("Downloading refset diff report for {}", absFileName);
 

@@ -14,13 +14,13 @@
 		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
 	</listener>
 
-	<!-- Processes application requests -->
+	<!-- Processes application requests. Note context loading is done by above context loader and their is only one context -->
 	<servlet>
 		<servlet-name>appServlet</servlet-name>
 		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
 		<init-param>
 			<param-name>contextConfigLocation</param-name>
-			<param-value>/WEB-INF/spring/root-context.xml</param-value>
+			<param-value></param-value>
 		</init-param>
 		<load-on-startup>1</load-on-startup>
 	</servlet>

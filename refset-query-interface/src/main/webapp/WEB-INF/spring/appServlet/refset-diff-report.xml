@@ -123,4 +123,6 @@
 					]]>
 	    	</value></constructor-arg>
 	    </bean>
+	    
+	    <!--  bean id="dataLoaderTask" class="org.ihtsdo.otf.refset.service.loader.DataLoaderTask" / -->
  </beans>
