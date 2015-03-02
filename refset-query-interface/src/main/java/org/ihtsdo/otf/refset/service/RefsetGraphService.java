@@ -164,6 +164,31 @@ public class RefsetGraphService implements RefsetBrowseService {
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.otf.refset.service.RefsetBrowseService#getMyRefsets(java.lang.Integer, java.lang.Integer, java.lang.String)
+	 */
+	@Override
+	public List<Refset> getMyRefsets(Integer page, Integer size, String userName)
+			throws RefsetServiceException {
+
+		LOGGER.debug("getRefsets");
+		
+		List<Refset> refsets = Collections.emptyList();
+		try {
+			
+			refsets = gao.getMyRefSets(userName, page, size);
+			
+		} catch (RefsetGraphAccessException e) {
+			
+			LOGGER.error("Error in graph db call", e);
+			throw new RefsetServiceException(e.getMessage());
+		}
+		
+		return refsets;
+		
+	}
+
+	
 
 
 }

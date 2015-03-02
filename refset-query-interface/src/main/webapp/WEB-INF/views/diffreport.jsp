@@ -35,9 +35,9 @@
 
 <div class="container">
 	<form id="diffReportForm" method="POST" enctype="multipart/form-data"
-		action="/refset/v1.0/refsets/generateDiffReport" class="navbar-form navbar-left">
+		action="/refset/v1.0/refsets/diffReport" class="navbar-form navbar-left">
 		
-		<h3><span class="label label-info"> Select desired release date and provide refset files to generate refset diff report</span></h3>
+		<h3><span class="label label-info"> Select desired release date and provide refset file to generate refset diff report</span></h3>
 
 	 <div class="panel panel-info">
 	 	<div class="panel-heading"><label for="releaseDate">SNOMED Release Date</label></div>
@@ -53,21 +53,21 @@
 	 </div>
 				
 	 <div class="panel panel-info">
-	 	<div class="panel-heading"><label for="file_refset_gpfp">Refset simple snapshot file</label></div>
+	 	<div class="panel-heading"><label for="file_refset_full">Refset File</label></div>
   	 	<div class="panel-body">
 			<div class="form-group col-sm-7" >
-				<input type="file" name="file_refset_gpfp" class="file">
+				<input type="file" name="file_refset_full" class="file">
 			    <p class="help-block">e.g der2_Refset_SimpleSnapshot_INT_20140930.txt </p>
 			</div>
 		</div> 
 	</div>
 
 	 <div class="panel panel-info">
-	 	<div class="panel-heading"><label for="file_refset_full">Refset simple full file</label></div>
+	 	<div class="panel-heading"><label for="email">User Email</label></div>
   	 	<div class="panel-body">
 			<div class="form-group col-sm-7">
-				<input type="file" name="file_refset_full" class="file">
-			    <p class="help-block">e.g der2_Refset_SimpleFull_INT_20140731.txt </p>
+				<input type="email" name="email" class="email">
+			    <p class="help-block">e.g user email to which generated report is sent</p>
 	    	 </div>
 		</div>
 	</div>
@@ -105,43 +105,25 @@
                 	$("#outcome").html("<font color='red'>Uploading refset files</font>");
 		        	$("#progressbar").width(percentComplete + '%');
 	                $("#percent").html(percentComplete + '%');
-	                if (percentComplete == 100) {
-	                	$("#outcome").html("<font color='red'>Generating diff report.......</font>");
-		                $("#progressbar").width('0%');
-		                $("#percent").html('');
-
-	                }
-		        },
-		        success : function() {
-		                
-	        		$("#progressbar").width('100%');
-	                $("#percent").html('100%');
-	                $("#outcome").html("<font color='red'>Generating diff report......</font>");
-	                $("#progressbar").width('0%');
-	                $("#percent").html('');
-
 		        },
 		        complete : function(response) {
 		            console.log(response);
 		            if(response.status == '400') {
 			      		
-		            	$("#outcome").html("<font color='red'> Bad Request</font>");
+		            	$("#outcome").html("<font color='red'> Refset file and User email is mandatory</font>");
 
 		            }
-		            else if (response.responseText.indexOf('Refset_Diff_Report_') > -1){
+		            else {
 		            	
-			      		$("#outcome").html("<font color='red'> Report generation completed </font> ");
-			      		var url = window.location.protocol + "//" + window.location.host + "/refset/v1.0/refsets/downloadDiffReport/" + response.responseText; 			            
-			      		$("#outcome").html("<a href='" + url + "'>Download Generated Report</a>"); 
-
-		            } else {
-		            	
-			      		$("#outcome").html("<font color='red'> " + response.responseText + " </font>");
+			      		$("#outcome").html("<font color='red'> " + response.responseJSON + " </font>");
 
 		            }
 
-		        	//setTimeout(function() { $("#progressbox").hide(); }, 5000);
-           	        
+	                // clear everything
+	                
+		        	setTimeout(function() { $("#progressbox").hide(); }, 10000);
+		        	setTimeout(function() { $("#outcome").hide(); }, 10000);
+
 		        },
 		        error : function() {
 		        	

@@ -29,6 +29,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Sets;
+
 /**
  * @author 
  *
@@ -292,11 +295,15 @@ public class RefsetAuthoringServiceImpl implements RefsetAuthoringService {
 		try {			
 			
 			LOGGER.debug("Adding member {} to refset {}", members, refsetId);
-			
-			Map<String, String> outcome = mGao.addMembers(refsetId, members, user);
-			tOutcome.putAll(outcome);
+			//add 100 members at a time. Otherwise when large number of members being added transaction is slow due to too many vertices/edges
+			for (List<Member> ms : Iterables.partition(members, 100)) {
+				
+				Map<String, String> outcome = mGao.addMembers(refsetId, Sets.newHashSet(ms), user);
+				tOutcome.putAll(outcome);
+			}
 
-			LOGGER.debug("Added member {} to refset {}");
+
+			LOGGER.debug("Added member to refset");
 
 			
 		} catch (EntityNotFoundException e) {

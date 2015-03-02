@@ -60,13 +60,13 @@
 		
 	<logger name="org.springframework.security" level="info" />
 
+	<logger name="org.springframework.mail" level="debug" />
+	<logger name="javax.mail" level="debug" />
 
-	<logger name="com.mangofactory" level="error" >
-			<appender-ref ref="file" />
-	</logger>		
+	<logger name="com.mangofactory" level="error" />
 
 	<!-- Root Logger -->
-	<root level="INFO">
+	<root level="info">
 		<appender-ref ref="file" />
 	</root>
 	

@@ -99,4 +99,14 @@ public class RefsetBrowseServiceStub implements RefsetBrowseService {
 		return null;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.otf.refset.service.RefsetBrowseService#getMyRefsets(java.lang.Integer, java.lang.Integer, java.lang.String)
+	 */
+	@Override
+	public List<Refset> getMyRefsets(Integer page, Integer size, String userName)
+			throws RefsetServiceException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

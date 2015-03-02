@@ -8,6 +8,7 @@ import static org.ihtsdo.otf.refset.domain.RGC.ID;
 import static org.ihtsdo.otf.refset.domain.RGC.PUBLISHED;
 import static org.ihtsdo.otf.refset.domain.RGC.SCTID;
 import static org.ihtsdo.otf.refset.domain.RGC.TYPE;
+import static org.ihtsdo.otf.refset.domain.RGC.CREATED_BY;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -589,6 +590,58 @@ public class RefsetGAO {
 
 		
 		return isSctIdExist;
+
+	}
+	
+	
+	public List<Refset> getMyRefSets(String createdBy, int from, int to) throws RefsetGraphAccessException {
+		
+		TitanGraph g = null;
+		List<Refset> refsets = Collections.emptyList();
+		
+		try {
+			
+			g = rgFactory.getReadOnlyGraph();
+
+			GremlinPipeline<Vertex, Vertex> pipe = new GremlinPipeline<Vertex, Vertex>(g);
+			
+			pipe.V().has(CREATED_BY, createdBy).has(TYPE, VertexType.refset.toString()).range(from, to);
+
+			
+			List<Vertex> vs = pipe.toList();
+			FramedGraph<TitanGraph> fg = fgf.create(g);
+			List<GRefset> ls = new ArrayList<GRefset>();
+			
+			for (Vertex rV : vs) {
+				
+				GRefset gR = fg.getVertex(rV.getId(), GRefset.class);
+				GremlinPipeline<Vertex, Long> mPipe = new GremlinPipeline<Vertex, Long>();
+				long noOfMembers = mPipe.start(rV).inE(EdgeLabel.members.toString()).has(END, Long.MAX_VALUE).count();
+				gR.setNoOfMembers(noOfMembers);
+				ls.add(gR);
+				
+			}
+			
+			refsets = RefsetConvertor.getRefsets(ls);
+
+					
+			
+			
+		} catch (Exception e) {
+			
+			RefsetGraphFactory.rollback(g);			
+			LOGGER.error("Error getting refsets created by {}", createdBy, e);
+			throw new RefsetGraphAccessException(e.getMessage(), e);
+			
+		} finally {
+			
+			RefsetGraphFactory.shutdown(g);
+		}
+	
+		
+		LOGGER.debug("Returning {} refsets  ", (refsets != null ? refsets.size() : 0));
+
+		return refsets;
 
 	}
 	

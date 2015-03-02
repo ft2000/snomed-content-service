@@ -65,5 +65,11 @@ public interface RefsetBrowseService {
 	Refset getRefsetForExport(String refsetId) throws RefsetServiceException,
 			EntityNotFoundException;
 
-
+	/**Method to get List of {@link Refset}s owned by given user
+	 * @param page
+	 * @param size
+	 * @return {@link List} of {@link Refset}
+	 * @throws RefsetServiceException
+	 */
+	public List<Refset> getMyRefsets(Integer page, Integer size, String userName) throws RefsetServiceException ;
 }

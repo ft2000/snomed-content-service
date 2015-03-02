@@ -34,6 +34,7 @@
         <module>refset-graph-indexer</module>
         <module>snomed-graph-indexer</module>
         <module>snomed-graph-loader</module>
+        <module>terminology-domain</module>
         <module>refset-query-interface</module>
     </modules>
 

@@ -11,6 +11,7 @@
 */
 package org.ihtsdo.otf.refset.service.diffreport;
 
+import com.google.common.base.Objects;
 /**
  *
  */
@@ -201,8 +202,49 @@ public class DiffReportRecord implements Comparable<DiffReportRecord>{
 	 */
 	@Override
 	public int compareTo(DiffReportRecord o) {
-		// TODO Auto-generated method stub
+
 		return new Long(this.refsetId).compareTo(new Long(o.refsetId));
+	}
+	
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object o) {
+
+		if (this == o) { return true; }
+        if (o == null) { return false; }
+
+        if (o instanceof DiffReportRecord) {
+            final DiffReportRecord other = (DiffReportRecord) o;
+            return Objects.equal(getRefsetId(), other.getRefsetId()) 
+            		&& Objects.equal(getConceptId(), other.getConceptId())
+            		&& Objects.equal(getReferenceComponentId(), other.getReferenceComponentId());
+        }
+        return false;
+	}
+	/* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+
+		return this.toString().hashCode();
+	}
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+
+        return String.format("%s(conceptId=%s, conceptDescription=%s, refsetId=%s"
+        		+ "refsetDescription=%s, active=%s, reasonCode=%s"
+        		+ "reasonDescription=%s, associationRefCode=%s, associationDescription=%s"
+        		+ "referenceComponentId=%s, referenceComponentDescription=%s)", 
+        		this.getClass().getSimpleName(), this.conceptId, this.conceptDescription, this.refsetId,
+        		this.refsetDescription, this.associationRefCode, this.associationDescription,
+        		this.reasonDescription, this.conceptDescription, this.refsetId,
+        		this.referenceComponentId, this.referenceComponentDescription);
 	}
 
 
