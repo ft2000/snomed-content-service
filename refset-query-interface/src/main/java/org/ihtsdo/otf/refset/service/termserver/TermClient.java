@@ -21,6 +21,7 @@ import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.HttpClients;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
@@ -38,6 +39,9 @@ public class TermClient extends RestTemplate {
 	@Value("${ts.password}")
 	private String password;
 	
+	@Value("${ts.server.host}")
+	private String host;
+	
 	@PostConstruct 
 	void addAuthProvider() {
 		CredentialsProvider authProvider = new BasicCredentialsProvider();
@@ -50,6 +54,12 @@ public class TermClient extends RestTemplate {
         
         this.setRequestFactory(new HttpComponentsClientHttpRequestFactory(httpClient));
 		this.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
+		this.getMessageConverters().add(new StringHttpMessageConverter());
 
+	}
+	
+	public String getHost() {
+		
+		return host;
 	}
 }

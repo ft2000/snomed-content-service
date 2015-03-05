@@ -47,7 +47,7 @@ public class RefsetService {
         Map<String, String> var = new HashMap<String, String>();
         var.put("version", releaseDate);
         var.put("id", id);
-        SnomedRefset refset = termClient.getForObject(refsetEndpoint, SnomedRefset.class, var);
+        SnomedRefset refset = termClient.getForObject(termClient.getHost() + refsetEndpoint, SnomedRefset.class, var);
 		return refset;
 	}
 

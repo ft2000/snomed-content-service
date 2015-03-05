@@ -17,6 +17,10 @@ package org.ihtsdo.otf.terminology.domain;
  */
 public class SnomedRefset extends SnomedComponent {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private String term;
 	private String type;
 	private Integer memberCount;

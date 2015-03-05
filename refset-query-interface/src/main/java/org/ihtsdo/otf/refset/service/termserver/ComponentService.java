@@ -51,7 +51,7 @@ public class ComponentService {
 		
         Map<String, Object> var = new HashMap<String, Object>();
         var.put("version", releaseDate);
-        ResponseEntity<List<SnomedConcept>> response = termClient.exchange(componentEndpoint, HttpMethod.POST, 
+        ResponseEntity<List<SnomedConcept>> response = termClient.exchange(termClient.getHost() + componentEndpoint, HttpMethod.POST, 
         		new HttpEntity<List<String>>(ids), new ParameterizedTypeReference<List<SnomedConcept>>() {
 		}, var); 
 

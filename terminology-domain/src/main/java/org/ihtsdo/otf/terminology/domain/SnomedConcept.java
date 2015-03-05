@@ -20,6 +20,10 @@ import java.util.Map;
  */
 public class SnomedConcept extends SnomedComponent {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private String definitionStatus;
 	private String subclassDefinitionStatus;
 	private String inactivationIndicator;

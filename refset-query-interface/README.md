@@ -7,13 +7,15 @@
 
 Refset rest server is built with extensive set of open source libraries and frameworks. Main ones are listed as follows
 
+
+
 |  Technology | version   |  Remark |
 
-|---|:---|:---|
+|-------------|:----------|:--------|
 
-|  JDK |  v1.7 |   |
+|  JDK        |      v1.7 |         |
 
-| Servlet | v3.x |  |
+| Servlet 	  | v3.x 	  |		    |
 
 |  Maven |  v3.2.2 |   |
 
@@ -105,7 +107,7 @@ Locally application can be run using command 'mvn -DRefsetConfig=src/main/resour
 
 
 ---
-###Maintenance
+##Maintenance
 
 Most people do not need this. And only relevant if you are trying to drop existing data & schema
 

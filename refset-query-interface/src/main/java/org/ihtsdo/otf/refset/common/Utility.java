@@ -10,6 +10,7 @@ import org.ihtsdo.otf.refset.security.User;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.StringUtils;
 
@@ -19,6 +20,7 @@ import org.springframework.util.StringUtils;
 public class Utility {
 
 	private static final DateTimeFormatter YYYY_MM_DD_FORMATTER = DateTimeFormat.forPattern("yyyy-MM-dd");
+	private static final String SUCESS = "Success";
 
 	/**Convert given {@link DateTime} in yyyyMMdd format
 	 * @param dt
@@ -43,8 +45,13 @@ public class Utility {
 	 */
 	public static Result<Map<String, Object>> getResult() {
 		Result<Map<String, Object>> result = new Result<Map<String, Object>>();
+		
 		Meta m = new Meta();
+		m.setMessage(SUCESS);
+		m.setStatus(HttpStatus.OK);
+		
 		result.setMeta(m);
+
 		return result;
 	}
 	

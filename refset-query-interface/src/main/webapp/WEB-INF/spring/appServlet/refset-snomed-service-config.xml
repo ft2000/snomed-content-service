@@ -14,11 +14,11 @@
 			p:repositoryConfig="${titan.config}" p:config-ref="refset.graph.titan.config" 
 		/-->
 		
-	<bean id="conceptLookService" 
+	<!--  bean id="conceptLookService" 
 			class="org.ihtsdo.otf.snomed.service.ConceptLookUpServiceImplv1_0" 
 			p:factory-ref="snomedGraphFactory"
-		/>
-		
+		/ -->
+	<bean id="conceptLookService" class="org.ihtsdo.otf.snomed.service.ConceptLookUpServiceImplv1_1"/>	
 	<bean id="snomed.graph.titan.config" 
 			class="org.apache.commons.configuration.PropertiesConfiguration" 
 			c:fileName="${snomed.graph.config}" />

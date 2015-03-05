@@ -18,6 +18,10 @@ package org.ihtsdo.otf.terminology.domain;
  */
 public class SnomedDescription extends SnomedComponent {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private String descriptionInactivationIndicator;
 	private String term;
 	private String conceptId;

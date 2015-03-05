@@ -1,5 +1,6 @@
 package org.ihtsdo.otf.terminology.domain;
 
+import java.io.Serializable;
 import java.util.Date;
 /**
  * Copyright 2014 IHTSDO
@@ -16,8 +17,12 @@ import java.util.Date;
 /**
  *Base class to a SNOMED component
  */
-public class SnomedComponent {
+public class SnomedComponent implements Serializable {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -2230303622618948274L;
 	private boolean released;
 	private boolean active;
 	private Date effectiveTime;
