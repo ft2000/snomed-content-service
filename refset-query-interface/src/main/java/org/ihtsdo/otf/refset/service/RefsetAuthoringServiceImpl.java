@@ -16,6 +16,7 @@ import org.ihtsdo.otf.refset.exception.EntityAlreadyExistException;
 import org.ihtsdo.otf.refset.exception.EntityNotFoundException;
 import org.ihtsdo.otf.refset.exception.LockingException;
 import org.ihtsdo.otf.refset.exception.RefsetServiceException;
+import org.ihtsdo.otf.refset.exception.UpdateDeniedException;
 import org.ihtsdo.otf.refset.graph.RefsetGraphAccessException;
 import org.ihtsdo.otf.refset.graph.gao.MemberGAO;
 import org.ihtsdo.otf.refset.graph.gao.RefsetAdminGAO;
@@ -81,7 +82,7 @@ public class RefsetAuthoringServiceImpl implements RefsetAuthoringService {
 	 */
 	@Override
 	public void addMember(String refsetId, Member m)
-			throws RefsetServiceException, EntityNotFoundException, EntityAlreadyExistException {
+			throws RefsetServiceException, EntityAlreadyExistException {
 		
 		LOGGER.debug("Adding member {} to refset {}", m, refsetId);
 
@@ -91,32 +92,33 @@ public class RefsetAuthoringServiceImpl implements RefsetAuthoringService {
 		}
 		try {
 			
-			Refset r = gao.getRefset(refsetId);
+			 String owner = gao.getOwner(refsetId);
+
+			 if (StringUtils.isEmpty(owner) || !owner.equalsIgnoreCase(m.getCreatedBy())) {
+				 
+				 throw new UpdateDeniedException("Only an owner can remove member from refset");
+			 }
 			
-			List<Member> members = new ArrayList<Member>();
-			m.setUuid(UUID.randomUUID().toString());
-			if(StringUtils.isEmpty(m.getDescription())) {
+			 Refset r = gao.getRefset(refsetId);
+			
+			 List<Member> members = new ArrayList<Member>();
+			 m.setUuid(UUID.randomUUID().toString());
+			 if(StringUtils.isEmpty(m.getDescription())) {
 				
-				Concept c = lService.getConcept(m.getReferencedComponentId());
-				m.setDescription(c.getLabel());
-			}
-			members.add(m);
+				 Concept c = lService.getConcept(m.getReferencedComponentId());
+				 m.setDescription(c.getLabel());
+			 }
+			 members.add(m);
 			
 			
-			r.setMembers(members);
+			 r.setMembers(members);
 
-			LOGGER.debug("Adding member {} to refset {}", m, r);
+			 LOGGER.debug("Adding member {} to refset {}", m, r);
 
-			adminGao.addRefset(r);
+			 adminGao.addRefset(r);
 
-			LOGGER.debug("Added member {} to refset {}", m, r);
+			 LOGGER.debug("Added member {} to refset {}", m, r);
 
-			
-		} catch (EntityNotFoundException e) {
-
-			LOGGER.error("Error during service call", e);
-
-			throw e;
 			
 		} catch (RefsetGraphAccessException e) {
 			// TODO Auto-generated catch block
@@ -132,13 +134,21 @@ public class RefsetAuthoringServiceImpl implements RefsetAuthoringService {
 	}
 
 	@Override
-	public String updateRefset(Refset r) throws RefsetServiceException, EntityNotFoundException {
+	public String updateRefset(Refset r) throws RefsetServiceException {
 		
 		LOGGER.debug("updateRefset member {} to refset {}", r);
 
 		 try {
-			r = obfuscate(r); 
-			adminGao.updateRefset(r);
+			 
+			 String owner = gao.getOwner(r.getUuid());
+
+			 if (StringUtils.isEmpty(owner) || !owner.equalsIgnoreCase(r.getCreatedBy())) {
+				 
+				 throw new UpdateDeniedException("Only an owner can remove member from refset");
+			 }
+			 r = obfuscate(r); 
+			
+			 adminGao.updateRefset(r);
 			
 		} catch (RefsetGraphAccessException e) {
 			
@@ -173,12 +183,17 @@ public class RefsetAuthoringServiceImpl implements RefsetAuthoringService {
 	}
 
 	@Override
-	public void remove(String refsetId, String user) throws RefsetServiceException,
-			EntityNotFoundException, LockingException {
+	public void remove(String refsetId, String user) throws RefsetServiceException, LockingException {
 		
 		LOGGER.debug("remove refset {}", refsetId);
 
 		try {
+			
+			String owner = gao.getOwner(refsetId);
+			if (StringUtils.isEmpty(owner) || !owner.equalsIgnoreCase(user)) {
+				
+				throw new UpdateDeniedException("Refset can not be deleted as it is not owned by you");
+			}
 			 
 			adminGao.lock(refsetId);
 			
@@ -211,7 +226,7 @@ public class RefsetAuthoringServiceImpl implements RefsetAuthoringService {
 	 */
 	@Override
 	public void removeMemberFromRefset(String refsetId, String rcId, String user)
-			throws RefsetServiceException, EntityNotFoundException {
+			throws RefsetServiceException {
 
 		LOGGER.debug("removeMemberFromRefset member {} from refset {}", rcId, refsetId);
 
@@ -221,16 +236,17 @@ public class RefsetAuthoringServiceImpl implements RefsetAuthoringService {
 		}
 		
 		
+		
 		try {
+			
+			String owner = gao.getOwner(refsetId);
+			if (StringUtils.isEmpty(owner) || !owner.equalsIgnoreCase(user)) {
+				
+				throw new UpdateDeniedException("Only an owner can remove member from refset");
+			}
 			
 			mGao.removeMember(refsetId, rcId, user);
 
-		} catch (EntityNotFoundException e) {
-
-			LOGGER.error("Error during service call", e);
-
-			throw e;
-			
 		} catch (RefsetGraphAccessException e) {
 
 			LOGGER.error("Error during service call", e);
@@ -247,7 +263,7 @@ public class RefsetAuthoringServiceImpl implements RefsetAuthoringService {
 	 */
 	@Override
 	public Map<String, String> removeMembers(String refsetId, Set<String> conceptIds, String user)
-			throws RefsetServiceException, EntityNotFoundException {
+			throws RefsetServiceException {
 		
 
 		Map<String, String> tOutcome = new HashMap<String, String>();
@@ -256,17 +272,17 @@ public class RefsetAuthoringServiceImpl implements RefsetAuthoringService {
 
 		try {
 			
+			String owner = gao.getOwner(refsetId);
+			if (StringUtils.isEmpty(owner) || !owner.equalsIgnoreCase(user)) {
+				
+				throw new UpdateDeniedException("Only an owner can remove member from refset");
+			}
+			
 			Map<String, String> outcome = mGao.removeMembers(refsetId, conceptIds, user);
 			
 			tOutcome.putAll(outcome);
 
 
-			
-		} catch (EntityNotFoundException e) {
-
-			LOGGER.error("Error during service call", e);
-
-			throw e;
 			
 		} catch (RefsetGraphAccessException e) {
 
@@ -285,7 +301,7 @@ public class RefsetAuthoringServiceImpl implements RefsetAuthoringService {
 	 */
 	@Override
 	public Map<String, String> addMembers(String refsetId, Set<Member> members, String user)
-			throws RefsetServiceException, EntityNotFoundException {
+			throws RefsetServiceException {
 		
 
 		Map<String, String> tOutcome = new HashMap<String, String>();
@@ -293,6 +309,12 @@ public class RefsetAuthoringServiceImpl implements RefsetAuthoringService {
 		LOGGER.debug("Adding members {} to refset {}", members, refsetId);
 
 		try {			
+			
+			String owner = gao.getOwner(refsetId);
+			if (StringUtils.isEmpty(owner) || !owner.equalsIgnoreCase(user)) {
+				
+				throw new UpdateDeniedException("Only an owner of refset can add new member");
+			}
 			
 			LOGGER.debug("Adding member {} to refset {}", members, refsetId);
 			//add 100 members at a time. Otherwise when large number of members being added transaction is slow due to too many vertices/edges
@@ -305,12 +327,6 @@ public class RefsetAuthoringServiceImpl implements RefsetAuthoringService {
 
 			LOGGER.debug("Added member to refset");
 
-			
-		} catch (EntityNotFoundException e) {
-
-			LOGGER.error("Error during service call", e);
-
-			throw e;
 			
 		} catch (RefsetGraphAccessException e) {
 

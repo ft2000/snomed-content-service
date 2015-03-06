@@ -13,6 +13,7 @@ import org.ihtsdo.otf.refset.exception.EntityNotFoundException;
 import org.ihtsdo.otf.refset.exception.ExportServiceException;
 import org.ihtsdo.otf.refset.exception.InvalidServiceException;
 import org.ihtsdo.otf.refset.exception.RefsetServiceException;
+import org.ihtsdo.otf.refset.exception.UpdateDeniedException;
 import org.ihtsdo.otf.refset.exception.ValidationException;
 import org.ihtsdo.otf.snomed.exception.ConceptServiceException;
 import org.slf4j.Logger;
@@ -248,6 +249,25 @@ public class RefsetExceptionResolver {
 	    
 		Meta m = new Meta();
 		m.setStatus(HttpStatus.BAD_REQUEST);
+		m.setErrorInfo(errorInfo);
+		response.setMeta(m);
+
+		return response;
+
+	}
+	
+	@ResponseStatus(HttpStatus.UNAUTHORIZED)
+	@ExceptionHandler(UpdateDeniedException.class)
+	@ResponseBody Result<Map<String, Object>> handleUpdateDeniedException(UpdateDeniedException e) {
+		
+		LOGGER.error("Exception details \n", e);
+
+		String message = StringUtils.isEmpty(e.getMessage()) ? "Unauthorized update, only owner of refset can update refset or add/remove members"  : e.getMessage();
+		
+		ErrorInfo errorInfo = new ErrorInfo(message, Integer.toString(org.apache.http.HttpStatus.SC_UNAUTHORIZED));
+	    
+		Meta m = new Meta();
+		m.setStatus(HttpStatus.UNAUTHORIZED);
 		m.setErrorInfo(errorInfo);
 		response.setMeta(m);
 

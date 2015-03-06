@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 /**
  * This service supports 
@@ -65,7 +66,7 @@ public class RefsetGraphService implements RefsetBrowseService {
 	 * @see org.ihtsdo.otf.refset.service.RefsetBrowseService#getRefset(java.lang.String)
 	 */
 	@Override
-	public Refset getRefset(String refsetId) throws RefsetServiceException, EntityNotFoundException {
+	public Refset getRefset(String refsetId) throws RefsetServiceException {
 
 		LOGGER.debug("getRefset for {}", refsetId);
 
@@ -102,7 +103,7 @@ public class RefsetGraphService implements RefsetBrowseService {
 	 */
 	@Override
 	public Refset getRefset(String refsetId, Integer from, Integer to)
-			throws RefsetServiceException, EntityNotFoundException {
+			throws RefsetServiceException {
 
 		LOGGER.debug("getRefset for range from {}, to {}", from, to);
 
@@ -128,7 +129,7 @@ public class RefsetGraphService implements RefsetBrowseService {
 	 */
 	@Override
 	public Refset getRefsetHeader(String refSetId)
-			throws RefsetServiceException, EntityNotFoundException {
+			throws RefsetServiceException {
 
 		LOGGER.debug("getRefsetHeader for refSetId {}", refSetId);
 
@@ -148,7 +149,7 @@ public class RefsetGraphService implements RefsetBrowseService {
 	 * @see org.ihtsdo.otf.refset.service.RefsetBrowseService#getRefset(java.lang.String)
 	 */
 	@Override
-	public Refset getRefsetForExport(String refsetId) throws RefsetServiceException, EntityNotFoundException {
+	public Refset getRefsetForExport(String refsetId) throws RefsetServiceException {
 
 		LOGGER.debug("getRefsetForExport for {}", refsetId);
 
@@ -187,6 +188,18 @@ public class RefsetGraphService implements RefsetBrowseService {
 		return refsets;
 		
 	}
+
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.otf.refset.service.RefsetBrowseService#isOwner(java.lang.String, java.lang.String)
+	 */
+	@Override
+	public boolean isOwner(String refsetId, String userName) throws RefsetGraphAccessException {
+
+		return !StringUtils.isEmpty(userName) ? userName.equalsIgnoreCase(gao.getOwner(refsetId)) : false;
+	}
+	
+	
+	
 
 	
 

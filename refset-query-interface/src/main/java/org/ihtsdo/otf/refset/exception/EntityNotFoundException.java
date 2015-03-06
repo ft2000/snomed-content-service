@@ -4,10 +4,10 @@
 package org.ihtsdo.otf.refset.exception;
 
 /**
- * @author Episteme Partners
+ * @author 
  *
  */
-public class EntityNotFoundException extends Exception {
+public class EntityNotFoundException extends RuntimeException {
 
 	/**
 	 * 

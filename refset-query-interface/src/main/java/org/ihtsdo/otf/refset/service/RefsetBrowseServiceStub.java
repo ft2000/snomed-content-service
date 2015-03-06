@@ -8,6 +8,7 @@ import java.util.List;
 import org.ihtsdo.otf.refset.domain.Refset;
 import org.ihtsdo.otf.refset.exception.EntityNotFoundException;
 import org.ihtsdo.otf.refset.exception.RefsetServiceException;
+import org.ihtsdo.otf.refset.graph.RefsetGraphAccessException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -107,6 +108,16 @@ public class RefsetBrowseServiceStub implements RefsetBrowseService {
 			throws RefsetServiceException {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.otf.refset.service.RefsetBrowseService#isOwner(java.lang.String, java.lang.String)
+	 */
+	@Override
+	public boolean isOwner(String refsetId, String userName)
+			throws RefsetGraphAccessException {
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 }

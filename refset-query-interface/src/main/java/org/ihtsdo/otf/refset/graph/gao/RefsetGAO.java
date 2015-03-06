@@ -79,7 +79,7 @@ public class RefsetGAO {
 	 * @throws RefsetGraphAccessException
 	 * @throws EntityNotFoundException 
 	 */
-	protected Vertex getRefsetVertex(String id, FramedTransactionalGraph<TitanGraph> tg) throws RefsetGraphAccessException, EntityNotFoundException {
+	protected Vertex getRefsetVertex(String id, FramedTransactionalGraph<TitanGraph> tg) throws RefsetGraphAccessException {
 		
 		LOGGER.debug("getRefsetVertex for given refset id {}", id);
 
@@ -127,7 +127,7 @@ public class RefsetGAO {
 	 * @return {@link Refset}
 	 * @throws RefsetGraphAccessException
 	 */
-	public Refset getRefset(String id) throws RefsetGraphAccessException, EntityNotFoundException {
+	public Refset getRefset(String id) throws RefsetGraphAccessException {
 				
 		TitanGraph g = null;
 		Refset r = null;
@@ -269,7 +269,7 @@ public class RefsetGAO {
 	 * @throws RefsetGraphAccessException
 	 * @throws EntityNotFoundException 
 	 */
-	public MetaData getMetaData(Object rId) throws RefsetGraphAccessException, EntityNotFoundException {
+	public MetaData getMetaData(Object rId) throws RefsetGraphAccessException {
 		
 		TitanGraph g = null;
 		MetaData md = null;
@@ -369,9 +369,8 @@ public class RefsetGAO {
 	 * @param size
 	 * @return
 	 * @throws RefsetGraphAccessException 
-	 * @throws EntityNotFoundException 
 	 */
-	public Refset getRefset(String refsetId, Integer from, Integer to) throws RefsetGraphAccessException, EntityNotFoundException {
+	public Refset getRefset(String refsetId, Integer from, Integer to) throws RefsetGraphAccessException {
 		
 		LOGGER.debug("Getting refset members from {}, to {}", from, to);
 		
@@ -477,7 +476,12 @@ public class RefsetGAO {
 			RefsetGraphFactory.commit(g);			
 
 			
-		} catch (Exception e) {
+		}catch(EntityNotFoundException e) {
+			
+			throw e;
+		}
+		
+		catch (Exception e) {
 			
 			RefsetGraphFactory.rollback(g);			
 			LOGGER.error("Error getting refset for {}", refSetId, e);
@@ -594,6 +598,13 @@ public class RefsetGAO {
 	}
 	
 	
+	/**
+	 * @param createdBy
+	 * @param from
+	 * @param to
+	 * @return
+	 * @throws RefsetGraphAccessException
+	 */
 	public List<Refset> getMyRefSets(String createdBy, int from, int to) throws RefsetGraphAccessException {
 		
 		TitanGraph g = null;
@@ -642,6 +653,28 @@ public class RefsetGAO {
 		LOGGER.debug("Returning {} refsets  ", (refsets != null ? refsets.size() : 0));
 
 		return refsets;
+
+	}
+	
+	/**
+	 * @param createdBy
+	 * @param from
+	 * @param to
+	 * @return
+	 * @throws RefsetGraphAccessException
+	 */
+	public String getOwner(String refsetId) throws RefsetGraphAccessException {
+		
+		Refset r = getRefsetHeader(refsetId);
+		
+		if (r != null) {
+			
+			LOGGER.debug("Returning owner as {}", r.getCreatedBy());
+
+			return r.getCreatedBy();
+		}
+		
+		throw new EntityNotFoundException(String.format("Refset with id %s is not available", refsetId));
 
 	}
 	

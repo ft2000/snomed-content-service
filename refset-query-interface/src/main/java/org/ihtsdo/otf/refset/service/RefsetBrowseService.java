@@ -9,6 +9,7 @@ import org.ihtsdo.otf.refset.domain.Member;
 import org.ihtsdo.otf.refset.domain.Refset;
 import org.ihtsdo.otf.refset.exception.EntityNotFoundException;
 import org.ihtsdo.otf.refset.exception.RefsetServiceException;
+import org.ihtsdo.otf.refset.graph.RefsetGraphAccessException;
 
 /**
  * @author Episteme Partners
@@ -29,7 +30,7 @@ public interface RefsetBrowseService {
 	 * @return
 	 * @throws RefsetServiceException
 	 */
-	public Refset getRefset(String refsetId) throws RefsetServiceException, EntityNotFoundException ;
+	public Refset getRefset(String refsetId) throws RefsetServiceException ;
 	
 	/**Validates if given description exist in the system or not
 	 * @param descrition
@@ -48,13 +49,13 @@ public interface RefsetBrowseService {
 	 * @return
 	 * @throws RefsetServiceException
 	 */
-	public Refset getRefset(String refsetId, Integer from, Integer to) throws RefsetServiceException, EntityNotFoundException ;
+	public Refset getRefset(String refsetId, Integer from, Integer to) throws RefsetServiceException ;
 
 	/**
 	 * @param refSetId
 	 * @return a {@link Refset} with member count and excluding all member details
 	 */
-	public Refset getRefsetHeader(String refSetId) throws RefsetServiceException, EntityNotFoundException ;
+	public Refset getRefsetHeader(String refSetId) throws RefsetServiceException ;
 
 	/**
 	 * @param refsetId
@@ -72,4 +73,13 @@ public interface RefsetBrowseService {
 	 * @throws RefsetServiceException
 	 */
 	public List<Refset> getMyRefsets(Integer page, Integer size, String userName) throws RefsetServiceException ;
+	
+	
+	/** Validates if given refset id  belong to given user
+	 * @param refsetId
+	 * @param userName
+	 * @return
+	 * @throws RefsetGraphAccessException 
+	 */
+	public boolean isOwner(String refsetId, String userName) throws RefsetGraphAccessException;
 }
