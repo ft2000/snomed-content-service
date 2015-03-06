@@ -7,7 +7,6 @@ import static org.ihtsdo.otf.refset.common.Utility.getResult;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -34,8 +33,11 @@ import com.wordnik.swagger.annotations.ApiOperation;
  *
  */
 @RestController
-@Api(value="SNOMED", description="Service to lookup concept details")
-@RequestMapping("/v1.0/snomed")
+@Api(value="SNOMEDCT", 
+	description="Services to lookup SNOMED®CT Terminology data as well as meta data", 
+	produces = MediaType.APPLICATION_JSON_VALUE,
+	consumes = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping("/v1/snomed")
 public class ConceptLookupController {
 	
 	private static final Logger logger = LoggerFactory.getLogger(ConceptLookupController.class);
@@ -43,8 +45,7 @@ public class ConceptLookupController {
 	@Resource(name = "conceptLookService")
 	private ConceptLookupService cService;
 	
-	@RequestMapping( method = RequestMethod.POST, value = "/concepts", produces = MediaType.APPLICATION_JSON_VALUE , 
-			consumes = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping( method = RequestMethod.POST, value = "/concepts")
 	@ApiOperation( value = "Retrieves concept details for given concept ids", notes = "Retrieves concept details for given concept ids " )
     public ResponseEntity<Result< Map<String, Object>>> getConceptDetails( 
     		@RequestBody( required = true) Set<String> conceptIds ) throws Exception {
@@ -57,9 +58,7 @@ public class ConceptLookupController {
 		
 		Map<String, Concept> cs =  cService.getConcepts(conceptIds);
 
-		Map<String, Object> data = new HashMap<String, Object>();
-		data.put("concepts", cs);
-		response.setData(data);
+		response.getData().put("concepts", cs);
 		
 		return new ResponseEntity<Result<Map<String,Object>>>(response, HttpStatus.OK);
 		
@@ -67,7 +66,7 @@ public class ConceptLookupController {
          
     }
 	
-	@RequestMapping( method = RequestMethod.GET, value = "/concepts/{conceptId}", produces = "application/json" )
+	@RequestMapping( method = RequestMethod.GET, value = "/concepts/{conceptId}")
 	@ApiOperation( value = "Api to get details of a concept for given concept id.", notes = "Api to get details of a concept for given concept id" )
     public ResponseEntity<Result< Map<String, Object>>> getConcept( @PathVariable( value = "conceptId") String conceptId ) throws Exception {
 		
@@ -79,9 +78,7 @@ public class ConceptLookupController {
 		
 		Concept c =  cService.getConcept(conceptId);
 
-		Map<String, Object> data = new HashMap<String, Object>();
-		data.put("concept", c);
-		response.setData(data);
+		response.getData().put("concept", c);
 
 		return new ResponseEntity<Result<Map<String,Object>>>(response, HttpStatus.OK);
 		

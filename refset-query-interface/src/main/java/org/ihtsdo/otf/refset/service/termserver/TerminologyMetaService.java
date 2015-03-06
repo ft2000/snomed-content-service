@@ -12,9 +12,9 @@
 package org.ihtsdo.otf.refset.service.termserver;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.ihtsdo.otf.refset.exception.RefsetServiceException;
 import org.slf4j.Logger;
@@ -48,7 +48,7 @@ public class TerminologyMetaService {
 	protected Map<String, String> getReleases() throws RefsetServiceException {
 
 		LOGGER.debug("Calling term server to get releases");
-		Map<String, String> releases = new HashMap<String, String>();
+		Map<String, String> releases = new TreeMap<String, String>();
 		
         ResponseEntity<GenericTermServerResponse<String>> response = termClient.exchange(termClient.getHost() + versionsEndpoint, HttpMethod.GET, 
         		null, new ParameterizedTypeReference<GenericTermServerResponse<String>>() {

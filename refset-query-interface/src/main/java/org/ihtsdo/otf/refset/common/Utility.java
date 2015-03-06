@@ -4,6 +4,7 @@
 package org.ihtsdo.otf.refset.common;
 
 import java.nio.file.AccessDeniedException;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.ihtsdo.otf.refset.security.User;
@@ -40,7 +41,7 @@ public class Utility {
 		return null;
 	}
 	
-	/**{@link Result} container for response returned from controller
+	/**Pre-built {@link Result} container for response returned from controller.
 	 * @return
 	 */
 	public static Result<Map<String, Object>> getResult() {
@@ -49,8 +50,10 @@ public class Utility {
 		Meta m = new Meta();
 		m.setMessage(SUCESS);
 		m.setStatus(HttpStatus.OK);
-		
 		result.setMeta(m);
+
+		Map<String, Object> data = new HashMap<String, Object>();
+		result.setData(data);
 
 		return result;
 	}
