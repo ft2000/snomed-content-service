@@ -45,6 +45,9 @@ public class RefsetValidator implements Validator {
         ValidationUtils.rejectIfEmpty(e, "description", "Refset description is mandatory");
         ValidationUtils.rejectIfEmpty(e, "languageCode", "Refset language is mandatory");
         ValidationUtils.rejectIfEmpty(e, "published", "Indication of Refset is published or not is mandatory");
+        ValidationUtils.rejectIfEmpty(e, "scope", "Refset use case/scope is mandatory and can not be left empty");
+        ValidationUtils.rejectIfEmpty(e, "originCountry", "Refset origin country is mandatory and can not be left empty");
+        ValidationUtils.rejectIfEmpty(e, "snomedCTVersion", "SNOMED®CT release version is mandatory and can not be left empty");
 
 	}
 

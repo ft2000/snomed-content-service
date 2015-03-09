@@ -24,6 +24,12 @@ import static org.ihtsdo.otf.refset.domain.RGC.E_EFFECTIVE_TIME;
 import static org.ihtsdo.otf.refset.domain.RGC.L_EFFECTIVE_TIME;
 import static org.ihtsdo.otf.refset.domain.RGC.PARENT_ID;
 import static org.ihtsdo.otf.refset.domain.RGC.LOCK;
+import static org.ihtsdo.otf.refset.domain.RGC.SCOPE;
+import static org.ihtsdo.otf.refset.domain.RGC.ORIGIN_COUNTRY;
+import static org.ihtsdo.otf.refset.domain.RGC.SNOMED_CT_EXT;
+import static org.ihtsdo.otf.refset.domain.RGC.SNOMED_CT_VERSION;
+import static org.ihtsdo.otf.refset.domain.RGC.CONTRIBUTING_ORG;
+import static org.ihtsdo.otf.refset.domain.RGC.IMPLEMENTATION_DETAILS;
 
 import java.util.Arrays;
 import java.util.List;
@@ -587,6 +593,51 @@ public class RefsetSchema {
 			mgmt.makePropertyKey(LOCK).dataType(Integer.class).make();
 			
 		}
+		
+		if (!mgmt.containsRelationType(SCOPE)) {
+
+			LOGGER.debug("Creating Property {}", SCOPE);
+			mgmt.makePropertyKey(SCOPE).dataType(String.class).make();
+			
+		}
+		
+		
+		if (!mgmt.containsRelationType(ORIGIN_COUNTRY)) {
+
+			LOGGER.debug("Creating Property {}", ORIGIN_COUNTRY);
+			mgmt.makePropertyKey(ORIGIN_COUNTRY).dataType(String.class).make();
+			
+		}
+		
+		if (!mgmt.containsRelationType(CONTRIBUTING_ORG)) {
+
+			LOGGER.debug("Creating Property {}", CONTRIBUTING_ORG);
+			mgmt.makePropertyKey(CONTRIBUTING_ORG).dataType(String.class).make();
+			
+		}
+		
+		if (!mgmt.containsRelationType(SNOMED_CT_EXT)) {
+
+			LOGGER.debug("Creating Property {}", SNOMED_CT_EXT);
+			mgmt.makePropertyKey(SNOMED_CT_EXT).dataType(String.class).make();
+			
+		}
+		
+		if (!mgmt.containsRelationType(SNOMED_CT_VERSION)) {
+
+			LOGGER.debug("Creating Property {}", SNOMED_CT_VERSION);
+			mgmt.makePropertyKey(SNOMED_CT_VERSION).dataType(String.class).make();
+			
+		}
+		
+		if (!mgmt.containsRelationType(IMPLEMENTATION_DETAILS)) {
+
+			LOGGER.debug("Creating Property {}", IMPLEMENTATION_DETAILS);
+			mgmt.makePropertyKey(IMPLEMENTATION_DETAILS).dataType(String.class).make();
+			
+		}
+		
+
 
 	}
 	
@@ -650,8 +701,7 @@ public class RefsetSchema {
 						Parameter.of(MAPPED, START))
 				.addKey(mgmt.getPropertyKey(END), 
 						Parameter.of(MAPPED, END))
-						
-
+				
 				.indexOnly(mgmt.getVertexLabel("GRefset")).buildMixedIndex(backingIndexName);
 			}
 			
@@ -746,7 +796,48 @@ public class RefsetSchema {
 					mgmt.addIndexKey(giRefset, mgmt.getPropertyKey(EXPECTED_PUBLISH_DATE), 
 						Parameter.of(MAPPED, EXPECTED_PUBLISH_DATE));
 				}
+				
+				if (!existingProp.contains(mgmt.getPropertyKey(SCOPE))) {
 
+					mgmt.addIndexKey(giRefset, mgmt.getPropertyKey(SCOPE), 
+							Parameter.of(MAPPED, SCOPE));
+				
+				}
+				if (!existingProp.contains(mgmt.getPropertyKey(CONTRIBUTING_ORG))) {
+
+					mgmt.addIndexKey(giRefset, mgmt.getPropertyKey(CONTRIBUTING_ORG), 
+							Parameter.of(MAPPED, CONTRIBUTING_ORG));
+
+				}
+				
+				if (!existingProp.contains(mgmt.getPropertyKey(SNOMED_CT_EXT))) {
+
+					mgmt.addIndexKey(giRefset, mgmt.getPropertyKey(SNOMED_CT_EXT), 
+							Parameter.of(MAPPED, SNOMED_CT_EXT));
+
+				}
+				
+				if (!existingProp.contains(mgmt.getPropertyKey(SNOMED_CT_VERSION))) {
+
+					mgmt.addIndexKey(giRefset, mgmt.getPropertyKey(SNOMED_CT_VERSION), 
+							Parameter.of(MAPPED, SNOMED_CT_VERSION));
+
+				}
+				
+				if (!existingProp.contains(mgmt.getPropertyKey(ORIGIN_COUNTRY))) {
+
+					mgmt.addIndexKey(giRefset, mgmt.getPropertyKey(ORIGIN_COUNTRY), 
+							Parameter.of(MAPPED, ORIGIN_COUNTRY));
+					
+				}
+				
+				if (!existingProp.contains(mgmt.getPropertyKey(IMPLEMENTATION_DETAILS))) {
+
+					mgmt.addIndexKey(giRefset, mgmt.getPropertyKey(IMPLEMENTATION_DETAILS), 
+							Parameter.of(MAPPED, IMPLEMENTATION_DETAILS));
+
+				}
+				
 			}
 			
 			

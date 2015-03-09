@@ -33,6 +33,38 @@ public class Refset extends BaseObj implements Comparable<Refset> {
 	
 	private DateTime latestEffectiveTime;
 	
+	/**
+	 * Use case of this refset
+	 */
+	private String scope;
+	
+	/**
+	 * refset contributing organization
+	 */
+	private String contributingOrganization;
+	
+	
+	/**Country of Origin for this refset
+	 * 
+	 */
+	private String originCountry;
+	
+	/**SNOMED®CT release date
+	 * 
+	 */
+	private String snomedCTVersion;
+	
+	/**
+	 * SNOMED®CT extension
+	 */
+	private String snomedCTExtension;
+	
+	/**
+	 * Details implementation notes
+	 */
+	private String implementationDetails;
+	
+	
 	
 	/**
 	 * @return the typeId
@@ -126,9 +158,13 @@ public class Refset extends BaseObj implements Comparable<Refset> {
 	   return String.format( "Refset [id - %s, created - %s, createdBy - %s, description - %s, "
 	   		+ "effectiveTime - %s,  isPublished - %s, languageCode - %s, members - %s, moduleId - %s, publishedDate - %s "
 	   		+ "superRefsetTypeId - %s, type - %s, typeId - %s, description - %s, latestEffectiveTime - %s,"
-	   		+ " earliestEffectiveTime -%s ]", this.uuid, this.created, this.createdBy, this.description,
-	   		this.effectiveTime, this.published, this.languageCode, this.members, this.moduleId, this.publishedDate,
-	   		this.superRefsetTypeId, this.type, this.typeId, this.description, this.earliestEffectiveTime, this.latestEffectiveTime );
+	   		+ " earliestEffectiveTime -%s, scope - %s, snomedCTExtension - %s, snomedCTVersion - %s,"
+	   		+ " contributingOrganization - %s, originCountry - %s, implementationDetails - %s"
+	   		+ "]", this.uuid, this.created, this.createdBy, this.description, this.effectiveTime, this.published,
+	   		this.languageCode, this.members, this.moduleId, this.publishedDate, this.superRefsetTypeId, this.type,
+	   		this.typeId, this.description, this.earliestEffectiveTime, this.latestEffectiveTime, this.scope,
+	   		this.snomedCTExtension, this.snomedCTVersion, this.contributingOrganization, this.originCountry,
+	   		this.implementationDetails);
    }
 
 
@@ -215,6 +251,90 @@ public class Refset extends BaseObj implements Comparable<Refset> {
 	 */
 	public void setLatestEffectiveTime(DateTime latestEffectiveTime) {
 		this.latestEffectiveTime = latestEffectiveTime;
+	}
+
+	/**
+	 * @return the scope
+	 */
+	public String getScope() {
+		return scope;
+	}
+
+	/**
+	 * @param scope the scope to set
+	 */
+	public void setScope(String scope) {
+		this.scope = scope;
+	}
+
+	/**
+	 * @return the contributingOrganization
+	 */
+	public String getContributingOrganization() {
+		return contributingOrganization;
+	}
+
+	/**
+	 * @param contributingOrganization the contributingOrganization to set
+	 */
+	public void setContributingOrganization(String contributingOrganization) {
+		this.contributingOrganization = contributingOrganization;
+	}
+
+	/**
+	 * @return the originCountry
+	 */
+	public String getOriginCountry() {
+		return originCountry;
+	}
+
+	/**
+	 * @param originCountry the originCountry to set
+	 */
+	public void setOriginCountry(String originCountry) {
+		this.originCountry = originCountry;
+	}
+
+	/**
+	 * @return the snomedCTVersion
+	 */
+	public String getSnomedCTVersion() {
+		return snomedCTVersion;
+	}
+
+	/**
+	 * @param snomedCTVersion the snomedCTVersion to set
+	 */
+	public void setSnomedCTVersion(String snomedCTVersion) {
+		this.snomedCTVersion = snomedCTVersion;
+	}
+
+	/**
+	 * @return the snomedCTExtension
+	 */
+	public String getSnomedCTExtension() {
+		return snomedCTExtension;
+	}
+
+	/**
+	 * @param snomedCTExtension the snomedCTExtension to set
+	 */
+	public void setSnomedCTExtension(String snomedCTExtension) {
+		this.snomedCTExtension = snomedCTExtension;
+	}
+
+	/**
+	 * @return the implementationDetails
+	 */
+	public String getImplementationDetails() {
+		return implementationDetails;
+	}
+
+	/**
+	 * @param implementationDetails the implementationDetails to set
+	 */
+	public void setImplementationDetails(String implementationDetails) {
+		this.implementationDetails = implementationDetails;
 	}
 
 

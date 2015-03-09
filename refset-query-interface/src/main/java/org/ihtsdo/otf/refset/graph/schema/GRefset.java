@@ -282,5 +282,76 @@ public interface GRefset extends VertexFrame {
 	 */
 	@Property( value = "latestEffectiveTime")
 	public void setLatestEffectiveTime(long latestEffectiveTime);
+	
+	/**
+	 * @return the scope
+	 */
+	@Property( value = "scope")
+	public String getScope();
+
+	/**
+	 * @param scope the scope to set
+	 */
+	@Property( value = "scope")
+	public void setScope(String scope);
+
+	/**
+	 * @return the contributingOrganization
+	 */
+	@Property( value = "contributingOrganization")
+	public String getContributingOrganization();
+	/**
+	 * @param contributingOrganization the contributingOrganization to set
+	 */
+	@Property( value = "contributingOrganization")
+	public void setContributingOrganization(String contributingOrganization);
+	
+	/**
+	 * @return the originCountry
+	 */
+	@Property( value = "originCountry")
+	public String getOriginCountry();
+
+	/**
+	 * @param originCountry the originCountry to set
+	 */
+	@Property( value = "originCountry")
+	public void setOriginCountry(String originCountry);
+
+	/**
+	 * @return the snomedCTVersion
+	 */
+	@Property( value = "snomedCTVersion")
+	public String getSnomedCTVersion();
+
+	/**
+	 * @param snomedCTVersion the snomedCTVersion to set
+	 */
+	@Property( value = "snomedCTVersion")
+	public void setSnomedCTVersion(String snomedCTVersion);
+
+	/**
+	 * @return the snomedCTExtension
+	 */
+	@Property( value = "snomedCTExtension")
+	public String getSnomedCTExtension();
+
+	/**
+	 * @param snomedCTExtension the snomedCTExtension to set
+	 */
+	@Property( value = "snomedCTExtension")
+	public void setSnomedCTExtension(String snomedCTExtension);
+
+	/**
+	 * @return the implementationDetails
+	 */
+	@Property( value = "implementationDetails")
+	public String getImplementationDetails();
+
+	/**
+	 * @param implementationDetails the implementationDetails to set
+	 */
+	@Property( value = "implementationDetails")
+	public void setImplementationDetails(String implementationDetails);
 
 }

@@ -42,8 +42,10 @@ import com.tinkerpop.blueprints.Vertex;
 
 /**
  * Service to look up Terminology data.
- *
+ * *deprecated due to introduction of new {@link ConceptLookUpServiceImplv1_1} service which
+ *integrates Term Server in real time.
  */
+@Deprecated
 public class ConceptLookUpServiceImplv1_0 implements ConceptLookupService {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(ConceptLookUpServiceImplv1_0.class);

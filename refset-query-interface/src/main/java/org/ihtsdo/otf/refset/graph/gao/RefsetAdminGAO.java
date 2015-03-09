@@ -243,6 +243,44 @@ public class RefsetAdminGAO {
 			}
 			gr.setType(VertexType.refset.toString());
 			
+			//new field after MVP
+			if (!StringUtils.isEmpty(r.getScope())) {
+				
+				gr.setScope(r.getScope());
+
+			}
+			
+			if (!StringUtils.isEmpty(r.getSnomedCTExtension())) {
+
+				gr.setSnomedCTExtension(r.getSnomedCTExtension());
+
+			}
+			
+			if (!StringUtils.isEmpty(r.getSnomedCTVersion())) {
+				
+				gr.setSnomedCTVersion(r.getSnomedCTVersion());
+
+			}
+			
+			if (!StringUtils.isEmpty(r.getOriginCountry())) {
+
+				gr.setOriginCountry(r.getOriginCountry());
+
+			}
+			
+			if (!StringUtils.isEmpty(r.getContributingOrganization())) {
+
+				gr.setContributingOrganization(r.getContributingOrganization());
+
+			}
+			
+			if (!StringUtils.isEmpty(r.getImplementationDetails())) {
+
+				gr.setImplementationDetails(r.getImplementationDetails());
+
+			}
+			
+			
 			LOGGER.debug("Added Refset as vertex to graph {}", gr.getId());
 
 			rV = gr.asVertex();			
@@ -511,6 +549,43 @@ public class RefsetAdminGAO {
 			
 			//rV.setSctdId(r.getSctId());
 			rV.setProperty(SCTID, r.getSctId());
+		}
+		
+		//new field after MVP
+		if (!StringUtils.isEmpty(r.getScope())) {
+			
+			rV.setProperty(SCOPE, r.getScope());
+
+		}
+		
+		if (!StringUtils.isEmpty(r.getSnomedCTExtension())) {
+
+			rV.setProperty(SNOMED_CT_EXT, r.getSnomedCTExtension());
+
+		}
+		
+		if (!StringUtils.isEmpty(r.getSnomedCTVersion())) {
+			
+			rV.setProperty(SNOMED_CT_VERSION, r.getSnomedCTVersion());
+
+		}
+		
+		if (!StringUtils.isEmpty(r.getOriginCountry())) {
+
+			rV.setProperty(ORIGIN_COUNTRY, r.getOriginCountry());
+
+		}
+		
+		if (!StringUtils.isEmpty(r.getContributingOrganization())) {
+
+			rV.setProperty(CONTRIBUTING_ORG, r.getContributingOrganization());
+
+		}
+		
+		if (!StringUtils.isEmpty(r.getImplementationDetails())) {
+
+			rV.setProperty(IMPLEMENTATION_DETAILS, r.getImplementationDetails());
+
 		}
 
 		

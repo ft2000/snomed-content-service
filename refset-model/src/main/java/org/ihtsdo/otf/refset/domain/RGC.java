@@ -39,9 +39,43 @@ public final class RGC {
 	
 	public static final String LOCK = "lock"; //used in write lock. This is to handle long running transaction.
 
-
+	
 	
 
+	
+	//new field defined post MVP
+	
+	/**
+	 * Use case of this refset
+	 */
+	public static final String SCOPE = "scope";
+	
+	/**
+	 * refset contributing organization
+	 */
+	public static final String  CONTRIBUTING_ORG = "contributingOrganization";
+	
+	
+	/**Country of Origin for this refset
+	 * 
+	 */
+	public static final String ORIGIN_COUNTRY = "originCountry";
+	
+	/**SNOMED®CT release date
+	 * 
+	 */
+	public static final String SNOMED_CT_VERSION = "snomedCTVersion";
+	
+	/**
+	 * SNOMED®CT extension
+	 */
+	public static final String SNOMED_CT_EXT = "snomedCTExtension";
+	
+	/**
+	 * Details implementation notes
+	 */
+	public static final String IMPLEMENTATION_DETAILS = "implementationDetails";
+	
 
 
 }

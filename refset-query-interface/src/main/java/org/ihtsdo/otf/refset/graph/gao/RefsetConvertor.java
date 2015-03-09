@@ -25,6 +25,12 @@ import static org.ihtsdo.otf.refset.domain.RGC.TYPE_ID;
 import static org.ihtsdo.otf.refset.domain.RGC.END;
 import static org.ihtsdo.otf.refset.domain.RGC.E_EFFECTIVE_TIME;
 import static org.ihtsdo.otf.refset.domain.RGC.L_EFFECTIVE_TIME;
+import static org.ihtsdo.otf.refset.domain.RGC.SCOPE;
+import static org.ihtsdo.otf.refset.domain.RGC.ORIGIN_COUNTRY;
+import static org.ihtsdo.otf.refset.domain.RGC.SNOMED_CT_EXT;
+import static org.ihtsdo.otf.refset.domain.RGC.SNOMED_CT_VERSION;
+import static org.ihtsdo.otf.refset.domain.RGC.CONTRIBUTING_ORG;
+import static org.ihtsdo.otf.refset.domain.RGC.IMPLEMENTATION_DETAILS;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -232,6 +238,44 @@ public class RefsetConvertor {
 			r.setLatestEffectiveTime(new DateTime(vR.getLatestEffectiveTime()));
 
 		}
+		
+		//new fields post MVP
+		if ( keys.contains(SCOPE) ) {
+					
+			r.setScope(vR.getScope());
+		
+		}
+		
+		if ( keys.contains(SNOMED_CT_EXT) ) {
+			
+			r.setSnomedCTExtension(vR.getSnomedCTExtension());
+		
+		}
+		
+		if ( keys.contains(SNOMED_CT_VERSION) ) {
+			
+			r.setSnomedCTVersion(vR.getSnomedCTVersion());
+		
+		}
+		
+		if ( keys.contains(ORIGIN_COUNTRY) ) {
+			
+			r.setOriginCountry(vR.getOriginCountry());
+		
+		}
+		
+		if ( keys.contains(IMPLEMENTATION_DETAILS) ) {
+			
+			r.setImplementationDetails(vR.getImplementationDetails());
+		
+		}
+		
+		if ( keys.contains(CONTRIBUTING_ORG) ) {
+			
+			r.setContributingOrganization(vR.getContributingOrganization());
+		
+		}
+
 
 		return r;
 	}
@@ -619,6 +663,49 @@ public class RefsetConvertor {
 			
 			r.setLatestEffectiveTime(new DateTime(vR.getProperty(L_EFFECTIVE_TIME)));
 
+		}
+		
+		//new fields post MVP
+		if ( keys.contains(SCOPE) ) {
+			
+			String scope = vR.getProperty(SCOPE);
+			r.setScope(scope);
+		
+		}
+		
+		if ( keys.contains(SNOMED_CT_EXT) ) {
+			
+			String snomedCTExtension = vR.getProperty(SNOMED_CT_EXT);
+			r.setSnomedCTExtension(snomedCTExtension);
+		
+		}
+		
+		if ( keys.contains(SNOMED_CT_VERSION) ) {
+			
+			String snomedCTVersion = vR.getProperty(SNOMED_CT_VERSION);
+			r.setSnomedCTVersion(snomedCTVersion);
+		
+		}
+		
+		if ( keys.contains(ORIGIN_COUNTRY) ) {
+			
+			String originCountry = vR.getProperty(ORIGIN_COUNTRY);
+			r.setOriginCountry(originCountry);
+		
+		}
+		
+		if ( keys.contains(IMPLEMENTATION_DETAILS) ) {
+			
+			String implementationDetails = vR.getProperty(IMPLEMENTATION_DETAILS);
+			r.setImplementationDetails(implementationDetails);
+		
+		}
+		
+		if ( keys.contains(CONTRIBUTING_ORG) ) {
+			
+			String contributingOrganization = vR.getProperty(CONTRIBUTING_ORG);
+			r.setContributingOrganization(contributingOrganization);
+		
 		}
 		
 		return r;

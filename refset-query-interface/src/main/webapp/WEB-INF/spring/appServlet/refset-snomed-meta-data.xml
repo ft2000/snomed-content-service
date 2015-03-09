@@ -41,6 +41,7 @@
 		<entry key="CTE005" value="UK" />
 		<entry key="CTE006" value="US" />
 
-	</util:map>				
+	</util:map>		
+				
 		
 </beans>
