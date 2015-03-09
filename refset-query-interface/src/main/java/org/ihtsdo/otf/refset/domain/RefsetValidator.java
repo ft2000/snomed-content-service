@@ -48,6 +48,7 @@ public class RefsetValidator implements Validator {
         ValidationUtils.rejectIfEmpty(e, "scope", "Refset use case/scope is mandatory and can not be left empty");
         ValidationUtils.rejectIfEmpty(e, "originCountry", "Refset origin country is mandatory and can not be left empty");
         ValidationUtils.rejectIfEmpty(e, "snomedCTVersion", "SNOMED®CT release version is mandatory and can not be left empty");
+        ValidationUtils.rejectIfEmpty(e, "clinicalDomain", "Refset clinical domain is mandatory and can not be left empty");
 
 	}
 

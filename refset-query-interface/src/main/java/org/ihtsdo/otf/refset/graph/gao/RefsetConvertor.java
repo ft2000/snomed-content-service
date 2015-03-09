@@ -31,6 +31,7 @@ import static org.ihtsdo.otf.refset.domain.RGC.SNOMED_CT_EXT;
 import static org.ihtsdo.otf.refset.domain.RGC.SNOMED_CT_VERSION;
 import static org.ihtsdo.otf.refset.domain.RGC.CONTRIBUTING_ORG;
 import static org.ihtsdo.otf.refset.domain.RGC.IMPLEMENTATION_DETAILS;
+import static org.ihtsdo.otf.refset.domain.RGC.CLINICAL_DOMAIN;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -276,6 +277,11 @@ public class RefsetConvertor {
 		
 		}
 
+		if ( keys.contains(CLINICAL_DOMAIN) ) {
+			
+			r.setClinicalDomain(vR.getClinicalDomain());
+		
+		}
 
 		return r;
 	}
@@ -705,6 +711,13 @@ public class RefsetConvertor {
 			
 			String contributingOrganization = vR.getProperty(CONTRIBUTING_ORG);
 			r.setContributingOrganization(contributingOrganization);
+		
+		}
+		
+		if ( keys.contains(CLINICAL_DOMAIN) ) {
+			
+			String clinicalDomain = vR.getProperty(CLINICAL_DOMAIN);
+			r.setClinicalDomain(clinicalDomain);
 		
 		}
 		

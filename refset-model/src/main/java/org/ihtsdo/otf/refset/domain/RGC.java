@@ -76,6 +76,8 @@ public final class RGC {
 	 */
 	public static final String IMPLEMENTATION_DETAILS = "implementationDetails";
 	
+	
+	public static final String CLINICAL_DOMAIN = "clinicalDomain";
 
 
 }

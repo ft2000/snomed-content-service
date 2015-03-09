@@ -64,6 +64,8 @@ public class Refset extends BaseObj implements Comparable<Refset> {
 	 */
 	private String implementationDetails;
 	
+	private String clinicalDomain;
+	
 	
 	
 	/**
@@ -159,12 +161,12 @@ public class Refset extends BaseObj implements Comparable<Refset> {
 	   		+ "effectiveTime - %s,  isPublished - %s, languageCode - %s, members - %s, moduleId - %s, publishedDate - %s "
 	   		+ "superRefsetTypeId - %s, type - %s, typeId - %s, description - %s, latestEffectiveTime - %s,"
 	   		+ " earliestEffectiveTime -%s, scope - %s, snomedCTExtension - %s, snomedCTVersion - %s,"
-	   		+ " contributingOrganization - %s, originCountry - %s, implementationDetails - %s"
+	   		+ " contributingOrganization - %s, originCountry - %s, implementationDetails - %s, clinicalDomain - %s"
 	   		+ "]", this.uuid, this.created, this.createdBy, this.description, this.effectiveTime, this.published,
 	   		this.languageCode, this.members, this.moduleId, this.publishedDate, this.superRefsetTypeId, this.type,
 	   		this.typeId, this.description, this.earliestEffectiveTime, this.latestEffectiveTime, this.scope,
 	   		this.snomedCTExtension, this.snomedCTVersion, this.contributingOrganization, this.originCountry,
-	   		this.implementationDetails);
+	   		this.implementationDetails, this.clinicalDomain);
    }
 
 
@@ -335,6 +337,20 @@ public class Refset extends BaseObj implements Comparable<Refset> {
 	 */
 	public void setImplementationDetails(String implementationDetails) {
 		this.implementationDetails = implementationDetails;
+	}
+
+	/**
+	 * @return the clinicalDomain
+	 */
+	public String getClinicalDomain() {
+		return clinicalDomain;
+	}
+
+	/**
+	 * @param clinicalDomain the clinicalDomain to set
+	 */
+	public void setClinicalDomain(String clinicalDomain) {
+		this.clinicalDomain = clinicalDomain;
 	}
 
 

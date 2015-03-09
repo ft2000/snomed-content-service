@@ -30,6 +30,7 @@ import static org.ihtsdo.otf.refset.domain.RGC.SNOMED_CT_EXT;
 import static org.ihtsdo.otf.refset.domain.RGC.SNOMED_CT_VERSION;
 import static org.ihtsdo.otf.refset.domain.RGC.CONTRIBUTING_ORG;
 import static org.ihtsdo.otf.refset.domain.RGC.IMPLEMENTATION_DETAILS;
+import static org.ihtsdo.otf.refset.domain.RGC.CLINICAL_DOMAIN;
 
 import java.util.Arrays;
 import java.util.List;
@@ -637,6 +638,13 @@ public class RefsetSchema {
 			
 		}
 		
+		if (!mgmt.containsRelationType(CLINICAL_DOMAIN)) {
+
+			LOGGER.debug("Creating Property {}", CLINICAL_DOMAIN);
+			mgmt.makePropertyKey(CLINICAL_DOMAIN).dataType(String.class).make();
+			
+		}
+		
 
 
 	}
@@ -835,6 +843,13 @@ public class RefsetSchema {
 
 					mgmt.addIndexKey(giRefset, mgmt.getPropertyKey(IMPLEMENTATION_DETAILS), 
 							Parameter.of(MAPPED, IMPLEMENTATION_DETAILS));
+
+				}
+				
+				if (!existingProp.contains(mgmt.getPropertyKey(CLINICAL_DOMAIN))) {
+
+					mgmt.addIndexKey(giRefset, mgmt.getPropertyKey(CLINICAL_DOMAIN), 
+							Parameter.of(MAPPED, CLINICAL_DOMAIN));
 
 				}
 				

@@ -354,4 +354,14 @@ public interface GRefset extends VertexFrame {
 	@Property( value = "implementationDetails")
 	public void setImplementationDetails(String implementationDetails);
 
+	/**
+	 * @return the clinicalDomain
+	 */
+	@Property( value = "clinicalDomain")
+	public String getClinicalDomain();
+	/**
+	 * @param clinicalDomain the clinicalDomain to set
+	 */
+	@Property( value = "clinicalDomain")
+	public void setClinicalDomain(String clinicalDomain);
 }
