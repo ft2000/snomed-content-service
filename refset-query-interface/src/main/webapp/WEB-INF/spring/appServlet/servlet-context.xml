@@ -83,5 +83,5 @@
 	<beans:import resource="refset-snomed-service-config.xml" />
 	<beans:import resource="refset-cache-config.xml"/>
 	<beans:import resource="refset-diff-report.xml"/>
-	
+	<beans:import resource="refset-snomed-meta-data.xml"/>
 </beans:beans>

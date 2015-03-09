@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.0.xsd">
+		
+		<!-- refer https://jira.ihtsdotools.org/browse/RMT-322 -->
+	<util:map id="snomed.clicnicalDomain" map-class="java.util.TreeMap" >
+		<entry key="CD001" value="Cardiovascular" />
+		<entry key="CD002" value="Common Laboratory Procedures -Specimen Source" />
+		<entry key="CD003">
+			<value><![CDATA[Ear, Nose and Throat, Gastrointestinal & Infectious Disease]]></value>
+		</entry>
+		<entry key="CD004" value="Emergency Department" />
+		<entry key="CD005" value="Endocrine, Urology, Nephrology" />
+		<entry key="CD006" >
+			<value><![CDATA[Hematology & Oncology]]></value>
+		</entry>
+		<entry key="CD007" value="History of / Family History of" />
+		<entry key="CD008" value="Injuries" />
+		<entry key="CD009" value="Mental Health" />
+		<entry key="CD010" value="Musculoskeletal" />
+		<entry key="CD011" value="Neurology" />
+		<entry key="CD012" value="Ob/Gyn" />
+		<entry key="CD013" value="Ophthalmology" />
+		<entry key="CD014" value="Orthopedics" />
+		<entry key="CD015" >
+			<value><![CDATA[Skin & Respiratory]]></value>
+		</entry>
+		<entry key="CD016" value="Specimen Type" />
+		<entry key="CD017" value="Top 2500 diagnoses" />
+	</util:map>
+	
+	
+	<util:map id="snomed.extensions" map-class="java.util.TreeMap">
+		<entry key="CTE001" value="Denmark" />
+		<entry key="CTE002" value="Malyasian" />
+		<entry key="CTE003" value="Spanish" />
+		<entry key="CTE004" value="Swedish" />
+		<entry key="CTE005" value="UK" />
+		<entry key="CTE006" value="US" />
+
+	</util:map>				
+		
+</beans>

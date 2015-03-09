@@ -10,6 +10,7 @@ import java.util.Set;
 
 import org.ihtsdo.otf.refset.common.Result;
 import org.ihtsdo.otf.refset.service.termserver.TermServer;
+import org.ihtsdo.otf.snomed.service.RefsetMetadataService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +40,9 @@ public class SnomedMetaDataController {
 
 	@Autowired
 	private TermServer tService;
+	
+	@Autowired
+	private RefsetMetadataService mdService;
 
 	
 	@RequestMapping( method = RequestMethod.GET, value="/releases/")
@@ -88,11 +92,8 @@ public class SnomedMetaDataController {
 
 		Result<Map<String, Object>> response = getResult();
 
-		Map<String, String> releases = tService.getReleases();
-		
-		Set<String> versions = releases.keySet();
-
-		response.getData().put("clinicalDomains", versions);
+		Map<String, String> clincaldomains = mdService.getClinicalDomains();
+		response.getData().put("clinicalDomains", clincaldomains);
 		
 		return new ResponseEntity<Result<Map<String,Object>>>(response, HttpStatus.OK);
 		
@@ -108,11 +109,9 @@ public class SnomedMetaDataController {
 		Result<Map<String, Object>> response = getResult();
 
 
-		Map<String, String> releases = tService.getReleases();
+		Map<String, String> extensions = mdService.getExtensions();
 		
-		Set<String> versions = releases.keySet();
-
-		response.getData().put("extensions", versions);
+		response.getData().put("extensions", extensions);
 		
 		return new ResponseEntity<Result<Map<String,Object>>>(response, HttpStatus.OK);
 		
