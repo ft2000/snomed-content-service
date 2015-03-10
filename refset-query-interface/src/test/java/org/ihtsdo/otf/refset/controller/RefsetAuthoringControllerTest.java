@@ -139,7 +139,7 @@ public class RefsetAuthoringControllerTest {
 	@Test
 	public void testAddRefsetNotACorrectRole() throws Exception {
 		
-		this.mockMvc.perform(post("/v1.0/refsets/new").contentType(MediaType.APPLICATION_JSON).content(REFSET).accept(MediaType.APPLICATION_JSON))
+		this.mockMvc.perform(post("/v1/refsets/new").contentType(MediaType.APPLICATION_JSON).content(REFSET).accept(MediaType.APPLICATION_JSON))
         .andDo(print())
         .andExpect(status().is4xxClientError());//TODO isCreated
         //.andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -155,7 +155,7 @@ public class RefsetAuthoringControllerTest {
 	@Test
 	public void testAddRefset() throws Exception {
 		
-		this.mockMvc.perform(post("/v1.0/refsets/new").contentType(MediaType.APPLICATION_JSON).content(REFSET).accept(MediaType.APPLICATION_JSON))
+		this.mockMvc.perform(post("/v1/refsets/new").contentType(MediaType.APPLICATION_JSON).content(REFSET).accept(MediaType.APPLICATION_JSON))
         .andDo(print())
         .andExpect(status().is4xxClientError());
         //.andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -170,7 +170,7 @@ public class RefsetAuthoringControllerTest {
 	@Test
 	public void testUpdateRefset() throws Exception {
 		
-		this.mockMvc.perform(post("/v1.0/refsets/update").contentType(MediaType.APPLICATION_JSON).content(UPDATE_REFSET).accept(MediaType.APPLICATION_JSON))
+		this.mockMvc.perform(post("/v1/refsets/update").contentType(MediaType.APPLICATION_JSON).content(UPDATE_REFSET).accept(MediaType.APPLICATION_JSON))
         .andDo(print())
         .andExpect(status().is4xxClientError());///TODO fix isOK
         //.andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -187,7 +187,7 @@ public class RefsetAuthoringControllerTest {
 		
 		doThrow(new RefsetServiceException("Can not add junit driven refset")).when(aService).updateRefset(any(Refset.class));
 
-		this.mockMvc.perform(post("/v1.0/refsets/update").contentType(MediaType.APPLICATION_JSON).content(UPDATE_REFSET).accept(MediaType.APPLICATION_JSON))
+		this.mockMvc.perform(post("/v1/refsets/update").contentType(MediaType.APPLICATION_JSON).content(UPDATE_REFSET).accept(MediaType.APPLICATION_JSON))
         .andDo(print())
         .andExpect(status().is4xxClientError());///TODO fix isOK
         //.andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -204,7 +204,7 @@ public class RefsetAuthoringControllerTest {
 		
 		doThrow(new EntityNotFoundException("Can not add junit driven refset")).when(aService).updateRefset(any(Refset.class));
 
-		this.mockMvc.perform(post("/v1.0/refsets/update").contentType(MediaType.APPLICATION_JSON).content(UPDATE_REFSET).accept(MediaType.APPLICATION_JSON))
+		this.mockMvc.perform(post("/v1/refsets/update").contentType(MediaType.APPLICATION_JSON).content(UPDATE_REFSET).accept(MediaType.APPLICATION_JSON))
         .andDo(print())
         .andExpect(status().is4xxClientError());///TODO fix isOK
         //.andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -221,7 +221,7 @@ public class RefsetAuthoringControllerTest {
 		
 		doThrow(new RefsetServiceException("Can not add junit driven refset")).when(aService).addRefset(any(Refset.class));
 
-		this.mockMvc.perform(post("/v1.0/refsets/new").contentType(MediaType.APPLICATION_JSON).content(REFSET).accept(MediaType.APPLICATION_JSON))
+		this.mockMvc.perform(post("/v1/refsets/new").contentType(MediaType.APPLICATION_JSON).content(REFSET).accept(MediaType.APPLICATION_JSON))
         .andDo(print())
         .andExpect(status().is4xxClientError());//TODO fix isOK
        // .andExpect(content().contentType(MediaType.APPLICATION_JSON))

@@ -30,7 +30,7 @@ import com.wordnik.swagger.annotations.ApiOperation;
  */
 @RestController
 @Api(value="Refset", description="Service to export refset and its members in RF2 format", position = 3)
-@RequestMapping("/v1.0/refsets")
+@RequestMapping("/v1/refsets")
 public class RefsetExportController {
 	
 	private static final Logger logger = LoggerFactory.getLogger(RefsetExportController.class);

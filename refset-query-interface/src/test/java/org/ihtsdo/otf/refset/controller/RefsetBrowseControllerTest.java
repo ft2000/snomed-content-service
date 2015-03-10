@@ -98,7 +98,7 @@ public class RefsetBrowseControllerTest {
 	@Test
 	public void testGetRefsets() throws Exception {
 		
-		this.mockMvc.perform(get("/v1.0/refsets").accept(MediaType.APPLICATION_JSON))
+		this.mockMvc.perform(get("/v1/refsets").accept(MediaType.APPLICATION_JSON))
         .andDo(print())
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -115,7 +115,7 @@ public class RefsetBrowseControllerTest {
 		doThrow(new RefsetServiceException()).when(service).getRefsets(anyInt(), anyInt(), anyBoolean());
 
 		
-		this.mockMvc.perform(get("/v1.0/refsets").accept(MediaType.APPLICATION_JSON))
+		this.mockMvc.perform(get("/v1/refsets").accept(MediaType.APPLICATION_JSON))
         .andDo(print());
 	}
 	
@@ -129,7 +129,7 @@ public class RefsetBrowseControllerTest {
 		doThrow(new RefsetServiceException("Junit Error Checking")).when(service).getRefsets(anyInt(), anyInt(), anyBoolean());
 
 		
-		this.mockMvc.perform(get("/v1.0/refsets").accept(MediaType.APPLICATION_JSON))
+		this.mockMvc.perform(get("/v1/refsets").accept(MediaType.APPLICATION_JSON))
         .andDo(print());
 		
 	}
@@ -141,7 +141,7 @@ public class RefsetBrowseControllerTest {
 	@Test
 	public void testGetRefsetsMetaData() throws Exception {
 		
-		this.mockMvc.perform(get("/v1.0/refsets").accept(MediaType.APPLICATION_JSON))
+		this.mockMvc.perform(get("/v1/refsets").accept(MediaType.APPLICATION_JSON))
         .andDo(print())
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -161,7 +161,7 @@ public class RefsetBrowseControllerTest {
 	    doThrow(new RefsetServiceException("junit Error Checking")).when(service).getRefset(anyString());
 
 		this.mockMvc.perform(
-				get("/v1.0/refsets/{refSetId}", "0")
+				get("/v1/refsets/{refSetId}", "0")
 				.accept(MediaType.APPLICATION_JSON))
         .andDo(print());
 

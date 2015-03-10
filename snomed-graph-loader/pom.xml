@@ -22,7 +22,7 @@
 	<junit-version>4.11</junit-version>
 	<com.fasterxml.jackson-version>2.4.0</com.fasterxml.jackson-version>
 	<commons-cli-version>1.2</commons-cli-version>
-	<com.thinkaurelius.titan-version>0.5.0</com.thinkaurelius.titan-version>
+	<com.thinkaurelius.titan-version>0.5.4</com.thinkaurelius.titan-version>
 	<net.sf.supercsv-version>2.2.0</net.sf.supercsv-version>
   </properties>
 

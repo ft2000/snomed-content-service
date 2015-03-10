@@ -37,7 +37,7 @@
 	
     <interceptors>
         <interceptor>
-            <mapping path="/v1.0/**" />
+            <mapping path="/v1/**" />
             <beans:ref bean="refset.Profiler"/>
         </interceptor>
     </interceptors>

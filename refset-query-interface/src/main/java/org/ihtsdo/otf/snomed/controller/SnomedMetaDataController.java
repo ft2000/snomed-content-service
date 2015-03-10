@@ -101,8 +101,9 @@ public class SnomedMetaDataController {
     }
 	
 	@RequestMapping( method = RequestMethod.GET, value="/extensions/" )
-	@ApiOperation( value = "Retrieves list of available SNOMED® CT extensions", 
-		notes = "Retrieves list of available SNOMED® CT extensions" )
+	@ApiOperation( value = "Retrieves map of available SNOMED® CT extensions", 
+		notes = "Retrieves map of available SNOMED® CT extensions. Extension is are mapped with system generated code."
+				+ "This code should be used to retrieve extension name" )
     public ResponseEntity<Result< Map<String, Object>>> getExtensions() throws Exception {
 		
 		logger.debug("SNOMED® CT extensions");
@@ -112,6 +113,42 @@ public class SnomedMetaDataController {
 		Map<String, String> extensions = mdService.getExtensions();
 		
 		response.getData().put("extensions", extensions);
+		
+		return new ResponseEntity<Result<Map<String,Object>>>(response, HttpStatus.OK);
+		
+	         
+    }
+	
+	@RequestMapping( method = RequestMethod.GET, value="/originCountries/" )
+	@ApiOperation( value = "Retrieves iso 3166 countries with 2 digit code and country display name as key", 
+		notes = "Retrieves iso 3166 countries with 2 digit code as value and country display name as key" )
+    public ResponseEntity<Result< Map<String, Object>>> getOriginCountries() throws Exception {
+		
+		logger.debug("Refset origin countries");
+		Result<Map<String, Object>> response = getResult();
+
+
+		Map<String, String> countries = mdService.getISOCountries();
+		
+		response.getData().put("originCountries", countries);
+		
+		return new ResponseEntity<Result<Map<String,Object>>>(response, HttpStatus.OK);
+		
+	         
+    }
+	
+	@RequestMapping( method = RequestMethod.GET, value="/languages/" )
+	@ApiOperation( value = "Retrieves ISO-639 Languages", 
+		notes = "Retrieves ISO-639 Languages" )
+    public ResponseEntity<Result< Map<String, Object>>> getLanguages() throws Exception {
+		
+		logger.debug("Refset origin countries");
+		Result<Map<String, Object>> response = getResult();
+
+
+		Map<String, String> languages = mdService.getISOLanguages();
+		
+		response.getData().put("languages", languages);
 		
 		return new ResponseEntity<Result<Map<String,Object>>>(response, HttpStatus.OK);
 		

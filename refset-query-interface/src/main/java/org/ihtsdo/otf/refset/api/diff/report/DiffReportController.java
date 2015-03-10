@@ -53,7 +53,7 @@ import com.wordnik.swagger.annotations.ApiOperation;
  */
 @RestController
 @Api(value="Refset", description="Service to generate a diff report based on refset and suggest release data")
-@RequestMapping("/v1.0/refsets")
+@RequestMapping("/v1/refsets")
 public class DiffReportController {
 
 	private static final Logger logger = LoggerFactory.getLogger(DiffReportController.class);

@@ -43,7 +43,7 @@ public class DefaultControllerTest {
 	public void testHandleUnknownRequest() throws Exception {
 		
 		this.mockMvc.perform(
-				get("/v1.0/U")
+				get("/v1/U")
 				.accept(MediaType.APPLICATION_JSON))
         .andDo(print());
 

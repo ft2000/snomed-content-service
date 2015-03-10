@@ -41,7 +41,7 @@ import com.wordnik.swagger.annotations.ApiOperation;
 
 @RestController
 @Api(value="Refset", description="Service to import refset and their members in RF2 format", position = 4)
-@RequestMapping("/v1.0/refsets")
+@RequestMapping("/v1/refsets")
 public class RefsetImportController {
 	
 	private static final Logger logger = LoggerFactory.getLogger(RefsetImportController.class);

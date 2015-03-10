@@ -40,7 +40,7 @@ import com.wordnik.swagger.annotations.ApiOperation;
  */
 @RestController
 @Api(value="Authentication", description="Service to authenticate & authorize user and get details of user")
-@RequestMapping("/v1.0/refsets")
+@RequestMapping("/v1/refsets")
 public class UserController {
 	
 	private static final Logger logger = LoggerFactory.getLogger(UserController.class);

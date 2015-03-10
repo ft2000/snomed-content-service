@@ -47,7 +47,7 @@
     </dependency>
   </dependencies>
   <properties>
-    <com.thinkaurelius.titan-version>0.5.0</com.thinkaurelius.titan-version>
+    <com.thinkaurelius.titan-version>0.5.4</com.thinkaurelius.titan-version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <commons-cli-version>1.2</commons-cli-version>
     <junit-version>4.11</junit-version>

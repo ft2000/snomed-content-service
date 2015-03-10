@@ -20,10 +20,10 @@
 		
 		<sec:access-denied-handler ref="refset.accessDeniedHandler" />
 		<sec:custom-filter ref="refset.exceptionTranslationFilter" after="FIRST"/>
-		<sec:intercept-url pattern="/v1.0/refsets/search*" access="permitAll"/>
-		<sec:intercept-url pattern="/v1.0/refsets/*" access="isAuthenticated()" />
-		<sec:intercept-url pattern="/v1.0/snomed/*" access="permitAll"/>
-		<sec:intercept-url pattern="/v1.0/refsets/getUserDetails" access="isAuthenticated()"/>
+		<sec:intercept-url pattern="/v1/refsets/search*" access="permitAll"/>
+		<sec:intercept-url pattern="/v1/refsets/*" access="isAuthenticated()" />
+		<sec:intercept-url pattern="/v1/snomed/*" access="permitAll"/>
+		<sec:intercept-url pattern="/v1/refsets/getUserDetails" access="isAuthenticated()"/>
 		<sec:intercept-url pattern="/logout" access="permitAll"/>
 		
 	</sec:http>

@@ -31,7 +31,7 @@ import com.wordnik.swagger.annotations.ApiOperation;
  */
 @RestController
 @Api(value="Maintenance", description="Service to perform application maintenance and troubleshooting ")
-@RequestMapping("/v1.0/refsets")
+@RequestMapping("/v1/refsets")
 public class RefsetTestController {
 	
 	private static final Logger logger = LoggerFactory.getLogger(RefsetTestController.class);

@@ -45,7 +45,7 @@ public class TypeLookupControllerTest {
 
 		
 		this.mockMvc.perform(
-				get("/v1.0/snomed/componentTypes")
+				get("/v1/snomed/componentTypes")
 				.accept(MediaType.APPLICATION_JSON))
         .andDo(print())
         .andExpect(status().isOk())
@@ -78,7 +78,7 @@ public class TypeLookupControllerTest {
 	public void testGetRefseTypes() throws Exception {
 		
 		this.mockMvc.perform(
-				get("/v1.0/snomed/refsetTypes")
+				get("/v1/snomed/refsetTypes")
 				.accept(MediaType.APPLICATION_JSON))
         .andDo(print())
         .andExpect(status().isOk())
@@ -96,7 +96,7 @@ public class TypeLookupControllerTest {
 	public void testGetModules() throws Exception {
 		
 		this.mockMvc.perform(
-				get("/v1.0/snomed/modules")
+				get("/v1/snomed/modules")
 				.accept(MediaType.APPLICATION_JSON))
        .andDo(print())
        .andExpect(status().isOk())

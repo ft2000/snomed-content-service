@@ -47,7 +47,7 @@ import com.wordnik.swagger.annotations.ApiOperation;
  */
 @RestController
 @Api(value="Refset", description="Service to get refset change histories")
-@RequestMapping("/v1.0/refsets")
+@RequestMapping("/v1/refsets")
 public class ChangeHistoryController {
 	
 	private static final Logger logger = LoggerFactory.getLogger(ChangeHistoryController.class);

@@ -53,7 +53,7 @@ import com.wordnik.swagger.annotations.ApiOperation;
  */
 @RestController
 @Api(value="Refset Authoring", description="Service to author refset and their member details", position = 1)
-@RequestMapping("/v1.0/refsets")
+@RequestMapping("/v1/refsets")
 public class RefsetAuthoringController {
 	
 	private static final Logger logger = LoggerFactory.getLogger(RefsetAuthoringController.class);

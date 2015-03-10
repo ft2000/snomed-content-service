@@ -41,7 +41,7 @@ import com.wordnik.swagger.annotations.ApiOperation;
  */
 @RestController
 @Api(value="Refset", description="Service to retrieve existing refset and their member details" , position = 2)
-@RequestMapping("/v1.0/refsets")
+@RequestMapping("/v1/refsets")
 public class RefsetBrowseController {
 	
 	private static final Logger logger = LoggerFactory.getLogger(RefsetBrowseController.class);
