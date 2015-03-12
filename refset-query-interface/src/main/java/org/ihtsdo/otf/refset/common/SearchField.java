@@ -9,12 +9,14 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.ihtsdo.otf.refset.graph.gao;
+package org.ihtsdo.otf.refset.common;
+
+import org.ihtsdo.otf.refset.domain.RGC;
 
 /**
- *
+ *This enum is select case of {@link RGC} constants and can not contain any value other than defined constant in {@link RGC}
  */
-public enum VertexType {
+public enum SearchField {
 
-	refset, member, hRefset, hMember, user
+	publishedDate, languageCode, createdBy, modifiedDate, clinicalDomain, published
 }

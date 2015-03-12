@@ -33,6 +33,8 @@ public class Refset extends BaseObj implements Comparable<Refset> {
 	
 	private DateTime latestEffectiveTime;
 	
+	private Matrix matrix = new Matrix();
+	
 	/**
 	 * Use case of this refset
 	 */
@@ -351,6 +353,20 @@ public class Refset extends BaseObj implements Comparable<Refset> {
 	 */
 	public void setClinicalDomain(String clinicalDomain) {
 		this.clinicalDomain = clinicalDomain;
+	}
+
+	/**
+	 * @return the matrix
+	 */
+	public Matrix getMatrix() {
+		return matrix;
+	}
+
+	/**
+	 * @param matrix the matrix to set
+	 */
+	public void setMatrix(Matrix matrix) {
+		this.matrix = matrix;
 	}
 
 

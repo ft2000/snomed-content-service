@@ -30,8 +30,6 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.ihtsdo.otf.refset.exception.ValidationException;
-import org.ihtsdo.otf.refset.service.diffreport.DiffReportRecord;
-import org.ihtsdo.otf.refset.service.diffreport.DiffReportService;
 import org.ihtsdo.otf.refset.service.diffreport.DiffReportServiceV2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,9 +55,9 @@ import com.wordnik.swagger.annotations.ApiOperation;
 public class DiffReportController {
 
 	private static final Logger logger = LoggerFactory.getLogger(DiffReportController.class);
-	private static final String OCTMAP = "octmap";
+	/*private static final String OCTMAP = "octmap";
 	private static final String OCTMAP_FULL = "octmapfull";
-	private static final String REFSET_IDS = "refsetids";
+	private static final String REFSET_IDS = "refsetids";*/
 	private static final Map<String, String> validReleaseDates = new HashMap<String, String>();
 	
 	static {
@@ -72,12 +70,9 @@ public class DiffReportController {
 	}
 	
 	@Autowired
-	private DiffReportService service;
-	
-	@Autowired
 	private DiffReportServiceV2 serviceV2;
 	
-	@RequestMapping( method = RequestMethod.POST, value = "/generateDiffReport",  
+	/*@RequestMapping( method = RequestMethod.POST, value = "/generateDiffReport",  
 			produces = {MediaType.APPLICATION_JSON_VALUE})
 	@ApiOperation( value = "Generate a refset diff report",
 			notes = "This api call generates refset diff report in xlsx foramt based on following input files"
@@ -247,7 +242,7 @@ public class DiffReportController {
 		}
 		
 		return sb.toString();
-    }
+    }*/
 	
 	
 	@RequestMapping( method = RequestMethod.GET, value = "/downloadDiffReport/{fileName}",  

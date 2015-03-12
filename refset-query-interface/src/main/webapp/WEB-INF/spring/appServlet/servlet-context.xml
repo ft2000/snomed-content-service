@@ -82,6 +82,6 @@
 	<beans:import resource="spring-refset-browse-service-stub-data.xml" />
 	<beans:import resource="refset-snomed-service-config.xml" />
 	<beans:import resource="refset-cache-config.xml"/>
-	<beans:import resource="refset-diff-report.xml"/>
+	<!-- beans:import resource="refset-diff-report.xml"/ Not required as Diff Report now being generated using term server-->
 	<beans:import resource="refset-snomed-meta-data.xml"/>
 </beans:beans>

@@ -6,6 +6,7 @@ package org.ihtsdo.otf.refset.service;
 import java.util.Collections;
 import java.util.List;
 
+import org.ihtsdo.otf.refset.common.SearchCriteria;
 import org.ihtsdo.otf.refset.domain.Refset;
 import org.ihtsdo.otf.refset.exception.EntityNotFoundException;
 import org.ihtsdo.otf.refset.exception.RefsetServiceException;
@@ -166,18 +167,26 @@ public class RefsetGraphService implements RefsetBrowseService {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.ihtsdo.otf.refset.service.RefsetBrowseService#getMyRefsets(java.lang.Integer, java.lang.Integer, java.lang.String)
+	 * @see org.ihtsdo.otf.refset.service.RefsetBrowseService#isOwner(java.lang.String, java.lang.String)
 	 */
 	@Override
-	public List<Refset> getMyRefsets(Integer page, Integer size, String userName)
-			throws RefsetServiceException {
+	public boolean isOwner(String refsetId, String userName) throws RefsetGraphAccessException {
 
-		LOGGER.debug("getRefsets");
+		return !StringUtils.isEmpty(userName) ? userName.equalsIgnoreCase(gao.getOwner(refsetId)) : false;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.otf.refset.service.RefsetBrowseService#getRefsets(org.ihtsdo.otf.refset.common.SearchCriteria)
+	 */
+	@Override
+	public List<Refset> getRefsets(SearchCriteria criteria) throws RefsetServiceException {
+
+		LOGGER.debug("getRefsets with criteria");
 		
 		List<Refset> refsets = Collections.emptyList();
 		try {
 			
-			refsets = gao.getMyRefSets(userName, page, size);
+			refsets = gao.getRefSets(criteria);
 			
 		} catch (RefsetGraphAccessException e) {
 			
@@ -187,15 +196,6 @@ public class RefsetGraphService implements RefsetBrowseService {
 		
 		return refsets;
 		
-	}
-
-	/* (non-Javadoc)
-	 * @see org.ihtsdo.otf.refset.service.RefsetBrowseService#isOwner(java.lang.String, java.lang.String)
-	 */
-	@Override
-	public boolean isOwner(String refsetId, String userName) throws RefsetGraphAccessException {
-
-		return !StringUtils.isEmpty(userName) ? userName.equalsIgnoreCase(gao.getOwner(refsetId)) : false;
 	}
 	
 	

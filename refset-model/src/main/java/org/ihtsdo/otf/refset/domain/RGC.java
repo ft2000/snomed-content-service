@@ -4,8 +4,7 @@
 package org.ihtsdo.otf.refset.domain;
 
 /**
- * @author Episteme Partners
- *
+ *These constant are mapped to Refset schema
  */
 public final class RGC {
 
@@ -38,8 +37,6 @@ public final class RGC {
 	public static final String PARENT_ID = "parentId";
 	
 	public static final String LOCK = "lock"; //used in write lock. This is to handle long running transaction.
-
-	
 	
 
 	
@@ -78,6 +75,14 @@ public final class RGC {
 	
 	
 	public static final String CLINICAL_DOMAIN = "clinicalDomain";
+
+	public static final String VIEW_COUNT = "viewCount";
+	
+	public static final String DOWNLOAD_COUNT = "downloadCount";
+
+	//field for user schema
+	
+	public static final String USER_NAME = "userName";
 
 
 }

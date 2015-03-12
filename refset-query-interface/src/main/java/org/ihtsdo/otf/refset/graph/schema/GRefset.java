@@ -3,13 +3,14 @@
  */
 package org.ihtsdo.otf.refset.graph.schema;
 
+import org.ihtsdo.otf.refset.domain.Matrix;
+
 import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.frames.Adjacency;
 import com.tinkerpop.frames.Property;
 import com.tinkerpop.frames.VertexFrame;
 
 /**
- * @author Episteme Partners
  *
  */
 
@@ -364,4 +365,27 @@ public interface GRefset extends VertexFrame {
 	 */
 	@Property( value = "clinicalDomain")
 	public void setClinicalDomain(String clinicalDomain);
+	
+
+	/**
+	 * @return the views
+	 */
+	
+	@Property( value = "viewCount")
+	public int getViews();
+	/**
+	 * @param views the views to set
+	 */
+	@Property( value = "viewCount")
+	public void setViews(int views);
+	/**
+	 * @return the downloads
+	 */
+	@Property( value = "downloadCount")
+	public int getDownloads();
+	/**
+	 * @param downloads the downloads to set
+	 */
+	@Property( value = "downloadCount")
+	public void setDownloads(int downloads);
 }

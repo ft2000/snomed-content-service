@@ -32,6 +32,8 @@ import static org.ihtsdo.otf.refset.domain.RGC.SNOMED_CT_VERSION;
 import static org.ihtsdo.otf.refset.domain.RGC.CONTRIBUTING_ORG;
 import static org.ihtsdo.otf.refset.domain.RGC.IMPLEMENTATION_DETAILS;
 import static org.ihtsdo.otf.refset.domain.RGC.CLINICAL_DOMAIN;
+import static org.ihtsdo.otf.refset.domain.RGC.VIEW_COUNT;
+import static org.ihtsdo.otf.refset.domain.RGC.DOWNLOAD_COUNT;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -82,9 +84,6 @@ public class RefsetConvertor {
 			}
 			
 		}
-		Collections.sort(refsets);
-		Collections.reverse(refsets);
-
 		return Collections.unmodifiableList(refsets);
 	}
 
@@ -280,6 +279,18 @@ public class RefsetConvertor {
 		if ( keys.contains(CLINICAL_DOMAIN) ) {
 			
 			r.setClinicalDomain(vR.getClinicalDomain());
+		
+		}
+		
+		if ( keys.contains(VIEW_COUNT) ) {
+					
+			r.getMatrix().setViews(vR.getViews());
+				
+		}
+		
+		if ( keys.contains(DOWNLOAD_COUNT) ) {
+			
+			r.getMatrix().setDownloads(vR.getDownloads());
 		
 		}
 

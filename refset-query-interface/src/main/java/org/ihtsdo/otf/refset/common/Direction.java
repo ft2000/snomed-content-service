@@ -9,12 +9,12 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.ihtsdo.otf.refset.schema;
+package org.ihtsdo.otf.refset.common;
 
 /**
  *
  */
-public enum RefsetRelations {
+public enum Direction {
 
-	members
+	asc, desc
 }

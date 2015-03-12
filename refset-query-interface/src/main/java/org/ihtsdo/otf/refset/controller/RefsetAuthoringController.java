@@ -18,6 +18,7 @@ import java.util.UUID;
 
 import javax.annotation.Resource;
 
+import org.ihtsdo.otf.refset.api.browse.RefsetBrowseController;
 import org.ihtsdo.otf.refset.common.Meta;
 import org.ihtsdo.otf.refset.common.Result;
 import org.ihtsdo.otf.refset.domain.Member;

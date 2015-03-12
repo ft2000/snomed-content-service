@@ -32,9 +32,10 @@ import org.springframework.stereotype.Service;
  * this is temporary and should be converted in a permanent solution using cassandra.
  * Also final query used is as provided by Andrew A. This query will change once solution moves
  * to cassandra
- *
+ *No longer in use. Should be removed after QA of term server based diff report
  */
-@Service
+//@Service
+@Deprecated
 public class DiffReportService {
 	private static final Logger logger = LoggerFactory.getLogger(DiffReportController.class);
 

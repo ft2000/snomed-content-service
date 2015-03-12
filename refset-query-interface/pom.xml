@@ -146,11 +146,11 @@
 			<artifactId>spring-aop</artifactId>
 			<version>${org.springframework-version}</version>
 		</dependency>
-		<dependency>
+		<!-- dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-tx</artifactId>
 			<version>${org.springframework-version}</version>
-		</dependency>				
+		</dependency-->				
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-jdbc</artifactId>
@@ -201,11 +201,11 @@
 			<version>${org.springframework.security-version}</version>
   		</dependency>
   		
-		<dependency>
+		<!-- dependency>
            <groupId>mysql</groupId>
            <artifactId>mysql-connector-java</artifactId>
            <version>5.1.34</version>
-        </dependency>
+        </dependency -->
 		<!--  dependency>uncomment when next 4.x GA release available 
     		<groupId>org.springframework.security</groupId>
     		<artifactId>spring-security-test</artifactId>

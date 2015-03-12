@@ -5,6 +5,7 @@ package org.ihtsdo.otf.refset.service;
 
 import java.util.List;
 
+import org.ihtsdo.otf.refset.common.SearchCriteria;
 import org.ihtsdo.otf.refset.domain.Refset;
 import org.ihtsdo.otf.refset.exception.EntityNotFoundException;
 import org.ihtsdo.otf.refset.exception.RefsetServiceException;
@@ -101,16 +102,6 @@ public class RefsetBrowseServiceStub implements RefsetBrowseService {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.ihtsdo.otf.refset.service.RefsetBrowseService#getMyRefsets(java.lang.Integer, java.lang.Integer, java.lang.String)
-	 */
-	@Override
-	public List<Refset> getMyRefsets(Integer page, Integer size, String userName)
-			throws RefsetServiceException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/* (non-Javadoc)
 	 * @see org.ihtsdo.otf.refset.service.RefsetBrowseService#isOwner(java.lang.String, java.lang.String)
 	 */
 	@Override
@@ -118,6 +109,15 @@ public class RefsetBrowseServiceStub implements RefsetBrowseService {
 			throws RefsetGraphAccessException {
 		// TODO Auto-generated method stub
 		return false;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.otf.refset.service.RefsetBrowseService#getRefsets(org.ihtsdo.otf.refset.common.SearchCriteria)
+	 */
+	@Override
+	public List<Refset> getRefsets(SearchCriteria criteria) throws RefsetServiceException {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

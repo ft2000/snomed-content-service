@@ -31,11 +31,15 @@ import static org.ihtsdo.otf.refset.domain.RGC.SNOMED_CT_VERSION;
 import static org.ihtsdo.otf.refset.domain.RGC.CONTRIBUTING_ORG;
 import static org.ihtsdo.otf.refset.domain.RGC.IMPLEMENTATION_DETAILS;
 import static org.ihtsdo.otf.refset.domain.RGC.CLINICAL_DOMAIN;
+import static org.ihtsdo.otf.refset.domain.RGC.USER_NAME;
+import static org.ihtsdo.otf.refset.domain.RGC.VIEW_COUNT;
+import static org.ihtsdo.otf.refset.domain.RGC.DOWNLOAD_COUNT;
 
 import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
+import org.ihtsdo.otf.refset.domain.RefsetRelations;
 import org.ihtsdo.otf.snomed.domain.Properties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -104,13 +108,17 @@ public class RefsetSchema {
 
 			makePropertyKeys(mgmt);
 			
-			LOGGER.info("Making members edge label");
+			LOGGER.info("Making edge label");
 			mgmt.makeEdgeLabel(RefsetRelations.members.toString());
-	
+			mgmt.makeEdgeLabel(RefsetRelations.viewed.toString());
+			mgmt.makeEdgeLabel(RefsetRelations.downloaded.toString());
+
 			createRefsetVertexLabel(mgmt);
 			createMemberVertexLabel(mgmt);
-
+			createUserVertexLabel(mgmt);
+			
 			createCompositIndex(mgmt);			
+			createUserCompositIndex(mgmt);
 			
 			LOGGER.info("commiting Index & schema  ");
 
@@ -287,6 +295,19 @@ public class RefsetSchema {
 
 		
 	}
+	
+	private void createUserCompositIndex(TitanManagement mgmt) {
+			
+			TitanGraphIndex byUserName = mgmt.getGraphIndex(CompositeIndex.byUserName.toString());
+			
+			if (byUserName == null) {
+			
+				LOGGER.info("Creating Index  {}" , CompositeIndex.byUserName.toString());
+				mgmt.buildIndex(CompositeIndex.byUserName.toString(), Vertex.class)
+				.addKey(mgmt.getPropertyKey(USER_NAME))
+				.buildCompositeIndex();
+			}
+	}
 
 	/**
 	 * @param mgmt
@@ -314,6 +335,20 @@ public class RefsetSchema {
 			mgmt.makeVertexLabel("GMember");
 
 		}
+	}
+	
+	/**
+	 * @param mgmt
+	 */
+	private void createUserVertexLabel(TitanManagement mgmt) {
+
+		if (!mgmt.containsVertexLabel("User")) {
+			
+			LOGGER.info("Creating Vertex Label {}" , "User");
+			mgmt.makeVertexLabel("User");
+
+		}
+		
 	}
 
 	public void printSchema() {
@@ -644,6 +679,32 @@ public class RefsetSchema {
 			
 		}
 		
+		if (!mgmt.containsRelationType(DOWNLOAD_COUNT)) {
+
+			LOGGER.info("Creating Property {}", DOWNLOAD_COUNT);
+			mgmt.makePropertyKey(DOWNLOAD_COUNT).dataType(Integer.class).make();
+			
+		}
+		
+		if (!mgmt.containsRelationType(VIEW_COUNT)) {
+
+			LOGGER.info("Creating Property {}", VIEW_COUNT);
+			mgmt.makePropertyKey(VIEW_COUNT).dataType(Integer.class).make();
+			
+		}
+		
+		
+		
+		
+		//for user vertex
+		
+		if (!mgmt.containsRelationType(USER_NAME)) {
+
+			LOGGER.info("Creating Property {}", USER_NAME);
+			mgmt.makePropertyKey(USER_NAME).dataType(String.class).make();
+			
+		}
+		
 
 
 	}
@@ -750,6 +811,22 @@ public class RefsetSchema {
 	
 			}
 			
+			TitanGraphIndex user = mgmt.getGraphIndex(MixedIndex.User.toString());
+			
+			if (user == null) {
+				LOGGER.info("Creating Index  {}" , "User mixed index");
+					
+				mgmt.buildIndex(MixedIndex.User.toString(), Vertex.class)
+				.addKey(mgmt.getPropertyKey(USER_NAME), 
+						Parameter.of(MAPPED, USER_NAME))
+				.addKey(mgmt.getPropertyKey(CREATED), 
+	    				Parameter.of(MAPPED, Properties.created.toString()))
+
+				.indexOnly(mgmt.getVertexLabel("User"))
+	    		.buildMixedIndex(backingIndexName);
+	
+			}
+			
 			mgmt.commit();
 			
 	    } catch (Exception e) {
@@ -849,6 +926,20 @@ public class RefsetSchema {
 
 					mgmt.addIndexKey(giRefset, mgmt.getPropertyKey(CLINICAL_DOMAIN), 
 							Parameter.of(MAPPED, CLINICAL_DOMAIN));
+
+				}
+				
+				if (!existingProp.contains(mgmt.getPropertyKey(VIEW_COUNT))) {
+
+					mgmt.addIndexKey(giRefset, mgmt.getPropertyKey(VIEW_COUNT), 
+							Parameter.of(MAPPED, VIEW_COUNT));
+
+				}
+				
+				if (!existingProp.contains(mgmt.getPropertyKey(DOWNLOAD_COUNT))) {
+
+					mgmt.addIndexKey(giRefset, mgmt.getPropertyKey(DOWNLOAD_COUNT), 
+							Parameter.of(MAPPED, DOWNLOAD_COUNT));
 
 				}
 				

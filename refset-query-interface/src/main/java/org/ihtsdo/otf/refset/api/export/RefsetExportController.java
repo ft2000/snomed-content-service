@@ -3,10 +3,13 @@
  */
 package org.ihtsdo.otf.refset.api.export;
 
+import static org.ihtsdo.otf.refset.common.Utility.getUserDetails;
+
 import javax.servlet.http.HttpServletResponse;
 
 import org.ihtsdo.otf.refset.common.Utility;
 import org.ihtsdo.otf.refset.service.export.ExportService;
+import org.ihtsdo.otf.refset.service.matrix.ActivityMatrixService;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,6 +40,9 @@ public class RefsetExportController {
 	
 	@Autowired
 	private ExportService eService;
+	
+	@Autowired
+	private ActivityMatrixService matrixService;
 
 	@RequestMapping( method = RequestMethod.GET, value = "/{refsetId}/export", produces = {MediaType.APPLICATION_OCTET_STREAM_VALUE})
 	@ApiOperation( value = "Export a Refset in RF2 format", notes = "Export a refset of a given refset id in RF2 format" )
@@ -53,6 +59,9 @@ public class RefsetExportController {
  
 	    eService.getRF2Payload(csvWriter, refsetId);
 
+		//capture user event. This is Async call
+		matrixService.addViewEvent(refsetId, getUserDetails().getUsername());
+		
 	    csvWriter.close();
 
         

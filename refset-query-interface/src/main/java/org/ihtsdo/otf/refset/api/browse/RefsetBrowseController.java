@@ -1,26 +1,30 @@
 /**
  * 
  */
-package org.ihtsdo.otf.refset.controller;
+package org.ihtsdo.otf.refset.api.browse;
 
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 import static org.ihtsdo.otf.refset.common.Utility.getResult;
 import static org.ihtsdo.otf.refset.common.Utility.getUserDetails;
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
 
-import org.ihtsdo.otf.refset.common.Meta;
+import org.ihtsdo.otf.refset.common.Direction;
 import org.ihtsdo.otf.refset.common.Result;
+import org.ihtsdo.otf.refset.common.SearchCriteria;
+import org.ihtsdo.otf.refset.common.SearchField;
 import org.ihtsdo.otf.refset.domain.Member;
 import org.ihtsdo.otf.refset.domain.Refset;
 import org.ihtsdo.otf.refset.service.RefsetBrowseService;
+import org.ihtsdo.otf.refset.service.matrix.ActivityMatrixService;
+import org.ihtsdo.otf.refset.service.matrix.ViewActivityMatrixService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -45,12 +49,15 @@ import com.wordnik.swagger.annotations.ApiOperation;
 public class RefsetBrowseController {
 	
 	private static final Logger logger = LoggerFactory.getLogger(RefsetBrowseController.class);
-
-	private static final String SUCESS = "Success";
-
 	
 	@Resource(name = "browseGraphService")
 	private RefsetBrowseService bService;
+	
+	@Autowired
+	private ActivityMatrixService matrixService;
+	
+	@Autowired
+	private ViewActivityMatrixService viewMatrixService;
 	
 	@RequestMapping( method = RequestMethod.GET, produces = "application/json", value = "/myRefsets" )
 	@ApiOperation( value = "Retrieves list of existing refsets owned by logged in user", notes = "Returns existing refsets owned by logged in user save their members. "
@@ -63,18 +70,22 @@ public class RefsetBrowseController {
 
 		Result<Map<String, Object>> r = getResult();
 		r.getMeta().add( linkTo( methodOn( RefsetBrowseController.class ).getRefsets( from, to ) ).withRel("Refsets"));		
+		
+		
+		SearchCriteria criteria = new SearchCriteria();
+		criteria.addSortBy(SearchField.modifiedDate, Direction.desc);
+		
+		criteria.setFrom(from);
+		criteria.setTo(to);
+		
 		String userName = getUserDetails().getUsername();
-		List<Refset> refSets =  bService.getMyRefsets(from, to, userName);
+		criteria.addSearchField(SearchField.createdBy, userName);
+		List<Refset> refSets =  bService.getRefsets(criteria);
 
-		Map<String, Object> data = new HashMap<String, Object>();
-		data.put("refsets", refSets);
-		r.setData(data);
+		r.getData().put("refsets", refSets);
 		
-		r.getMeta().setMessage(SUCESS);
-		r.getMeta().setStatus(HttpStatus.OK);
-
 		return new ResponseEntity<Result<Map<String,Object>>>(r, HttpStatus.OK);
-		
+
 	         
     }
 	
@@ -85,14 +96,9 @@ public class RefsetBrowseController {
 		
 		logger.debug("Getting refset details");
 
-		Result<Map<String, Object>> response = new Result<Map<String, Object>>();
+		Result<Map<String, Object>> response = getResult();
 		
-		Meta m = new Meta();
-
-		m.add( linkTo( methodOn( RefsetBrowseController.class, refSetId).getRefsetDetails(refSetId) ).withRel("Refset") );
-		response.setMeta(m);
-
-
+		response.getMeta().add( linkTo( methodOn( RefsetBrowseController.class, refSetId).getRefsetDetails(refSetId) ).withRel("Refset") );
 		
 		Refset refSet =  bService.getRefset(refSetId);
 
@@ -101,12 +107,8 @@ public class RefsetBrowseController {
 			throw new AccessDeniedException("Please login to see work in progress refsets");
 			
 		}
-		Map<String, Object> data = new HashMap<String, Object>();
-		data.put("refset", refSet);
+		response.getData().put("refset", refSet);
 		
-		response.setData(data);
-		m.setMessage(SUCESS);
-		m.setStatus(HttpStatus.OK);
 
 		return new ResponseEntity<Result<Map<String,Object>>>(response, HttpStatus.OK);
 		
@@ -120,19 +122,12 @@ public class RefsetBrowseController {
 		
 		logger.debug("validating description {}", description);
 
-		Result<Map<String, Object>> response = new Result<Map<String, Object>>();
+		Result<Map<String, Object>> response = getResult();
 
-		Meta m = new Meta();
-		
 		boolean isExist = bService.isDescriptionExist(description);
 
-		Map<String, Object> data = new HashMap<String, Object>();
-		data.put("exist", isExist);
+		response.getData().put("outcome", isExist);
 		
-		response.setData(data);
-		m.setMessage(SUCESS);
-		m.setStatus(HttpStatus.OK);
-
 		return new ResponseEntity<Result<Map<String,Object>>>(response, HttpStatus.OK);
 		
 	       
@@ -148,12 +143,9 @@ public class RefsetBrowseController {
 		
 		logger.debug("Getting members of {} ", refsetId);
 
-		Result<Map<String, Object>> response = new Result<Map<String, Object>>();
-		Meta m = new Meta();
-		m.add( linkTo( methodOn( RefsetBrowseController.class ).getRefsetMembers( from, to, refsetId ) ).withRel("Members") );
-		
-		response.setMeta(m);
-		
+		Result<Map<String, Object>> response = getResult();
+		response.getMeta().add( linkTo( methodOn( RefsetBrowseController.class ).getRefsetMembers( from, to, refsetId ) ).withRel("Members") );
+				
 		bService.getRefset(refsetId, from, to);
 
 		
@@ -169,13 +161,7 @@ public class RefsetBrowseController {
 		
 		logger.debug("returning {} members", ms.size());
 
-		Map<String, Object> data = new HashMap<String, Object>();
-		data.put("members", ms);
-		response.setData(data);
-		
-		
-		m.setMessage(SUCESS);
-		m.setStatus(HttpStatus.OK);
+		response.getData().put("members", ms);
 
 		return new ResponseEntity<Result<Map<String,Object>>>(response, HttpStatus.OK);
 		
@@ -183,37 +169,32 @@ public class RefsetBrowseController {
     }
 	
 	
-	@RequestMapping( method = RequestMethod.GET, value = "/{refSetId}/header", produces = "application/json")
+	@RequestMapping( method = RequestMethod.GET, value = "/{refsetId}/header", produces = "application/json")
 	@ApiOperation( value = "Api to get details of a refset excluding its members.", 
 		notes = "Get refset header details for given refset uuid. "
 				+ "A Lightweight service for user who are only intrested in getting refset details not their members" )
-    public ResponseEntity<Result< Map<String, Object>>> getRefsetHeader( @PathVariable( value = "refSetId" ) String refSetId ) throws Exception {
+    public ResponseEntity<Result< Map<String, Object>>> getRefsetHeader( @PathVariable( value = "refsetId" ) String refsetId ) throws Exception {
 		
 		logger.debug("Getting refset details");
 
-		Result<Map<String, Object>> response = new Result<Map<String, Object>>();
+		Result<Map<String, Object>> response = getResult();
 		
-		Meta m = new Meta();
-
-		m.add( linkTo( methodOn( RefsetBrowseController.class, refSetId).getRefsetDetails(refSetId) ).withRel("RefsetHeader") );
-		response.setMeta(m);
+		response.getMeta().add( linkTo( methodOn( RefsetBrowseController.class, refsetId).getRefsetDetails(refsetId) ).withRel("RefsetHeader") );
 
 
 		
-		Refset refSet =  bService.getRefsetHeader(refSetId);
+		Refset refSet =  bService.getRefsetHeader(refsetId);
 
 		if (SecurityContextHolder.getContext().getAuthentication() instanceof AnonymousAuthenticationToken && !refSet.isPublished()) {
 			
 			throw new AccessDeniedException("Please login to see work in progress refsets");
 			
 		}
-		Map<String, Object> data = new HashMap<String, Object>();
-		data.put("refset", refSet);
-		
-		response.setData(data);
-		m.setMessage(SUCESS);
-		m.setStatus(HttpStatus.OK);
+		//capture user event. This is Async call
+		matrixService.addViewEvent(refsetId, getUserDetails().getUsername());
 
+		response.getData().put("refset", refSet);
+		
 		return new ResponseEntity<Result<Map<String,Object>>>(response, HttpStatus.OK);
 		
 	       
@@ -230,12 +211,8 @@ public class RefsetBrowseController {
 		
 		logger.debug("Existing refsets");
 
-		Result<Map<String, Object>> response = new Result<Map<String, Object>>();
-		Meta m = new Meta();
-		m.add( linkTo( methodOn( RefsetBrowseController.class ).getRefsets( from, to ) ).withRel("Refsets"));
-		
-		response.setMeta(m);
-
+		Result<Map<String, Object>> r = getResult();
+		r.getMeta().add( linkTo( methodOn( RefsetBrowseController.class ).getRefsets( from, to ) ).withRel("Refsets"));
 
 		boolean published = false;
 		
@@ -247,14 +224,59 @@ public class RefsetBrowseController {
 		}
 		List<Refset> refSets =  bService.getRefsets( from, to, published );
 
-		Map<String, Object> data = new HashMap<String, Object>();
-		data.put("refsets", refSets);
-		response.setData(data);
-		
-		m.setMessage(SUCESS);
-		m.setStatus(HttpStatus.OK);
+		r.getData().put("refsets", refSets);
 
-		return new ResponseEntity<Result<Map<String,Object>>>(response, HttpStatus.OK);
+
+		return new ResponseEntity<Result<Map<String,Object>>>(r, HttpStatus.OK);
+		
+	         
+    }
+	
+	
+	@RequestMapping( method = RequestMethod.GET, produces = "application/json", value = "/mostviewed" )
+	@ApiOperation( value = "Retrieves list of 10 most viewed published refsets", 
+		notes = "Returns 10 most viewed published refset sorted by most viewed count where most viewed at top" )
+    public ResponseEntity<Result< Map<String, Object>>> getMostViewedRefset( @RequestParam( value = "from", defaultValue = "0" ) int from, 
+    		@RequestParam( value = "to", defaultValue = "10" ) int to ) throws Exception {
+		
+		logger.debug("get most viewed refsets");
+
+		Result<Map<String, Object>> r = getResult();
+		r.getMeta().add( linkTo( methodOn( RefsetBrowseController.class ).getRefsets( from, to ) ).withRel("Refsets"));		
+		List<Refset> refSets =  viewMatrixService.getMostViewedPublishedRefsets(to);
+
+		r.getData().put("refsets", refSets);
+
+
+		return new ResponseEntity<Result<Map<String,Object>>>(r, HttpStatus.OK);
+		
+	         
+    }
+	
+	@RequestMapping( method = RequestMethod.GET, produces = "application/json", value = "/latestPublished" )
+	@ApiOperation( value = "Retrieves list of 10 most recently published refsets", 
+		notes = "Returns 10 most recently published refset sorted by published date where latest at top" )
+    public ResponseEntity<Result< Map<String, Object>>> getLatestPublishedRefset( @RequestParam( value = "from", defaultValue = "0" ) int from, 
+    		@RequestParam( value = "to", defaultValue = "10" ) int to ) throws Exception {
+		
+		logger.debug("get most latest published refsets");
+
+		Result<Map<String, Object>> r = getResult();
+		r.getMeta().add( linkTo( methodOn( RefsetBrowseController.class ).getRefsets( from, to ) ).withRel("Refsets"));
+		
+		SearchCriteria criteria = new SearchCriteria();
+		criteria.addSortBy(SearchField.publishedDate, Direction.desc);
+		
+		criteria.setFrom(from);
+		criteria.setTo(to);
+		
+		criteria.addSearchField(SearchField.published, true);
+		List<Refset> refSets =  bService.getRefsets(criteria);
+
+		r.getData().put("refsets", refSets);
+
+
+		return new ResponseEntity<Result<Map<String,Object>>>(r, HttpStatus.OK);
 		
 	         
     }

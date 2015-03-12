@@ -5,6 +5,7 @@ package org.ihtsdo.otf.refset.service;
 
 import java.util.List;
 
+import org.ihtsdo.otf.refset.common.SearchCriteria;
 import org.ihtsdo.otf.refset.domain.Member;
 import org.ihtsdo.otf.refset.domain.Refset;
 import org.ihtsdo.otf.refset.exception.EntityNotFoundException;
@@ -18,12 +19,12 @@ import org.ihtsdo.otf.refset.graph.RefsetGraphAccessException;
 public interface RefsetBrowseService {
 	
 	/**Method to get List of published {@link Refset}s
-	 * @param page
-	 * @param size
+	 * @param from
+	 * @param to
 	 * @return
 	 * @throws RefsetServiceException
 	 */
-	public List<Refset> getRefsets(Integer page, Integer size, boolean published) throws RefsetServiceException ;
+	public List<Refset> getRefsets(Integer from, Integer to, boolean published) throws RefsetServiceException ;
 	
 	/**Method to retrieve {@link Refset} details for given refset id.
 	 * @param refsetId
@@ -65,14 +66,6 @@ public interface RefsetBrowseService {
 	 */
 	Refset getRefsetForExport(String refsetId) throws RefsetServiceException,
 			EntityNotFoundException;
-
-	/**Method to get List of {@link Refset}s owned by given user
-	 * @param page
-	 * @param size
-	 * @return {@link List} of {@link Refset}
-	 * @throws RefsetServiceException
-	 */
-	public List<Refset> getMyRefsets(Integer page, Integer size, String userName) throws RefsetServiceException ;
 	
 	
 	/** Validates if given refset id  belong to given user
@@ -82,4 +75,7 @@ public interface RefsetBrowseService {
 	 * @throws RefsetGraphAccessException 
 	 */
 	public boolean isOwner(String refsetId, String userName) throws RefsetGraphAccessException;
+	
+	public List<Refset> getRefsets(SearchCriteria criteria) throws RefsetServiceException ;
+
 }

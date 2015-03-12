@@ -18,6 +18,6 @@ public enum CompositeIndex {
 
 	bySctId, bySctIdStatus, byDescription, byIdAndCreatedBy, byId, byIdAndCreated, byIdAndModified, 
 	byRefComponentId, byPublished, byType, byIdAndEndAndStartDate, byIdAndStartDate, byIdAndEndDate,
-	byEndDateAndPublished, byEndDateAndType, bySctIdType
+	byEndDateAndPublished, byEndDateAndType, bySctIdType, byUserName
 	
 }

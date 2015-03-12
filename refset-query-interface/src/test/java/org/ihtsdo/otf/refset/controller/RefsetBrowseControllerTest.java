@@ -13,6 +13,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.List;
 
+import org.ihtsdo.otf.refset.api.browse.RefsetBrowseController;
 import org.ihtsdo.otf.refset.domain.Refset;
 import org.ihtsdo.otf.refset.exception.RefsetServiceException;
 import org.ihtsdo.otf.refset.service.RefsetBrowseService;
@@ -92,7 +93,7 @@ public class RefsetBrowseControllerTest {
 	}
 
 	/**
-	 * Test method for {@link org.ihtsdo.otf.refset.controller.RefsetBrowseController#getRefsets(int, int)}.
+	 * Test method for {@link org.ihtsdo.otf.refset.api.browse.RefsetBrowseController#getRefsets(int, int)}.
 	 * @throws Exception 
 	 */
 	@Test
@@ -106,7 +107,7 @@ public class RefsetBrowseControllerTest {
 	}
 	
 	/**
-	 * Test method for {@link org.ihtsdo.otf.refset.controller.RefsetBrowseController#getRefsets(int, int)}.
+	 * Test method for {@link org.ihtsdo.otf.refset.api.browse.RefsetBrowseController#getRefsets(int, int)}.
 	 * @throws Exception 
 	 */
 	@Test(expected = Exception.class)
@@ -120,7 +121,7 @@ public class RefsetBrowseControllerTest {
 	}
 	
 	/**
-	 * Test method for {@link org.ihtsdo.otf.refset.controller.RefsetBrowseController#getRefsets(int, int)}.
+	 * Test method for {@link org.ihtsdo.otf.refset.api.browse.RefsetBrowseController#getRefsets(int, int)}.
 	 * @throws Exception 
 	 */
 	@Test(expected = Exception.class)
@@ -135,7 +136,7 @@ public class RefsetBrowseControllerTest {
 	}
 	
 	/**
-	 * Test method for {@link org.ihtsdo.otf.refset.controller.RefsetBrowseController#getRefsets(int, int)}.
+	 * Test method for {@link org.ihtsdo.otf.refset.api.browse.RefsetBrowseController#getRefsets(int, int)}.
 	 * @throws Exception 
 	 */
 	@Test
@@ -152,7 +153,7 @@ public class RefsetBrowseControllerTest {
 	}
 
 	/**
-	 * Test method for {@link org.ihtsdo.otf.refset.controller.RefsetBrowseController#getRefsetDetails(java.lang.String)}.
+	 * Test method for {@link org.ihtsdo.otf.refset.api.browse.RefsetBrowseController#getRefsetDetails(java.lang.String)}.
 	 * @throws Exception 
 	 */
 	@Test(expected = Exception.class)

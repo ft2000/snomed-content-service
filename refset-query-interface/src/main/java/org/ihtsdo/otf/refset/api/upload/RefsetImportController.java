@@ -14,9 +14,9 @@ import java.util.zip.GZIPInputStream;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.ihtsdo.otf.refset.api.browse.RefsetBrowseController;
 import org.ihtsdo.otf.refset.common.Meta;
 import org.ihtsdo.otf.refset.common.Result;
-import org.ihtsdo.otf.refset.controller.RefsetBrowseController;
 import org.ihtsdo.otf.refset.security.User;
 import org.ihtsdo.otf.refset.service.upload.ImportService;
 import org.ihtsdo.otf.refset.service.upload.Rf2VerificationService;
