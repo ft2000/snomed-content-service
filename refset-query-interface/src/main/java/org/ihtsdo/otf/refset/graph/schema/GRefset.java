@@ -3,8 +3,6 @@
  */
 package org.ihtsdo.otf.refset.graph.schema;
 
-import org.ihtsdo.otf.refset.domain.Matrix;
-
 import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.frames.Adjacency;
 import com.tinkerpop.frames.Property;
@@ -388,4 +386,28 @@ public interface GRefset extends VertexFrame {
 	 */
 	@Property( value = "downloadCount")
 	public void setDownloads(int downloads);
+	
+	/**
+	 * @return the externalUrl
+	 */
+	@Property( value = "externalUrl")
+	public String getExternalUrl();
+
+	/**
+	 * @param externalUrl the externalUrl to set
+	 */
+	@Property( value = "externalUrl")
+	public void setExternalUrl(String externalUrl);
+
+	/**
+	 * @return the externalContact
+	 */
+	@Property( value = "externalContact")
+	public String getExternalContact();
+
+	/**
+	 * @param externalContact the externalContact to set
+	 */
+	@Property( value = "externalContact")
+	public void setExternalContact(String externalContact);
 }

@@ -3,37 +3,7 @@
  */
 package org.ihtsdo.otf.refset.graph.gao;
 
-import static org.ihtsdo.otf.refset.domain.RGC.ACTIVE;
-import static org.ihtsdo.otf.refset.domain.RGC.CREATED;
-import static org.ihtsdo.otf.refset.domain.RGC.CREATED_BY;
-import static org.ihtsdo.otf.refset.domain.RGC.DESC;
-import static org.ihtsdo.otf.refset.domain.RGC.EFFECTIVE_DATE;
-import static org.ihtsdo.otf.refset.domain.RGC.EXPECTED_PUBLISH_DATE;
-import static org.ihtsdo.otf.refset.domain.RGC.ID;
-import static org.ihtsdo.otf.refset.domain.RGC.LANG_CODE;
-import static org.ihtsdo.otf.refset.domain.RGC.MEMBER_TYPE_ID;
-import static org.ihtsdo.otf.refset.domain.RGC.MODIFIED_BY;
-import static org.ihtsdo.otf.refset.domain.RGC.MODIFIED_DATE;
-import static org.ihtsdo.otf.refset.domain.RGC.MODULE_ID;
-import static org.ihtsdo.otf.refset.domain.RGC.PUBLISHED;
-import static org.ihtsdo.otf.refset.domain.RGC.PUBLISHED_DATE;
-import static org.ihtsdo.otf.refset.domain.RGC.REFERENCE_COMPONENT_ID;
-import static org.ihtsdo.otf.refset.domain.RGC.SCTID;
-import static org.ihtsdo.otf.refset.domain.RGC.SUPER_REFSET_TYPE_ID;
-import static org.ihtsdo.otf.refset.domain.RGC.TYPE;
-import static org.ihtsdo.otf.refset.domain.RGC.TYPE_ID;
-import static org.ihtsdo.otf.refset.domain.RGC.END;
-import static org.ihtsdo.otf.refset.domain.RGC.E_EFFECTIVE_TIME;
-import static org.ihtsdo.otf.refset.domain.RGC.L_EFFECTIVE_TIME;
-import static org.ihtsdo.otf.refset.domain.RGC.SCOPE;
-import static org.ihtsdo.otf.refset.domain.RGC.ORIGIN_COUNTRY;
-import static org.ihtsdo.otf.refset.domain.RGC.SNOMED_CT_EXT;
-import static org.ihtsdo.otf.refset.domain.RGC.SNOMED_CT_VERSION;
-import static org.ihtsdo.otf.refset.domain.RGC.CONTRIBUTING_ORG;
-import static org.ihtsdo.otf.refset.domain.RGC.IMPLEMENTATION_DETAILS;
-import static org.ihtsdo.otf.refset.domain.RGC.CLINICAL_DOMAIN;
-import static org.ihtsdo.otf.refset.domain.RGC.VIEW_COUNT;
-import static org.ihtsdo.otf.refset.domain.RGC.DOWNLOAD_COUNT;
+import static org.ihtsdo.otf.refset.domain.RGC.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -291,6 +261,18 @@ public class RefsetConvertor {
 		if ( keys.contains(DOWNLOAD_COUNT) ) {
 			
 			r.getMatrix().setDownloads(vR.getDownloads());
+		
+		}
+		
+		if ( keys.contains(EXT_URL) ) {
+			
+			r.setExternalUrl(vR.getExternalUrl());
+		
+		}
+		
+		if ( keys.contains(EXT_CONTACT) ) {
+			
+			r.setExternalContact(vR.getExternalContact());
 		
 		}
 

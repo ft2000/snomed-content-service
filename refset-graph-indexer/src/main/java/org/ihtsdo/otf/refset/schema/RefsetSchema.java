@@ -1,39 +1,6 @@
 package org.ihtsdo.otf.refset.schema;
-import static org.ihtsdo.otf.refset.domain.RGC.ACTIVE;
-import static org.ihtsdo.otf.refset.domain.RGC.CREATED;
-import static org.ihtsdo.otf.refset.domain.RGC.CREATED_BY;
-import static org.ihtsdo.otf.refset.domain.RGC.DESC;
-import static org.ihtsdo.otf.refset.domain.RGC.EFFECTIVE_DATE;
-import static org.ihtsdo.otf.refset.domain.RGC.ID;
-import static org.ihtsdo.otf.refset.domain.RGC.LANG_CODE;
-import static org.ihtsdo.otf.refset.domain.RGC.MODIFIED_BY;
-import static org.ihtsdo.otf.refset.domain.RGC.MODIFIED_DATE;
-import static org.ihtsdo.otf.refset.domain.RGC.MODULE_ID;
-import static org.ihtsdo.otf.refset.domain.RGC.PUBLISHED;
-import static org.ihtsdo.otf.refset.domain.RGC.PUBLISHED_DATE;
-import static org.ihtsdo.otf.refset.domain.RGC.REFERENCE_COMPONENT_ID;
-import static org.ihtsdo.otf.refset.domain.RGC.SUPER_REFSET_TYPE_ID;
-import static org.ihtsdo.otf.refset.domain.RGC.TYPE;
-import static org.ihtsdo.otf.refset.domain.RGC.TYPE_ID;
-import static org.ihtsdo.otf.refset.domain.RGC.SCTID;
-import static org.ihtsdo.otf.refset.domain.RGC.MEMBER_TYPE_ID;
-import static org.ihtsdo.otf.refset.domain.RGC.EXPECTED_PUBLISH_DATE;
-import static org.ihtsdo.otf.refset.domain.RGC.START;
-import static org.ihtsdo.otf.refset.domain.RGC.END;
-import static org.ihtsdo.otf.refset.domain.RGC.E_EFFECTIVE_TIME;
-import static org.ihtsdo.otf.refset.domain.RGC.L_EFFECTIVE_TIME;
-import static org.ihtsdo.otf.refset.domain.RGC.PARENT_ID;
-import static org.ihtsdo.otf.refset.domain.RGC.LOCK;
-import static org.ihtsdo.otf.refset.domain.RGC.SCOPE;
-import static org.ihtsdo.otf.refset.domain.RGC.ORIGIN_COUNTRY;
-import static org.ihtsdo.otf.refset.domain.RGC.SNOMED_CT_EXT;
-import static org.ihtsdo.otf.refset.domain.RGC.SNOMED_CT_VERSION;
-import static org.ihtsdo.otf.refset.domain.RGC.CONTRIBUTING_ORG;
-import static org.ihtsdo.otf.refset.domain.RGC.IMPLEMENTATION_DETAILS;
-import static org.ihtsdo.otf.refset.domain.RGC.CLINICAL_DOMAIN;
-import static org.ihtsdo.otf.refset.domain.RGC.USER_NAME;
-import static org.ihtsdo.otf.refset.domain.RGC.VIEW_COUNT;
-import static org.ihtsdo.otf.refset.domain.RGC.DOWNLOAD_COUNT;
+import static org.ihtsdo.otf.refset.domain.RGC.*;
+
 
 import java.util.Arrays;
 import java.util.List;
@@ -694,6 +661,20 @@ public class RefsetSchema {
 		}
 		
 		
+		if (!mgmt.containsRelationType(EXT_CONTACT)) {
+
+			LOGGER.info("Creating Property {}", EXT_CONTACT);
+			mgmt.makePropertyKey(EXT_CONTACT).dataType(String.class).make();
+			
+		}
+		
+		if (!mgmt.containsRelationType(EXT_URL)) {
+
+			LOGGER.info("Creating Property {}", EXT_URL);
+			mgmt.makePropertyKey(EXT_URL).dataType(String.class).make();
+			
+		}
+		
 		
 		
 		//for user vertex
@@ -940,6 +921,20 @@ public class RefsetSchema {
 
 					mgmt.addIndexKey(giRefset, mgmt.getPropertyKey(DOWNLOAD_COUNT), 
 							Parameter.of(MAPPED, DOWNLOAD_COUNT));
+
+				}
+				
+				if (!existingProp.contains(mgmt.getPropertyKey(EXT_CONTACT))) {
+
+					mgmt.addIndexKey(giRefset, mgmt.getPropertyKey(EXT_CONTACT), 
+							Parameter.of(MAPPED, EXT_CONTACT));
+
+				}
+				
+				if (!existingProp.contains(mgmt.getPropertyKey(EXT_URL))) {
+
+					mgmt.addIndexKey(giRefset, mgmt.getPropertyKey(EXT_URL), 
+							Parameter.of(MAPPED, EXT_URL));
 
 				}
 				

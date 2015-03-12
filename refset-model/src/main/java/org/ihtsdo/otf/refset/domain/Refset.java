@@ -8,7 +8,7 @@ import java.util.List;
 
 import org.joda.time.DateTime;
 /**
- * @author Episteme Partners
+ * @author 
  *
  */
 public class Refset extends BaseObj implements Comparable<Refset> {
@@ -34,6 +34,10 @@ public class Refset extends BaseObj implements Comparable<Refset> {
 	private DateTime latestEffectiveTime;
 	
 	private Matrix matrix = new Matrix();
+	
+	//used when refset doesn't not have members and available on http url. see https://jira.ihtsdotools.org/browse/RMT-321
+	private String externalUrl;
+	private String externalContact;
 	
 	/**
 	 * Use case of this refset
@@ -369,5 +373,34 @@ public class Refset extends BaseObj implements Comparable<Refset> {
 		this.matrix = matrix;
 	}
 
+	/**
+	 * @return the externalUrl
+	 */
+	public String getExternalUrl() {
+		return externalUrl;
+	}
+
+	/**
+	 * @param externalUrl the externalUrl to set
+	 */
+	public void setExternalUrl(String externalUrl) {
+		this.externalUrl = externalUrl;
+	}
+
+	/**
+	 * @return the externalContact
+	 */
+	public String getExternalContact() {
+		return externalContact;
+	}
+
+	/**
+	 * @param externalContact the externalContact to set
+	 */
+	public void setExternalContact(String externalContact) {
+		this.externalContact = externalContact;
+	}
+
+	
 
 }

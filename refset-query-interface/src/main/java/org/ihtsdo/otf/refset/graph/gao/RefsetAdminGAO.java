@@ -285,6 +285,20 @@ public class RefsetAdminGAO {
 				gr.setClinicalDomain(r.getClinicalDomain());
 
 			}
+			
+			if (!StringUtils.isEmpty(r.getExternalUrl())) {
+
+				gr.setExternalUrl(r.getExternalUrl());
+
+			}
+			
+			if (!StringUtils.isEmpty(r.getExternalContact())) {
+
+				gr.setExternalContact(r.getExternalContact());
+
+			}
+			
+			
 			LOGGER.debug("Added Refset as vertex to graph {}", gr.getId());
 
 			rV = gr.asVertex();			
@@ -598,10 +612,17 @@ public class RefsetAdminGAO {
 
 		}
 		
-		
-		
-		
+		if (!StringUtils.isEmpty(r.getExternalUrl())) {
 
+			rV.setProperty(EXT_URL, r.getExternalUrl());
+
+		}
+		
+		if (!StringUtils.isEmpty(r.getExternalContact())) {
+
+			rV.setProperty(EXT_CONTACT, r.getExternalContact());
+
+		}
 		
 		LOGGER.debug("updateRefsetNode {} finished", rV);
 

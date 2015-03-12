@@ -682,7 +682,7 @@ public class RefsetGAO {
 			
 			//there is an issue with index query i.e. there is no range option like Gremlin pipe but Gremlin pipe does not have sorting.
 			//Pipes use in-memory sorting which can be expensive at the same time sorting may not be correct as it will apply only on subset of results 
-			//hence put maximum limit and provide subset based on from - to range. 
+			//hence put a probable max limit and provide subset based on from - to range. 
 			//This query is done on elastic search which is blazingly fast and Result is just light vertex object.
 			
 			query.limit(100000); 

@@ -52,12 +52,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<refset-query-interface-app-port>8080</refset-query-interface-app-port>
-	
-	
-	
-	
-	
-		
+
 		<org.ihtsdo.otf-version>${project.version}</org.ihtsdo.otf-version>
 		
 		<!-- Maven Plugin Versions -->
@@ -285,18 +280,21 @@
 			<groupId>org.powermock</groupId>
 			<artifactId>powermock-api-mockito</artifactId>
 			<version>${org.powermock-version}</version>
+			<scope>test</scope>
 		</dependency>
 		
 		<dependency>
 			<groupId>org.powermock</groupId>
 			<artifactId>powermock-module-junit4</artifactId>
 			<version>${org.powermock-version}</version>
+			<scope>test</scope>
 		</dependency>
 		
 		<dependency>
 			<groupId>org.powermock</groupId>
 			<artifactId>powermock-api-easymock</artifactId>
 			<version>${org.powermock-version}</version>
+			<scope>test</scope>
 		</dependency>
 		
 		
@@ -345,6 +343,10 @@
 					<groupId>org.slf4j</groupId>
 					<artifactId>slf4j-log4j12</artifactId>
 				</exclusion>
+				<exclusion>
+					<groupId>org.scala-lang</groupId>
+				</exclusion>
+				
 			</exclusions>        	
 		</dependency>
 		

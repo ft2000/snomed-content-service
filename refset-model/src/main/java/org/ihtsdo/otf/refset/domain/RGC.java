@@ -84,5 +84,9 @@ public final class RGC {
 	
 	public static final String USER_NAME = "userName";
 
+	//used when refset doesn't not have members and available on http url. see https://jira.ihtsdotools.org/browse/RMT-321
+	public static final String EXT_URL = "externalUrl";
+	public static final String EXT_CONTACT = "externalContact";
+
 
 }
