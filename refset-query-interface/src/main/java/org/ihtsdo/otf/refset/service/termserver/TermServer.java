@@ -105,7 +105,7 @@ public class TermServer {
 		
 		 Map<String, String> releases = getReleases();
 		 
-		 DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssz");
+		 DateFormat df = new SimpleDateFormat("yyyyMMdd");//response has changed now hence format
 		 		 
 		 SortedMap<Date, String> sortedEffectiveDate = new TreeMap<Date, String>();
 		 
