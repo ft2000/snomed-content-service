@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.ihtsdo.otf.refset.service;
+package org.ihtsdo.otf.refset.service.authoring;
 
 import java.util.Map;
 import java.util.Set;

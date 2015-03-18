@@ -11,7 +11,8 @@
 */
 package org.ihtsdo.otf.refset.domain;
 
-import org.hibernate.validator.internal.constraintvalidators.URLValidator;
+import org.ihtsdo.otf.snomed.service.RefsetMetadataService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.Errors;
@@ -23,6 +24,9 @@ import org.springframework.validation.Validator;
  */
 @Component
 public class RefsetValidator implements Validator {
+
+	@Autowired
+	private RefsetMetadataService mdService;
 
 	/* (non-Javadoc)
 	 * @see org.springframework.validation.Validator#supports(java.lang.Class)
@@ -50,8 +54,9 @@ public class RefsetValidator implements Validator {
         ValidationUtils.rejectIfEmptyOrWhitespace(e, "scope", "Refset use case/scope is mandatory and can not be left empty");
         //ValidationUtils.rejectIfEmpty(e, "originCountry", "Refset origin country is mandatory and can not be left empty");
         ValidationUtils.rejectIfEmptyOrWhitespace(e, "snomedCTVersion", "SNOMED®CT release version is mandatory and can not be left empty");
-        ValidationUtils.rejectIfEmptyOrWhitespace(e, "clinicalDomain", "Refset clinical domain is mandatory and can not be left empty");
-        
+        ValidationUtils.rejectIfEmptyOrWhitespace(e, "clinicalDomainCode", "Refset clinical domain is mandatory and can not be left empty");
+        ValidationUtils.rejectIfEmptyOrWhitespace(e, "expectedReleaseDate", "Expected published date is mandatory");
+
         //conditional validation
         Refset r = (Refset)m;
         
@@ -65,6 +70,24 @@ public class RefsetValidator implements Validator {
 
             ValidationUtils.rejectIfEmptyOrWhitespace(e, "externalContact", "Refset contact is mandatory");
             ValidationUtils.rejectIfEmptyOrWhitespace(e, "originCountry", "Refset origin country is mandatory and can not be left empty");
+
+		}
+        
+        if (!mdService.getClinicalDomains().containsKey(r.getClinicalDomainCode())) {
+			
+    		e.rejectValue("clinicalDomainCode", "Provided refset clinical domain is not supported");
+
+		}
+        
+        if (!StringUtils.isEmpty(r.getSnomedCTExtensionNs()) && !mdService.getExtensions().containsKey(r.getSnomedCTExtensionNs())) {
+			
+    		e.rejectValue("snomedCTExtensionNs", "Provided SNOMED®CT Extension namespace is not supported");
+
+		}
+
+        if (!StringUtils.isEmpty(r.getOriginCountryCode()) && !mdService.getISOCountries().containsValue(r.getOriginCountryCode())) {
+			
+    		e.rejectValue("originCountryCode", "Provided origin country code is not supported");
 
 		}
 

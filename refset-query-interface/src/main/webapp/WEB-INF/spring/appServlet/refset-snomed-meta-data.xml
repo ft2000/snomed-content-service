@@ -34,12 +34,15 @@
 	
 	
 	<util:map id="snomed.extensions" map-class="java.util.TreeMap">
-		<entry key="CTE001" value="Denmark" />
-		<entry key="CTE002" value="Malyasian" />
-		<entry key="CTE003" value="Spanish" />
-		<entry key="CTE004" value="Swedish" />
-		<entry key="CTE005" value="UK" />
-		<entry key="CTE006" value="US" />
+		<entry key="EXT1000124" value="US National Extension" />
+		<entry key="EXT1000122" value="Spanish National Extension" />
+		<entry key="EXT1000142" value="International Extension Namespace" />
+		<entry key="EXT1000167" value="Chilean National Extension" />
+		<entry key="EXT1000179" value="Uruguayan National Extension" />
+		<entry key="EXT1000125" value="Slovak National Extension" />
+		<entry key="EXT1000001" value="UK Drug Extension"/>
+		<entry key="EXT1000002" value="US Drug Extension"/>
+		<entry key="EXT1000119" value="SNOMED CT content extension"/>
 
 	</util:map>		
 		

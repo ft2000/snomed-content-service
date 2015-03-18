@@ -19,6 +19,7 @@ import org.ihtsdo.otf.refset.exception.RefsetServiceException;
 import org.ihtsdo.otf.refset.graph.RefsetGraphAccessException;
 import org.ihtsdo.otf.refset.graph.gao.RefsetAdminGAO;
 import org.ihtsdo.otf.refset.graph.gao.RefsetGAO;
+import org.ihtsdo.otf.refset.service.authoring.RefsetAuthoringServiceImpl;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -79,7 +80,7 @@ public class RefsetAuthoringServiceImplTest {
 	}
 
 	/**
-	 * Test method for {@link org.ihtsdo.otf.refset.service.RefsetAuthoringServiceImpl#addRefset(org.ihtsdo.otf.refset.domain.Refset)}.
+	 * Test method for {@link org.ihtsdo.otf.refset.service.authoring.RefsetAuthoringServiceImpl#addRefset(org.ihtsdo.otf.refset.domain.Refset)}.
 	 * @throws RefsetServiceException 
 	 * @throws RefsetGraphAccessException 
 	 * @throws EntityNotFoundException 
@@ -96,7 +97,7 @@ public class RefsetAuthoringServiceImplTest {
 	
 
 	/**
-	 * Test method for {@link org.ihtsdo.otf.refset.service.RefsetAuthoringServiceImpl#addMember(java.lang.String, org.ihtsdo.otf.refset.domain.Member)}.
+	 * Test method for {@link org.ihtsdo.otf.refset.service.authoring.RefsetAuthoringServiceImpl#addMember(java.lang.String, org.ihtsdo.otf.refset.domain.Member)}.
 	 * @throws RefsetServiceException 
 	 * @throws RefsetGraphAccessException 
 	 * @throws EntityNotFoundException 
@@ -113,7 +114,7 @@ public class RefsetAuthoringServiceImplTest {
 	}
 	
 	/**
-	 * Test method for {@link org.ihtsdo.otf.refset.service.RefsetAuthoringServiceImpl#addMember(java.lang.String, org.ihtsdo.otf.refset.domain.Member)}.
+	 * Test method for {@link org.ihtsdo.otf.refset.service.authoring.RefsetAuthoringServiceImpl#addMember(java.lang.String, org.ihtsdo.otf.refset.domain.Member)}.
 	 * @throws RefsetServiceException 
 	 * @throws RefsetGraphAccessException 
 	 * @throws EntityNotFoundException 
@@ -132,7 +133,7 @@ public class RefsetAuthoringServiceImplTest {
 	}
 	
 	/**
-	 * Test method for {@link org.ihtsdo.otf.refset.service.RefsetAuthoringServiceImpl#addMember(java.lang.String, org.ihtsdo.otf.refset.domain.Member)}.
+	 * Test method for {@link org.ihtsdo.otf.refset.service.authoring.RefsetAuthoringServiceImpl#addMember(java.lang.String, org.ihtsdo.otf.refset.domain.Member)}.
 	 * @throws RefsetServiceException 
 	 * @throws RefsetGraphAccessException 
 	 * @throws EntityNotFoundException 
@@ -150,7 +151,7 @@ public class RefsetAuthoringServiceImplTest {
 	}
 	
 	/**
-	 * Test method for {@link org.ihtsdo.otf.refset.service.RefsetAuthoringServiceImpl#addMember(java.lang.String, org.ihtsdo.otf.refset.domain.Member)}.
+	 * Test method for {@link org.ihtsdo.otf.refset.service.authoring.RefsetAuthoringServiceImpl#addMember(java.lang.String, org.ihtsdo.otf.refset.domain.Member)}.
 	 * @throws RefsetServiceException 
 	 * @throws EntityNotFoundException 
 	 * @throws RefsetGraphAccessException 
@@ -168,7 +169,7 @@ public class RefsetAuthoringServiceImplTest {
 	}
 	
 	/**
-	 * Test method for {@link org.ihtsdo.otf.refset.service.RefsetAuthoringServiceImpl#updateRefset(org.ihtsdo.otf.refset.domain.Refset)}.
+	 * Test method for {@link org.ihtsdo.otf.refset.service.authoring.RefsetAuthoringServiceImpl#updateRefset(org.ihtsdo.otf.refset.domain.Refset)}.
 	 * @throws RefsetServiceException 
 	 * @throws RefsetGraphAccessException 
 	 * @throws EntityNotFoundException 
@@ -183,7 +184,7 @@ public class RefsetAuthoringServiceImplTest {
 	}
 	
 	/**
-	 * Test method for {@link org.ihtsdo.otf.refset.service.RefsetAuthoringServiceImpl#updateRefset(org.ihtsdo.otf.refset.domain.Refset)}.
+	 * Test method for {@link org.ihtsdo.otf.refset.service.authoring.RefsetAuthoringServiceImpl#updateRefset(org.ihtsdo.otf.refset.domain.Refset)}.
 	 * @throws RefsetServiceException 
 	 * @throws RefsetGraphAccessException 
 	 * @throws EntityNotFoundException 
@@ -198,7 +199,7 @@ public class RefsetAuthoringServiceImplTest {
 	}
 	
 	/**
-	 * Test method for {@link org.ihtsdo.otf.refset.service.RefsetAuthoringServiceImpl#updateRefset(org.ihtsdo.otf.refset.domain.Refset)}.
+	 * Test method for {@link org.ihtsdo.otf.refset.service.authoring.RefsetAuthoringServiceImpl#updateRefset(org.ihtsdo.otf.refset.domain.Refset)}.
 	 * @throws RefsetServiceException 
 	 * @throws RefsetGraphAccessException 
 	 * @throws EntityNotFoundException 

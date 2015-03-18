@@ -19,7 +19,7 @@ import org.ihtsdo.otf.refset.common.SearchCriteria;
 import org.ihtsdo.otf.refset.common.SearchField;
 import org.ihtsdo.otf.refset.domain.Member;
 import org.ihtsdo.otf.refset.domain.Refset;
-import org.ihtsdo.otf.refset.service.RefsetBrowseService;
+import org.ihtsdo.otf.refset.service.browse.RefsetBrowseService;
 import org.ihtsdo.otf.refset.service.matrix.ActivityMatrixService;
 import org.ihtsdo.otf.refset.service.matrix.ViewActivityMatrixService;
 import org.slf4j.Logger;

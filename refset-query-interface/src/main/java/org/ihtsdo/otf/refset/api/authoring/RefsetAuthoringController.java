@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.ihtsdo.otf.refset.controller;
+package org.ihtsdo.otf.refset.api.authoring;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
@@ -25,9 +25,12 @@ import org.ihtsdo.otf.refset.domain.Member;
 import org.ihtsdo.otf.refset.domain.MemberValidator;
 import org.ihtsdo.otf.refset.domain.Refset;
 import org.ihtsdo.otf.refset.domain.RefsetValidator;
+import org.ihtsdo.otf.refset.exception.RefsetServiceException;
 import org.ihtsdo.otf.refset.exception.ValidationException;
-import org.ihtsdo.otf.refset.service.RefsetAuthoringService;
-import org.ihtsdo.otf.refset.service.RefsetBrowseService;
+import org.ihtsdo.otf.refset.service.authoring.RefsetAuthoringService;
+import org.ihtsdo.otf.refset.service.browse.RefsetBrowseService;
+import org.ihtsdo.otf.refset.service.termserver.TermServer;
+import org.ihtsdo.otf.snomed.service.RefsetMetadataService;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,6 +75,12 @@ public class RefsetAuthoringController {
 	
 	@Autowired
 	private RefsetValidator rValidator;
+	
+	@Autowired
+	private TermServer tService;
+
+	@Autowired
+	private RefsetMetadataService mdService;
 
 	@RequestMapping( method = RequestMethod.POST, value = "/new",  produces = "application/json", consumes = "application/json")
 	@ApiOperation( value = "Add a Refset", notes = "It adds a brand new refset to database" )

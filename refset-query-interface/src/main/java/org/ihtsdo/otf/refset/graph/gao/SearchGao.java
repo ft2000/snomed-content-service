@@ -17,9 +17,9 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
+import org.ihtsdo.otf.refset.domain.RGC;
 import org.ihtsdo.otf.refset.domain.SearchResult;
 import org.ihtsdo.otf.refset.graph.RefsetGraphAccessException;
-import org.ihtsdo.otf.refset.graph.RefsetGraphFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
@@ -37,7 +37,11 @@ public class SearchGao {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(SearchGao.class);
 	private static final String QUERY = "/refset/Member/_search?q=referenceComponentId,title %s&from=%s&size=%s";
-	private RefsetGraphFactory f;
+	private static final String ALL_QUERY = "/refset/Refset,Member/_search?q=clinicalDomain,contributingOrganization,createdBy,"
+			+ "description,earliestEffectiveTime,expectedPublishDate,"
+			+ "externalContact,externalUrl,implementationDetails,componentTypeId,modifiedBy,"
+			+ "moduleId,referencedComponentId,scope,sctId,snomedCTExtension,snomedCTVersion,originCountry,typeId %s&from=%s&size=%s";
+
 	private String url;
 	private RestTemplate rt;
 
@@ -55,15 +59,6 @@ public class SearchGao {
 	@Resource(name = "refset.auth.RestTemplate")
 	public void setRt(RestTemplate rt) {
 		this.rt = rt;
-	}
-
-	/**
-	 * @param factory the factory to set
-	 */
-	@Resource(name = "refsetGraphFactory")
-	public  void setFactory(RefsetGraphFactory factory) {
-		
-		this.f = factory;
 	}
 	
 	/**
@@ -141,11 +136,106 @@ public class SearchGao {
 		} catch (Exception e) {
 			
 			//RefsetGraphFactory.rollback(g);			
-			LOGGER.error("Error getting refsets member history", e);
+			LOGGER.error("Error getting search results", e);
 			throw new RefsetGraphAccessException(e.getMessage(), e);
 			
 		}
 
+		return result;
+	}
+
+
+	/**looks up given search query string in following fields simultaneously 
+	 * {@link RGC#CLINICAL_DOMAIN}
+	 * {@link RGC#CONTRIBUTING_ORG}
+	 * {@link RGC#CREATED_BY}
+	 * {@link RGC#DESC}
+	 * {@link RGC#E_EFFECTIVE_TIME}
+	 * {@link RGC#EXPECTED_PUBLISH_DATE}
+	 * {@link RGC#EXT_CONTACT}
+	 * {@link RGC#EXT_URL}
+	 * {@link RGC#IMPLEMENTATION_DETAILS}
+	 * {@link RGC#MEMBER_TYPE_ID}
+	 * {@link RGC#MODIFIED_BY}
+	 * {@link RGC#MODULE_ID}
+	 * {@link RGC#REFERENCE_COMPONENT_ID}
+	 * {@link RGC#SCOPE}
+	 * {@link RGC#SCTID}
+	 * {@link RGC#SNOMED_CT_EXT}
+	 * {@link RGC#SNOMED_CT_VERSION}
+	 * {@link RGC#ORIGIN_COUNTRY}
+	 * {@link RGC#TYPE_ID}
+	 * @param query2
+	 * @param from
+	 * @param to
+	 * @return
+	 */
+	public SearchResult<String> searchAll(String query, int from, int to) {
+
+		SearchResult<String> result = new SearchResult<String>();
+
+		String queryString = String.format( url + ALL_QUERY, query, from, to - from);
+		LOGGER.debug("Getting getting search result for {}", queryString);
+
+		JsonNode response = rt.getForObject(queryString, JsonNode.class);
+		
+		LOGGER.debug("search service call successfully returned with {} ", response);
+		
+		Iterator<String> fields = response.fieldNames();
+		while (fields.hasNext()) {
+			String field = fields.next();
+			if("took".equalsIgnoreCase(field)) {
+				
+				result.setTime(response.get(field).asInt());
+			}
+			
+			if ("hits".equalsIgnoreCase(field)) {
+				
+				Iterator<String> hitsFields = response.get(field).fieldNames();
+				
+				while (hitsFields.hasNext()) {
+
+					String hitsField = hitsFields.next();
+					
+					if("total".equalsIgnoreCase(hitsField)) {
+						
+						result.setTotalNoOfResults(response.get(field).get(hitsField).asInt());
+					}
+
+					if("hits".equalsIgnoreCase(hitsField)) {
+
+						Iterator<JsonNode> source = response.get(field).get(hitsField).elements();
+						List<String> r = new ArrayList<String>();
+						
+						while (source.hasNext()) {
+							
+							String uuid = null;
+							JsonNode current = source.next();
+							String type = current.at("/_source/type").asText();
+							if ("member".equalsIgnoreCase(type)) {
+								
+								uuid = current.at("/_source/parentId").asText();
+
+							} else if ("refset".equalsIgnoreCase(type)) {
+							
+								uuid = current.at("/_source/sid").asText();
+
+							}
+							if(!StringUtils.isEmpty(uuid) && !r.contains(uuid)) {
+
+								r.add(uuid);
+							}
+							
+						}
+
+						result.setRecords(r);
+
+					}
+
+				}
+			}
+
+		}
 		return result;
 	}
 	

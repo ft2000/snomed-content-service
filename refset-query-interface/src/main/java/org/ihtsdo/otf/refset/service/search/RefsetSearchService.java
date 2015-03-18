@@ -26,12 +26,9 @@ public class RefsetSearchService {
 
 
 	/**
-	 * @param refsetId
-	 * @param referenceComponentId
-	 * @param fromDate
-	 * @param toDate
 	 * @param from
 	 * @param to
+	 * @param query
 	 * @return
 	 * @throws RefsetServiceException
 	 */
@@ -45,9 +42,25 @@ public class RefsetSearchService {
 			
 		} catch (RefsetGraphAccessException e) {
 			
-			LOGGER.error("Error in graph db call", e);
+			LOGGER.error("Error in search service call", e);
 			throw new RefsetServiceException(e.getMessage());
 		}
+				
+	}
+	
+	/**
+	 * @param from
+	 * @param to
+	 * @param query
+	 * @return
+	 * @throws RefsetServiceException
+	 */
+	public SearchResult<String> searchAll(String query, int from, int to) throws RefsetServiceException {
+
+		LOGGER.debug("getSearchResult {}", query);
+		
+		return gao.searchAll(query, from, to);
+
 				
 	}
 

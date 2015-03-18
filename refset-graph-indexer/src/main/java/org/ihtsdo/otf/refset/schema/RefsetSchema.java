@@ -611,6 +611,13 @@ public class RefsetSchema {
 			
 		}
 		
+		if (!mgmt.containsRelationType(ORIGIN_COUNTRY_CODE)) {
+
+			LOGGER.info("Creating Property {}", ORIGIN_COUNTRY_CODE);
+			mgmt.makePropertyKey(ORIGIN_COUNTRY_CODE).dataType(String.class).make();
+			
+		}
+		
 		if (!mgmt.containsRelationType(CONTRIBUTING_ORG)) {
 
 			LOGGER.info("Creating Property {}", CONTRIBUTING_ORG);
@@ -622,6 +629,13 @@ public class RefsetSchema {
 
 			LOGGER.info("Creating Property {}", SNOMED_CT_EXT);
 			mgmt.makePropertyKey(SNOMED_CT_EXT).dataType(String.class).make();
+			
+		}
+		
+		if (!mgmt.containsRelationType(SNOMED_CT_EXT_NS)) {
+
+			LOGGER.info("Creating Property {}", SNOMED_CT_EXT_NS);
+			mgmt.makePropertyKey(SNOMED_CT_EXT_NS).dataType(String.class).make();
 			
 		}
 		
@@ -643,6 +657,12 @@ public class RefsetSchema {
 
 			LOGGER.info("Creating Property {}", CLINICAL_DOMAIN);
 			mgmt.makePropertyKey(CLINICAL_DOMAIN).dataType(String.class).make();
+			
+		}
+		if (!mgmt.containsRelationType(CLINICAL_DOMAIN_CODE)) {
+
+			LOGGER.info("Creating Property {}", CLINICAL_DOMAIN_CODE);
+			mgmt.makePropertyKey(CLINICAL_DOMAIN_CODE).dataType(String.class).make();
 			
 		}
 		
@@ -882,6 +902,13 @@ public class RefsetSchema {
 
 				}
 				
+				if (!existingProp.contains(mgmt.getPropertyKey(SNOMED_CT_EXT_NS))) {
+
+					mgmt.addIndexKey(giRefset, mgmt.getPropertyKey(SNOMED_CT_EXT_NS), 
+							Parameter.of(MAPPED, SNOMED_CT_EXT_NS));
+
+				}
+				
 				if (!existingProp.contains(mgmt.getPropertyKey(SNOMED_CT_VERSION))) {
 
 					mgmt.addIndexKey(giRefset, mgmt.getPropertyKey(SNOMED_CT_VERSION), 
@@ -896,6 +923,13 @@ public class RefsetSchema {
 					
 				}
 				
+				if (!existingProp.contains(mgmt.getPropertyKey(ORIGIN_COUNTRY_CODE))) {
+
+					mgmt.addIndexKey(giRefset, mgmt.getPropertyKey(ORIGIN_COUNTRY_CODE), 
+							Parameter.of(MAPPED, ORIGIN_COUNTRY_CODE));
+					
+				}
+				
 				if (!existingProp.contains(mgmt.getPropertyKey(IMPLEMENTATION_DETAILS))) {
 
 					mgmt.addIndexKey(giRefset, mgmt.getPropertyKey(IMPLEMENTATION_DETAILS), 
@@ -907,6 +941,13 @@ public class RefsetSchema {
 
 					mgmt.addIndexKey(giRefset, mgmt.getPropertyKey(CLINICAL_DOMAIN), 
 							Parameter.of(MAPPED, CLINICAL_DOMAIN));
+
+				}
+				
+				if (!existingProp.contains(mgmt.getPropertyKey(CLINICAL_DOMAIN_CODE))) {
+
+					mgmt.addIndexKey(giRefset, mgmt.getPropertyKey(CLINICAL_DOMAIN_CODE), 
+							Parameter.of(MAPPED, CLINICAL_DOMAIN_CODE));
 
 				}
 				

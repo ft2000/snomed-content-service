@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.ihtsdo.otf.refset.service;
+package org.ihtsdo.otf.refset.service.browse;
 
 import java.util.List;
 

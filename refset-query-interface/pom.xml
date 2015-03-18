@@ -345,6 +345,7 @@
 				</exclusion>
 				<exclusion>
 					<groupId>org.scala-lang</groupId>
+					<artifactId>scala-library</artifactId>
 				</exclusion>
 				
 			</exclusions>        	

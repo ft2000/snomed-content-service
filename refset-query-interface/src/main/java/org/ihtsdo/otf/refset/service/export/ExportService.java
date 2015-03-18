@@ -15,7 +15,7 @@ import org.ihtsdo.otf.refset.domain.Refset;
 import org.ihtsdo.otf.refset.exception.EntityNotFoundException;
 import org.ihtsdo.otf.refset.exception.ExportServiceException;
 import org.ihtsdo.otf.refset.exception.RefsetServiceException;
-import org.ihtsdo.otf.refset.service.RefsetBrowseService;
+import org.ihtsdo.otf.refset.service.browse.RefsetBrowseService;
 import org.ihtsdo.otf.snomed.service.ConceptLookupService;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;

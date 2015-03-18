@@ -16,7 +16,6 @@ import java.util.TreeMap;
 
 import javax.annotation.Resource;
 
-import org.ihtsdo.otf.refset.exception.RefsetServiceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -39,6 +38,9 @@ public class RefsetMetadataService {
 	@Resource( name = "snomed.extensions" )
 	private Map<String, String> snomedExtensions;
 	
+	/**Retrieves {@link Map} of clinical domain with clinical domain code as key and clinical domain display text as value
+	 * @return
+	 */
 	public Map<String, String> getClinicalDomains() {
 		
 		LOGGER.debug("getClinicalDomains");
@@ -46,7 +48,7 @@ public class RefsetMetadataService {
 		return clinicalDomain;
 	}
 
-	/**
+	/**Retrieves {@link Map} of SNOMED®CT extensions with extension namespace as key and extension display text as value
 	 * @return
 	 */
 	public Map<String, String> getExtensions() {
@@ -56,11 +58,10 @@ public class RefsetMetadataService {
 		return snomedExtensions;
 	}
 	
-	/**Loads  iso_3166 with Country name and two digit code
+	/**Loads {@link Map} with iso_3166 Country name as key and two digit code as value
 	 * @return
-	 * @throws RefsetServiceException
 	 */
-	public Map<String, String> getISOCountries() throws RefsetServiceException {
+	public Map<String, String> getISOCountries() {
 		
 		LOGGER.debug("getISOCountries");
 
@@ -78,7 +79,9 @@ public class RefsetMetadataService {
 		return originCountries;
 	}
 
-	/**Retrieves ISO-639 Languages
+	/**
+	 *Loads {@link Map} with ISO-639 Language name as key and two digit code as value
+
 	 * @return
 	 */
 	public Map<String, String> getISOLanguages() {

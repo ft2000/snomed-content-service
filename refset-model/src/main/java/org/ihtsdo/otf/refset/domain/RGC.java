@@ -87,6 +87,13 @@ public final class RGC {
 	//used when refset doesn't not have members and available on http url. see https://jira.ihtsdotools.org/browse/RMT-321
 	public static final String EXT_URL = "externalUrl";
 	public static final String EXT_CONTACT = "externalContact";
+	
+	public static final String CLINICAL_DOMAIN_CODE = "clinicalDomainCode";
+
+	public static final String SNOMED_CT_EXT_NS = "snomedCTExtensionNs";
+	
+	public static final String ORIGIN_COUNTRY_CODE = "originCountryCode";
+
 
 
 }

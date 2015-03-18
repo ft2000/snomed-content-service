@@ -256,6 +256,12 @@ public class RefsetAdminGAO {
 
 			}
 			
+			if (!StringUtils.isEmpty(r.getSnomedCTExtensionNs())) {
+
+				gr.setSnomedCTExtensionNs(r.getSnomedCTExtensionNs());
+
+			}
+			
 			if (!StringUtils.isEmpty(r.getSnomedCTVersion())) {
 				
 				gr.setSnomedCTVersion(r.getSnomedCTVersion());
@@ -265,6 +271,12 @@ public class RefsetAdminGAO {
 			if (!StringUtils.isEmpty(r.getOriginCountry())) {
 
 				gr.setOriginCountry(r.getOriginCountry());
+
+			}
+			
+			if (!StringUtils.isEmpty(r.getOriginCountryCode())) {
+
+				gr.setOriginCountryCode(r.getOriginCountryCode());
 
 			}
 			
@@ -286,6 +298,12 @@ public class RefsetAdminGAO {
 
 			}
 			
+			if (!StringUtils.isEmpty(r.getClinicalDomainCode())) {
+
+				gr.setClinicalDomainCode(r.getClinicalDomainCode());
+
+			}
+			
 			if (!StringUtils.isEmpty(r.getExternalUrl())) {
 
 				gr.setExternalUrl(r.getExternalUrl());
@@ -297,6 +315,8 @@ public class RefsetAdminGAO {
 				gr.setExternalContact(r.getExternalContact());
 
 			}
+			
+			
 			
 			
 			LOGGER.debug("Added Refset as vertex to graph {}", gr.getId());
@@ -582,6 +602,12 @@ public class RefsetAdminGAO {
 
 		}
 		
+		if (!StringUtils.isEmpty(r.getSnomedCTExtensionNs())) {
+
+			rV.setProperty(SNOMED_CT_EXT_NS, r.getSnomedCTExtensionNs());
+
+		}
+		
 		if (!StringUtils.isEmpty(r.getSnomedCTVersion())) {
 			
 			rV.setProperty(SNOMED_CT_VERSION, r.getSnomedCTVersion());
@@ -591,6 +617,12 @@ public class RefsetAdminGAO {
 		if (!StringUtils.isEmpty(r.getOriginCountry())) {
 
 			rV.setProperty(ORIGIN_COUNTRY, r.getOriginCountry());
+
+		}
+		
+		if (!StringUtils.isEmpty(r.getOriginCountryCode())) {
+
+			rV.setProperty(ORIGIN_COUNTRY_CODE, r.getOriginCountryCode());
 
 		}
 		
@@ -612,6 +644,11 @@ public class RefsetAdminGAO {
 
 		}
 		
+		if (!StringUtils.isEmpty(r.getClinicalDomainCode())) {
+
+			rV.setProperty(CLINICAL_DOMAIN_CODE, r.getClinicalDomainCode());
+
+		}		
 		if (!StringUtils.isEmpty(r.getExternalUrl())) {
 
 			rV.setProperty(EXT_URL, r.getExternalUrl());

@@ -73,5 +73,29 @@ public class SearchController {
 
 		return new ResponseEntity<Result<Map<String,Object>>>(r, HttpStatus.OK);
 	}
+	
+	@RequestMapping( method = RequestMethod.GET, value = "/searchAll",  produces = "application/json", consumes = "application/json")
+	@ApiOperation( value = "Get a member history ",
+			notes = "This api searches desired text and returns a paginated list of refset uuid")
+    public ResponseEntity<Result< Map<String, Object>>> searchAll( @RequestParam(value = "q") String query,
+    		@RequestParam(required = false, defaultValue = "0") int from, @RequestParam(required = false, defaultValue = "10") int to) throws Exception {
+		
+		logger.debug("Searching for {}", query);
+
+		Result<Map<String, Object>> r = Utility.getResult();
+
+		SearchResult<String> result = service.searchAll(query, from, to);
+		
+		Map<String, Object> data = new HashMap<String, Object>();
+		data.put("result", result);
+		r.getMeta().add( linkTo( methodOn( SearchController.class ).searchAll(query, from, to)).withRel("Search Result"));
+
+		r.setData(data);
+
+		r.getMeta().setMessage(SUCCESS);
+		r.getMeta().setStatus(HttpStatus.OK);
+
+		return new ResponseEntity<Result<Map<String,Object>>>(r, HttpStatus.OK);
+	}
 
 }

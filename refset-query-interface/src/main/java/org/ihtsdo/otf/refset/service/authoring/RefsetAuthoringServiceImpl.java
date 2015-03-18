@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.ihtsdo.otf.refset.service;
+package org.ihtsdo.otf.refset.service.authoring;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -24,6 +24,7 @@ import org.ihtsdo.otf.refset.graph.gao.RefsetGAO;
 import org.ihtsdo.otf.snomed.domain.Concept;
 import org.ihtsdo.otf.snomed.exception.ConceptServiceException;
 import org.ihtsdo.otf.snomed.service.ConceptLookupService;
+import org.ihtsdo.otf.snomed.service.RefsetMetadataService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,6 +54,9 @@ public class RefsetAuthoringServiceImpl implements RefsetAuthoringService {
 	
 	@Autowired
 	private ConceptLookupService lService;
+	
+	@Autowired
+	private RefsetMetadataService mdService;
 
 
 	/* (non-Javadoc)
@@ -64,6 +68,10 @@ public class RefsetAuthoringServiceImpl implements RefsetAuthoringService {
 		LOGGER.debug("addrefset {}", r);
 		
 		try {
+			
+			setOriginCountry(r);
+			setSnomedCTExt(r);
+			setClinicalDomain(r);
 			
 			adminGao.addRefset(r);
 			return r.getUuid();
@@ -142,12 +150,16 @@ public class RefsetAuthoringServiceImpl implements RefsetAuthoringService {
 			 
 			 String owner = gao.getOwner(r.getUuid());
 
-			 if (StringUtils.isEmpty(owner) || !owner.equalsIgnoreCase(r.getCreatedBy())) {
+			 if (StringUtils.isEmpty(owner) || !owner.equalsIgnoreCase(r.getModifiedBy())) {
 				 
 				 throw new UpdateDeniedException("Only an owner can remove member from refset");
 			 }
 			 r = obfuscate(r); 
-			
+			 
+			 setOriginCountry(r);
+			 setSnomedCTExt(r);
+			 setClinicalDomain(r);
+				
 			 adminGao.updateRefset(r);
 			
 		} catch (RefsetGraphAccessException e) {
@@ -338,6 +350,33 @@ public class RefsetAuthoringServiceImpl implements RefsetAuthoringService {
 
 		return tOutcome;
 		
+	}
+	
+	/**
+	 * @param r
+	 */
+	private void setOriginCountry(Refset r) {
+		
+		if (r != null && !StringUtils.isEmpty(r.getOriginCountryCode())) {
+			
+			r.setOriginCountry(mdService.getISOCountries().get(r.getOriginCountryCode()));
+		}
+	}
+	
+	private void setSnomedCTExt(Refset r) {
+		
+		if (r != null && !StringUtils.isEmpty(r.getSnomedCTExtensionNs())) {
+			
+			r.setSnomedCTExtension(mdService.getExtensions().get(r.getSnomedCTExtensionNs()));
+		}
+	}
+	
+	private void setClinicalDomain(Refset r) {
+		
+		if (r != null && !StringUtils.isEmpty(r.getClinicalDomainCode())) {
+			
+			r.setClinicalDomain(mdService.getClinicalDomains().get(r.getClinicalDomain()));
+		}
 	}
 
 }

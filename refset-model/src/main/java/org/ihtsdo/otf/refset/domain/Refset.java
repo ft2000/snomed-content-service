@@ -72,7 +72,12 @@ public class Refset extends BaseObj implements Comparable<Refset> {
 	
 	private String clinicalDomain;
 	
+	private String clinicalDomainCode;
+
+	private String snomedCTExtensionNs;
 	
+	private String originCountryCode;
+
 	
 	/**
 	 * @return the typeId
@@ -167,12 +172,14 @@ public class Refset extends BaseObj implements Comparable<Refset> {
 	   		+ "effectiveTime - %s,  isPublished - %s, languageCode - %s, members - %s, moduleId - %s, publishedDate - %s "
 	   		+ "superRefsetTypeId - %s, type - %s, typeId - %s, description - %s, latestEffectiveTime - %s,"
 	   		+ " earliestEffectiveTime -%s, scope - %s, snomedCTExtension - %s, snomedCTVersion - %s,"
-	   		+ " contributingOrganization - %s, originCountry - %s, implementationDetails - %s, clinicalDomain - %s"
+	   		+ " contributingOrganization - %s, originCountry - %s, implementationDetails - %s, clinicalDomain - %s,"
+	   		+ " clinicalDomainCode - %s, snomedCTExtensionNs - %s, originCountryCode - %s, externalUrl - %s, externalContact - %s "
 	   		+ "]", this.uuid, this.created, this.createdBy, this.description, this.effectiveTime, this.published,
 	   		this.languageCode, this.members, this.moduleId, this.publishedDate, this.superRefsetTypeId, this.type,
 	   		this.typeId, this.description, this.earliestEffectiveTime, this.latestEffectiveTime, this.scope,
 	   		this.snomedCTExtension, this.snomedCTVersion, this.contributingOrganization, this.originCountry,
-	   		this.implementationDetails, this.clinicalDomain);
+	   		this.implementationDetails, this.clinicalDomain, this.clinicalDomainCode, this.snomedCTExtensionNs,
+	   		this.originCountryCode, this.externalUrl, this.externalContact);
    }
 
 
@@ -399,6 +406,48 @@ public class Refset extends BaseObj implements Comparable<Refset> {
 	 */
 	public void setExternalContact(String externalContact) {
 		this.externalContact = externalContact;
+	}
+
+	/**
+	 * @return the clinicalDomainCode
+	 */
+	public String getClinicalDomainCode() {
+		return clinicalDomainCode;
+	}
+
+	/**
+	 * @param clinicalDomainCode the clinicalDomainCode to set
+	 */
+	public void setClinicalDomainCode(String clinicalDomainCode) {
+		this.clinicalDomainCode = clinicalDomainCode;
+	}
+
+	/**
+	 * @return the snomedCTExtensionNs
+	 */
+	public String getSnomedCTExtensionNs() {
+		return snomedCTExtensionNs;
+	}
+
+	/**
+	 * @param snomedCTExtensionNs the snomedCTExtensionNs to set
+	 */
+	public void setSnomedCTExtensionNs(String snomedCTExtensionNs) {
+		this.snomedCTExtensionNs = snomedCTExtensionNs;
+	}
+
+	/**
+	 * @return the originCountryCode
+	 */
+	public String getOriginCountryCode() {
+		return originCountryCode;
+	}
+
+	/**
+	 * @param originCountryCode the originCountryCode to set
+	 */
+	public void setOriginCountryCode(String originCountryCode) {
+		this.originCountryCode = originCountryCode;
 	}
 
 	

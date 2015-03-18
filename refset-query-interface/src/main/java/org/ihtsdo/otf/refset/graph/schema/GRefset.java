@@ -410,4 +410,41 @@ public interface GRefset extends VertexFrame {
 	 */
 	@Property( value = "externalContact")
 	public void setExternalContact(String externalContact);
+	
+	/**
+	 * @return the clinicalDomainCode
+	 */
+	@Property( value = "clinicalDomainCode")
+	public String getClinicalDomainCode();
+
+	/**
+	 * @param clinicalDomainCode the clinicalDomainCode to set
+	 */
+	@Property( value = "clinicalDomainCode")
+	public void setClinicalDomainCode(String clinicalDomainCode);
+
+	/**
+	 * @return the snomedCTExtensionNs
+	 */
+	@Property( value = "snomedCTExtensionNs")
+	public String getSnomedCTExtensionNs();
+
+	/**
+	 * @param snomedCTExtensionNs the snomedCTExtensionNs to set
+	 */
+	@Property( value = "snomedCTExtensionNs")
+	public void setSnomedCTExtensionNs(String snomedCTExtensionNs);
+
+	/**
+	 * @return the originCountryCode
+	 */
+	@Property( value = "originCountryCode")
+	public String getOriginCountryCode();
+
+	/**
+	 * @param originCountryCode the originCountryCode to set
+	 */
+	@Property( value = "originCountryCode")
+	public void setOriginCountryCode(String originCountryCode);
+
 }

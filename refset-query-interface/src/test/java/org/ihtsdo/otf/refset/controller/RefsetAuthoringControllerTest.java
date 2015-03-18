@@ -12,11 +12,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetup;
 
+import org.ihtsdo.otf.refset.api.authoring.RefsetAuthoringController;
 import org.ihtsdo.otf.refset.domain.Refset;
 import org.ihtsdo.otf.refset.exception.EntityNotFoundException;
 import org.ihtsdo.otf.refset.exception.RefsetServiceException;
-import org.ihtsdo.otf.refset.service.RefsetAuthoringService;
-import org.ihtsdo.otf.refset.service.RefsetBrowseService;
+import org.ihtsdo.otf.refset.service.authoring.RefsetAuthoringService;
+import org.ihtsdo.otf.refset.service.browse.RefsetBrowseService;
 import org.joda.time.DateTime;
 import org.junit.After;
 import org.junit.Before;
@@ -133,7 +134,7 @@ public class RefsetAuthoringControllerTest {
 	
 	
 	/**
-	 * Test method for {@link org.ihtsdo.otf.refset.controller.RefsetAuthoringController#addRefset(org.ihtsdo.otf.refset.domain.Refset)}.
+	 * Test method for {@link org.ihtsdo.otf.refset.api.authoring.RefsetAuthoringController#addRefset(org.ihtsdo.otf.refset.domain.Refset)}.
 	 * @throws Exception 
 	 */
 	@Test
@@ -149,7 +150,7 @@ public class RefsetAuthoringControllerTest {
 	
 
 	/**
-	 * Test method for {@link org.ihtsdo.otf.refset.controller.RefsetAuthoringController#addRefset(org.ihtsdo.otf.refset.domain.Refset)}.
+	 * Test method for {@link org.ihtsdo.otf.refset.api.authoring.RefsetAuthoringController#addRefset(org.ihtsdo.otf.refset.domain.Refset)}.
 	 * @throws Exception 
 	 */
 	@Test
@@ -164,7 +165,7 @@ public class RefsetAuthoringControllerTest {
 	}
 	
 	/**
-	 * Test method for {@link org.ihtsdo.otf.refset.controller.RefsetAuthoringController#updateRefset(org.ihtsdo.otf.refset.domain.Refset)}.
+	 * Test method for {@link org.ihtsdo.otf.refset.api.authoring.RefsetAuthoringController#updateRefset(org.ihtsdo.otf.refset.domain.Refset)}.
 	 * @throws Exception 
 	 */
 	@Test
@@ -179,7 +180,7 @@ public class RefsetAuthoringControllerTest {
 	}
 	
 	/**
-	 * Test method for {@link org.ihtsdo.otf.refset.controller.RefsetAuthoringController#updateRefset(org.ihtsdo.otf.refset.domain.Refset)}.
+	 * Test method for {@link org.ihtsdo.otf.refset.api.authoring.RefsetAuthoringController#updateRefset(org.ihtsdo.otf.refset.domain.Refset)}.
 	 * @throws Exception 
 	 */
 	@Test
@@ -196,7 +197,7 @@ public class RefsetAuthoringControllerTest {
 	}
 	
 	/**
-	 * Test method for {@link org.ihtsdo.otf.refset.controller.RefsetAuthoringController#updateRefset(org.ihtsdo.otf.refset.domain.Refset)}.
+	 * Test method for {@link org.ihtsdo.otf.refset.api.authoring.RefsetAuthoringController#updateRefset(org.ihtsdo.otf.refset.domain.Refset)}.
 	 * @throws Exception 
 	 */
 	@Test
@@ -213,7 +214,7 @@ public class RefsetAuthoringControllerTest {
 	}
 	
 	/**
-	 * Test method for {@link org.ihtsdo.otf.refset.controller.RefsetAuthoringController#addRefset(org.ihtsdo.otf.refset.domain.Refset)}.
+	 * Test method for {@link org.ihtsdo.otf.refset.api.authoring.RefsetAuthoringController#addRefset(org.ihtsdo.otf.refset.domain.Refset)}.
 	 * @throws Exception 
 	 */
 	@Test
@@ -230,7 +231,7 @@ public class RefsetAuthoringControllerTest {
 	}
 
 	/**
-	 * Test method for {@link org.ihtsdo.otf.refset.controller.RefsetAuthoringController#addMember(java.lang.String, org.ihtsdo.otf.refset.domain.Member)}.
+	 * Test method for {@link org.ihtsdo.otf.refset.api.authoring.RefsetAuthoringController#addMember(java.lang.String, org.ihtsdo.otf.refset.domain.Member)}.
 	 */
 	@Test
 	public void testAddMember() {
