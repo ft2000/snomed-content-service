@@ -3,17 +3,20 @@
  */
 package org.ihtsdo.otf.refset.common;
 
-import java.nio.file.AccessDeniedException;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.ihtsdo.otf.refset.security.User;
+import org.ihtsdo.otf.im.domain.IHTSDOUser;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.StringUtils;
+
+import com.atlassian.crowd.integration.springsecurity.user.CrowdUserDetails;
 
 /**
  * Utility class to support common function required at various lavel
@@ -93,12 +96,12 @@ public class Utility {
 	 * @return
 	 * @throws AccessDeniedException
 	 */
-	public static User getUserDetails() throws AccessDeniedException {
-		Object auth = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+	public static IHTSDOUser getUserDetails() throws AccessDeniedException {
+		Authentication  auth = SecurityContextHolder.getContext().getAuthentication();
 		
-		if (auth instanceof User) {
+		if (auth.getPrincipal() instanceof CrowdUserDetails) {
 			
-			User user = (User) auth;
+			IHTSDOUser user =  IHTSDOUser.getInstance(SecurityContextHolder.getContext().getAuthentication());
 			return user;
 		}
 		

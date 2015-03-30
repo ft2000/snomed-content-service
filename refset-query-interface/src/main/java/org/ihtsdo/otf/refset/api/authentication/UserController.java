@@ -14,20 +14,14 @@ package org.ihtsdo.otf.refset.api.authentication;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.ihtsdo.otf.im.domain.IHTSDOUser;
 import org.ihtsdo.otf.refset.common.Result;
 import org.ihtsdo.otf.refset.common.Utility;
-import org.ihtsdo.otf.refset.security.RefsetAuthenticationProvider;
-import org.ihtsdo.otf.refset.security.RefsetIdentityService;
-import org.ihtsdo.otf.refset.security.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -47,12 +41,6 @@ public class UserController {
 
 	private static final String SUCCESS = "Success";
 
-	@Autowired
-	RefsetAuthenticationProvider provider;
-	
-	@Autowired
-	RefsetIdentityService service;
-	
 	@RequestMapping( method = RequestMethod.POST, value = "/getUserDetails",  produces = "application/json", consumes = "application/json")
 	@ApiOperation( value = "Authenticates a user for given username and password provided in request header and returns user details ",
 			notes = "This api call authenticates a user and also authorize a user for Refset app access. "
@@ -60,22 +48,14 @@ public class UserController {
 					+ " supplied in request header, are being used for authentication/authorization. If successful"
 					+ " it returns an UserDetails object and a authentication token X-REFSET-AUTH-TOKEN as part of response header."
 					+ " X-REFSET-AUTH-TOKEN token can be used in header of subsequent requests for API handshake")
-	@PreAuthorize("hasRole('ROLE_USER')")
+	@PreAuthorize("isAuthenticated()")
 	public ResponseEntity<Result< Map<String, Object>>> login() throws Exception {
 		
 		logger.debug("authenticating user {}");
 
 		Result<Map<String, Object>> r = Utility.getResult();
 		Map<String, Object> data = new HashMap<String, Object>();
-		User u = org.ihtsdo.otf.refset.common.Utility.getUserDetails();
-		if (StringUtils.isEmpty(u.getGivenname())) {
-			
-			Authentication authentication = new UsernamePasswordAuthenticationToken(u, u.getPassword());
-			provider.authenticate(authentication);
-			u = (User)authentication.getPrincipal();
-			
-		}
-		u.setPassword(null);//make it empty before sending it in response
+		IHTSDOUser u = org.ihtsdo.otf.refset.common.Utility.getUserDetails();
 		data.put("user", u);
 		r.setData(data);
 

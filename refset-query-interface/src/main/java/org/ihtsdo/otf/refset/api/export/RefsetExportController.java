@@ -46,7 +46,6 @@ public class RefsetExportController {
 
 	@RequestMapping( method = RequestMethod.GET, value = "/{refsetId}/export", produces = {MediaType.APPLICATION_OCTET_STREAM_VALUE})
 	@ApiOperation( value = "Export a Refset in RF2 format", notes = "Export a refset of a given refset id in RF2 format" )
-	@PreAuthorize("hasRole('ROLE_USER')")
     public @ResponseBody void exportRF2( @PathVariable String refsetId, HttpServletResponse resp) throws Exception {
 		
 		logger.debug("Exporting an existing refset {} in rf2 format", refsetId);

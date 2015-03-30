@@ -62,7 +62,7 @@ public class RefsetBrowseController {
 	@RequestMapping( method = RequestMethod.GET, produces = "application/json", value = "/myRefsets" )
 	@ApiOperation( value = "Retrieves list of existing refsets owned by logged in user", notes = "Returns existing refsets owned by logged in user save their members. "
 			+ "By default it returns 10 refset and thereafter another 10 or desired range" )
-	@PreAuthorize("hasRole('ROLE_USER')")
+	@PreAuthorize("hasRole('ROLE_ihtsdo_tools_user')")
     public ResponseEntity<Result< Map<String, Object>>> getMyRefsets( @RequestParam( value = "from", defaultValue = "0" ) int from, 
     		@RequestParam( value = "to", defaultValue = "10" ) int to ) throws Exception {
 		

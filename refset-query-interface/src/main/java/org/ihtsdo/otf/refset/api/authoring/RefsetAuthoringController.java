@@ -25,7 +25,6 @@ import org.ihtsdo.otf.refset.domain.Member;
 import org.ihtsdo.otf.refset.domain.MemberValidator;
 import org.ihtsdo.otf.refset.domain.Refset;
 import org.ihtsdo.otf.refset.domain.RefsetValidator;
-import org.ihtsdo.otf.refset.exception.RefsetServiceException;
 import org.ihtsdo.otf.refset.exception.ValidationException;
 import org.ihtsdo.otf.refset.service.authoring.RefsetAuthoringService;
 import org.ihtsdo.otf.refset.service.browse.RefsetBrowseService;
@@ -84,7 +83,7 @@ public class RefsetAuthoringController {
 
 	@RequestMapping( method = RequestMethod.POST, value = "/new",  produces = "application/json", consumes = "application/json")
 	@ApiOperation( value = "Add a Refset", notes = "It adds a brand new refset to database" )
-	@PreAuthorize("hasRole('ROLE_USER')")
+	@PreAuthorize("hasRole('ROLE_ihtsdo-users')")
     public ResponseEntity<Result< Map<String, Object>>> addRefset( @RequestBody Refset r) throws Exception {
 		
 		logger.debug("Adding refsets {}", r);
@@ -144,7 +143,7 @@ public class RefsetAuthoringController {
 	@RequestMapping( method = RequestMethod.POST, value = "/{refSetId}/add/member", produces = "application/json", consumes = "application/json" )
 	@ApiOperation( value = "Shortcut method to add a member to an existing refset.", 
 		notes = "Adds a single member to refset identified by refset id in path")
-	@PreAuthorize("hasRole('ROLE_USER')")
+	@PreAuthorize("hasRole('ROLE_ihtsdo-users')")
     public ResponseEntity<Result< Map<String, Object>>> addMember(@PathVariable(value = "refSetId") String refsetId, 
     		@RequestBody( required = true) Member member) throws Exception {
 		
@@ -182,7 +181,7 @@ public class RefsetAuthoringController {
 	
 	@RequestMapping( method = RequestMethod.POST, value = "/update",  produces = "application/json", consumes = "application/json")
 	@ApiOperation( value = "Update a Refset", notes = "Updates an existing refset" )
-	@PreAuthorize("hasRole('ROLE_USER')")
+	@PreAuthorize("hasRole('ROLE_ihtsdo-users')")
     public ResponseEntity<Result< Map<String, Object>>> updateRefset( @RequestBody Refset r) throws Exception {
 		
 		logger.debug("Updating an existing refsets {}", r);
@@ -231,7 +230,7 @@ public class RefsetAuthoringController {
 	@RequestMapping( method = RequestMethod.DELETE, value = "/delete/{refsetId}",  produces = "application/json", consumes = "application/json")
 	@ApiOperation( value = "Remove a unpublished refset", notes = "It deletes an existing refset identified by refset id in path "
 			+ ", it also delete refset members")
-	@PreAuthorize("hasRole('ROLE_USER')")
+	@PreAuthorize("hasRole('ROLE_ihtsdo-users')")
     public ResponseEntity<Result< Map<String, Object>>> removeRefset( @PathVariable String refsetId) throws Exception {
 		
 		logger.debug("Removing an existing refsets {}", refsetId);
@@ -259,7 +258,7 @@ public class RefsetAuthoringController {
 	
 	@RequestMapping( method = RequestMethod.POST, value = "/{refSetId}/add/members", produces = "application/json", consumes = "application/json" )
 	@ApiOperation( value = "Add no of members in this call", notes = "Adds no of members in single call to a refset identified by refset id in path" )
-	@PreAuthorize("hasRole('ROLE_USER')")
+	@PreAuthorize("hasRole('ROLE_ihtsdo-users')")
     public ResponseEntity<Result< Map<String, Object>>> addMembers(@PathVariable(value = "refSetId") String refsetId, 
     		@RequestBody( required = true) Set<Member> members) throws Exception {
 		
