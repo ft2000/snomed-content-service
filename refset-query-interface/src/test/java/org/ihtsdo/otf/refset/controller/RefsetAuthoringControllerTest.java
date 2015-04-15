@@ -13,7 +13,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetup;
 
 import org.ihtsdo.otf.refset.api.authoring.RefsetAuthoringController;
-import org.ihtsdo.otf.refset.domain.Refset;
+import org.ihtsdo.otf.refset.domain.RefsetDTO;
 import org.ihtsdo.otf.refset.exception.EntityNotFoundException;
 import org.ihtsdo.otf.refset.exception.RefsetServiceException;
 import org.ihtsdo.otf.refset.service.authoring.RefsetAuthoringService;
@@ -42,7 +42,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.context.WebApplicationContext;
 
 /**
- * @author Episteme Partners
  *
  */
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -82,7 +81,7 @@ public class RefsetAuthoringControllerTest {
 	private RefsetAuthoringService aService;
 	
 	@Mock
-	private Refset refset;
+	private RefsetDTO refset;
 	
 	@InjectMocks
 	private RefsetAuthoringController controller;
@@ -110,8 +109,8 @@ public class RefsetAuthoringControllerTest {
 		when(refset.getCreatedBy()).thenReturn("Junit author");
 
 	    
-		when(aService.addRefset(any(Refset.class))).thenReturn("1000003");
-		when(aService.updateRefset(any(Refset.class))).thenReturn("1000003");
+		when(aService.addRefset(any(RefsetDTO.class))).thenReturn("1000003");
+		when(aService.updateRefset(any(RefsetDTO.class))).thenReturn("1000003");
 
 		
 	}
@@ -186,7 +185,7 @@ public class RefsetAuthoringControllerTest {
 	@Test
 	public void testUpdateRefsetException() throws Exception {
 		
-		doThrow(new RefsetServiceException("Can not add junit driven refset")).when(aService).updateRefset(any(Refset.class));
+		doThrow(new RefsetServiceException("Can not add junit driven refset")).when(aService).updateRefset(any(RefsetDTO.class));
 
 		this.mockMvc.perform(post("/v1/refsets/update").contentType(MediaType.APPLICATION_JSON).content(UPDATE_REFSET).accept(MediaType.APPLICATION_JSON))
         .andDo(print())
@@ -203,7 +202,7 @@ public class RefsetAuthoringControllerTest {
 	@Test
 	public void testUpdateRefsetEntityNotFoundException() throws Exception {
 		
-		doThrow(new EntityNotFoundException("Can not add junit driven refset")).when(aService).updateRefset(any(Refset.class));
+		doThrow(new EntityNotFoundException("Can not add junit driven refset")).when(aService).updateRefset(any(RefsetDTO.class));
 
 		this.mockMvc.perform(post("/v1/refsets/update").contentType(MediaType.APPLICATION_JSON).content(UPDATE_REFSET).accept(MediaType.APPLICATION_JSON))
         .andDo(print())
@@ -220,7 +219,7 @@ public class RefsetAuthoringControllerTest {
 	@Test
 	public void testAddRefsetException() throws Exception {
 		
-		doThrow(new RefsetServiceException("Can not add junit driven refset")).when(aService).addRefset(any(Refset.class));
+		doThrow(new RefsetServiceException("Can not add junit driven refset")).when(aService).addRefset(any(RefsetDTO.class));
 
 		this.mockMvc.perform(post("/v1/refsets/new").contentType(MediaType.APPLICATION_JSON).content(REFSET).accept(MediaType.APPLICATION_JSON))
         .andDo(print())

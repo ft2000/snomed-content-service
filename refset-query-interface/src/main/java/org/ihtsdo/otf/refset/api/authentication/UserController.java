@@ -42,12 +42,8 @@ public class UserController {
 	private static final String SUCCESS = "Success";
 
 	@RequestMapping( method = RequestMethod.POST, value = "/getUserDetails",  produces = "application/json", consumes = "application/json")
-	@ApiOperation( value = "Authenticates a user for given username and password provided in request header and returns user details ",
-			notes = "This api call authenticates a user and also authorize a user for Refset app access. "
-					+ " Pre-Auth tokens(X-REFSET-PRE-AUTH-USERNAME & X-REFSET-PRE-AUTH-TOKEN)"
-					+ " supplied in request header, are being used for authentication/authorization. If successful"
-					+ " it returns an UserDetails object and a authentication token X-REFSET-AUTH-TOKEN as part of response header."
-					+ " X-REFSET-AUTH-TOKEN token can be used in header of subsequent requests for API handshake")
+	@ApiOperation( value = "Retrieves user details for an already authenticated user.",
+			notes = "Call to get user profile details")
 	@PreAuthorize("isAuthenticated()")
 	public ResponseEntity<Result< Map<String, Object>>> login() throws Exception {
 		

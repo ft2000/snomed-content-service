@@ -6,9 +6,9 @@ package org.ihtsdo.otf.refset.service.authoring;
 import java.util.Map;
 import java.util.Set;
 
-import org.ihtsdo.otf.refset.domain.Member;
+import org.ihtsdo.otf.refset.domain.MemberDTO;
 import org.ihtsdo.otf.refset.domain.MetaData;
-import org.ihtsdo.otf.refset.domain.Refset;
+import org.ihtsdo.otf.refset.domain.RefsetDTO;
 import org.ihtsdo.otf.refset.exception.EntityAlreadyExistException;
 import org.ihtsdo.otf.refset.exception.EntityNotFoundException;
 import org.ihtsdo.otf.refset.exception.LockingException;
@@ -20,29 +20,29 @@ import org.ihtsdo.otf.refset.exception.RefsetServiceException;
  */
 public interface RefsetAuthoringService {
 	
-	/**Method to add a {@link Refset}
-	 * @param r a {@link Refset}
+	/**Method to add a {@link RefsetDTO}
+	 * @param r a {@link RefsetDTO}
 	 * @throws RefsetServiceException
-	 * @return a {@link Refset} object stored in graph with {@link MetaData}
+	 * @return a {@link RefsetDTO} object stored in graph with {@link MetaData}
 	 * @throws EntityAlreadyExistException 
 	 */
-	public String addRefset(Refset r) throws RefsetServiceException, EntityAlreadyExistException ;
+	public String addRefset(RefsetDTO r) throws RefsetServiceException, EntityAlreadyExistException ;
 	
-	/**Method to add a {@link Member} to given {@link Refset}.
+	/**Method to add a {@link Member} to given {@link RefsetDTO}.
 	 * @param refsetId
 	 * @throws RefsetServiceException
 	 * @throws EntityNotFoundException 
 	 * @throws EntityAlreadyExistException 
 	 */
-	public void addMember(String refsetId, Member m) throws RefsetServiceException, EntityNotFoundException, EntityAlreadyExistException ;
+	public void addMember(String refsetId, MemberDTO m) throws RefsetServiceException, EntityNotFoundException, EntityAlreadyExistException ;
 	
 	
-	/**Method to add a {@link Refset}
-	 * @param r a {@link Refset}
+	/**Method to add a {@link RefsetDTO}
+	 * @param r a {@link RefsetDTO}
 	 * @throws RefsetServiceException
-	 * @return a {@link Refset} object stored in graph with {@link MetaData}
+	 * @return a {@link RefsetDTO} object stored in graph with {@link MetaData}
 	 */
-	public String updateRefset(Refset r) throws RefsetServiceException, EntityNotFoundException ;
+	public String updateRefset(RefsetDTO r) throws RefsetServiceException, EntityNotFoundException ;
 	
 	/**Method to add a {@link Member} to given {@link Refset}.
 	 * @param refsetId
@@ -59,7 +59,7 @@ public interface RefsetAuthoringService {
 	 * @throws RefsetServiceException
 	 * @throws EntityNotFoundException 
 	 */
-	public Map<String, String> addMembers(String refsetId,Set<Member> members, String user) throws RefsetServiceException, EntityNotFoundException ;
+	public Map<String, String> addMembers(String refsetId,Set<MemberDTO> members, String user) throws RefsetServiceException, EntityNotFoundException ;
 	
 	/** removes a {@link Member} from {@link Refset}
 	 * @param refsetId

@@ -27,6 +27,7 @@ public class ErrorInfo {
         this.message = message;
         this.code = code;
         this.details = "";
+
     }
 	
 	public ErrorInfo(String message, String code, Map<Object, List<ErrorInfo>> validationErrors) {

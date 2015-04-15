@@ -19,11 +19,10 @@ import java.util.UUID;
 import javax.annotation.Resource;
 
 import org.ihtsdo.otf.refset.api.browse.RefsetBrowseController;
-import org.ihtsdo.otf.refset.common.Meta;
 import org.ihtsdo.otf.refset.common.Result;
-import org.ihtsdo.otf.refset.domain.Member;
+import org.ihtsdo.otf.refset.domain.MemberDTO;
 import org.ihtsdo.otf.refset.domain.MemberValidator;
-import org.ihtsdo.otf.refset.domain.Refset;
+import org.ihtsdo.otf.refset.domain.RefsetDTO;
 import org.ihtsdo.otf.refset.domain.RefsetValidator;
 import org.ihtsdo.otf.refset.exception.ValidationException;
 import org.ihtsdo.otf.refset.service.authoring.RefsetAuthoringService;
@@ -47,11 +46,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.mangofactory.swagger.annotations.ApiIgnore;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 
 /**
- * Controller class to facilitate {@link Refset} authoring.It also check required authorization  
+ * Controller class to facilitate {@link RefsetDTO} authoring.It also check required authorization  
  *
  */
 @RestController
@@ -60,8 +60,6 @@ import com.wordnik.swagger.annotations.ApiOperation;
 public class RefsetAuthoringController {
 	
 	private static final Logger logger = LoggerFactory.getLogger(RefsetAuthoringController.class);
-
-	private static final String SUCCESS = "Success";
 	
 	@Resource(name = "browseGraphService")
 	private RefsetBrowseService bService;
@@ -80,29 +78,29 @@ public class RefsetAuthoringController {
 
 	@Autowired
 	private RefsetMetadataService mdService;
+	
 
 	@RequestMapping( method = RequestMethod.POST, value = "/new",  produces = "application/json", consumes = "application/json")
 	@ApiOperation( value = "Add a Refset", notes = "It adds a brand new refset to database" )
 	@PreAuthorize("hasRole('ROLE_ihtsdo-users')")
-    public ResponseEntity<Result< Map<String, Object>>> addRefset( @RequestBody Refset r) throws Exception {
+    public ResponseEntity<Result< Map<String, Object>>> addRefset( @RequestBody RefsetDTO r) throws Exception {
 		
 		logger.debug("Adding refsets {}", r);
 		validateRefset(r);
-		Set<Member> ms = new HashSet<Member>();
+		Set<MemberDTO> ms = new HashSet<MemberDTO>();
 		ms.addAll(r.getMembers());
 		if (ms != null && !ms.isEmpty()) {
 			
 			validateMembers(ms);
 
 		}
-		Result<Map<String, Object>> result = getResult();
 
 		addMetaDetails(r);
 		r.setCreatedBy(getUserDetails().getUsername());
 		r.setModifiedBy(getUserDetails().getUsername());
 
-		List<Member> members = r.getMembers();
-		for (Member member : members) {
+		List<MemberDTO> members = r.getMembers();
+		for (MemberDTO member : members) {
 			
 			member.setCreatedBy(getUserDetails().getUsername());
 			member.setModifiedBy(getUserDetails().getUsername());
@@ -110,26 +108,21 @@ public class RefsetAuthoringController {
 		}
 		aService.addRefset(r);
 		
+		Result<Map<String, Object>> result = getResult();
 
-		Map<String, Object> data = new HashMap<String, Object>();
-		data.put("uuid", r.getUuid());
-		result.getMeta().add( linkTo( methodOn( RefsetBrowseController.class ).getRefsetDetails(r.getUuid())).withRel("Refset"));
-
-		result.setData(data);
-
-		result.getMeta().setMessage(SUCCESS);
-		result.getMeta().setStatus(HttpStatus.CREATED);
+		result.getData().put("uuid", r.getUuid());
+		result.getMeta().add( linkTo( methodOn( RefsetBrowseController.class ).getRefsetHeader(r.getUuid(), -1)).withRel("Refset"));
 
 		return new ResponseEntity<Result<Map<String,Object>>>(result, HttpStatus.CREATED);
 		
 	
     }
 	
-	/**Adds meta details in new {@link Refset}
+	/**Adds meta details in new {@link RefsetDTO}
 	 * @param r
 	 * @throws AccessDeniedException 
 	 */
-	private void addMetaDetails(Refset r) throws AccessDeniedException {
+	private void addMetaDetails(RefsetDTO r) throws AccessDeniedException {
 		
 		String id = UUID.randomUUID().toString();
 		r.setUuid(id);
@@ -144,36 +137,31 @@ public class RefsetAuthoringController {
 	@ApiOperation( value = "Shortcut method to add a member to an existing refset.", 
 		notes = "Adds a single member to refset identified by refset id in path")
 	@PreAuthorize("hasRole('ROLE_ihtsdo-users')")
+	@ApiIgnore
     public ResponseEntity<Result< Map<String, Object>>> addMember(@PathVariable(value = "refSetId") String refsetId, 
-    		@RequestBody( required = true) Member member) throws Exception {
+    		@RequestBody( required = true) MemberDTO member) throws Exception {
 		
 		logger.debug("Adding member {} to refset {}", member, refsetId);
 
-		Set<Member> ms = new HashSet<Member>();
+		Set<MemberDTO> ms = new HashSet<MemberDTO>();
 		ms.add(member);
 		if (ms != null && !ms.isEmpty()) {
 			
 			validateMembers(ms);
 
 		}
-		Result<Map<String, Object>> result = new Result<Map<String, Object>>();
 		
-		Meta m = new Meta();
 		member.setCreatedBy(getUserDetails().getUsername());
 		member.setModifiedBy(getUserDetails().getUsername());
 
 
 		aService.addMember(refsetId, member);
 		
-		Map<String, Object> data = new HashMap<String, Object>();
-		data.put("uuid", refsetId);
-		m.add( linkTo( methodOn( RefsetBrowseController.class ).getRefsetDetails(refsetId)).withRel("Refset"));
+		Result<Map<String, Object>> result = getResult();
 
-		result.setData(data);
-		
-		m.setMessage(SUCCESS);
-		m.setStatus(HttpStatus.OK);
-		
+		result.getData().put("uuid", refsetId);
+		result.getMeta().add( linkTo( methodOn( RefsetBrowseController.class ).getRefsetHeader(refsetId, -1)).withRel("Refset"));
+
 		return new ResponseEntity<Result<Map<String,Object>>>(result, HttpStatus.OK);
 		
 	       
@@ -182,46 +170,36 @@ public class RefsetAuthoringController {
 	@RequestMapping( method = RequestMethod.POST, value = "/update",  produces = "application/json", consumes = "application/json")
 	@ApiOperation( value = "Update a Refset", notes = "Updates an existing refset" )
 	@PreAuthorize("hasRole('ROLE_ihtsdo-users')")
-    public ResponseEntity<Result< Map<String, Object>>> updateRefset( @RequestBody Refset r) throws Exception {
+    public ResponseEntity<Result< Map<String, Object>>> updateRefset( @RequestBody RefsetDTO r) throws Exception {
 		
 		logger.debug("Updating an existing refsets {}", r);
 
 		validateRefset(r);
-		Set<Member> ms = new HashSet<Member>();
+		Set<MemberDTO> ms = new HashSet<MemberDTO>();
 		ms.addAll(r.getMembers());
 		if (ms != null && !ms.isEmpty()) {
 			
 			validateMembers(ms);
 
 		}
-		Result<Map<String, Object>> response = new Result<Map<String, Object>>();
-		Meta m = new Meta();
-		
-		response.setMeta(m);
 
 		r.setModifiedBy(getUserDetails().getUsername());
 		
-		List<Member> members = r.getMembers();
-		for (Member member : members) {
+		List<MemberDTO> members = r.getMembers();
+		for (MemberDTO member : members) {
 			
 			member.setModifiedBy(getUserDetails().getUsername());
 
 		}
 
-
 		aService.updateRefset(r);
 		
+		Result<Map<String, Object>> result = getResult();
 
-		Map<String, Object> data = new HashMap<String, Object>();
-		data.put("uuid", r.getUuid());
-		m.add( linkTo( methodOn( RefsetBrowseController.class ).getRefsetDetails(r.getUuid())).withRel("Refset"));
+		result.getData().put("uuid", r.getUuid());
+		result.getMeta().add( linkTo( methodOn( RefsetBrowseController.class ).getRefsetHeader(r.getUuid(), -1)).withRel("Refset"));
 
-		response.setData(data);
-
-		m.setMessage(SUCCESS);
-		m.setStatus(HttpStatus.OK);
-
-		return new ResponseEntity<Result<Map<String,Object>>>(response, HttpStatus.OK);
+		return new ResponseEntity<Result<Map<String,Object>>>(result, HttpStatus.OK);
 		
 	         
     }
@@ -235,21 +213,15 @@ public class RefsetAuthoringController {
 		
 		logger.debug("Removing an existing refsets {}", refsetId);
 
-		Result<Map<String, Object>> response = new Result<Map<String, Object>>();
-		Meta m = new Meta();
-		
-		response.setMeta(m);
-
 		Assert.notNull(refsetId, "Required refset id is not available in request");
 		
 		aService.remove(refsetId, getUserDetails().getUsername());
+		
+		Result<Map<String, Object>> result = getResult();
 
-		m.add( linkTo( methodOn( RefsetBrowseController.class ).getRefsets(1, 10)).withRel("Refset"));
+		result.getMeta().add( linkTo( methodOn( RefsetBrowseController.class ).getRefsets(1, 10)).withRel("Refset"));
 
-		m.setMessage(SUCCESS);
-		m.setStatus(HttpStatus.OK);
-
-		return new ResponseEntity<Result<Map<String,Object>>>(response, HttpStatus.OK);
+		return new ResponseEntity<Result<Map<String,Object>>>(result, HttpStatus.OK);
 		
 	         
     }
@@ -260,16 +232,13 @@ public class RefsetAuthoringController {
 	@ApiOperation( value = "Add no of members in this call", notes = "Adds no of members in single call to a refset identified by refset id in path" )
 	@PreAuthorize("hasRole('ROLE_ihtsdo-users')")
     public ResponseEntity<Result< Map<String, Object>>> addMembers(@PathVariable(value = "refSetId") String refsetId, 
-    		@RequestBody( required = true) Set<Member> members) throws Exception {
+    		@RequestBody( required = true) Set<MemberDTO> members) throws Exception {
 		
 		logger.debug("Adding member {} to refset {}", members, refsetId);
 
 		validateMembers(members);
-		Result<Map<String, Object>> result = new Result<Map<String, Object>>();
-		
-		Meta m = new Meta();
 
-		for (Member member : members) {
+		for (MemberDTO member : members) {
 			
 			member.setCreatedBy(getUserDetails().getUsername());
 			member.setModifiedBy(getUserDetails().getUsername());
@@ -280,15 +249,10 @@ public class RefsetAuthoringController {
 		}
 		Map<String, String> outcome = aService.addMembers(refsetId, members, getUserDetails().getUsername());
 		
-		Map<String, Object> data = new HashMap<String, Object>();
-		data.put("outcome", outcome);
-		m.add( linkTo( methodOn( RefsetBrowseController.class ).getRefsetDetails(refsetId)).withRel("Refset"));
+		Result<Map<String, Object>> result = getResult();
+		result.getData().put("outcome", outcome);
+		result.getMeta().add( linkTo( methodOn( RefsetBrowseController.class ).getRefsetHeader(refsetId, -1)).withRel("Refset"));
 
-		result.setData(data);
-		
-		m.setMessage(SUCCESS);
-		m.setStatus(HttpStatus.OK);
-		
 		return new ResponseEntity<Result<Map<String,Object>>>(result, HttpStatus.OK);
 		
 	
@@ -298,12 +262,12 @@ public class RefsetAuthoringController {
 	/**
 	 * @param members
 	 */
-	private void validateMembers(Set<Member> members) throws ValidationException {
+	private void validateMembers(Set<MemberDTO> members) throws ValidationException {
 		// TODO Auto-generated method stub
 		
 		Map<Object, List<FieldError>> errors = new HashMap<Object, List<FieldError>>();
 		
-		for (Member m : members) {
+		for (MemberDTO m : members) {
 			
 			Errors e = new BeanPropertyBindingResult(m, "member");
 			mValidator.validate(m, e );
@@ -327,55 +291,37 @@ public class RefsetAuthoringController {
 			produces = "application/json", consumes = "application/json")
 	@ApiOperation( value = "Removes a member from refset", notes = "Removes  a member identified "
 			+ "by refserence component id of member from a refset" )
-	@PreAuthorize("hasRole('ROLE_USER')")
+	@PreAuthorize("hasRole('ROLE_ihtsdo-users')")
     public ResponseEntity<Result< Map<String, Object>>> removeMember( @PathVariable String refsetId,
     		@PathVariable String referenceComponentId) throws Exception {
 		
 		logger.debug("Removing an existing refsets {}", refsetId);
 
-		Result<Map<String, Object>> response = new Result<Map<String, Object>>();
-		Meta m = new Meta();
-		
-		response.setMeta(m);
-
 		Assert.notNull(refsetId, "Required refset id is not available in request");
 		
 		aService.removeMemberFromRefset(refsetId, referenceComponentId, getUserDetails().getUsername());
 
-		m.add( linkTo( methodOn( RefsetBrowseController.class ).getRefsets(1, 10)).withRel("Refset"));
+		Result<Map<String, Object>> result = getResult();
+		result.getMeta().add( linkTo( methodOn( RefsetBrowseController.class ).getRefsets(1, 10)).withRel("Refset"));
 
-		m.setMessage(SUCCESS);
-		m.setStatus(HttpStatus.OK);
-
-		return new ResponseEntity<Result<Map<String,Object>>>(response, HttpStatus.OK);
+		return new ResponseEntity<Result<Map<String,Object>>>(result, HttpStatus.OK);
 		
 	         
     }
 	
 	@RequestMapping( method = RequestMethod.DELETE, value = "/delete/{refsetId}/members",  produces = "application/json", consumes = "application/json")
 	@ApiOperation( value = "Removes list of members from refset.", notes = "Removes number of members from a refset for given reference component id" )
-	@PreAuthorize("hasRole('ROLE_USER')")
+	@PreAuthorize("hasRole('ROLE_ihtsdo-users')")
     public ResponseEntity<Result< Map<String, Object>>> removeMembers( @PathVariable String refsetId,
     		@RequestBody Set<String> referencedComponentIds) throws Exception {
 		
 		logger.debug("Removing an existing refsets {}", refsetId);
 
-		Result<Map<String, Object>> result = new Result<Map<String, Object>>();
-		Meta m = new Meta();
-		
-		result.setMeta(m);
-		
 		Map<String, String> outcome = aService.removeMembers(refsetId, referencedComponentIds, getUserDetails().getUsername());
 
-		Map<String, Object> data = new HashMap<String, Object>();
-		data.put("outcome", outcome);
-		m.add( linkTo( methodOn( RefsetBrowseController.class ).getRefsetDetails(refsetId)).withRel("Refset"));
-
-		result.setData(data);
-		
-		m.setMessage(SUCCESS);
-		m.setStatus(HttpStatus.OK);
-
+		Result<Map<String, Object>> result = getResult();
+		result.getData().put("outcome", outcome);
+		result.getMeta().add( linkTo( methodOn( RefsetBrowseController.class ).getRefsetHeader(refsetId, -1)).withRel("Refset"));
 		return new ResponseEntity<Result<Map<String,Object>>>(result, HttpStatus.OK);
 		
 	         
@@ -385,7 +331,7 @@ public class RefsetAuthoringController {
 	/**
 	 * @param members
 	 */
-	private void validateRefset(Refset r) throws ValidationException {
+	private void validateRefset(RefsetDTO r) throws ValidationException {
 		// TODO Auto-generated method stub
 		
 		Map<Object, List<FieldError>> errors = new HashMap<Object, List<FieldError>>();
@@ -397,10 +343,7 @@ public class RefsetAuthoringController {
 			
 			errors.put(r, e.getFieldErrors());
 		}
-		
-		
-	
-		
+
 		if (!errors.isEmpty()) {
 			
 			throw new ValidationException(errors);

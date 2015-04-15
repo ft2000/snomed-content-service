@@ -13,8 +13,8 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
-import org.ihtsdo.otf.refset.domain.Member;
-import org.ihtsdo.otf.refset.domain.Refset;
+import org.ihtsdo.otf.refset.domain.MemberDTO;
+import org.ihtsdo.otf.refset.domain.RefsetDTO;
 import org.ihtsdo.otf.refset.exception.EntityNotFoundException;
 import org.ihtsdo.otf.refset.graph.RefsetGraphAccessException;
 import org.ihtsdo.otf.refset.graph.RefsetGraphFactory;
@@ -50,11 +50,11 @@ public class RefsetExportGAO {
 	 * @return {@link Refset}
 	 * @throws RefsetGraphAccessException
 	 */
-	public Refset getRefset(String id) throws RefsetGraphAccessException, EntityNotFoundException {
+	public RefsetDTO getRefset(String id) throws RefsetGraphAccessException, EntityNotFoundException {
 				
 		LOGGER.debug("Geting member data for export for given refset id {} ", id);
 		TitanGraph g = null;
-		Refset r = null;
+		RefsetDTO r = null;
 		try {
 			
 			g = rgFactory.getReadOnlyGraph();
@@ -67,7 +67,7 @@ public class RefsetExportGAO {
 			
 			Vertex vR = vRs.iterator().next();
 			r = RefsetConvertor.getRefset(fgf.create(g).frame(vR, GRefset.class));
-			r.setMembers(new ArrayList<Member>());
+			r.setMembers(new ArrayList<MemberDTO>());
 			/*export required all member which are not published yet*/
 			GremlinPipeline<Vertex, Vertex> pipe = new GremlinPipeline<Vertex, Vertex>(g);
 			
@@ -94,7 +94,7 @@ public class RefsetExportGAO {
 					
 					if ( edge.getPropertyKeys().contains(REFERENCE_COMPONENT_ID) ) {
 						
-						Member m = RefsetConvertor.getMember(vM);
+						MemberDTO m = RefsetConvertor.getMember(vM);
 
 						String referenceComponentId = edge.getProperty(REFERENCE_COMPONENT_ID);
 						m.setReferencedComponentId(referenceComponentId);
@@ -108,8 +108,8 @@ public class RefsetExportGAO {
 						Iterable<Vertex> vHms = mPipe.toList();
 						for (Vertex vHm : vHms) {
 						
-							Member hm = RefsetConvertor.getMember(vHm);
-							Member merged = merge(hm, m);
+							MemberDTO hm = RefsetConvertor.getMember(vHm);
+							MemberDTO merged = merge(hm, m);
 							LOGGER.debug("Adding historical state of member & its detail {} ", merged);
 							if (!r.getMembers().contains(merged)) {
 								
@@ -158,7 +158,7 @@ public class RefsetExportGAO {
 	 * @param hm
 	 * @param m
 	 */
-	private Member merge(Member hm, Member m) {
+	private MemberDTO merge(MemberDTO hm, MemberDTO m) {
 		
 		if(StringUtils.isEmpty(hm.getModuleId())) {
 			

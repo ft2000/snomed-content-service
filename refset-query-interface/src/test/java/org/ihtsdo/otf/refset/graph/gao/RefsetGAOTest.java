@@ -10,7 +10,7 @@ import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.ihtsdo.otf.refset.common.TestGraph;
 import org.ihtsdo.otf.refset.domain.MetaData;
-import org.ihtsdo.otf.refset.domain.Refset;
+import org.ihtsdo.otf.refset.domain.RefsetDTO;
 import org.ihtsdo.otf.refset.exception.EntityAlreadyExistException;
 import org.ihtsdo.otf.refset.exception.EntityNotFoundException;
 import org.ihtsdo.otf.refset.exception.RefsetServiceException;
@@ -45,7 +45,7 @@ public class RefsetGAOTest {
 	@Autowired
 	private RefsetBrowseServiceStubData data;
 	
-	private static List<Refset> rs;
+	private static List<RefsetDTO> rs;
 	
 	private static RefsetGraphFactory f;
 	
@@ -110,11 +110,11 @@ public class RefsetGAOTest {
 	
 	@Test
 	public void testGetReftest() throws RefsetServiceException, RefsetGraphAccessException, EntityNotFoundException, EntityAlreadyExistException {
-		Refset i = rs.get(0);
+		RefsetDTO i = rs.get(0);
 		aGao.removeRefset(i.getUuid(), "junit");
 		aGao.addRefset(data.getRefSet(i.getUuid()));
 
-		Refset r = gao.getRefset(i.getUuid());
+		RefsetDTO r = gao.getRefset(i.getUuid(), 0, 100, -1);
 
 		assertNotNull(r);
 		assertEquals(i.getCreated().getMillis(), r.getCreated().getMillis(), 1000);
@@ -132,7 +132,7 @@ public class RefsetGAOTest {
 	@Test(expected = EntityNotFoundException.class)
 	public void testGetReftestInvalidRefsetId() throws RefsetServiceException, RefsetGraphAccessException, EntityNotFoundException {		
 				
-		gao.getRefset("junitId");
+		gao.getRefset("junitId", 0, 100, -1);
 		
 	}
 	
@@ -140,13 +140,13 @@ public class RefsetGAOTest {
 	@Test
 	public void testGetMetaDataAfterGetttingRefset() throws RefsetServiceException, RefsetGraphAccessException, EntityNotFoundException, EntityAlreadyExistException {		
 		
-		Refset i = rs.get(0);
+		RefsetDTO i = rs.get(0);
 		
-		Refset rInput = data.getRefSet(i.getUuid());
+		RefsetDTO rInput = data.getRefSet(i.getUuid());
 		
 		aGao.addRefset(rInput);
 
-		Refset r = gao.getRefset(rInput.getUuid());
+		RefsetDTO r = gao.getRefset(rInput.getUuid(), 0, 100, -1);
 		
 		assertNotNull(r);
 		
@@ -161,7 +161,7 @@ public class RefsetGAOTest {
 	public void testGetMetaDataInvalidId() throws RefsetServiceException, RefsetGraphAccessException, EntityNotFoundException, EntityAlreadyExistException {		
 		
 		//make sure atleast one Refset exist in database to avoid schema exception
-		Refset input = rs.get(0);
+		RefsetDTO input = rs.get(0);
 		
 		aGao.addRefset(data.getRefSet(input.getUuid()));
 
@@ -172,11 +172,11 @@ public class RefsetGAOTest {
 	
 	@Test(expected = EntityNotFoundException.class)
 	public void testGetReftestInvalidNodeId() throws RefsetServiceException, RefsetGraphAccessException, EntityNotFoundException, EntityAlreadyExistException {		
-		Refset input = rs.get(0);
+		RefsetDTO input = rs.get(0);
 		
 		aGao.addRefset(data.getRefSet(input.getUuid()));//to avoid NPE when there is no class available of type Refset
 
-		gao.getRefset("junitId");
+		gao.getRefset("junitId", 0, 100, -1);
 		
 	}
 	

@@ -10,6 +10,7 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.Resource;
 
@@ -17,8 +18,8 @@ import org.ihtsdo.otf.refset.common.Direction;
 import org.ihtsdo.otf.refset.common.Result;
 import org.ihtsdo.otf.refset.common.SearchCriteria;
 import org.ihtsdo.otf.refset.common.SearchField;
-import org.ihtsdo.otf.refset.domain.Member;
-import org.ihtsdo.otf.refset.domain.Refset;
+import org.ihtsdo.otf.refset.domain.MemberDTO;
+import org.ihtsdo.otf.refset.domain.RefsetDTO;
 import org.ihtsdo.otf.refset.service.browse.RefsetBrowseService;
 import org.ihtsdo.otf.refset.service.matrix.ActivityMatrixService;
 import org.ihtsdo.otf.refset.service.matrix.ViewActivityMatrixService;
@@ -62,7 +63,7 @@ public class RefsetBrowseController {
 	@RequestMapping( method = RequestMethod.GET, produces = "application/json", value = "/myRefsets" )
 	@ApiOperation( value = "Retrieves list of existing refsets owned by logged in user", notes = "Returns existing refsets owned by logged in user save their members. "
 			+ "By default it returns 10 refset and thereafter another 10 or desired range" )
-	@PreAuthorize("hasRole('ROLE_ihtsdo_tools_user')")
+	@PreAuthorize("hasRole('ROLE_ihtsdo-users')")
     public ResponseEntity<Result< Map<String, Object>>> getMyRefsets( @RequestParam( value = "from", defaultValue = "0" ) int from, 
     		@RequestParam( value = "to", defaultValue = "10" ) int to ) throws Exception {
 		
@@ -78,41 +79,19 @@ public class RefsetBrowseController {
 		criteria.setFrom(from);
 		criteria.setTo(to);
 		
-		String userName = getUserDetails().getUsername();
+		String userName = getUserDetails().getUsername();//getUserDetails().getUsername();
 		criteria.addSearchField(SearchField.createdBy, userName);
-		List<Refset> refSets =  bService.getRefsets(criteria);
+		List<RefsetDTO> refSets =  bService.getRefsets(criteria);
 
 		r.getData().put("refsets", refSets);
+				
+		Long totalNoOfRefsets = bService.totalNoOfRefset(criteria);
+		
+		r.getData().put("totalNoOfRefsets", totalNoOfRefsets);
 		
 		return new ResponseEntity<Result<Map<String,Object>>>(r, HttpStatus.OK);
 
 	         
-    }
-	
-	@RequestMapping( method = RequestMethod.GET, value = "/{refSetId}", produces = "application/json" )
-	@ApiOperation( value = "Api to get details of a refset for given refset uuid.", 
-		notes = "Return details of refset identified by refset id in path" )
-    public ResponseEntity<Result< Map<String, Object>>> getRefsetDetails( @PathVariable( value = "refSetId" ) String refSetId ) throws Exception {
-		
-		logger.debug("Getting refset details");
-
-		Result<Map<String, Object>> response = getResult();
-		
-		response.getMeta().add( linkTo( methodOn( RefsetBrowseController.class, refSetId).getRefsetDetails(refSetId) ).withRel("Refset") );
-		
-		Refset refSet =  bService.getRefset(refSetId);
-
-		if (SecurityContextHolder.getContext().getAuthentication() instanceof AnonymousAuthenticationToken && !refSet.isPublished()) {
-			
-			throw new AccessDeniedException("Please login to see work in progress refsets");
-			
-		}
-		response.getData().put("refset", refSet);
-		
-
-		return new ResponseEntity<Result<Map<String,Object>>>(response, HttpStatus.OK);
-		
-	       
     }
 	
 	@RequestMapping( method = RequestMethod.GET, value = "checkDescription/{description}", produces = "application/json" )
@@ -139,27 +118,24 @@ public class RefsetBrowseController {
 			+ "by refset id in the path and given range ")
     public ResponseEntity<Result< Map<String, Object>>> getRefsetMembers( @RequestParam( value = "from", defaultValue = "0" ) int from, 
     		@RequestParam( value = "to", defaultValue = "15" ) int to,  
-    		@PathVariable( value = "refsetId" ) String refsetId) throws Exception {
+    		@PathVariable( value = "refsetId" ) String refsetId, @RequestParam( value = "version", defaultValue = "-1") Integer version) throws Exception {
 		
-		logger.debug("Getting members of {} ", refsetId);
-
-		Result<Map<String, Object>> response = getResult();
-		response.getMeta().add( linkTo( methodOn( RefsetBrowseController.class ).getRefsetMembers( from, to, refsetId ) ).withRel("Members") );
-				
-		bService.getRefset(refsetId, from, to);
-
+		logger.debug("Getting members of {} and version ", refsetId, version);
 		
-		Refset refSet =  bService.getRefset(refsetId, from, to);
+		RefsetDTO refSet =  bService.getRefset(refsetId, from, to, version);
 
 		if (SecurityContextHolder.getContext().getAuthentication() instanceof AnonymousAuthenticationToken && !refSet.isPublished()) {
 			
-			throw new AccessDeniedException("Please login to see work in progress refsets members");
+			//throw new AccessDeniedException("Please login to see work in progress refsets members");
 			
 		}
 
-		List<Member> ms = refSet.getMembers();
+		List<MemberDTO> ms = refSet.getMembers();
 		
 		logger.debug("returning {} members", ms.size());
+
+		Result<Map<String, Object>> response = getResult();
+		response.getMeta().add( linkTo( methodOn( RefsetBrowseController.class ).getRefsetMembers( from, to, refsetId, version) ).withRel("Members") );
 
 		response.getData().put("members", ms);
 
@@ -173,25 +149,26 @@ public class RefsetBrowseController {
 	@ApiOperation( value = "Api to get details of a refset excluding its members.", 
 		notes = "Get refset header details for given refset uuid. "
 				+ "A Lightweight service for user who are only intrested in getting refset details not their members" )
-    public ResponseEntity<Result< Map<String, Object>>> getRefsetHeader( @PathVariable( value = "refsetId" ) String refsetId ) throws Exception {
+    public ResponseEntity<Result< Map<String, Object>>> getRefsetHeader( @PathVariable( value = "refsetId" ) String refsetId, 
+    		@RequestParam( value = "version", defaultValue = "-1") Integer version ) throws Exception {
 		
 		logger.debug("Getting refset details");
 
 		Result<Map<String, Object>> response = getResult();
 		
-		response.getMeta().add( linkTo( methodOn( RefsetBrowseController.class, refsetId).getRefsetDetails(refsetId) ).withRel("RefsetHeader") );
+		response.getMeta().add( linkTo( methodOn( RefsetBrowseController.class, refsetId).getRefsetHeader(refsetId, version) ).withRel("RefsetHeader") );
 
 
 		
-		Refset refSet =  bService.getRefsetHeader(refsetId);
+		RefsetDTO refSet =  bService.getRefsetHeader(refsetId, version);
 
 		if (SecurityContextHolder.getContext().getAuthentication() instanceof AnonymousAuthenticationToken && !refSet.isPublished()) {
 			
-			throw new AccessDeniedException("Please login to see work in progress refsets");
+			//throw new AccessDeniedException("Please login to see work in progress refsets");
 			
 		}
 		//capture user event. This is Async call
-		matrixService.addViewEvent(refsetId, getUserDetails().getUsername());
+		matrixService.addViewEvent(refsetId, getEligibleUser());
 
 		response.getData().put("refset", refSet);
 		
@@ -201,6 +178,21 @@ public class RefsetBrowseController {
     }
 	
 	
+	/**Shortcut to get guest user if user is not logged in
+	 * @return
+	 */
+	private String getEligibleUser() {
+
+		try {
+			
+			return getUserDetails().getUsername();
+			
+		}catch (AccessDeniedException e) {
+			
+			return "guest";
+		}
+	}
+
 	@RequestMapping( method = RequestMethod.GET, produces = "application/json" )
 	@ApiOperation( value = "Retrieves list of existing refsets", notes = "Returns existing refsets save their members. "
 			+ "If user is authorized then all refsets are returned however if user is not logged in then only "
@@ -221,12 +213,22 @@ public class RefsetBrowseController {
 			published = true;
 			logger.debug("Geting only published ? = {}", published);
 			
-		}
-		List<Refset> refSets =  bService.getRefsets( from, to, published );
+		}		
+		SearchCriteria criteria = new SearchCriteria();
+		criteria.addSortBy(SearchField.publishedDate, Direction.desc);
+		
+		criteria.setFrom(from);
+		criteria.setTo(to);
+		
+		criteria.addSearchField(SearchField.published, published);
+		List<RefsetDTO> refSets =  bService.getRefsets(criteria);
 
 		r.getData().put("refsets", refSets);
-
-
+		
+		Long totalNoOfRefsets = bService.totalNoOfRefset(criteria);
+		
+		r.getData().put("totalNoOfRefsets", totalNoOfRefsets);
+		
 		return new ResponseEntity<Result<Map<String,Object>>>(r, HttpStatus.OK);
 		
 	         
@@ -243,7 +245,7 @@ public class RefsetBrowseController {
 
 		Result<Map<String, Object>> r = getResult();
 		r.getMeta().add( linkTo( methodOn( RefsetBrowseController.class ).getRefsets( from, to ) ).withRel("Refsets"));		
-		List<Refset> refSets =  viewMatrixService.getMostViewedPublishedRefsets(to);
+		List<RefsetDTO> refSets =  viewMatrixService.getMostViewedPublishedRefsets(to);
 
 		r.getData().put("refsets", refSets);
 
@@ -271,7 +273,7 @@ public class RefsetBrowseController {
 		criteria.setTo(to);
 		
 		criteria.addSearchField(SearchField.published, true);
-		List<Refset> refSets =  bService.getRefsets(criteria);
+		List<RefsetDTO> refSets =  bService.getRefsets(criteria);
 
 		r.getData().put("refsets", refSets);
 
@@ -279,6 +281,29 @@ public class RefsetBrowseController {
 		return new ResponseEntity<Result<Map<String,Object>>>(r, HttpStatus.OK);
 		
 	         
+    }
+	
+	@RequestMapping( method = RequestMethod.GET, value = "/{refsetId}/versions", produces = "application/json")
+	@ApiOperation( value = "Api to get all available published/released version of a refset.", 
+		notes = "Get all available published/released version of a given refset uuid. "
+				+ "A Lightweight service for user who are only intrested in getting refset details not their members" )
+    public ResponseEntity<Result< Map<String, Object>>> getRefsetVersions( @PathVariable( value = "refsetId" ) String refsetId ) throws Exception {
+		
+		logger.debug("Getting refset details");
+
+		Result<Map<String, Object>> response = getResult();
+		
+		response.getMeta().add( linkTo( methodOn( RefsetBrowseController.class, refsetId).getRefsetVersions(refsetId) ).withRel("versions") );
+
+
+		
+		Set<Integer> versions =  bService.getRefsetVersions(refsetId);
+		
+		response.getData().put("versions", versions);
+		
+		return new ResponseEntity<Result<Map<String,Object>>>(response, HttpStatus.OK);
+		
+	       
     }
 
 	

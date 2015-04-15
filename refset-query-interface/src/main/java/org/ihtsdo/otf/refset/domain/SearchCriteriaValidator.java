@@ -11,7 +11,11 @@
 */
 package org.ihtsdo.otf.refset.domain;
 
+import java.util.Set;
+
+import org.ihtsdo.otf.refset.common.SearchCriteriaDTO;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.Errors;
 import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;
@@ -20,28 +24,46 @@ import org.springframework.validation.Validator;
  *
  */
 @Component
-public class MemberValidator implements Validator {
+public class SearchCriteriaValidator implements Validator {
 
 	/* (non-Javadoc)
 	 * @see org.springframework.validation.Validator#supports(java.lang.Class)
 	 */
 	@Override
-	public boolean supports(Class<?> arg0) {
+	public boolean supports(Class<?> clazz) {
 
-		return MemberDTO.class.equals(arg0);
+		return SearchCriteriaDTO.class.equals(clazz);
 	}
 
 	/* (non-Javadoc)
 	 * @see org.springframework.validation.Validator#validate(java.lang.Object, org.springframework.validation.Errors)
 	 */
 	@Override
-	public void validate(Object m, Errors e) {
+	public void validate(Object target, Errors errors) {
+
+		ValidationUtils.rejectIfEmpty(errors, "fields", "At least one search criteria is required");
 		
-        ValidationUtils.rejectIfEmpty(e, "referencedComponentId", "Referenced component id is mandatory");
-        //ValidationUtils.rejectIfEmpty(e, "effectiveTime", "Effective time can not be empty");
-        ValidationUtils.rejectIfEmpty(e, "moduleId", "Module Id is Mandatory");
-        ValidationUtils.rejectIfEmpty(e, "published", "Published flag is mandatory");
-        ValidationUtils.rejectIfEmpty(e, "active", "Active Flag is mandatory");
+		SearchCriteriaDTO dto = (SearchCriteriaDTO)target;
+		
+		Set<String> keys = dto.getFields().keySet();
+		StringBuilder sb = new StringBuilder();
+		boolean moreThenOne = false;
+		
+		for (String key : keys) {
+			
+			if (moreThenOne) {
+				
+				sb.append(",");
+			}
+			sb.append(key);
+			moreThenOne = true;
+			
+		}
+		if (StringUtils.isEmpty(sb.toString())) {
+			
+			errors.rejectValue("fields", sb.toString() + " field(s) are not valid in search criteria");
+
+		}
 
 	}
 

@@ -23,7 +23,7 @@ public class RefsetIndexer {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		
-		if (args != null & args.length != 2) {
+		if (args != null & args.length < 2) {
 			
 			System.err.println("Invalid input. Titan db configuration file with abosolute path is required to create Snomed Graph schema "
 					+ "and required operation ie index or schema or print (to print schema and indexes) is mandatory");
@@ -54,7 +54,17 @@ public class RefsetIndexer {
 		case update:
 			s.updateMixedIndex();
 			break;
-
+		case repair:
+			if(args.length != 3) {
+				
+				System.err.println("To repair a index, an index name is required beside graph configurations. "
+						+ "Use print option to see available indexes "
+						+ "To repair see doc @ http://s3.thinkaurelius.com/docs/titan/0.5.0/reindex.html"
+						+ " for more details");
+				break;
+			}
+			s.repairIndex(args[2]);
+			break;
 		default:
 			System.out.println("No valid operation specified. Valid operation are index or schema");
 			break;

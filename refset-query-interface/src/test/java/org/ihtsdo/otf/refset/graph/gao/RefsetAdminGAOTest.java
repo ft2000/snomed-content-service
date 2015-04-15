@@ -13,6 +13,7 @@ import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.MapConfiguration;
 import org.ihtsdo.otf.refset.domain.MetaData;
 import org.ihtsdo.otf.refset.domain.Refset;
+import org.ihtsdo.otf.refset.domain.RefsetDTO;
 import org.ihtsdo.otf.refset.exception.EntityAlreadyExistException;
 import org.ihtsdo.otf.refset.exception.EntityNotFoundException;
 import org.ihtsdo.otf.refset.exception.RefsetServiceException;
@@ -48,7 +49,7 @@ public class RefsetAdminGAOTest {
 	@Autowired
 	private RefsetBrowseServiceStubData data;
 	
-	private List<Refset> rs;
+	private List<RefsetDTO> rs;
 	
 	private RefsetGraphFactory f;
 	
@@ -136,7 +137,7 @@ public class RefsetAdminGAOTest {
 		
 		aGao.addRefset(rs.get(0));
 		
-		List<Refset> rs = gao.getRefSets(false);
+		List<RefsetDTO> rs = gao.getRefSets(false);
 		
 		assertEquals(1, rs.size());
 		
@@ -148,7 +149,7 @@ public class RefsetAdminGAOTest {
 		aGao.addRefset(rs.get(0));
 		aGao.addRefset(rs.get(0));
 		
-		List<Refset> rs = gao.getRefSets(false);
+		List<RefsetDTO> rs = gao.getRefSets(false);
 		
 		assertEquals(1, rs.size());
 	}
@@ -167,29 +168,29 @@ public class RefsetAdminGAOTest {
 		
 		aGao.addRefset(data.getRefSet("450973005"));
 
-		assertEquals(true, gao.getRefset("450973005") != null);
+		assertEquals(true, gao.getRefset("450973005", 0, 10, -1) != null);
 	}
 	
 	@Test
 	public void loadData() throws RefsetServiceException, RefsetGraphAccessException, EntityNotFoundException, EntityAlreadyExistException {
 		
 		int i = 0;
-		for (Refset r : rs.subList(0, 2)) {
+		for (RefsetDTO r : rs.subList(0, 2)) {
 			
 			aGao.addRefset(data.getRefSet(r.getUuid()));
 			
-			assertEquals(true, gao.getRefset(r.getUuid()) != null);
+			assertEquals(true, gao.getRefsetHeader(r.getUuid(), -1) != null);
 			i++;
 		}
 
 		assertEquals(i, 2);
 		
-		List<Refset> result = gao.getRefSets(false);
+		List<RefsetDTO> result = gao.getRefSets(false);
 		assertEquals(2, result.size());
 
 		assertEquals(0, result.get(0).getMembers().size());
 		
-		Refset r = gao.getRefset(result.get(0).getUuid());
+		RefsetDTO r = gao.getRefset(result.get(0).getUuid(), 1, 100, -1);
 		
 		assertEquals(300, r.getMembers().size());
 		
@@ -198,18 +199,18 @@ public class RefsetAdminGAOTest {
 	@Test
 	public void testUpdateRefset() throws RefsetServiceException, RefsetGraphAccessException, EntityNotFoundException, EntityAlreadyExistException {		
 		
-		Refset input = rs.get(0);
+		RefsetDTO input = rs.get(0);
 
 		aGao.addRefset(data.getRefSet(input.getUuid()));
 
-		Refset r = gao.getRefset(input.getUuid());
+		RefsetDTO r = gao.getRefset(input.getUuid(), 0, 100, -1);
 		
 		assertNotNull(r);
 		
 		r.setDescription("Junit Update");
 		aGao.updateRefset(r);
 		
-		Refset rUpdated = gao.getRefset(input.getUuid());
+		RefsetDTO rUpdated = gao.getRefset(input.getUuid(), 0, 100, -1);
 
 		
 		MetaData rm = r.getMetaData();

@@ -18,5 +18,7 @@ import org.ihtsdo.otf.refset.domain.RGC;
  */
 public enum SearchField {
 
-	publishedDate, languageCode, createdBy, modifiedDate, clinicalDomain, published
+	publishedDate, languageCode, createdBy, modifiedDate, clinicalDomain,contributingOrganization, description,
+	earliestEffectiveTime,expectedPublishDate, externalContact, externalUrl, implementationDetails, componentTypeId, 
+	modifiedBy, moduleId, scope, sctId, snomedCTExtension, snomedCTVersion, originCountry, typeId, published
 }

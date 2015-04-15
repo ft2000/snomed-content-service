@@ -1,9 +1,9 @@
 package org.ihtsdo.otf.refset.schema;
 import static org.ihtsdo.otf.refset.domain.RGC.*;
 
-
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 import org.ihtsdo.otf.refset.domain.RefsetRelations;
@@ -17,8 +17,11 @@ import com.thinkaurelius.titan.core.TitanFactory;
 import com.thinkaurelius.titan.core.TitanGraph;
 import com.thinkaurelius.titan.core.VertexLabel;
 import com.thinkaurelius.titan.core.schema.Parameter;
+import com.thinkaurelius.titan.core.schema.SchemaAction;
+import com.thinkaurelius.titan.core.schema.SchemaStatus;
 import com.thinkaurelius.titan.core.schema.TitanGraphIndex;
 import com.thinkaurelius.titan.core.schema.TitanManagement;
+import com.thinkaurelius.titan.hadoop.TitanIndexRepair;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Vertex;
 
@@ -260,6 +263,29 @@ public class RefsetSchema {
 			.buildCompositeIndex();
 		}
 
+		TitanGraphIndex byIdAndVersion = mgmt.getGraphIndex(CompositeIndex.byIdAndVersion.toString());
+		
+		if (byIdAndVersion == null) {
+		
+			LOGGER.info("Creating Index  {}" , CompositeIndex.byIdAndVersion);
+			mgmt.buildIndex(CompositeIndex.byIdAndVersion.toString(), Vertex.class)
+			.addKey(mgmt.getPropertyKey(ID))
+			.addKey(mgmt.getPropertyKey(VERSION))
+			.buildCompositeIndex();
+		}
+		
+		TitanGraphIndex byIdAndRefsetStatus = mgmt.getGraphIndex(CompositeIndex.byIdAndRefsetStatus.toString());
+		
+		if (byIdAndRefsetStatus == null) {
+		
+			LOGGER.info("Creating Index  {}" , CompositeIndex.byIdAndRefsetStatus);
+			mgmt.buildIndex(CompositeIndex.byIdAndRefsetStatus.toString(), Vertex.class)
+			.addKey(mgmt.getPropertyKey(REFSET_STATUS))
+			.addKey(mgmt.getPropertyKey(ID))
+			.buildCompositeIndex();
+		}
+		
+		
 		
 	}
 	
@@ -706,6 +732,20 @@ public class RefsetSchema {
 			
 		}
 		
+		if (!mgmt.containsRelationType(REFSET_STATUS)) {
+
+			LOGGER.info("Creating Property {}", REFSET_STATUS);
+			mgmt.makePropertyKey(REFSET_STATUS).dataType(String.class).make();
+			
+		}
+		
+		if (!mgmt.containsRelationType(VERSION)) {
+
+			LOGGER.info("Creating Property {}", VERSION);
+			mgmt.makePropertyKey(VERSION).dataType(Integer.class).make();
+			
+		}
+		
 
 
 	}
@@ -979,6 +1019,20 @@ public class RefsetSchema {
 
 				}
 				
+				if (!existingProp.contains(mgmt.getPropertyKey(REFSET_STATUS))) {
+
+					mgmt.addIndexKey(giRefset, mgmt.getPropertyKey(REFSET_STATUS), 
+							Parameter.of(MAPPED, REFSET_STATUS));
+
+				}
+				
+				if (!existingProp.contains(mgmt.getPropertyKey(VERSION))) {
+
+					mgmt.addIndexKey(giRefset, mgmt.getPropertyKey(VERSION), 
+							Parameter.of(MAPPED, VERSION));
+
+				}
+				
 			}
 			
 			
@@ -1021,14 +1075,81 @@ public class RefsetSchema {
 			
 	    } catch (Exception e) {
 		
-	    	LOGGER.error("Management Transaction Rolledback");
+	    	LOGGER.error("Management Transaction Rolledback", e);
 	    	mgmt.rollback();
-	    	e.printStackTrace();
 	    	
 	    } finally {
 		
 	    	g.shutdown();
 	    }
+	
+	}
+	
+	/**Reapir a named index
+	 * @param indexName
+	 */
+	public void repairIndex(String indexName) {
+	    
+		TitanGraph g = openGraph(config);
+	    TitanManagement mgmt = g.getManagementSystem();
+
+	    try {
+	    	boolean registered = false;
+	    	LOGGER.info("Starting repair");		
+			long before = System.currentTimeMillis();
+			//to register index
+			mgmt.updateIndex(mgmt.getGraphIndex(indexName), SchemaAction.REGISTER_INDEX);
+			mgmt.commit();
+			Set<String> instances = mgmt.getOpenInstances();
+			for (String instance : instances) {
+				
+		    	LOGGER.info("Running instance {}", instance);		
+
+			}
+			mgmt = g.getManagementSystem();
+			
+			TitanGraphIndex updatedIndex = mgmt.getGraphIndex(indexName);
+			
+		    for (PropertyKey key : updatedIndex.getFieldKeys()) {
+		    	
+		        SchemaStatus s = mgmt.getGraphIndex(indexName).getIndexStatus(key);
+		        //mgmt.getGraphIndex(indexName).
+		    	LOGGER.info("Updated index {} status is {}", updatedIndex.getName(), s.toString());		
+
+		    }
+
+			while (!registered) {
+			    Thread.sleep(500L);
+			    TitanManagement local = g.getManagementSystem();
+
+			    TitanGraphIndex index  = local.getGraphIndex(indexName);
+			    registered = true;
+			    
+			    for (PropertyKey key : index.getFieldKeys()) {
+			        SchemaStatus s = index.getIndexStatus(key);
+			    	LOGGER.info("Target index {} status is {}", index.getName(), s.toString());		
+
+			        registered &= s.equals(SchemaStatus.REGISTERED);
+			    }
+			    local.rollback();
+			}
+			LOGGER.info("Index REGISTERED in " + (System.currentTimeMillis() - before) + " ms");
+
+	    			
+	    	TitanIndexRepair.cassandraRepair(config, indexName, "", "org.apache.cassandra.dht.Murmur3Partitioner");
+	    	
+	    	mgmt = g.getManagementSystem();
+	    	//re-enable the index
+	    	mgmt.updateIndex(mgmt.getGraphIndex(indexName), SchemaAction.ENABLE_INDEX);
+	    	mgmt.commit();
+	    } catch (Exception e) {
+
+	    	LOGGER.error("Index repair failed", e);
+	    	mgmt.rollback();
+	    	System.exit(1);
+
+	    }
+	
 	
 	}
 }

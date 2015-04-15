@@ -446,5 +446,32 @@ public interface GRefset extends VertexFrame {
 	 */
 	@Property( value = "originCountryCode")
 	public void setOriginCountryCode(String originCountryCode);
+	
+	
+	/**
+	 * @return the status
+	 */
+	@Property( value = "refsetStatus")
+	public String getStatus();
+	
+	/**
+	 * @param status the status to set
+	 */
+	@Property( value = "refsetStatus")
+	public void setStatus(String status);
+	
+	/**
+	 * @return the version
+	 */
+	@Property( value = "version")
+	public Integer getVersion();
+	
+	/**
+	 * @param version the version to set
+	 */
+	@Property( value = "version")
+	public void setVersion(Integer version);
+
+
 
 }

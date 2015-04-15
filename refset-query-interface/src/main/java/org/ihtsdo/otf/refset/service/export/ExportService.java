@@ -10,8 +10,8 @@ import java.util.List;
 import javax.annotation.Resource;
 
 import org.ihtsdo.otf.refset.common.Utility;
-import org.ihtsdo.otf.refset.domain.Member;
-import org.ihtsdo.otf.refset.domain.Refset;
+import org.ihtsdo.otf.refset.domain.MemberDTO;
+import org.ihtsdo.otf.refset.domain.RefsetDTO;
 import org.ihtsdo.otf.refset.exception.EntityNotFoundException;
 import org.ihtsdo.otf.refset.exception.ExportServiceException;
 import org.ihtsdo.otf.refset.exception.RefsetServiceException;
@@ -61,7 +61,7 @@ public class ExportService {
 			//TODO header has to come from refset descriptor. For now hard code
 			//http://supercsv.sourceforge.net/examples_writing.html. 
 			
-			Refset r = bService.getRefsetForExport(refsetUuId);
+			RefsetDTO r = bService.getRefsetForExport(refsetUuId);
 			
             final CellProcessor[] processors = getProcessors();
             /**
@@ -73,9 +73,9 @@ public class ExportService {
 
             lWriter.writeHeader(header);
 			
-			List<Member> ms = r.getMembers();
+			List<MemberDTO> ms = r.getMembers();
 			String refsetId = StringUtils.isEmpty(r.getSctId()) ? r.getUuid() : r.getSctId();
-			for (Member m : ms) {
+			for (MemberDTO m : ms) {
 								
 				String active = m.isActive() ? "1" : "0";
 				DateTime et = m.getEffectiveTime() != null ? m.getEffectiveTime() : r.getExpectedReleaseDate();

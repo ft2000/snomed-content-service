@@ -16,7 +16,7 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
-import org.ihtsdo.otf.refset.domain.Refset;
+import org.ihtsdo.otf.refset.domain.RefsetDTO;
 import org.ihtsdo.otf.refset.exception.RefsetServiceException;
 import org.ihtsdo.otf.refset.graph.RefsetGraphAccessException;
 import org.ihtsdo.otf.refset.graph.RefsetGraphFactory;
@@ -54,7 +54,7 @@ public class ViewMatrixGAO {
 	 * @param userName
 	 * @throws RefsetServiceException
 	 */
-	protected List<Refset> getMostViewedPublishedRefsets(int noOfResults) throws RefsetGraphAccessException {
+	protected List<RefsetDTO> getMostViewedPublishedRefsets(int noOfResults) throws RefsetGraphAccessException {
 		
 		LOGGER.debug("getMostViewedPublishedRefsets for {}");
 		

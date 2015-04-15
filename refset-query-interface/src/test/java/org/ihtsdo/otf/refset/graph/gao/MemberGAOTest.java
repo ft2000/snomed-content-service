@@ -10,8 +10,8 @@ import java.util.Map;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.MapConfiguration;
-import org.ihtsdo.otf.refset.domain.Member;
-import org.ihtsdo.otf.refset.domain.Refset;
+import org.ihtsdo.otf.refset.domain.MemberDTO;
+import org.ihtsdo.otf.refset.domain.RefsetDTO;
 import org.ihtsdo.otf.refset.exception.EntityAlreadyExistException;
 import org.ihtsdo.otf.refset.exception.EntityNotFoundException;
 import org.ihtsdo.otf.refset.graph.RefsetGraphAccessException;
@@ -132,17 +132,17 @@ public class MemberGAOTest {
 	public void removeMember() throws EntityNotFoundException, RefsetGraphAccessException, EntityAlreadyExistException {
 		addRefset();
 		
-		Refset before = rGao.getRefset("junit_1");
+		RefsetDTO before = rGao.getRefset("junit_1", 0, 100, -1);
 
-		int beforeSize = before.getMembers().size();
+		long beforeSize = before.getTotalNoOfMembers();
 		
 		assertEquals(2, beforeSize);
 		
 		gao.removeMember("junit_1", "101", "junit");
 		
-		Refset after = rGao.getRefset("junit_1");
+		RefsetDTO after = rGao.getRefset("junit_1", 0, 100, -1);
 
-		int afterSize = after.getMembers().size();
+		long afterSize = after.getTotalNoOfMembers();
 
 		assertEquals(1, afterSize);
 	}
@@ -173,17 +173,17 @@ public class MemberGAOTest {
 	
 	private void addRefset() throws RefsetGraphAccessException, EntityAlreadyExistException {
 		
-		Refset r = new Refset();
+		RefsetDTO r = new RefsetDTO();
 		r.setUuid("junit_1");
 		r.setDescription("Junit");
 		
-		Member m = new Member();
+		MemberDTO m = new MemberDTO();
 		m.setReferencedComponentId("101");
 
-		Member m_1 = new Member();
+		MemberDTO m_1 = new MemberDTO();
 		m_1.setReferencedComponentId("102");
 
-		List<Member> members = new ArrayList<Member>();
+		List<MemberDTO> members = new ArrayList<MemberDTO>();
 		members.add(m);
 		members.add(m_1);
 

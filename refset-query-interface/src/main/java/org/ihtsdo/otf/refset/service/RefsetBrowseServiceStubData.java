@@ -12,8 +12,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import org.ihtsdo.otf.refset.domain.Member;
-import org.ihtsdo.otf.refset.domain.Refset;
+import org.ihtsdo.otf.refset.domain.MemberDTO;
+import org.ihtsdo.otf.refset.domain.RefsetDTO;
 import org.ihtsdo.otf.refset.exception.RefsetServiceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -186,13 +186,13 @@ public class RefsetBrowseServiceStubData {
 	 * @return
 	 * @throws RefsetServiceException
 	 */
-	public   List<Refset> getRefSets() throws RefsetServiceException {
+	public   List<RefsetDTO> getRefSets() throws RefsetServiceException {
 		
 		Assert.notNull(csvs);
 		Resource csv = csvs.get(REFSET_LIST);
 		Assert.notNull(csv);
 		
-		List<Refset> refsets = new ArrayList<Refset>();
+		List<RefsetDTO> refsets = new ArrayList<RefsetDTO>();
 		
 		ICsvDozerBeanReader s = null;
 		
@@ -201,9 +201,9 @@ public class RefsetBrowseServiceStubData {
 			s = new CsvDozerBeanReader(new FileReader(csv.getFile()), CsvPreference.STANDARD_PREFERENCE);
 			 
 			s.getHeader(true); // ignore the header
-			s.configureBeanMapping(Refset.class, REFSET_MAPPING);
-			Refset r = null;
-			while( (r = s.read(Refset.class, getRefSetProcessors())) != null ) {
+			s.configureBeanMapping(RefsetDTO.class, REFSET_MAPPING);
+			RefsetDTO r = null;
+			while( (r = s.read(RefsetDTO.class, getRefSetProcessors())) != null ) {
 	           
 				refsets.add(r);
 
@@ -237,17 +237,17 @@ public class RefsetBrowseServiceStubData {
 		return Collections.unmodifiableList(refsets);
 	}
 	
-	/**Generate a dummy list of {@link Refset}
+	/**Generate a dummy list of {@link RefsetDTO}
 	 * @return
 	 * @throws RefsetServiceException
 	 */
-	public   Refset getRefSet(String refSetId) throws RefsetServiceException {
+	public   RefsetDTO getRefSet(String refSetId) throws RefsetServiceException {
 		
-		List<Refset> refSets = getRefSets();
+		List<RefsetDTO> refSets = getRefSets();
 				
-		Refset result = null;
+		RefsetDTO result = null;
 		
-		for (Refset refset : refSets) {
+		for (RefsetDTO refset : refSets) {
 			
 			if(refset.getUuid().equalsIgnoreCase(refSetId)) {
 								
@@ -268,7 +268,7 @@ public class RefsetBrowseServiceStubData {
 		Resource csv = csvs.get(MEMBER_LIST);
 		Assert.notNull(csv);
 		
-		List<Member> members = new ArrayList<Member>();
+		List<MemberDTO> members = new ArrayList<MemberDTO>();
 		
 		ICsvDozerBeanReader s = null;
 		
@@ -277,9 +277,9 @@ public class RefsetBrowseServiceStubData {
 			s = new CsvDozerBeanReader(new FileReader(csv.getFile()), CsvPreference.STANDARD_PREFERENCE);
 			 
 			s.getHeader(true); // ignore the header
-			s.configureBeanMapping(Member.class, MEMBER_MAPPING);
-			Member m = null;
-			while( (m = s.read(Member.class, getMemberProcessors())) != null ) {
+			s.configureBeanMapping(MemberDTO.class, MEMBER_MAPPING);
+			MemberDTO m = null;
+			while( (m = s.read(MemberDTO.class, getMemberProcessors())) != null ) {
 	            m.setUuid(UUID.randomUUID().toString());
 	            members.add(m);
 
@@ -308,7 +308,7 @@ public class RefsetBrowseServiceStubData {
 			}
 		}
 	    
-		List<Member> ms = members.subList(refsetIdsAndMembers.get(result.getUuid()) - 300, refsetIdsAndMembers.get(result.getUuid()));
+		List<MemberDTO> ms = members.subList(refsetIdsAndMembers.get(result.getUuid()) - 300, refsetIdsAndMembers.get(result.getUuid()));
 		result.setMembers(Collections.unmodifiableList(ms));
 		return result;
 	}

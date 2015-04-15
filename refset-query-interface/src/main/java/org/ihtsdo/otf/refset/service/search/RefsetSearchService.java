@@ -3,9 +3,14 @@
  */
 package org.ihtsdo.otf.refset.service.search;
 
+import java.util.List;
+
+import org.ihtsdo.otf.refset.common.SearchCriteria;
+import org.ihtsdo.otf.refset.domain.RefsetDTO;
 import org.ihtsdo.otf.refset.domain.SearchResult;
 import org.ihtsdo.otf.refset.exception.RefsetServiceException;
 import org.ihtsdo.otf.refset.graph.RefsetGraphAccessException;
+import org.ihtsdo.otf.refset.graph.gao.RefsetGAO;
 import org.ihtsdo.otf.refset.graph.gao.SearchGao;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +29,9 @@ public class RefsetSearchService {
 	@Autowired
 	private SearchGao gao;
 
+	@Autowired
+	private RefsetGAO rGao;
+	
 
 	/**
 	 * @param from
@@ -62,6 +70,23 @@ public class RefsetSearchService {
 		return gao.searchAll(query, from, to);
 
 				
+	}
+
+	/**
+	 * @param crieria
+	 * @return
+	 */
+	public List<RefsetDTO> getRefsetsSearchCriteria(SearchCriteria criteria) throws RefsetServiceException {
+
+		try {
+			
+			return rGao.getRefSets(criteria);
+			
+		} catch (RefsetGraphAccessException e) {
+
+			LOGGER.error("Error in search service call", e);
+			throw new RefsetServiceException(e.getMessage());
+		}
 	}
 
 }

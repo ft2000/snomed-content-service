@@ -11,14 +11,22 @@
 */
 package org.ihtsdo.otf.refset.common;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 /**
  *
  */
-public class SearchCriteria {
+public class SearchCriteria implements Serializable {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	
 	Map<SearchField, Direction> sortBy = new HashMap<SearchField, Direction>();
 	
 	Map<SearchField, Object> fields = new HashMap<SearchField, Object>();
@@ -96,5 +104,38 @@ public class SearchCriteria {
 		this.to = to;
 	}
 	
+	
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+
+		StringBuilder sb = new StringBuilder();
+		
+		Set<SearchField> fieldKeys = fields.keySet();
+		for (SearchField sf : fieldKeys) {
+			
+			sb.append("Search Field [ name :");
+			sb.append(sf);
+			sb.append(", and value :");
+			sb.append(fields.get(sf));
+			
+		}
+		
+		Set<SearchField> sortByKeys = sortBy.keySet();
+		for (SearchField sf : sortByKeys) {
+
+			sb.append("SortBy Field [ name :");
+			sb.append(sf);
+			sb.append(", and value :");
+			sb.append(fields.get(sf));
+			
+		
+		}
+		
+		
+		return sb.toString();
+	}
 	
 }

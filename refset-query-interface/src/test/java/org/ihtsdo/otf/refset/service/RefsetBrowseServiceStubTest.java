@@ -11,7 +11,9 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
-import org.ihtsdo.otf.refset.domain.Refset;
+import org.ihtsdo.otf.refset.common.SearchCriteria;
+import org.ihtsdo.otf.refset.common.SearchField;
+import org.ihtsdo.otf.refset.domain.RefsetDTO;
 import org.ihtsdo.otf.refset.exception.RefsetServiceException;
 import org.joda.time.DateTime;
 import org.junit.After;
@@ -31,13 +33,13 @@ public class RefsetBrowseServiceStubTest {
 	private RefsetBrowseServiceStubData dataService;
 	
 	@Mock
-	Refset refset;
+	RefsetDTO refset;
 	
 	@Mock
 	Map<String, org.springframework.core.io.Resource> csvs;
 	
 	@Mock
-	List<Refset> refsets;
+	List<RefsetDTO> refsets;
 
 	@Before
 	public void setUp() throws Exception {
@@ -66,7 +68,7 @@ public class RefsetBrowseServiceStubTest {
 	@Test
 	public void testGetRefset() throws RefsetServiceException {
 				
-		Refset result = service.getRefset("junit-1");
+		RefsetDTO result = service.getRefset("junit-1", 0, 100, -1);
 		
 		assertEquals(refset.getUuid(), result.getUuid());
 		assertEquals(refset.getModuleId(), result.getModuleId());
@@ -77,7 +79,7 @@ public class RefsetBrowseServiceStubTest {
 	public void testGetRefsetException() throws RefsetServiceException {
 				
 		doThrow(new RefsetServiceException("Junit Test Exception")).when(dataService).getRefSet(anyString());
-		service.getRefset("junit-1");
+		service.getRefset("junit-1", 0, 100, -1);
 		
 	}
 	
@@ -85,7 +87,12 @@ public class RefsetBrowseServiceStubTest {
 	public void testGetRefsetsException() throws RefsetServiceException {
 				
 		doThrow(new RefsetServiceException("Junit Test Exception")).when(dataService).getRefSets();
-		service.getRefsets(1, 10, false);
+		
+	    SearchCriteria criteria = new SearchCriteria();
+	    criteria.setFrom(1);
+	    criteria.setTo(10);
+	    criteria.addSearchField(SearchField.published, false);
+		service.getRefsets(criteria);
 		
 	}
 
@@ -98,7 +105,11 @@ public class RefsetBrowseServiceStubTest {
 		
 		when(dataService.getRefSets()).thenReturn(refsets);
 
-		List<Refset> rs = service.getRefsets(1, 10, false);
+	    SearchCriteria criteria = new SearchCriteria();
+	    criteria.setFrom(1);
+	    criteria.setTo(10);
+	    criteria.addSearchField(SearchField.published, false);
+		List<RefsetDTO> rs = service.getRefsets(criteria);
 		
 		assertEquals(false, rs.isEmpty());
 		assertEquals(1, rs.size());

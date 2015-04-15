@@ -94,6 +94,10 @@ public final class RGC {
 	
 	public static final String ORIGIN_COUNTRY_CODE = "originCountryCode";
 
+	public static final String REFSET_STATUS = "refsetStatus";
+
+	public static final String VERSION = "version";
+
 
 
 }

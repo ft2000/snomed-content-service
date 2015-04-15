@@ -7,6 +7,9 @@ import java.util.Collections;
 import java.util.List;
 
 import org.joda.time.DateTime;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 /**
  * @author 
  *
@@ -16,9 +19,7 @@ public class Refset extends BaseObj implements Comparable<Refset> {
 
 		
 	private String type;
-	
-	private List<Member> members;
-	
+		
 	private String typeId;
 	
 	private String superRefsetTypeId;
@@ -27,17 +28,86 @@ public class Refset extends BaseObj implements Comparable<Refset> {
 	
 	private DateTime expectedReleaseDate;
 	
-	private long totalNoOfMembers;
 	
 	private DateTime earliestEffectiveTime;
 	
 	private DateTime latestEffectiveTime;
 	
-	private Matrix matrix = new Matrix();
 	
 	//used when refset doesn't not have members and available on http url. see https://jira.ihtsdotools.org/browse/RMT-321
 	private String externalUrl;
 	private String externalContact;
+	
+	@JsonIgnore
+	private List<Member> memberList;
+	
+	private String status;
+	private String sctId;
+	protected Integer version;
+
+	
+	/**
+	 * @return the version
+	 */
+	public Integer getVersion() {
+		return version;
+	}
+	/**
+	 * @param version the version to set
+	 */
+	public void setVersion(Integer version) {
+		this.version = version;
+	}
+
+	/**
+	 * @return the status
+	 */
+	public String getStatus() {
+		return status;
+	}
+	/**
+	 * @param status the status to set
+	 */
+	public void setStatus(String status) {
+		this.status = status;
+	}
+	
+	/**
+	 * @return the sctId
+	 */
+	public String getSctId() {
+		return sctId;
+	}
+	/**
+	 * @param sctId the sctId to set
+	 */
+	public void setSctId(String sctId) {
+		this.sctId = sctId;
+	}
+	
+	/**
+	 * @return the members
+	 */
+	@JsonIgnore
+	public List<Member> getMemberList() {
+		
+		if(memberList == null) {
+			
+			memberList = Collections.emptyList();
+			
+		}
+		return memberList;
+	}
+
+	/**
+	 * @param members the members to set
+	 */
+	@JsonIgnore
+	public void setMemberList(List<Member> memberList) {
+		this.memberList = memberList;
+	}
+
+
 	
 	/**
 	 * Use case of this refset
@@ -123,26 +193,6 @@ public class Refset extends BaseObj implements Comparable<Refset> {
 		this.type = type;
 	}
 
-	/**
-	 * @return the members
-	 */
-	public List<Member> getMembers() {
-		
-		if(members == null) {
-			
-			members = Collections.emptyList();
-			
-		}
-		return members;
-	}
-
-	/**
-	 * @param members the members to set
-	 */
-	public void setMembers(List<Member> members) {
-		this.members = members;
-	}
-
 	
    @Override 
    public boolean equals(Object input) {
@@ -169,13 +219,13 @@ public class Refset extends BaseObj implements Comparable<Refset> {
    public String toString() {
 	   
 	   return String.format( "Refset [id - %s, created - %s, createdBy - %s, description - %s, "
-	   		+ "effectiveTime - %s,  isPublished - %s, languageCode - %s, members - %s, moduleId - %s, publishedDate - %s "
+	   		+ "effectiveTime - %s,  isPublished - %s, languageCode - %s, moduleId - %s, publishedDate - %s "
 	   		+ "superRefsetTypeId - %s, type - %s, typeId - %s, description - %s, latestEffectiveTime - %s,"
 	   		+ " earliestEffectiveTime -%s, scope - %s, snomedCTExtension - %s, snomedCTVersion - %s,"
 	   		+ " contributingOrganization - %s, originCountry - %s, implementationDetails - %s, clinicalDomain - %s,"
 	   		+ " clinicalDomainCode - %s, snomedCTExtensionNs - %s, originCountryCode - %s, externalUrl - %s, externalContact - %s "
 	   		+ "]", this.uuid, this.created, this.createdBy, this.description, this.effectiveTime, this.published,
-	   		this.languageCode, this.members, this.moduleId, this.publishedDate, this.superRefsetTypeId, this.type,
+	   		this.languageCode, this.moduleId, this.publishedDate, this.superRefsetTypeId, this.type,
 	   		this.typeId, this.description, this.earliestEffectiveTime, this.latestEffectiveTime, this.scope,
 	   		this.snomedCTExtension, this.snomedCTVersion, this.contributingOrganization, this.originCountry,
 	   		this.implementationDetails, this.clinicalDomain, this.clinicalDomainCode, this.snomedCTExtensionNs,
@@ -211,19 +261,7 @@ public class Refset extends BaseObj implements Comparable<Refset> {
 		this.expectedReleaseDate = expectedReleaseDate;
 	}
 
-	/**
-	 * @return the totalNoOfMembers
-	 */
-	public long getTotalNoOfMembers() {
-		return totalNoOfMembers;
-	}
-
-	/**
-	 * @param totalNoOfMembers the totalNoOfMembers to set
-	 */
-	public void setTotalNoOfMembers(long totalNoOfMembers) {
-		this.totalNoOfMembers = totalNoOfMembers;
-	}
+	
 
 	/* (non-Javadoc)
 	 * @see java.lang.Comparable#compareTo(java.lang.Object)
@@ -366,19 +404,7 @@ public class Refset extends BaseObj implements Comparable<Refset> {
 		this.clinicalDomain = clinicalDomain;
 	}
 
-	/**
-	 * @return the matrix
-	 */
-	public Matrix getMatrix() {
-		return matrix;
-	}
-
-	/**
-	 * @param matrix the matrix to set
-	 */
-	public void setMatrix(Matrix matrix) {
-		this.matrix = matrix;
-	}
+	
 
 	/**
 	 * @return the externalUrl

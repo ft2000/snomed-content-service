@@ -2,10 +2,9 @@ package org.ihtsdo.otf.refset.service;
 
 import static org.junit.Assert.*;
 
-
 import java.util.List;
 
-import org.ihtsdo.otf.refset.domain.Refset;
+import org.ihtsdo.otf.refset.domain.RefsetDTO;
 import org.ihtsdo.otf.refset.exception.RefsetServiceException;
 import org.junit.After;
 import org.junit.Before;
@@ -33,7 +32,7 @@ public class RefsetBrowseServiceStubDataTest {
 	@Test
 	public void testGetRefsets() throws RefsetServiceException {
 		
-		List<Refset> refsets = data.getRefSets();
+		List<RefsetDTO> refsets = data.getRefSets();
 		
 		assertNotNull(refsets);
 		assertTrue(!refsets.isEmpty());
@@ -45,7 +44,7 @@ public class RefsetBrowseServiceStubDataTest {
 	@Test
 	public void testGetRefset() throws RefsetServiceException {
 		
-		Refset refset = data.getRefSet("450971017");
+		RefsetDTO refset = data.getRefSet("450971017");
 		
 		assertNotNull(refset);
 		assertEquals(300, refset.getMembers().size());

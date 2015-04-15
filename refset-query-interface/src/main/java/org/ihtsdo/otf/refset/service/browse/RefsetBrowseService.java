@@ -4,35 +4,19 @@
 package org.ihtsdo.otf.refset.service.browse;
 
 import java.util.List;
+import java.util.Set;
 
 import org.ihtsdo.otf.refset.common.SearchCriteria;
-import org.ihtsdo.otf.refset.domain.Member;
-import org.ihtsdo.otf.refset.domain.Refset;
+import org.ihtsdo.otf.refset.domain.RefsetDTO;
 import org.ihtsdo.otf.refset.exception.EntityNotFoundException;
 import org.ihtsdo.otf.refset.exception.RefsetServiceException;
 import org.ihtsdo.otf.refset.graph.RefsetGraphAccessException;
 
 /**
- * @author Episteme Partners
  *
  */
 public interface RefsetBrowseService {
-	
-	/**Method to get List of published {@link Refset}s
-	 * @param from
-	 * @param to
-	 * @return
-	 * @throws RefsetServiceException
-	 */
-	public List<Refset> getRefsets(Integer from, Integer to, boolean published) throws RefsetServiceException ;
-	
-	/**Method to retrieve {@link Refset} details for given refset id.
-	 * @param refsetId
-	 * @return
-	 * @throws RefsetServiceException
-	 */
-	public Refset getRefset(String refsetId) throws RefsetServiceException ;
-	
+			
 	/**Validates if given description exist in the system or not
 	 * @param descrition
 	 * @return
@@ -50,13 +34,13 @@ public interface RefsetBrowseService {
 	 * @return
 	 * @throws RefsetServiceException
 	 */
-	public Refset getRefset(String refsetId, Integer from, Integer to) throws RefsetServiceException ;
+	public RefsetDTO getRefset(String refsetId, Integer from, Integer to, Integer version) throws RefsetServiceException ;
 
 	/**
 	 * @param refSetId
 	 * @return a {@link Refset} with member count and excluding all member details
 	 */
-	public Refset getRefsetHeader(String refSetId) throws RefsetServiceException ;
+	public RefsetDTO getRefsetHeader(String refSetId, Integer version) throws RefsetServiceException ;
 
 	/**
 	 * @param refsetId
@@ -64,7 +48,7 @@ public interface RefsetBrowseService {
 	 * @throws RefsetServiceException
 	 * @throws EntityNotFoundException
 	 */
-	Refset getRefsetForExport(String refsetId) throws RefsetServiceException,
+	public RefsetDTO getRefsetForExport(String refsetId) throws RefsetServiceException,
 			EntityNotFoundException;
 	
 	
@@ -76,6 +60,26 @@ public interface RefsetBrowseService {
 	 */
 	public boolean isOwner(String refsetId, String userName) throws RefsetGraphAccessException;
 	
-	public List<Refset> getRefsets(SearchCriteria criteria) throws RefsetServiceException ;
+	/**
+	 * @param criteria
+	 * @return
+	 * @throws RefsetServiceException
+	 */
+	public List<RefsetDTO> getRefsets(SearchCriteria criteria) throws RefsetServiceException ;
+	
+	/**Service to retrieve total no of refset for given criteria
+	 * @param criteria
+	 * @return
+	 * @throws RefsetServiceException
+	 */
+	public Long totalNoOfRefset(SearchCriteria criteria) throws RefsetServiceException ;
+	
+	/**Service to retrieve all available published/released version
+	 * @param refSetId
+	 * @return
+	 * @throws RefsetServiceException
+	 */
+	public Set<Integer> getRefsetVersions(String refSetId) throws RefsetServiceException ;
+
 
 }

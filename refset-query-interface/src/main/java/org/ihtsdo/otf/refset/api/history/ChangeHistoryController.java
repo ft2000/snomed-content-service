@@ -20,8 +20,8 @@ import java.util.Map;
 import org.ihtsdo.otf.refset.common.Meta;
 import org.ihtsdo.otf.refset.common.Result;
 import org.ihtsdo.otf.refset.domain.ChangeRecord;
-import org.ihtsdo.otf.refset.domain.Member;
-import org.ihtsdo.otf.refset.domain.Refset;
+import org.ihtsdo.otf.refset.domain.MemberDTO;
+import org.ihtsdo.otf.refset.domain.RefsetDTO;
 import org.ihtsdo.otf.refset.service.history.RefsetChangeHistoryService;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
@@ -39,6 +39,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.mangofactory.swagger.annotations.ApiIgnore;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 
@@ -48,6 +49,7 @@ import com.wordnik.swagger.annotations.ApiOperation;
 @RestController
 @Api(value="Refset", description="Service to get refset change histories")
 @RequestMapping("/v1/refsets")
+@ApiIgnore
 public class ChangeHistoryController {
 	
 	private static final Logger logger = LoggerFactory.getLogger(ChangeHistoryController.class);
@@ -65,7 +67,7 @@ public class ChangeHistoryController {
 					+ "It is sorted by latest first."
 				+ "If user of this api want to retrieve specific dates history, they should provide from date and to date"
 				+ "in the format of yyyy-mm-dd")
-	@PreAuthorize("hasRole('ROLE_USER')")
+	@PreAuthorize("hasRole('ROLE_ihtsdo-users')")
     public ResponseEntity<Result< Map<String, Object>>> getMemberHistory( @PathVariable String refsetId, 
     		@PathVariable String memberId,
     		@RequestParam( value = "fromDate", required = false) String fromDate, 
@@ -77,7 +79,7 @@ public class ChangeHistoryController {
 
 		Result<Map<String, Object>> r = getResult();
 
-		ChangeRecord<Member> history = service.getMemberHistory(refsetId, memberId, getFromDate(fromDate, 10), getToDate(toDate), from, to);
+		ChangeRecord<MemberDTO> history = service.getMemberHistory(refsetId, memberId, getFromDate(fromDate, 10), getToDate(toDate), from, to);
 		
 		Map<String, Object> data = new HashMap<String, Object>();
 		data.put("history", history);
@@ -98,7 +100,7 @@ public class ChangeHistoryController {
 					+ "It is sorted by latest first."
 				+ "If user of this api want to retrieve specific dates history, they should provide from date and to date"
 				+ "in the format of yyyy-mm-dd")
-	@PreAuthorize("hasRole('ROLE_USER')")
+	@PreAuthorize("hasRole('ROLE_ihtsdo-users')")
     public ResponseEntity<Result< Map<String, Object>>> getAllMembersHistory( @PathVariable String refsetId,
     		@RequestParam( value = "fromDate", required = false) String fromDate, 
     		@RequestParam( value = "toDate", required = false) String toDate,
@@ -109,7 +111,7 @@ public class ChangeHistoryController {
 
 		Result<Map<String, Object>> r = getResult();
 		
-		Map<String, ChangeRecord<Member>> history = service.getAllMembersHistory(refsetId, getFromDate(fromDate, 10), getToDate(toDate), from, to);
+		Map<String, ChangeRecord<MemberDTO>> history = service.getAllMembersHistory(refsetId, getFromDate(fromDate, 10), getToDate(toDate), from, to);
 		
 		Map<String, Object> data = new HashMap<String, Object>();
 		data.put("history", history);
@@ -129,7 +131,7 @@ public class ChangeHistoryController {
 		notes = "This api call retrieves refset header history by default for last 10 days. It is sorted by latest first."
 				+ "If user of this api want to retrieve specific dates history, they should provide from date and to date"
 				+ "in the format of yyyy-mm-dd" )
-	@PreAuthorize("hasRole('ROLE_USER')")
+	@PreAuthorize("hasRole('ROLE_ihtsdo-users')")
     public ResponseEntity<Result< Map<String, Object>>> getRefseHeaderHistory( @PathVariable String refsetId,
     		@RequestParam( value = "fromDate", required = false) String fromDate, 
     		@RequestParam( value = "toDate", required = false) String toDate,
@@ -140,7 +142,7 @@ public class ChangeHistoryController {
 
 		Result<Map<String, Object>> r = getResult();
 
-		ChangeRecord<Refset> history = service.getRefsetHeaderHistory(refsetId, getFromDate(fromDate, 10), getToDate(toDate), from, to);
+		ChangeRecord<RefsetDTO> history = service.getRefsetHeaderHistory(refsetId, getFromDate(fromDate, 10), getToDate(toDate), from, to);
 		
 		Map<String, Object> data = new HashMap<String, Object>();
 		data.put("history", history);
@@ -163,7 +165,7 @@ public class ChangeHistoryController {
 					+ "It is sorted by latest first."
 				+ "If user of this api want to retrieve specific dates history, they should provide from date and to date"
 				+ "in the format of yyyy-mm-dd")
-	@PreAuthorize("hasRole('ROLE_USER')")
+	@PreAuthorize("hasRole('ROLE_ihtsdo-users')")
     public ResponseEntity<Result< Map<String, Object>>> getMemberStateHistory( @PathVariable String refsetId, 
     		@PathVariable String memberId,
     		@RequestParam( value = "fromDate", required = false) String fromDate, 
@@ -175,7 +177,7 @@ public class ChangeHistoryController {
 
 		Result<Map<String, Object>> r = getResult();
 
-		ChangeRecord<Member> history = service.getMemberStateHistory(refsetId, memberId, getFromDate(fromDate, 200), getToDate(toDate), from, to);
+		ChangeRecord<MemberDTO> history = service.getMemberStateHistory(refsetId, memberId, getFromDate(fromDate, 200), getToDate(toDate), from, to);
 		
 		Map<String, Object> data = new HashMap<String, Object>();
 		data.put("history", history);
@@ -196,7 +198,7 @@ public class ChangeHistoryController {
 					+ "It is sorted by latest first."
 				+ "If user of this api want to retrieve specific dates history, they should provide from date and to date"
 				+ "in the format of yyyy-mm-dd")
-	@PreAuthorize("hasRole('ROLE_USER')")
+	@PreAuthorize("hasRole('ROLE_ihtsdo-users')")
     public ResponseEntity<Result< Map<String, Object>>> getAllMembersStateHistory( @PathVariable String refsetId,
     		@RequestParam( value = "fromDate", required = false) String fromDate, 
     		@RequestParam( value = "toDate", required = false) String toDate,
@@ -207,7 +209,7 @@ public class ChangeHistoryController {
 
 		Result<Map<String, Object>> r = getResult();
 		
-		Map<String, ChangeRecord<Member>> history = service.getAllMembersStateHistory(refsetId, getFromDate(fromDate, 200), getToDate(toDate), from, to);
+		Map<String, ChangeRecord<MemberDTO>> history = service.getAllMembersStateHistory(refsetId, getFromDate(fromDate, 200), getToDate(toDate), from, to);
 		
 		Map<String, Object> data = new HashMap<String, Object>();
 		data.put("history", history);
@@ -227,7 +229,7 @@ public class ChangeHistoryController {
 		notes = "This api call retrieves refset header state history by default for last 200 days. It is sorted by latest first."
 				+ "If user of this api want to retrieve specific dates history, they should provide from date and to date"
 				+ "in the format of yyyy-mm-dd" )
-	@PreAuthorize("hasRole('ROLE_USER')")
+	@PreAuthorize("hasRole('ROLE_ihtsdo-users')")
     public ResponseEntity<Result< Map<String, Object>>> getRefseHeaderStateHistory( @PathVariable String refsetId,
     		@RequestParam( value = "fromDate", required = false) String fromDate, 
     		@RequestParam( value = "toDate", required = false) String toDate,
@@ -238,7 +240,7 @@ public class ChangeHistoryController {
 
 		Result<Map<String, Object>> r = getResult();
 
-		ChangeRecord<Refset> history = service.getRefseHeaderStateHistory(refsetId, getFromDate(fromDate, 200), getToDate(toDate), from, to);
+		ChangeRecord<RefsetDTO> history = service.getRefseHeaderStateHistory(refsetId, getFromDate(fromDate, 200), getToDate(toDate), from, to);
 		
 		Map<String, Object> data = new HashMap<String, Object>();
 		data.put("history", history);
@@ -256,14 +258,14 @@ public class ChangeHistoryController {
 	@RequestMapping( method = RequestMethod.GET, value = "{refsetId}/{memberId}/allStates",  produces = "application/json", consumes = "application/json")
 	@ApiOperation( value = "Get all previous states of a member", 
 		notes = "This api call retrieves all previous published state of a member for given member uuid provided in api path")
-	@PreAuthorize("hasRole('ROLE_USER')")
+	@PreAuthorize("hasRole('ROLE_ihtsdo-users')")
     public ResponseEntity<Result< Map<String, Object>>> getMemberStateHistory( @PathVariable String memberId, @PathVariable String refsetId) throws Exception {
 		
 		logger.debug("geting member's all previous state history for member id {}", memberId);
 
 		Result<Map<String, Object>> r = getResult();
 
-		ChangeRecord<Member> history = service.getMemberStateHistory(memberId, refsetId);
+		ChangeRecord<MemberDTO> history = service.getMemberStateHistory(memberId, refsetId);
 		
 		Map<String, Object> data = new HashMap<String, Object>();
 		data.put("history", history);

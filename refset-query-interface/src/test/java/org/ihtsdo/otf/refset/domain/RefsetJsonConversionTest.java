@@ -71,7 +71,7 @@ public class RefsetJsonConversionTest {
 	@Test
 	public void getJson() throws JsonGenerationException, JsonMappingException, IOException {
 		
-		Refset r = new Refset();
+		RefsetDTO r = new RefsetDTO();
 		
 		r.setUuid("700043003");
 		r.setCreated( new DateTime() );
@@ -90,8 +90,8 @@ public class RefsetJsonConversionTest {
 		descriptor.put(REFSET_TYPE, REFSET_TYPE_DESC);
 		descriptor.put(REFSET_TYPE_ID, REFSET_TYPE_ID_DESC);
 		
-		List<Member> members = new ArrayList<Member>();
-		Member m = new Member();
+		List<MemberDTO> members = new ArrayList<MemberDTO>();
+		MemberDTO m = new MemberDTO();
 		m.setUuid("450451007");
 		m.setActive(true);
 		m.setReferencedComponentId("4504511107");
@@ -99,7 +99,7 @@ public class RefsetJsonConversionTest {
 
 		members.add(m);
 		
-		m = new Member();
+		m = new MemberDTO();
 		m.setActive(true);
 		m.setReferencedComponentId("4504511107");
 		m.setModuleId("900000000000207002");
@@ -107,14 +107,14 @@ public class RefsetJsonConversionTest {
 		m.setUuid("450451006");
 		members.add(m);
 		
-		m = new Member();
+		m = new MemberDTO();
 		m.setActive(true);
 		m.setReferencedComponentId("4504511107");
 		m.setModuleId("900000000000207008");
 		m.setUuid("450451005");
 		members.add(m);
 		
-		m = new Member();
+		m = new MemberDTO();
 		m.setActive(true);
 		m.setReferencedComponentId("4504511107");
 		m.setModuleId("900000000000207008");

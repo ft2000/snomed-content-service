@@ -13,7 +13,7 @@ package org.ihtsdo.otf.refset.service.matrix;
 
 import java.util.List;
 
-import org.ihtsdo.otf.refset.domain.Refset;
+import org.ihtsdo.otf.refset.domain.RefsetDTO;
 import org.ihtsdo.otf.refset.exception.RefsetServiceException;
 import org.ihtsdo.otf.refset.graph.RefsetGraphAccessException;
 import org.slf4j.Logger;
@@ -36,7 +36,7 @@ public class ViewActivityMatrixService {
 	 * @return
 	 * @throws RefsetServiceException
 	 */
-	public List<Refset> getMostViewedPublishedRefsets(int noOfResults) throws RefsetServiceException {
+	public List<RefsetDTO> getMostViewedPublishedRefsets(int noOfResults) throws RefsetServiceException {
 
 		try {
 			

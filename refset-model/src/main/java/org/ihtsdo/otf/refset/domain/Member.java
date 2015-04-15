@@ -3,18 +3,15 @@ package org.ihtsdo.otf.refset.domain;
 import org.ihtsdo.otf.snomed.domain.Concept;
 
 
+/**Represent a Member object in database
+ *
+ */
 public class Member extends BaseObj implements Comparable<Member>{
 	
 	
 	
 	private String referencedComponentId;
 	
-	//to indicate if member has been published any time.
-	private Integer memberHasPublishedState;
-	//to indicate member has pending publish details
-	private Integer memberHasPendingEdit;
-	//to indicate member has any published state history
-	private Integer memberHasPublishedStateHistory;
 
 	
 	//to get the current state of referenced component
@@ -34,30 +31,7 @@ public class Member extends BaseObj implements Comparable<Member>{
 	}
 	
 
-   /**
-	 * @return the memberHasPublishedState
-	 */
-	public Integer getMemberHasPublishedState() {
-		return memberHasPublishedState;
-	}
-	/**
-	 * @param memberHasPublishedState the memberHasPublishedState to set
-	 */
-	public void setMemberHasPublishedState(Integer memberHasPublishedState) {
-		this.memberHasPublishedState = memberHasPublishedState;
-	}
-	/**
-	 * @return the memberHasPendingEdit
-	 */
-	public Integer getMemberHasPendingEdit() {
-		return memberHasPendingEdit;
-	}
-	/**
-	 * @param memberHasPendingEdit the memberHasPendingEdit to set
-	 */
-	public void setMemberHasPendingEdit(Integer memberHasPendingEdit) {
-		this.memberHasPendingEdit = memberHasPendingEdit;
-	}
+   
 /**
 	 * @return the referencedComponent
 	 */
@@ -71,20 +45,8 @@ public class Member extends BaseObj implements Comparable<Member>{
 			Concept referencedComponent) {
 		this.referencedComponent = referencedComponent;
 	}
-/**
-	 * @return the memberHasPublishedStateHistory
-	 */
-	public Integer getMemberHasPublishedStateHistory() {
-		return memberHasPublishedStateHistory;
-	}
-	/**
-	 * @param memberHasPublishedStateHistory the memberHasPublishedStateHistory to set
-	 */
-	public void setMemberHasPublishedStateHistory(
-			Integer memberHasPublishedStateHistory) {
-		this.memberHasPublishedStateHistory = memberHasPublishedStateHistory;
-	}
-@Override 
+	
+	@Override 
    public boolean equals(Object input) {
 		   
 	   if ( this == input ) return true;

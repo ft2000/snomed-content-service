@@ -425,7 +425,7 @@ public class MemberGAO {
 			
 			throw new EntityNotFoundException("Invalid member details. Reference component id and member id is mandatory in member details");
 		}			
-        tg.addListener(new MemberChangeListener(tg.getBaseGraph(), m.getModifiedBy()));
+        //tg.addListener(new MemberChangeListener(tg.getBaseGraph(), m.getModifiedBy()));
         tg.addListener(new EffectiveTimeChangeListener(tg.getBaseGraph(), m.getModifiedBy()));
 
 		LOGGER.debug("Updating member {}", m);

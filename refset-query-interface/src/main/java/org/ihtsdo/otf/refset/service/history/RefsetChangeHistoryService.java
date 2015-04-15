@@ -6,8 +6,8 @@ package org.ihtsdo.otf.refset.service.history;
 import java.util.Map;
 
 import org.ihtsdo.otf.refset.domain.ChangeRecord;
-import org.ihtsdo.otf.refset.domain.Member;
-import org.ihtsdo.otf.refset.domain.Refset;
+import org.ihtsdo.otf.refset.domain.MemberDTO;
+import org.ihtsdo.otf.refset.domain.RefsetDTO;
 import org.ihtsdo.otf.refset.exception.EntityNotFoundException;
 import org.ihtsdo.otf.refset.exception.RefsetServiceException;
 import org.ihtsdo.otf.refset.graph.RefsetGraphAccessException;
@@ -41,7 +41,7 @@ public class RefsetChangeHistoryService {
 	 * @return
 	 * @throws RefsetServiceException
 	 */
-	public ChangeRecord<Member> getMemberHistory(String refsetId, String referenceComponentId, DateTime fromDate, DateTime toDate, int from, int to) throws RefsetServiceException {
+	public ChangeRecord<MemberDTO> getMemberHistory(String refsetId, String referenceComponentId, DateTime fromDate, DateTime toDate, int from, int to) throws RefsetServiceException {
 
 		LOGGER.debug("getMemberHistory");
 		
@@ -67,7 +67,7 @@ public class RefsetChangeHistoryService {
 	 * @return
 	 * @throws RefsetServiceException
 	 */
-	public Map<String, ChangeRecord<Member>> getAllMembersHistory(String refsetId, DateTime fromDate, DateTime toDate, int from, int to) throws RefsetServiceException {
+	public Map<String, ChangeRecord<MemberDTO>> getAllMembersHistory(String refsetId, DateTime fromDate, DateTime toDate, int from, int to) throws RefsetServiceException {
 
 		LOGGER.debug("getAllMembersHistory");
 		
@@ -92,7 +92,7 @@ public class RefsetChangeHistoryService {
 	 * @return
 	 * @throws RefsetServiceException
 	 */
-	public ChangeRecord<Refset> getRefsetHeaderHistory(String refsetId, DateTime fromDate, DateTime toDate, int from, int to) throws RefsetServiceException {
+	public ChangeRecord<RefsetDTO> getRefsetHeaderHistory(String refsetId, DateTime fromDate, DateTime toDate, int from, int to) throws RefsetServiceException {
 
 		LOGGER.debug("getRefsetHeaderHistory");
 		
@@ -118,7 +118,7 @@ public class RefsetChangeHistoryService {
 	 * @return
 	 * @throws RefsetServiceException 
 	 */
-	public ChangeRecord<Member> getMemberStateHistory(String refsetId,
+	public ChangeRecord<MemberDTO> getMemberStateHistory(String refsetId,
 			String memberId, DateTime fromDate, DateTime toDate, int from,
 			int to) throws RefsetServiceException {
 		
@@ -145,7 +145,7 @@ public class RefsetChangeHistoryService {
 	 * @return
 	 * @throws RefsetServiceException 
 	 */
-	public Map<String, ChangeRecord<Member>> getAllMembersStateHistory(
+	public Map<String, ChangeRecord<MemberDTO>> getAllMembersStateHistory(
 			String refsetId, DateTime fromDate, DateTime toDate, int from,
 			int to) throws RefsetServiceException {
 		
@@ -171,7 +171,7 @@ public class RefsetChangeHistoryService {
 	 * @return
 	 * @throws RefsetServiceException 
 	 */
-	public ChangeRecord<Refset> getRefseHeaderStateHistory(String refsetId,
+	public ChangeRecord<RefsetDTO> getRefseHeaderStateHistory(String refsetId,
 			DateTime fromDate, DateTime toDate, int from, int to) throws RefsetServiceException {
 		
 		LOGGER.debug("getRefseHeaderStateHistory");
@@ -193,7 +193,7 @@ public class RefsetChangeHistoryService {
 	 * @throws RefsetServiceException 
 	 * @throws EntityNotFoundException 
 	 */
-	public ChangeRecord<Member> getMemberStateHistory(String memberId, String refsetId) throws RefsetServiceException, EntityNotFoundException {
+	public ChangeRecord<MemberDTO> getMemberStateHistory(String memberId, String refsetId) throws RefsetServiceException, EntityNotFoundException {
 		
 		LOGGER.debug("getMemberStateHistory all");
 		

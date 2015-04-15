@@ -12,11 +12,8 @@ import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.StringUtils;
-
-import com.atlassian.crowd.integration.springsecurity.user.CrowdUserDetails;
 
 /**
  * Utility class to support common function required at various lavel
@@ -97,15 +94,10 @@ public class Utility {
 	 * @throws AccessDeniedException
 	 */
 	public static IHTSDOUser getUserDetails() throws AccessDeniedException {
-		Authentication  auth = SecurityContextHolder.getContext().getAuthentication();
 		
-		if (auth.getPrincipal() instanceof CrowdUserDetails) {
-			
-			IHTSDOUser user =  IHTSDOUser.getInstance(SecurityContextHolder.getContext().getAuthentication());
-			return user;
-		}
+		IHTSDOUser user =  IHTSDOUser.getInstance(SecurityContextHolder.getContext().getAuthentication());
+		return user;
 		
-		throw new AccessDeniedException("User lacks required authorization");
 	}
 	
 }

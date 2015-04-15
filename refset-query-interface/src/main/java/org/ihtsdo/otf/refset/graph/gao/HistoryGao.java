@@ -26,8 +26,8 @@ import java.util.Set;
 import javax.annotation.Resource;
 
 import org.ihtsdo.otf.refset.domain.ChangeRecord;
-import org.ihtsdo.otf.refset.domain.Member;
-import org.ihtsdo.otf.refset.domain.Refset;
+import org.ihtsdo.otf.refset.domain.MemberDTO;
+import org.ihtsdo.otf.refset.domain.RefsetDTO;
 import org.ihtsdo.otf.refset.exception.EntityNotFoundException;
 import org.ihtsdo.otf.refset.graph.RefsetGraphAccessException;
 import org.ihtsdo.otf.refset.graph.RefsetGraphFactory;
@@ -69,12 +69,12 @@ public class HistoryGao {
 	 * @return
 	 * @throws RefsetGraphAccessException
 	 */
-	public Map<String, ChangeRecord<Member>> getAllMembersHistory(String refsetId,
+	public Map<String, ChangeRecord<MemberDTO>> getAllMembersHistory(String refsetId,
 			DateTime fromDate, DateTime toDate, Integer from, Integer to) throws RefsetGraphAccessException {
 
 		LOGGER.debug("Getting all member history for refset id {}", refsetId);
 
-		Map<String, ChangeRecord<Member>> history = new HashMap<String, ChangeRecord<Member>>();
+		Map<String, ChangeRecord<MemberDTO>> history = new HashMap<String, ChangeRecord<MemberDTO>>();
 
 		TitanGraph g = null;
 		
@@ -105,8 +105,8 @@ public class HistoryGao {
 				.range(from, to);
 				List<Edge> mhls = mhPipe.toList();
 				
-				List<Member> ms = RefsetConvertor.getHistoryMembers(mhls);
-				ChangeRecord<Member> cr = new ChangeRecord<Member>();
+				List<MemberDTO> ms = RefsetConvertor.getHistoryMembers(mhls);
+				ChangeRecord<MemberDTO> cr = new ChangeRecord<MemberDTO>();
 				String rcId = e.getProperty(ID);
 				cr.setRecords(ms);
 				history.put(rcId, cr);
@@ -136,14 +136,14 @@ public class HistoryGao {
 	 * @return
 	 * @throws RefsetGraphAccessException
 	 */
-	public ChangeRecord<Member> getMemberHistory(String refsetId, String id, 
+	public ChangeRecord<MemberDTO> getMemberHistory(String refsetId, String id, 
 			DateTime fromDate, DateTime toDate, Integer from, Integer to) throws RefsetGraphAccessException {
 		
 		Object[] criteria = {id, fromDate, toDate, from, to};
 		
 		LOGGER.debug("Getting member history for refset id {} and criteria {}", refsetId, criteria);
 
-		ChangeRecord<Member> history = new ChangeRecord<Member>();
+		ChangeRecord<MemberDTO> history = new ChangeRecord<MemberDTO>();
 		
 		TitanGraph g = null;
 		
@@ -173,7 +173,7 @@ public class HistoryGao {
 			
 			List<Edge> fls = fPipe.toList();
 
-			List<Member> ms = RefsetConvertor.getHistoryMembers(fls);
+			List<MemberDTO> ms = RefsetConvertor.getHistoryMembers(fls);
 			history.setRecords(ms);
 
 		} catch (Exception e) {
@@ -201,13 +201,13 @@ public class HistoryGao {
 	 * @return
 	 * @throws RefsetGraphAccessException
 	 */
-	public ChangeRecord<Refset> getRefsetHeaderHistory(String refsetId,  DateTime fromDate, DateTime toDate, Integer from, Integer to) throws RefsetGraphAccessException {
+	public ChangeRecord<RefsetDTO> getRefsetHeaderHistory(String refsetId,  DateTime fromDate, DateTime toDate, Integer from, Integer to) throws RefsetGraphAccessException {
 
 		Object[] criteria = {fromDate, toDate, from, to};
 		
 		LOGGER.debug("Getting refset history for refset id {}, and criteria {}", refsetId, criteria);
 
-		ChangeRecord<Refset> history = new ChangeRecord<Refset>();
+		ChangeRecord<RefsetDTO> history = new ChangeRecord<RefsetDTO>();
 
 		TitanGraph g = null;
 		
@@ -232,7 +232,7 @@ public class HistoryGao {
 				.range(from, to);
 			
 			List<Edge> ls = rPipe.toList();
-			List<Refset> rs = RefsetConvertor.getHistoryRefsets(ls);
+			List<RefsetDTO> rs = RefsetConvertor.getHistoryRefsets(ls);
 
 			history.setRecords(rs);
 
@@ -258,13 +258,13 @@ public class HistoryGao {
 	 * @param to
 	 * @return
 	 */
-	public Map<String, ChangeRecord<Member>> getAllMembersStateHistory(
+	public Map<String, ChangeRecord<MemberDTO>> getAllMembersStateHistory(
 			String refsetId, DateTime fromDate, DateTime toDate, int from,
 			int to) throws RefsetGraphAccessException {
 
 		LOGGER.debug("Getting all member state history for refset id {}", refsetId);
 
-		Map<String, ChangeRecord<Member>> history = new HashMap<String, ChangeRecord<Member>>();
+		Map<String, ChangeRecord<MemberDTO>> history = new HashMap<String, ChangeRecord<MemberDTO>>();
 
 		TitanGraph g = null;
 		
@@ -296,8 +296,8 @@ public class HistoryGao {
 				.range(from, to);
 				List<Edge> mhls = mhPipe.toList();
 				
-				List<Member> ms = RefsetConvertor.getHistoryMembers(mhls);
-				ChangeRecord<Member> cr = new ChangeRecord<Member>();
+				List<MemberDTO> ms = RefsetConvertor.getHistoryMembers(mhls);
+				ChangeRecord<MemberDTO> cr = new ChangeRecord<MemberDTO>();
 				String rcId = e.getProperty(ID);
 				cr.setRecords(ms);
 				history.put(rcId, cr);
@@ -328,14 +328,14 @@ public class HistoryGao {
 	 * @param to
 	 * @return
 	 */
-	public ChangeRecord<Refset> getRefsetHeaderStateHistory(String refsetId,
+	public ChangeRecord<RefsetDTO> getRefsetHeaderStateHistory(String refsetId,
 			DateTime fromDate, DateTime toDate, int from, int to) throws RefsetGraphAccessException {
 		
 		Object[] criteria = {fromDate, toDate, from, to};
 		
 		LOGGER.debug("Getting refset history for refset id {}, and criteria {}", refsetId, criteria);
 
-		ChangeRecord<Refset> history = new ChangeRecord<Refset>();
+		ChangeRecord<RefsetDTO> history = new ChangeRecord<RefsetDTO>();
 
 		TitanGraph g = null;
 		
@@ -360,7 +360,7 @@ public class HistoryGao {
 				.range(from, to);
 			
 			List<Vertex> ls = rPipe.toList();
-			List<Refset> rs = RefsetConvertor.getStateRefsets(ls);
+			List<RefsetDTO> rs = RefsetConvertor.getStateRefsets(ls);
 
 			history.setRecords(rs);
 
@@ -388,7 +388,7 @@ public class HistoryGao {
 	 * @param to
 	 * @return
 	 */
-	public ChangeRecord<Member> getMemberStateHistory(String refsetId,
+	public ChangeRecord<MemberDTO> getMemberStateHistory(String refsetId,
 			String id, DateTime fromDate, DateTime toDate, int from,
 			int to) throws RefsetGraphAccessException {
 		
@@ -396,7 +396,7 @@ public class HistoryGao {
 		
 		LOGGER.debug("Getting member history for refset id {} and criteria {}", refsetId, criteria);
 
-		ChangeRecord<Member> history = new ChangeRecord<Member>();
+		ChangeRecord<MemberDTO> history = new ChangeRecord<MemberDTO>();
 		
 		TitanGraph g = null;
 		
@@ -427,7 +427,7 @@ public class HistoryGao {
 			
 			List<Vertex> fls = fPipe.toList();
 
-			List<Member> ms = RefsetConvertor.getStateMembers(fls);
+			List<MemberDTO> ms = RefsetConvertor.getStateMembers(fls);
 			history.setRecords(ms);
 
 		} catch (Exception e) {
@@ -453,13 +453,13 @@ public class HistoryGao {
 	 * @param memberId
 	 * @return {@link ChangeRecord}
 	 */
-	public ChangeRecord<Member> getMemberStateHistory(String memberId, String refsetId) throws RefsetGraphAccessException, EntityNotFoundException {
+	public ChangeRecord<MemberDTO> getMemberStateHistory(String memberId, String refsetId) throws RefsetGraphAccessException, EntityNotFoundException {
 		
 		Object[] criteria = {memberId, refsetId};
 		
 		LOGGER.debug("Getting member history for criteria {}", criteria);
 
-		ChangeRecord<Member> history = new ChangeRecord<Member>();
+		ChangeRecord<MemberDTO> history = new ChangeRecord<MemberDTO>();
 		
 		TitanGraph g = null;
 		
@@ -486,7 +486,7 @@ public class HistoryGao {
 			
 			for (Vertex vM : vMs) {
 				
-				Member currentMember = RefsetConvertor.getMember(vM);
+				MemberDTO currentMember = RefsetConvertor.getMember(vM);
 				
 				Iterable<Edge> edges = vM.getEdges(Direction.OUT, EdgeLabel.members.toString());
 				for (Edge edge : edges) {
@@ -507,10 +507,10 @@ public class HistoryGao {
 				
 				List<Vertex> fls = fPipe.toList();
 
-				List<Member> ms = RefsetConvertor.getStateMembers(fls);
+				List<MemberDTO> ms = RefsetConvertor.getStateMembers(fls);
 				
 				//we need to get missing data from existing member detail. TODO create full details during state creation
-				for (Member m : ms) {
+				for (MemberDTO m : ms) {
 					
 					if (StringUtils.isEmpty(m.getModuleId())) {
 						

@@ -10,9 +10,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import org.ihtsdo.otf.refset.domain.Member;
+import org.ihtsdo.otf.refset.domain.MemberDTO;
 import org.ihtsdo.otf.refset.domain.MetaData;
-import org.ihtsdo.otf.refset.domain.Refset;
+import org.ihtsdo.otf.refset.domain.RefsetDTO;
 import org.ihtsdo.otf.refset.graph.schema.GRefset;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -37,9 +37,9 @@ public class RefsetConvertor {
 	 * @param vs.
 	 * @return
 	 */
-	public static List<Refset> getRefsets(Iterable<GRefset> vs) {
+	public static List<RefsetDTO> getRefsets(Iterable<GRefset> vs) {
 
-		List<Refset> refsets = new ArrayList<Refset>();
+		List<RefsetDTO> refsets = new ArrayList<RefsetDTO>();
 
 		for (GRefset gr : vs) {
 			
@@ -47,7 +47,7 @@ public class RefsetConvertor {
 			
 			if (!StringUtils.isEmpty(gr.getId()) && keys.contains(DESC) ) {
 				
-				Refset r = getRefset(gr);
+				RefsetDTO r = getRefset(gr);
 
 				refsets.add(r);
 				
@@ -62,13 +62,13 @@ public class RefsetConvertor {
 	 * @param v
 	 * @return
 	 */
-	public static Refset convert2Refset(GRefset vR) {
+	public static RefsetDTO convert2Refset(GRefset vR) {
 
 
 		
 		LOGGER.debug("convert2Refsets {}", vR);
 
-		Refset r = getRefset(vR);
+		RefsetDTO r = getRefset(vR);
 
 		Iterable<Edge> eRs = vR.asVertex().getEdges(Direction.IN, "members");
 		r.setMembers(getMembers(eRs));
@@ -84,9 +84,9 @@ public class RefsetConvertor {
 	 * @param asVertex
 	 * @return
 	 */
-	protected static Refset getRefset(GRefset vR) {
+	protected static RefsetDTO getRefset(GRefset vR) {
 		
-		Refset r = new Refset();
+		RefsetDTO r = new RefsetDTO();
 		Set<String> keys = vR.asVertex().getPropertyKeys();
 		
 		if ( keys.contains(CREATED) ) {
@@ -275,14 +275,25 @@ public class RefsetConvertor {
 			r.setExternalContact(vR.getExternalContact());
 		
 		}
+		if ( keys.contains(REFSET_STATUS) ) {
+			
+			r.setStatus(vR.getStatus());
+		
+		}
+
+		if ( keys.contains(VERSION) ) {
+			
+			r.setVersion(vR.getVersion());
+		
+		}
 
 		return r;
 	}
 
 
-	protected static List<Member> getMembers(Iterable<Edge> eRs ) {
+	protected static List<MemberDTO> getMembers(Iterable<Edge> eRs ) {
 		
-		List<Member> members = new ArrayList<Member>();
+		List<MemberDTO> members = new ArrayList<MemberDTO>();
 
 		if(eRs != null) {
 			
@@ -308,7 +319,7 @@ public class RefsetConvertor {
 				
 				Vertex vM = eR.getVertex(Direction.OUT);
 				
-				Member m = getMember(vM);
+				MemberDTO m = getMember(vM);
 				
 				Set<String> eKeys = eR.getPropertyKeys();
 				if ( eKeys.contains(REFERENCE_COMPONENT_ID) ) {
@@ -375,11 +386,11 @@ public class RefsetConvertor {
 	/**
 	 * @param vM
 	 */
-	protected static Member getMember(Vertex vM) {
-		// TODO Auto-generated method stub
+	protected static MemberDTO getMember(Vertex vM) {
+
 		Set<String> mKeys = vM.getPropertyKeys();
 		
-		Member m = new Member();
+		MemberDTO m = new MemberDTO();
 		
 		if ( mKeys.contains(ID) ) {
 			
@@ -490,9 +501,9 @@ public class RefsetConvertor {
 	 * @param ls
 	 * @return
 	 */
-	public static List<Refset> getHistoryRefsets(List<Edge> ls) {
+	public static List<RefsetDTO> getHistoryRefsets(List<Edge> ls) {
 
-		List<Refset> history = new ArrayList<Refset>();
+		List<RefsetDTO> history = new ArrayList<RefsetDTO>();
 
 		if(ls != null) {
 			
@@ -501,7 +512,7 @@ public class RefsetConvertor {
 				
 				Vertex vR = eR.getVertex(Direction.IN);
 				
-				Refset r = getRefset(vR);
+				RefsetDTO r = getRefset(vR);
 
 				LOGGER.trace("Adding history refset as {} ", r.toString());
 
@@ -519,14 +530,14 @@ public class RefsetConvertor {
 	 * @param vR
 	 * @return
 	 */
-	private static Refset getRefset(Vertex vR) {
+	private static RefsetDTO getRefset(Vertex vR) {
 
 		if (vR == null) {
 			
 			return null;
 		}
 		
-		Refset r = new Refset();
+		RefsetDTO r = new RefsetDTO();
 		Set<String> keys = vR.getPropertyKeys();
 		
 		if ( keys.contains(CREATED) ) {
@@ -714,13 +725,26 @@ public class RefsetConvertor {
 		
 		}
 		
+		if ( keys.contains(REFSET_STATUS) ) {
+			
+			String status = vR.getProperty(REFSET_STATUS);
+			r.setStatus(status);
+		
+		}
+		if ( keys.contains(VERSION) ) {
+			
+			Integer version = vR.getProperty(VERSION);
+			r.setVersion(version);
+		
+		}
+		
 		return r;
 
 	}
 	
-	protected static List<Member> getHistoryMembers(Iterable<Edge> eRs ) {
+	protected static List<MemberDTO> getHistoryMembers(Iterable<Edge> eRs ) {
 		
-		List<Member> members = new ArrayList<Member>();
+		List<MemberDTO> members = new ArrayList<MemberDTO>();
 
 		if(eRs != null) {
 			
@@ -729,7 +753,7 @@ public class RefsetConvertor {
 				
 				Vertex vM = eR.getVertex(Direction.IN);
 				
-				Member m = getMember(vM);
+				MemberDTO m = getMember(vM);
 				
 				Set<String> eKeys = eR.getPropertyKeys();
 				if ( eKeys.contains(REFERENCE_COMPONENT_ID) ) {
@@ -754,14 +778,14 @@ public class RefsetConvertor {
 	 * @param ls
 	 * @return
 	 */
-	public static List<Refset> getStateRefsets(List<Vertex> ls) {
+	public static List<RefsetDTO> getStateRefsets(List<Vertex> ls) {
 	
-		List<Refset> history = new ArrayList<Refset>();
+		List<RefsetDTO> history = new ArrayList<RefsetDTO>();
 		if (ls != null && !ls.isEmpty()) {
 			
 			for (Vertex vR : ls) {
 				
-				Refset r = getRefset(vR);
+				RefsetDTO r = getRefset(vR);
 
 				LOGGER.trace("Adding history refset as {} ", r.toString());
 
@@ -777,15 +801,15 @@ public class RefsetConvertor {
 	 * @param fls
 	 * @return
 	 */
-	public static List<Member> getStateMembers(List<Vertex> fls) {
+	public static List<MemberDTO> getStateMembers(List<Vertex> fls) {
 		
-		List<Member> members = new ArrayList<Member>();
+		List<MemberDTO> members = new ArrayList<MemberDTO>();
 
 		if(fls != null) {
 			
 			for (Vertex vM : fls) {
 							
-				Member m = getMember(vM);
+				MemberDTO m = getMember(vM);
 				LOGGER.trace("Adding member as {} ", m.toString());
 
 				members.add(m);

@@ -12,9 +12,12 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
+import org.ihtsdo.otf.refset.common.SearchCriteria;
+import org.ihtsdo.otf.refset.common.SearchField;
 import org.ihtsdo.otf.refset.domain.Member;
 import org.ihtsdo.otf.refset.domain.MetaData;
 import org.ihtsdo.otf.refset.domain.Refset;
+import org.ihtsdo.otf.refset.domain.RefsetStatus;
 import org.ihtsdo.otf.refset.exception.EntityAlreadyExistException;
 import org.ihtsdo.otf.refset.exception.EntityNotFoundException;
 import org.ihtsdo.otf.refset.exception.LockingException;
@@ -81,7 +84,7 @@ public class RefsetAdminGAO {
 						
 			tg = factory.getEventGraph();
 			
-			if (rGao.isSctIdExist(r.getSctId(), tg.getBaseGraph())) {
+			if (isSctIdExist(r.getSctId())) {
 				
 				throw new EntityAlreadyExistException("Refset with same sctid already exist");
 				
@@ -91,7 +94,7 @@ public class RefsetAdminGAO {
 
 			
 			/*if members exist then add members*/
-			List<Member> members = r.getMembers();
+			List<Member> members = r.getMemberList();
 			/*populate descriptions*/
 			List<String> rcIds = new ArrayList<String>();
 			
@@ -164,6 +167,26 @@ public class RefsetAdminGAO {
 		return md;
 	}
 	
+
+	/**
+	 * @param sctId
+	 * @return
+	 */
+	private boolean isSctIdExist(String sctId) {
+
+		if (StringUtils.isEmpty(sctId)) {
+			
+			return false;
+		}
+		
+		SearchCriteria criteria = new SearchCriteria();
+		criteria.addSearchField(SearchField.sctId, sctId);
+		
+		Long noOfRefsets = rGao.totalNoOfRefset(criteria);
+		
+		return noOfRefsets > 0 ? true : false;
+	}
+
 
 	/**
 	 * @param r {@link Refset}
@@ -316,7 +339,11 @@ public class RefsetAdminGAO {
 
 			}
 			
+			String status = StringUtils.isEmpty(r.getStatus()) ? RefsetStatus.inProgress.toString() : r.getStatus();
 			
+			gr.setStatus(status);
+		
+			gr.setVersion(1);
 			
 			
 			LOGGER.debug("Added Refset as vertex to graph {}", gr.getId());
@@ -425,7 +452,7 @@ public class RefsetAdminGAO {
 			LOGGER.debug("Updating members");
 
 			/*if members exist then update members*/
-			List<Member> members = r.getMembers();
+			List<Member> members = r.getMemberList();
 			
 			if( !CollectionUtils.isEmpty(members) ) {
 				
@@ -486,7 +513,8 @@ public class RefsetAdminGAO {
 
 		Object rVId = rGao.getRefsetVertex(r.getUuid(), fgf.create(g.getBaseGraph()));
 		
-        g.addListener(new RefsetHeaderChangeListener(g.getBaseGraph(), r.getModifiedBy()));
+        //g.addListener(new RefsetHeaderChangeListener(g.getBaseGraph(), r.getModifiedBy()));
+        g.addListener(new StatusChangeListerner(g.getBaseGraph(), r.getModifiedBy()));
 
 		Vertex rV = g.getVertex(rVId);//, GRefset.class);
 		
@@ -555,37 +583,30 @@ public class RefsetAdminGAO {
 
 		if (!StringUtils.isEmpty(compTypeId)) {
 			
-			//rV.setComponentTypeId(compTypeId);
 			rV.setProperty(MEMBER_TYPE_ID, compTypeId);
 		}
 		
 		Integer activeFlag = r.isActive() ? 1 : 0;
 
-		//rV.setActive(activeFlag);
 		rV.setProperty(ACTIVE, activeFlag);
 		
 		String typeId = r.getTypeId();
 
 		if (!StringUtils.isEmpty(typeId)) {
 			
-			//rV.setTypeId(typeId);
 			rV.setProperty(TYPE_ID, typeId);
 		}
 
-		//rV.setModifiedBy(r.getModifiedBy());
-		//rV.setModifiedDate(new DateTime().getMillis());
 		rV.setProperty(MODIFIED_BY, r.getModifiedBy());
 		rV.setProperty(MODIFIED_DATE, new DateTime().getMillis());
 		DateTime ert = r.getExpectedReleaseDate();
 		if (ert != null) {
 			
-			//rV.setExpectedReleaseDate(ert.getMillis());
 			rV.setProperty(EXPECTED_PUBLISH_DATE, ert.getMillis());
 		}
 		
 		if (!StringUtils.isEmpty(r.getSctId())) {
 			
-			//rV.setSctdId(r.getSctId());
 			rV.setProperty(SCTID, r.getSctId());
 		}
 		
@@ -660,6 +681,19 @@ public class RefsetAdminGAO {
 			rV.setProperty(EXT_CONTACT, r.getExternalContact());
 
 		}
+		
+		if (!StringUtils.isEmpty(r.getStatus()) && !r.getStatus().equals(rV.getProperty(REFSET_STATUS))) {
+			
+			rV.setProperty(REFSET_STATUS, r.getStatus());
+			Object verObj = rV.getProperty(VERSION);
+			
+			Integer version = verObj != null ? (Integer)verObj + 1 : 1;
+			
+			rV.setProperty(VERSION, version);
+
+		}
+		
+		
 		
 		LOGGER.debug("updateRefsetNode {} finished", rV);
 

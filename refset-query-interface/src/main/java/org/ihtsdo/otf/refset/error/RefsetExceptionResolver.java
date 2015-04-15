@@ -34,7 +34,9 @@ public class RefsetExceptionResolver {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(RefsetExceptionResolver.class);
 	//TODO need to formalize
-	private static final String ERROR_CODE_SERVER = "55011";
+	private static final String ERROR_CODE_REFSET_SERVER = "55011";
+	private static final String ERROR_CODE_TERM_SERVER = "55012";
+
 	private static final String ERROR_CODE_GEN = "44011";
 	
 	final Result<Map<String, Object>> response = new Result<Map<String, Object>>();
@@ -97,7 +99,7 @@ public class RefsetExceptionResolver {
 		
 		LOGGER.error("Exception details \n", e);
 
-		ErrorInfo errorInfo = new ErrorInfo("Error occurred during export. Try after sometime", ERROR_CODE_SERVER);
+		ErrorInfo errorInfo = new ErrorInfo("Error occurred during export. Try after sometime", ERROR_CODE_REFSET_SERVER);
 	    
 		Meta m = new Meta();
 		m.setStatus(HttpStatus.OK);
@@ -132,7 +134,7 @@ public class RefsetExceptionResolver {
 		
 		LOGGER.error("Exception details \n", e);
 
-		ErrorInfo errorInfo = new ErrorInfo("An unknown error occurred in service call, try after sometime", ERROR_CODE_SERVER);
+		ErrorInfo errorInfo = new ErrorInfo("An unknown error occurred in service call, try after sometime", ERROR_CODE_REFSET_SERVER, e.getMessage());
 	    
 		Meta m = new Meta();
 		m.setStatus(HttpStatus.OK);
@@ -149,7 +151,7 @@ public class RefsetExceptionResolver {
 		
 		LOGGER.error("Exception details \n", e);
 
-		ErrorInfo errorInfo = new ErrorInfo("An unknown error occurred in service call, try after sometime", ERROR_CODE_SERVER);
+		ErrorInfo errorInfo = new ErrorInfo("An unknown error occurred in service call, try after sometime", ERROR_CODE_TERM_SERVER, e.getMessage());
 	    
 		Meta m = new Meta();
 		m.setStatus(HttpStatus.OK);

@@ -10,7 +10,7 @@
 		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd
 		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.0.xsd">
-	<sec:global-method-security pre-post-annotations="enabled"/>
+	<!--  sec:global-method-security pre-post-annotations="enabled"/ disabled to local testing-->
 	
 	<sec:http create-session="stateless" auto-config="false" 
 				entry-point-ref="crowdAuthenticationProcessingFilterEntryPoint"
@@ -21,7 +21,7 @@
 		<sec:custom-filter ref="authenticationProcessingFilter" position="FORM_LOGIN_FILTER"/>
 		<sec:custom-filter ref="logoutFilter" position="LOGOUT_FILTER"/>
 		<sec:intercept-url pattern="/v1/refsets/search*" access="permitAll"/>
-		<sec:intercept-url pattern="/v1/refsets/*" access="isAuthenticated()" />
+		<sec:intercept-url pattern="/v1/refsets/*" access="permitAll" /> <!-- isAuthenticated() replace it with permit all-->
 		<sec:intercept-url pattern="/v1/snomed/*" access="permitAll"/>
 		<sec:intercept-url pattern="/v1/refsets/getUserDetails" access="isAuthenticated()"/>
 		<sec:intercept-url pattern="/logout" access="permitAll"/>

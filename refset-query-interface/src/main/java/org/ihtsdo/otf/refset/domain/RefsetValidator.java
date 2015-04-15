@@ -34,7 +34,7 @@ public class RefsetValidator implements Validator {
 	@Override
 	public boolean supports(Class<?> arg0) {
 
-		return Refset.class.equals(arg0);
+		return RefsetDTO.class.equals(arg0);
 	}
 
 	/* (non-Javadoc)
@@ -58,7 +58,7 @@ public class RefsetValidator implements Validator {
         ValidationUtils.rejectIfEmptyOrWhitespace(e, "expectedReleaseDate", "Expected published date is mandatory");
 
         //conditional validation
-        Refset r = (Refset)m;
+        RefsetDTO r = (RefsetDTO)m;
         
         if (!StringUtils.isEmpty(r.getExternalUrl())) {
 			

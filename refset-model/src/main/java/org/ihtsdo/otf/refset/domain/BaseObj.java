@@ -36,9 +36,7 @@ public class BaseObj {
 	protected DateTime effectiveTime;
 		
 	protected DateTime publishedDate;
-	
-	protected String version;
-	
+		
 	protected String moduleId;
 	
 	protected boolean active;
@@ -52,8 +50,7 @@ public class BaseObj {
 	
 	@JsonIgnore
 	private MetaData metaData;
-	
-	private String sctId;
+		
 
 	
 	/**
@@ -207,18 +204,6 @@ public class BaseObj {
 		this.modifiedBy = modifiedBy;
 	}
 	/**
-	 * @return the version
-	 */
-	public String getVersion() {
-		return version;
-	}
-	/**
-	 * @param version the version to set
-	 */
-	public void setVersion(String version) {
-		this.version = version;
-	}
-	/**
 	 * @return the description
 	 */
 	public String getDescription() {
@@ -244,17 +229,7 @@ public class BaseObj {
 	public void setLanguageCode(String languageCode) {
 		this.languageCode = languageCode;
 	}
-	/**
-	 * @return the sctId
-	 */
-	public String getSctId() {
-		return sctId;
-	}
-	/**
-	 * @param sctId the sctId to set
-	 */
-	public void setSctId(String sctId) {
-		this.sctId = sctId;
-	}
+	
+
 
 }

@@ -9,12 +9,12 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.ihtsdo.otf.refset.schema;
+package org.ihtsdo.otf.refset.domain;
 
 /**
  *
  */
-public enum Operation {
+public enum RefsetStatus {
 
-	schema, index, print, update, repair
+	deleted, released, published, inProgress
 }

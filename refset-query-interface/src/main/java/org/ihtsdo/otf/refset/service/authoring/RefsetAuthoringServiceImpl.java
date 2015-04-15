@@ -5,13 +5,16 @@ package org.ihtsdo.otf.refset.service.authoring;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
 import org.ihtsdo.otf.refset.domain.Member;
-import org.ihtsdo.otf.refset.domain.Refset;
+import org.ihtsdo.otf.refset.domain.MemberDTO;
+import org.ihtsdo.otf.refset.domain.RefsetDTO;
+import org.ihtsdo.otf.refset.domain.RefsetStatus;
 import org.ihtsdo.otf.refset.exception.EntityAlreadyExistException;
 import org.ihtsdo.otf.refset.exception.EntityNotFoundException;
 import org.ihtsdo.otf.refset.exception.LockingException;
@@ -63,7 +66,7 @@ public class RefsetAuthoringServiceImpl implements RefsetAuthoringService {
 	 * @see org.ihtsdo.otf.refset.service.RefsetAdminService#addRefset(org.ihtsdo.otf.refset.domain.Refset)
 	 */
 	@Override
-	public String addRefset(Refset r) throws RefsetServiceException, EntityAlreadyExistException {
+	public String addRefset(RefsetDTO r) throws RefsetServiceException, EntityAlreadyExistException {
 		
 		LOGGER.debug("addrefset {}", r);
 		
@@ -89,7 +92,7 @@ public class RefsetAuthoringServiceImpl implements RefsetAuthoringService {
 	 * @see org.ihtsdo.otf.refset.service.RefsetAdminService#addMember(java.lang.String, org.ihtsdo.otf.refset.domain.Member)
 	 */
 	@Override
-	public void addMember(String refsetId, Member m)
+	public void addMember(String refsetId, MemberDTO m)
 			throws RefsetServiceException, EntityAlreadyExistException {
 		
 		LOGGER.debug("Adding member {} to refset {}", m, refsetId);
@@ -107,9 +110,9 @@ public class RefsetAuthoringServiceImpl implements RefsetAuthoringService {
 				 throw new UpdateDeniedException("Only an owner can remove member from refset");
 			 }
 			
-			 Refset r = gao.getRefset(refsetId);
+			 RefsetDTO r = gao.getRefsetHeader(refsetId, -1);
 			
-			 List<Member> members = new ArrayList<Member>();
+			 List<MemberDTO> members = new ArrayList<MemberDTO>();
 			 m.setUuid(UUID.randomUUID().toString());
 			 if(StringUtils.isEmpty(m.getDescription())) {
 				
@@ -134,15 +137,15 @@ public class RefsetAuthoringServiceImpl implements RefsetAuthoringService {
 			throw new RefsetServiceException(e.getMessage());
 
 		} catch (ConceptServiceException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOGGER.error("Error during service call", e);
+			throw new RefsetServiceException(e.getMessage());
 		}
 		
 
 	}
 
 	@Override
-	public String updateRefset(Refset r) throws RefsetServiceException {
+	public String updateRefset(RefsetDTO r) throws RefsetServiceException {
 		
 		LOGGER.debug("updateRefset member {} to refset {}", r);
 
@@ -159,7 +162,17 @@ public class RefsetAuthoringServiceImpl implements RefsetAuthoringService {
 			 setOriginCountry(r);
 			 setSnomedCTExt(r);
 			 setClinicalDomain(r);
-				
+			 
+			 if (!StringUtils.isEmpty(r.getSctId())) {
+				 
+				 r.setStatus(RefsetStatus.released.toString());
+				 
+			 } else if(r.isPublished()) {
+				 
+				 r.setStatus(RefsetStatus.published.toString());
+
+			 }
+						
 			 adminGao.updateRefset(r);
 			
 		} catch (RefsetGraphAccessException e) {
@@ -177,7 +190,7 @@ public class RefsetAuthoringServiceImpl implements RefsetAuthoringService {
 	 * @return
 	 * @throws RefsetServiceException
 	 */
-	private Refset obfuscate(Refset r) throws RefsetServiceException {
+	private RefsetDTO obfuscate(RefsetDTO r) throws RefsetServiceException {
 		// TODO Auto-generated method stub
 		if (r == null) {
 			
@@ -312,13 +325,13 @@ public class RefsetAuthoringServiceImpl implements RefsetAuthoringService {
 	 * @see org.ihtsdo.otf.refset.service.RefsetAuthoringService#addMembers(java.lang.String, java.util.Set)
 	 */
 	@Override
-	public Map<String, String> addMembers(String refsetId, Set<Member> members, String user)
+	public Map<String, String> addMembers(String refsetId, Set<MemberDTO> memberDTOs, String user)
 			throws RefsetServiceException {
 		
 
 		Map<String, String> tOutcome = new HashMap<String, String>();
 		
-		LOGGER.debug("Adding members {} to refset {}", members, refsetId);
+		LOGGER.debug("Adding members {} to refset {}", memberDTOs, refsetId);
 
 		try {			
 			
@@ -327,6 +340,8 @@ public class RefsetAuthoringServiceImpl implements RefsetAuthoringService {
 				
 				throw new UpdateDeniedException("Only an owner of refset can add new member");
 			}
+			
+			Set<Member> members = getMembers(memberDTOs);
 			
 			LOGGER.debug("Adding member {} to refset {}", members, refsetId);
 			//add 100 members at a time. Otherwise when large number of members being added transaction is slow due to too many vertices/edges
@@ -353,9 +368,21 @@ public class RefsetAuthoringServiceImpl implements RefsetAuthoringService {
 	}
 	
 	/**
+	 * @param memberDTOs
+	 * @return
+	 */
+	private Set<Member> getMembers(Set<MemberDTO> memberDTOs) {
+
+		Set<Member> members = new HashSet<Member>();
+		
+		members.addAll(memberDTOs);
+		return members;
+	}
+
+	/**
 	 * @param r
 	 */
-	private void setOriginCountry(Refset r) {
+	private void setOriginCountry(RefsetDTO r) {
 		
 		if (r != null && !StringUtils.isEmpty(r.getOriginCountryCode())) {
 			
@@ -363,7 +390,7 @@ public class RefsetAuthoringServiceImpl implements RefsetAuthoringService {
 		}
 	}
 	
-	private void setSnomedCTExt(Refset r) {
+	private void setSnomedCTExt(RefsetDTO r) {
 		
 		if (r != null && !StringUtils.isEmpty(r.getSnomedCTExtensionNs())) {
 			
@@ -371,11 +398,11 @@ public class RefsetAuthoringServiceImpl implements RefsetAuthoringService {
 		}
 	}
 	
-	private void setClinicalDomain(Refset r) {
+	private void setClinicalDomain(RefsetDTO r) {
 		
 		if (r != null && !StringUtils.isEmpty(r.getClinicalDomainCode())) {
 			
-			r.setClinicalDomain(mdService.getClinicalDomains().get(r.getClinicalDomain()));
+			r.setClinicalDomain(mdService.getClinicalDomains().get(r.getClinicalDomainCode()));
 		}
 	}
 
