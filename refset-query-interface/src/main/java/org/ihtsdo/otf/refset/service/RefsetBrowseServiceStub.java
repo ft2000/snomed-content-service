@@ -57,16 +57,6 @@ public class RefsetBrowseServiceStub implements RefsetBrowseService {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.ihtsdo.otf.refset.service.RefsetBrowseService#getRefsetForExport(java.lang.String)
-	 */
-	@Override
-	public RefsetDTO getRefsetForExport(String refsetId)
-			throws RefsetServiceException, EntityNotFoundException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/* (non-Javadoc)
 	 * @see org.ihtsdo.otf.refset.service.RefsetBrowseService#isOwner(java.lang.String, java.lang.String)
 	 */
 	@Override
@@ -101,6 +91,16 @@ public class RefsetBrowseServiceStub implements RefsetBrowseService {
 	@Override
 	public Set<Integer> getRefsetVersions(String refSetId)
 			throws RefsetServiceException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.otf.refset.service.browse.RefsetBrowseService#getRefsetForExport(java.lang.String, java.lang.Integer)
+	 */
+	@Override
+	public RefsetDTO getRefsetForExport(String refsetId, Integer version)
+			throws RefsetServiceException, EntityNotFoundException {
 		// TODO Auto-generated method stub
 		return null;
 	}

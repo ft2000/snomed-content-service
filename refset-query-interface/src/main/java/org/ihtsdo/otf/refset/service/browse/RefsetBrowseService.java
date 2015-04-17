@@ -44,11 +44,12 @@ public interface RefsetBrowseService {
 
 	/**
 	 * @param refsetId
+	 * @param version 
 	 * @return
 	 * @throws RefsetServiceException
 	 * @throws EntityNotFoundException
 	 */
-	public RefsetDTO getRefsetForExport(String refsetId) throws RefsetServiceException,
+	public RefsetDTO getRefsetForExport(String refsetId, Integer version) throws RefsetServiceException,
 			EntityNotFoundException;
 	
 	

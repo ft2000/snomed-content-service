@@ -725,6 +725,37 @@ public class RefsetConvertor {
 		
 		}
 		
+		if ( keys.contains(VIEW_COUNT) ) {
+			
+			Integer views = vR.getProperty(VIEW_COUNT);
+
+			r.getMatrix().setViews(views);
+				
+		}
+		
+		if ( keys.contains(DOWNLOAD_COUNT) ) {
+			Integer downloads = vR.getProperty(DOWNLOAD_COUNT);
+
+			r.getMatrix().setDownloads(downloads);
+		
+		}
+		
+		if ( keys.contains(EXT_URL) ) {
+			
+			String externalUrl = vR.getProperty(EXT_URL);
+
+			r.setExternalUrl(externalUrl);
+		
+		}
+		
+		if ( keys.contains(EXT_CONTACT) ) {
+			
+			String externalContact = vR.getProperty(EXT_CONTACT);
+
+			r.setExternalContact(externalContact);
+		
+		}
+		
 		if ( keys.contains(REFSET_STATUS) ) {
 			
 			String status = vR.getProperty(REFSET_STATUS);

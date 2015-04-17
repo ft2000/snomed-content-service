@@ -42,9 +42,9 @@ public class ExportService {
 	private ConceptLookupService lService;
 
 	
-	public  void getRF2Payload(ICsvListWriter lWriter, String refsetUuId) throws ExportServiceException, EntityNotFoundException {
+	public  void getRF2Payload(ICsvListWriter lWriter, String refsetUuId, Integer version) throws ExportServiceException, EntityNotFoundException {
 		
-		LOGGER.debug("Exporting refset {}", refsetUuId);
+		LOGGER.debug("Exporting refset as rf2 for refset {} and version {}", refsetUuId, version);
 		
 		if (lWriter == null) {
 			
@@ -61,7 +61,87 @@ public class ExportService {
 			//TODO header has to come from refset descriptor. For now hard code
 			//http://supercsv.sourceforge.net/examples_writing.html. 
 			
-			RefsetDTO r = bService.getRefsetForExport(refsetUuId);
+			RefsetDTO r = bService.getRefsetForExport(refsetUuId, version);
+			
+            final CellProcessor[] processors = getProcessors();
+            /**
+             * id	effectiveTime	active	moduleId	refsetId	referencedComponentId
+             */
+			final String[] header = new String[] { "id", "effectiveTime", "active"
+            		, "moduleId", "refsetId", "referencedComponentId"};
+			            
+
+            lWriter.writeHeader(header);
+			
+			List<MemberDTO> ms = r.getMembers();
+			String refsetId = StringUtils.isEmpty(r.getSctId()) ? r.getUuid() : r.getSctId();
+			for (MemberDTO m : ms) {
+								
+				String active = m.isActive() ? "1" : "0";
+				DateTime et = m.getEffectiveTime() != null ? m.getEffectiveTime() : r.getExpectedReleaseDate();
+				
+				Object[] rf2Record = new Object[] { m.getUuid(), Utility.getDate(et), active
+                		, m.getModuleId(), refsetId, m.getReferencedComponentId()};
+				
+				List<Object> concept = Arrays.asList(rf2Record);
+
+				lWriter.write(concept, processors);
+				
+			}
+		
+           			
+		} catch (RefsetServiceException e) {
+
+			LOGGER.error("Error during refset retrivel {}", e);
+			
+			throw new ExportServiceException("Error in refset retrievel during refset export");
+			
+		} catch (IOException e) {
+			
+			throw new ExportServiceException("Error in csv parsing in export");
+
+		}
+		
+	}
+	
+	public  RefsetDTO getJsonPayload(String refsetUuId, Integer version) throws ExportServiceException, EntityNotFoundException {
+		
+		LOGGER.debug("Exporting refset as json for refset {} and version {}", refsetUuId, version);
+		
+		try {
+			
+			return 	getRefsetWithAllMembers(refsetUuId, version);
+
+		} catch (RefsetServiceException e) {
+
+			LOGGER.error("Error during refset retrivel {}", e);
+			
+			throw new ExportServiceException("Error in refset retrievel during refset export");
+			
+		}
+		
+	}
+	
+	public  void getTSVPayload(ICsvListWriter lWriter, String refsetUuId, Integer version) throws ExportServiceException, EntityNotFoundException {
+		
+		LOGGER.debug("Exporting refset as rf2 for refset {} and version {}", refsetUuId, version);
+		
+		if (lWriter == null) {
+			
+			throw new ExportServiceException("No output writer available");
+		}
+		
+		if (StringUtils.isEmpty(refsetUuId)) {
+			
+			throw new ExportServiceException("Invalid request");
+
+		}
+
+		try {
+			//TODO header has to come from refset descriptor. For now hard code
+			//http://supercsv.sourceforge.net/examples_writing.html. 
+			
+			RefsetDTO r = getRefsetWithAllMembers(refsetUuId, version);
 			
             final CellProcessor[] processors = getProcessors();
             /**
@@ -116,6 +196,40 @@ public class ExportService {
         };
         
         return processors;
+	}
+	
+	/** Method to get refset header and all members in the refset.
+	 * @param refsetUuId
+	 * @param version
+	 * @return
+	 * @throws RefsetServiceException
+	 */
+	private RefsetDTO getRefsetWithAllMembers(String refsetUuId, int version) throws RefsetServiceException {
+		
+		int to = 100;
+		int from =0;
+		
+		RefsetDTO r = bService.getRefset(refsetUuId, from, to, version);
+		List<MemberDTO> ms = r.getMembers();
+		
+		if(r.getTotalNoOfMembers() > to) {
+			
+			while (to <= r.getTotalNoOfMembers()) {
+				from = to + 1;
+				to += 100;
+				RefsetDTO dto = bService.getRefset(refsetUuId, from, to, version);
+				ms.addAll(dto.getMembers());
+			}
+		}
+		//fix effective time.
+		for (MemberDTO m : ms) {
+			
+			DateTime et = m.getEffectiveTime() != null ? m.getEffectiveTime() : r.getExpectedReleaseDate();
+			m.setEffectiveTime(et);
+		}
+		r.setMembers(ms);
+		
+		return r;
 	}
 	
 }

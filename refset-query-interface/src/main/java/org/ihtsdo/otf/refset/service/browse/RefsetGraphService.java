@@ -108,13 +108,13 @@ public class RefsetGraphService implements RefsetBrowseService {
 	 * @see org.ihtsdo.otf.refset.service.RefsetBrowseService#getRefset(java.lang.String)
 	 */
 	@Override
-	public RefsetDTO getRefsetForExport(String refsetId) throws RefsetServiceException {
+	public RefsetDTO getRefsetForExport(String refsetId, Integer version) throws RefsetServiceException {
 
 		LOGGER.debug("getRefsetForExport for {}", refsetId);
 
 		try {
 			
-			return export.getRefset(refsetId);
+			return export.getRefset(refsetId, version);
 			
 		} catch (RefsetGraphAccessException e) {
 

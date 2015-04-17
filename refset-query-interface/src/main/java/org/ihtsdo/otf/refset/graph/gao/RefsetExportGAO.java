@@ -7,6 +7,7 @@ import static org.ihtsdo.otf.refset.domain.RGC.ID;
 import static org.ihtsdo.otf.refset.domain.RGC.PUBLISHED;
 import static org.ihtsdo.otf.refset.domain.RGC.REFERENCE_COMPONENT_ID;
 import static org.ihtsdo.otf.refset.domain.RGC.TYPE;
+import static org.ihtsdo.otf.refset.domain.RGC.VERSION;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +27,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
 import com.thinkaurelius.titan.core.TitanGraph;
+import com.thinkaurelius.titan.core.TitanGraphQuery;
 import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Vertex;
@@ -50,7 +52,7 @@ public class RefsetExportGAO {
 	 * @return {@link Refset}
 	 * @throws RefsetGraphAccessException
 	 */
-	public RefsetDTO getRefset(String id) throws RefsetGraphAccessException, EntityNotFoundException {
+	public RefsetDTO getRefset(String id, Integer version) throws RefsetGraphAccessException, EntityNotFoundException {
 				
 		LOGGER.debug("Geting member data for export for given refset id {} ", id);
 		TitanGraph g = null;
@@ -58,8 +60,19 @@ public class RefsetExportGAO {
 		try {
 			
 			g = rgFactory.getReadOnlyGraph();
+			TitanGraphQuery query = g.query().has(ID, id);
 			
-			Iterable<Vertex> vRs = g.query().has(ID, id).has(TYPE, VertexType.refset.toString()).vertices();
+			if (version > 0) {
+				
+				query.has(VERSION, version);
+				
+			} else {
+				
+				query.has(TYPE, VertexType.refset.toString());
+			}
+			
+			Iterable<Vertex> vRs = query.vertices();
+			
 			if(!vRs.iterator().hasNext()) {
 				
 				throw new EntityNotFoundException("No Refset available for given refset id");
@@ -72,8 +85,7 @@ public class RefsetExportGAO {
 			GremlinPipeline<Vertex, Vertex> pipe = new GremlinPipeline<Vertex, Vertex>(g);
 			
 			pipe.start(vR).inE(EdgeLabel.members.toString()).outV()
-				.has(PUBLISHED, 0)
-				.has(TYPE, VertexType.member.toString());
+				.has(PUBLISHED, 0);
 			
 			List<Vertex> vMs = pipe.toList();
 

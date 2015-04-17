@@ -69,7 +69,7 @@ public class RefsetValidator implements Validator {
         	}
 
             ValidationUtils.rejectIfEmptyOrWhitespace(e, "externalContact", "Refset contact is mandatory");
-            ValidationUtils.rejectIfEmptyOrWhitespace(e, "originCountry", "Refset origin country is mandatory and can not be left empty");
+            ValidationUtils.rejectIfEmptyOrWhitespace(e, "originCountryCode", "Refset origin country is mandatory and can not be left empty");
 
 		}
         
