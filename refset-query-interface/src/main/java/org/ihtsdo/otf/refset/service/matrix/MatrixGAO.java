@@ -100,7 +100,7 @@ public class MatrixGAO {
 	public void addMatrixEvent(String refsetId, String userName, RefsetRelations eventType) throws RefsetGraphAccessException {
 
 		
-		LOGGER.debug("addExportEvent for {}", refsetId);
+		LOGGER.debug("addMatrixEvent for refset {} and event type {}", refsetId, eventType.toString());
 		
 		if (StringUtils.isEmpty(refsetId) || StringUtils.isEmpty(userName)) {
 			

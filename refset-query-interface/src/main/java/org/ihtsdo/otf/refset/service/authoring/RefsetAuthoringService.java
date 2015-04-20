@@ -3,6 +3,7 @@
  */
 package org.ihtsdo.otf.refset.service.authoring;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -13,6 +14,8 @@ import org.ihtsdo.otf.refset.exception.EntityAlreadyExistException;
 import org.ihtsdo.otf.refset.exception.EntityNotFoundException;
 import org.ihtsdo.otf.refset.exception.LockingException;
 import org.ihtsdo.otf.refset.exception.RefsetServiceException;
+import org.ihtsdo.otf.refset.graph.RefsetGraphAccessException;
+import org.ihtsdo.otf.refset.service.upload.Rf2Record;
 
 /**Service to support {@link Refset} authoring
  * @author 
@@ -77,6 +80,17 @@ public interface RefsetAuthoringService {
 	 */
 	Map<String, String> removeMembers(String refsetId, Set<String> conceptIds, String user)
 			throws RefsetServiceException, EntityNotFoundException;
+
+	/**
+	 * @param rf2rLst
+	 * @param refsetId
+	 * @param user
+	 * @return
+	 * @throws RefsetGraphAccessException 
+	 * @throws EntityNotFoundException 
+	 */
+	public Map<String, String> addMembers(List<Rf2Record> rf2rLst,
+			String refsetId, String user) throws EntityNotFoundException, RefsetGraphAccessException;
 
 
 }

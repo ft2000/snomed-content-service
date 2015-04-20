@@ -130,7 +130,9 @@ public class RefsetGraphService implements RefsetBrowseService {
 	@Override
 	public boolean isOwner(String refsetId, String userName) throws RefsetGraphAccessException {
 
-		return !StringUtils.isEmpty(userName) ? userName.equalsIgnoreCase(gao.getOwner(refsetId)) : false;
+		RefsetDTO r = gao.getRefsetHeader(refsetId, -1);
+		
+		return !StringUtils.isEmpty(userName) ? userName.equalsIgnoreCase(r.getCreatedBy()) : false;
 	}
 
 	/* (non-Javadoc)

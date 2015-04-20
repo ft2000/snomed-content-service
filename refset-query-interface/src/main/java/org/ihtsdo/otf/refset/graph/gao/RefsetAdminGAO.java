@@ -103,7 +103,7 @@ public class RefsetAdminGAO {
 				rcIds.add(member.getReferencedComponentId());
 				
 			}
-			Map<String, String> descriptions = conceptService.getMembersDescription(rcIds);
+			Map<String, String> descriptions = conceptService.getMembersDescription(rcIds, r.getSnomedCTVersion());
 			
 			int i = 0;
 			if( !CollectionUtils.isEmpty(members) ) {
@@ -708,7 +708,7 @@ public class RefsetAdminGAO {
 	 * @throws EntityNotFoundException 
 	 * @throws RefsetGraphAccessException 
 	 */
-	public Map<String, String> addMembers(List<Rf2Record> rf2rLst, String refsetId, String user) throws EntityNotFoundException, RefsetGraphAccessException {
+	public Map<String, String> addMembers(List<Rf2Record> rf2rLst, String refsetId, String user, String release) throws EntityNotFoundException, RefsetGraphAccessException {
 		
 		Map<String, String> outcome = new HashMap<String, String>();
 		
@@ -720,7 +720,7 @@ public class RefsetAdminGAO {
 			
 			Vertex rV = rGao.getRefsetVertex(refsetId, fgf.create(g.getBaseGraph()));
 
-			Map<String, String> descriptions = populateDescription(rf2rLst);
+			Map<String, String> descriptions = populateDescription(rf2rLst, release);
 			Map<String, Vertex> processed = new HashMap<String, Vertex>();
 			for (Rf2Record r : rf2rLst) {
 				
@@ -864,7 +864,7 @@ public class RefsetAdminGAO {
 	 * @return
 	 * @throws RefsetGraphAccessException 
 	 */
-	private Map<String, String> populateDescription(List<Rf2Record> rf2rLst) throws RefsetGraphAccessException {
+	private Map<String, String> populateDescription(List<Rf2Record> rf2rLst, String version) throws RefsetGraphAccessException {
 
 		Map<String, String> descriptions = new HashMap<String, String>();
 		
@@ -879,7 +879,7 @@ public class RefsetAdminGAO {
 			rcIds.add(record.getReferencedComponentId());
 			
 		}
-		descriptions = conceptService.getMembersDescription(rcIds);
+		descriptions = conceptService.getMembersDescription(rcIds, version);
 
 		return descriptions;
 	}

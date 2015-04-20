@@ -190,7 +190,7 @@ public class MemberGAO {
 	 * @throws EntityNotFoundException 
 	 * @throws RefsetGraphAccessException 
 	 */
-	public Map<String, String> addMembers(String refsetId, Set<Member> members, String user) throws RefsetGraphAccessException, EntityNotFoundException {
+	public Map<String, String> addMembers(String refsetId, Set<Member> members, String user, String release) throws RefsetGraphAccessException, EntityNotFoundException {
 		
 		Map<String, String> outcomeMap = new HashMap<String, String>(); //needed at front end
 		
@@ -212,7 +212,7 @@ public class MemberGAO {
 				rcIds.add(member.getReferencedComponentId());
 				
 			}
-			Map<String, String> descriptions = conceptService.getMembersDescription(rcIds);
+			Map<String, String> descriptions = conceptService.getMembersDescription(rcIds, release);
 
 
 			for (Member m : members) {

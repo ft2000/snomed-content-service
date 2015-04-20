@@ -32,6 +32,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -126,7 +127,7 @@ public class RefsetBrowseController {
 
 		if (SecurityContextHolder.getContext().getAuthentication() instanceof AnonymousAuthenticationToken && !refSet.isPublished()) {
 			
-			//throw new AccessDeniedException("Please login to see work in progress refsets members");
+			throw new AccessDeniedException("Please login to see work in progress refsets members");
 			
 		}
 
@@ -160,17 +161,22 @@ public class RefsetBrowseController {
 
 
 		
-		RefsetDTO refSet =  bService.getRefsetHeader(refsetId, version);
+		RefsetDTO refset =  bService.getRefsetHeader(refsetId, version);
 
-		if (SecurityContextHolder.getContext().getAuthentication() instanceof AnonymousAuthenticationToken && !refSet.isPublished()) {
+		if (SecurityContextHolder.getContext().getAuthentication() instanceof AnonymousAuthenticationToken && !refset.isPublished()) {
 			
-			//throw new AccessDeniedException("Please login to see work in progress refsets");
+			throw new AccessDeniedException("Please login to see work in progress refsets");
 			
+		} else if(!refset.isPublished() && (StringUtils.isEmpty(getUserDetails().getUsername()) 
+				|| !getUserDetails().getUsername().equalsIgnoreCase(refset.getCreatedBy()))){
+			
+			throw new AccessDeniedException("Only owner is allowed to access their work in progress refset");
+
 		}
 		//capture user event. This is Async call
 		matrixService.addViewEvent(refsetId, getEligibleUser());
 
-		response.getData().put("refset", refSet);
+		response.getData().put("refset", refset);
 		
 		return new ResponseEntity<Result<Map<String,Object>>>(response, HttpStatus.OK);
 		
@@ -206,22 +212,14 @@ public class RefsetBrowseController {
 		Result<Map<String, Object>> r = getResult();
 		r.getMeta().add( linkTo( methodOn( RefsetBrowseController.class ).getRefsets( from, to ) ).withRel("Refsets"));
 
-		boolean published = false;
-		
-		if (SecurityContextHolder.getContext().getAuthentication() instanceof AnonymousAuthenticationToken) {
-			
-			published = true;
-			logger.debug("Geting only published ? = {}", published);
-			
-		}		
 		SearchCriteria criteria = new SearchCriteria();
-		criteria.addSortBy(SearchField.publishedDate, Direction.desc);
+		criteria.addSortBy(SearchField.expectedPublishDate, Direction.desc);
 		
 		criteria.setFrom(from);
 		criteria.setTo(to);
 		
-		criteria.addSearchField(SearchField.published, published);
-		List<RefsetDTO> refSets =  bService.getRefsets(criteria);
+		criteria.addSearchField(SearchField.published, true);//always retrieve published refsets
+		List<RefsetDTO> refSets =  bService.getRefsets(criteria);	
 
 		r.getData().put("refsets", refSets);
 		
@@ -267,7 +265,7 @@ public class RefsetBrowseController {
 		r.getMeta().add( linkTo( methodOn( RefsetBrowseController.class ).getRefsets( from, to ) ).withRel("Refsets"));
 		
 		SearchCriteria criteria = new SearchCriteria();
-		criteria.addSortBy(SearchField.publishedDate, Direction.desc);
+		criteria.addSortBy(SearchField.expectedPublishDate, Direction.desc);
 		
 		criteria.setFrom(from);
 		criteria.setTo(to);

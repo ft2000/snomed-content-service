@@ -51,7 +51,7 @@ public class ConceptLookUpServiceImplv1_1 implements ConceptLookupService {
 	 */
 	@Override
 	@Cacheable(value = { "concepts" })
-	public Map<String, Concept> getConcepts(Set<String> conceptIds)
+	public Map<String, Concept> getConcepts(Set<String> conceptIds, String release)
 			throws ConceptServiceException {
 
 		LOGGER.debug("getting concepts details for {}", conceptIds);
@@ -62,7 +62,7 @@ public class ConceptLookUpServiceImplv1_1 implements ConceptLookupService {
 			
 			for (List<String> ids : Iterables.partition(conceptIds, 20)) {
 				
-				Map<String, SnomedConcept> tsConcepts = server.getConcepts(ids, server.getLatestRelease());
+				Map<String, SnomedConcept> tsConcepts = server.getConcepts(ids, release);
 				
 				for (String id : ids) {
 					
@@ -92,10 +92,10 @@ public class ConceptLookUpServiceImplv1_1 implements ConceptLookupService {
 	 */
 	@Override
 	@Cacheable(value = { "concept" })
-	public Concept getConcept(String conceptId) throws ConceptServiceException,
+	public Concept getConcept(String conceptId, String release) throws ConceptServiceException,
 			EntityNotFoundException {
 		
-		LOGGER.debug("getting concept details for {} ", conceptId);
+		LOGGER.debug("getting concept details for {} and SNOMED release {} ", conceptId, release);
 
 		if (StringUtils.isEmpty(conceptId)) {
 			
@@ -105,7 +105,7 @@ public class ConceptLookUpServiceImplv1_1 implements ConceptLookupService {
 		
 		try {
 			
-			SnomedConcept tsConcept = server.getConcept(conceptId, server.getLatestRelease());
+			SnomedConcept tsConcept = server.getConcept(conceptId, release);
 			
 			Concept c = ConceptConvertor.getConcept(tsConcept);
 			
@@ -174,9 +174,9 @@ public class ConceptLookUpServiceImplv1_1 implements ConceptLookupService {
 	 */
 	@Override
 	@Cacheable(value = { "referenceComponentDescriptions" })
-	public Map<String, String> getMembersDescription(List<String> rcIds) throws RefsetGraphAccessException  {
+	public Map<String, String> getMembersDescription(List<String> rcIds, String release) throws RefsetGraphAccessException  {
 		
-		LOGGER.trace("getting members description for {} ", rcIds);
+		LOGGER.trace("getting members description for {} and snomed release {} ", rcIds, release);
 
 		Map<String, String> descMap = new HashMap<String, String>();
 		
@@ -190,7 +190,7 @@ public class ConceptLookUpServiceImplv1_1 implements ConceptLookupService {
 			Set<String> ids = new HashSet<String>();
 			ids.addAll(rcIds);
 			
-			Map<String, Concept> tsConcepts = getConcepts(ids);
+			Map<String, Concept> tsConcepts = getConcepts(ids, release);
 			
 			for (String id : rcIds) {
 				

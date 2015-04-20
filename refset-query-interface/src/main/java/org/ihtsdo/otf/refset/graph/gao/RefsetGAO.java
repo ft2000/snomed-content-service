@@ -141,7 +141,7 @@ public class RefsetGAO {
 	 * @throws RefsetGraphAccessException 
 	 * @throws ConceptServiceException 
 	 */
-	private void populateMemberDescription(List<MemberDTO> ms) throws RefsetGraphAccessException, ConceptServiceException {
+	private void populateMemberDescription(List<MemberDTO> ms, String release) throws RefsetGraphAccessException, ConceptServiceException {
 		
 		if (ms == null || ms.isEmpty()) {
 			
@@ -155,7 +155,7 @@ public class RefsetGAO {
 			
 		}
 		
-		Map<String, Concept> concepts = conceptService.getConcepts(rcIds);
+		Map<String, Concept> concepts = conceptService.getConcepts(rcIds, release);
 		for (MemberDTO m : ms) {
 		
 			if(concepts.containsKey(m.getReferencedComponentId())) {
@@ -382,7 +382,7 @@ public class RefsetGAO {
 			commit(g);
 			
 			//populate descriptions
-			populateMemberDescription(r.getMembers());
+			populateMemberDescription(r.getMembers(), r.getSnomedCTVersion());
 
 			
 			LOGGER.trace("Returning {} ", r);//it prints large output hence trace
@@ -456,7 +456,7 @@ public class RefsetGAO {
 			commit(g);			
 
 			
-		}catch(EntityNotFoundException e) {
+		} catch(EntityNotFoundException e) {
 			
 			throw e;
 		}
@@ -534,29 +534,6 @@ public class RefsetGAO {
 		return refsets;
 
 	}
-	
-	/**
-	 * @param createdBy
-	 * @param from
-	 * @param to
-	 * @return
-	 * @throws RefsetGraphAccessException
-	 */
-	public String getOwner(String refsetId) throws RefsetGraphAccessException {
-		
-		RefsetDTO r = getRefsetHeader(refsetId, -1);
-		
-		if (r != null) {
-			
-			LOGGER.debug("Returning owner as {}", r.getCreatedBy());
-
-			return r.getCreatedBy();
-		}
-		
-		throw new EntityNotFoundException(String.format("Refset with id %s is not available", refsetId));
-
-	}
-	
 	
 	/**
 	 * @param criteria

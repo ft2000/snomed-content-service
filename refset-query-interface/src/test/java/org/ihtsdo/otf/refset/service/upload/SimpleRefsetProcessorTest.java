@@ -20,7 +20,7 @@ import java.util.List;
 import org.ihtsdo.otf.refset.exception.EntityNotFoundException;
 import org.ihtsdo.otf.refset.exception.RefsetServiceException;
 import org.ihtsdo.otf.refset.graph.RefsetGraphAccessException;
-import org.ihtsdo.otf.refset.graph.gao.RefsetAdminGAO;
+import org.ihtsdo.otf.refset.service.authoring.RefsetAuthoringServiceImpl;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -31,7 +31,7 @@ import org.junit.Test;
 public class SimpleRefsetProcessorTest {
 	
 	private SimpleRefsetProcessor srp;
-	private RefsetAdminGAO gao;
+	private RefsetAuthoringServiceImpl service;
 	private static List<Rf2Record> refsets = new ArrayList<Rf2Record>();
 	static {
 		
@@ -50,9 +50,9 @@ public class SimpleRefsetProcessorTest {
 	public void setUp() throws Exception {
 		
 		srp = new SimpleRefsetProcessor();
-		gao = mock(RefsetAdminGAO.class);
-		srp.setGao(gao);
-		when(gao.addMembers(anyListOf(Rf2Record.class), anyString(), anyString())).thenReturn(new HashMap<String, String>());
+		service = mock(RefsetAuthoringServiceImpl.class);
+		srp.setService(service);
+		when(service.addMembers(anyListOf(Rf2Record.class), anyString(), anyString())).thenReturn(new HashMap<String, String>());
 	}
 
 	/**
@@ -97,7 +97,7 @@ public class SimpleRefsetProcessorTest {
 
 		srp.process(refsets, "junit", "junit");
 		
-		verify(gao).addMembers(anyListOf(Rf2Record.class), anyString(), anyString());
+		verify(service).addMembers(anyListOf(Rf2Record.class), anyString(), anyString());
 	}
 	
 	/**
@@ -109,7 +109,7 @@ public class SimpleRefsetProcessorTest {
 	@Test(expected = RefsetServiceException.class)
 	public void testProcessRefsetServiceException() throws RefsetServiceException, EntityNotFoundException, RefsetGraphAccessException {
 
-		doThrow(new RefsetGraphAccessException()).when(gao).addMembers(anyListOf(Rf2Record.class), anyString(), anyString());
+		doThrow(new RefsetGraphAccessException()).when(service).addMembers(anyListOf(Rf2Record.class), anyString(), anyString());
 		
 		srp.process(refsets, "junit", "junit");
 		
@@ -124,7 +124,7 @@ public class SimpleRefsetProcessorTest {
 	@Test(expected = EntityNotFoundException.class)
 	public void testProcessEntityNotFoundException() throws RefsetServiceException, EntityNotFoundException, RefsetGraphAccessException {
 		
-		doThrow(new EntityNotFoundException()).when(gao).addMembers(anyListOf(Rf2Record.class), anyString(), anyString());
+		doThrow(new EntityNotFoundException()).when(service).addMembers(anyListOf(Rf2Record.class), anyString(), anyString());
 		
 		srp.process(refsets, "junit", "junit");
 		

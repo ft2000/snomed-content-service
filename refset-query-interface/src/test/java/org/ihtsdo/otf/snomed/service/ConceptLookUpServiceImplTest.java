@@ -75,7 +75,7 @@ public class ConceptLookUpServiceImplTest {
 
 		Set<String> conceptIds = service.getConceptIds(1, 10);
 		
-		Map<String, Concept> concepts = service.getConcepts(conceptIds);
+		Map<String, Concept> concepts = service.getConcepts(conceptIds, null);
 		
 		assertNotNull(concepts);
 		
@@ -108,7 +108,7 @@ public class ConceptLookUpServiceImplTest {
 		Concept c = null;
 		for (String id : conceptIds) {
 			
-			c = service.getConcept(id);
+			c = service.getConcept(id, null);
 			System.err.println("---concept" + c.toString());
 			break;
 		}

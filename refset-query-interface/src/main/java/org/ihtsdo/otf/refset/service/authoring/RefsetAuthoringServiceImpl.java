@@ -24,6 +24,7 @@ import org.ihtsdo.otf.refset.graph.RefsetGraphAccessException;
 import org.ihtsdo.otf.refset.graph.gao.MemberGAO;
 import org.ihtsdo.otf.refset.graph.gao.RefsetAdminGAO;
 import org.ihtsdo.otf.refset.graph.gao.RefsetGAO;
+import org.ihtsdo.otf.refset.service.upload.Rf2Record;
 import org.ihtsdo.otf.snomed.domain.Concept;
 import org.ihtsdo.otf.snomed.exception.ConceptServiceException;
 import org.ihtsdo.otf.snomed.service.ConceptLookupService;
@@ -103,20 +104,18 @@ public class RefsetAuthoringServiceImpl implements RefsetAuthoringService {
 		}
 		try {
 			
-			 String owner = gao.getOwner(refsetId);
-
-			 if (StringUtils.isEmpty(owner) || !owner.equalsIgnoreCase(m.getCreatedBy())) {
-				 
-				 throw new UpdateDeniedException("Only an owner can remove member from refset");
-			 }
-			
 			 RefsetDTO r = gao.getRefsetHeader(refsetId, -1);
+			 
+			 isOwner(r.getCreatedBy(), m.getCreatedBy());
+						 
+			 isValidUpdateState(r.getStatus(), "A new member can not be added to a already published or released refset");
+			 
 			
 			 List<MemberDTO> members = new ArrayList<MemberDTO>();
 			 m.setUuid(UUID.randomUUID().toString());
 			 if(StringUtils.isEmpty(m.getDescription())) {
 				
-				 Concept c = lService.getConcept(m.getReferencedComponentId());
+				 Concept c = lService.getConcept(m.getReferencedComponentId(), r.getSnomedCTVersion());
 				 m.setDescription(c.getLabel());
 			 }
 			 members.add(m);
@@ -144,19 +143,31 @@ public class RefsetAuthoringServiceImpl implements RefsetAuthoringService {
 
 	}
 
+	/**
+	 * @param status
+	 */
+	private void isValidUpdateState(String status, String message) {
+
+
+		if (!RefsetStatus.inProgress.toString().equalsIgnoreCase(status)) {
+			 
+			 throw new UpdateDeniedException(message);
+		 }
+	}
+
 	@Override
 	public String updateRefset(RefsetDTO r) throws RefsetServiceException {
 		
-		LOGGER.debug("updateRefset member {} to refset {}", r);
+		LOGGER.debug("updateRefset {} to refset {}", r);
 
 		 try {
 			 
-			 String owner = gao.getOwner(r.getUuid());
+			 RefsetDTO dto = gao.getRefsetHeader(r.getUuid(), -1);
 
-			 if (StringUtils.isEmpty(owner) || !owner.equalsIgnoreCase(r.getModifiedBy())) {
-				 
-				 throw new UpdateDeniedException("Only an owner can remove member from refset");
-			 }
+			 isOwner(dto.getCreatedBy(), r.getModifiedBy());
+			 
+			 //is snomed ct version is same as earlier.
+			 validateSnomedCTVersion(dto, r);
 			 r = obfuscate(r); 
 			 
 			 setOriginCountry(r);
@@ -167,7 +178,7 @@ public class RefsetAuthoringServiceImpl implements RefsetAuthoringService {
 				 
 				 r.setStatus(RefsetStatus.released.toString());
 				 
-			 } else if(r.isPublished()) {
+			 } else {
 				 
 				 r.setStatus(RefsetStatus.published.toString());
 
@@ -183,6 +194,38 @@ public class RefsetAuthoringServiceImpl implements RefsetAuthoringService {
 		}
 		 
 		 return r.getUuid();
+	}
+
+	/**Validate if existing status is inProgress and current SNOMED®CT version 
+	 * and updated SNOMED®CT version is same
+	 * @param dto
+	 * @param r
+	 */
+	private void validateSnomedCTVersion(RefsetDTO existingRefset, RefsetDTO updatedRefset) {
+		
+		if(RefsetStatus.inProgress.toString().equalsIgnoreCase(existingRefset.getStatus()) 
+				&& !StringUtils.isEmpty(updatedRefset.getSnomedCTVersion()) 
+				&& !updatedRefset.getSnomedCTVersion().equals(existingRefset.getSnomedCTVersion())) {
+			
+			 throw new UpdateDeniedException("Selected SNOMED®CT version can not be changed while authoring refset");
+
+		}
+		
+		
+	}
+
+	/**Checks if modifying user is same as owner of refset
+	 * @param owner
+	 * @param modifiedBy
+	 */
+	private void isOwner(String owner, String modifiedBy) {
+		
+		if (StringUtils.isEmpty(owner) || !owner.equalsIgnoreCase(modifiedBy)) {
+			
+			 throw new UpdateDeniedException("Only an owner can update refset");
+
+		}
+		
 	}
 
 	/**Does required update checks and removes fields which can not be updated
@@ -213,13 +256,10 @@ public class RefsetAuthoringServiceImpl implements RefsetAuthoringService {
 		LOGGER.debug("remove refset {}", refsetId);
 
 		try {
+			RefsetDTO r = gao.getRefsetHeader(refsetId, -1);
 			
-			String owner = gao.getOwner(refsetId);
-			if (StringUtils.isEmpty(owner) || !owner.equalsIgnoreCase(user)) {
-				
-				throw new UpdateDeniedException("Refset can not be deleted as it is not owned by you");
-			}
-			 
+			isOwner(r.getCreatedBy(), user);
+			
 			adminGao.lock(refsetId);
 			
 			adminGao.removeRefset(refsetId, user);
@@ -264,11 +304,11 @@ public class RefsetAuthoringServiceImpl implements RefsetAuthoringService {
 		
 		try {
 			
-			String owner = gao.getOwner(refsetId);
-			if (StringUtils.isEmpty(owner) || !owner.equalsIgnoreCase(user)) {
-				
-				throw new UpdateDeniedException("Only an owner can remove member from refset");
-			}
+			RefsetDTO r = gao.getRefsetHeader(refsetId, -1);
+			
+			isOwner(r.getCreatedBy(), user);
+			 
+			isValidUpdateState(r.getStatus(), "Member can not be removed from already published/released refsets");
 			
 			mGao.removeMember(refsetId, rcId, user);
 
@@ -297,12 +337,12 @@ public class RefsetAuthoringServiceImpl implements RefsetAuthoringService {
 
 		try {
 			
-			String owner = gao.getOwner(refsetId);
-			if (StringUtils.isEmpty(owner) || !owner.equalsIgnoreCase(user)) {
-				
-				throw new UpdateDeniedException("Only an owner can remove member from refset");
-			}
+			RefsetDTO r = gao.getRefsetHeader(refsetId, -1);
 			
+			isOwner(r.getCreatedBy(), user);
+			 
+			isValidUpdateState(r.getStatus(), "Member can not be removed from already published/released refsets");
+						 
 			Map<String, String> outcome = mGao.removeMembers(refsetId, conceptIds, user);
 			
 			tOutcome.putAll(outcome);
@@ -335,11 +375,11 @@ public class RefsetAuthoringServiceImpl implements RefsetAuthoringService {
 
 		try {			
 			
-			String owner = gao.getOwner(refsetId);
-			if (StringUtils.isEmpty(owner) || !owner.equalsIgnoreCase(user)) {
-				
-				throw new UpdateDeniedException("Only an owner of refset can add new member");
-			}
+			RefsetDTO r = gao.getRefsetHeader(refsetId, -1);
+			
+			isOwner(r.getCreatedBy(), user);
+			 
+			isValidUpdateState(r.getStatus(), "No new member is allowed to be added in already published/released refsets");
 			
 			Set<Member> members = getMembers(memberDTOs);
 			
@@ -347,7 +387,7 @@ public class RefsetAuthoringServiceImpl implements RefsetAuthoringService {
 			//add 100 members at a time. Otherwise when large number of members being added transaction is slow due to too many vertices/edges
 			for (List<Member> ms : Iterables.partition(members, 100)) {
 				
-				Map<String, String> outcome = mGao.addMembers(refsetId, Sets.newHashSet(ms), user);
+				Map<String, String> outcome = mGao.addMembers(refsetId, Sets.newHashSet(ms), user, r.getSnomedCTVersion());
 				tOutcome.putAll(outcome);
 			}
 
@@ -404,6 +444,22 @@ public class RefsetAuthoringServiceImpl implements RefsetAuthoringService {
 			
 			r.setClinicalDomain(mdService.getClinicalDomains().get(r.getClinicalDomainCode()));
 		}
+	}
+
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.otf.refset.service.authoring.RefsetAuthoringService#addMembers(java.util.List, java.lang.String, java.lang.String)
+	 */
+	@Override
+	public Map<String, String> addMembers(List<Rf2Record> rf2rLst,
+			String refsetId, String user) throws EntityNotFoundException, RefsetGraphAccessException {
+
+		RefsetDTO r = gao.getRefsetHeader(refsetId, -1);
+		
+		isOwner(r.getCreatedBy(), user);
+		 
+		//isValidUpdateState(r.getStatus(), "No new member is allowed to be added in already published/released refsets");
+		
+		return adminGao.addMembers(rf2rLst, refsetId, user, r.getSnomedCTVersion());
 	}
 
 }

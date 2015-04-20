@@ -20,19 +20,21 @@ public interface ConceptLookupService {
 	
 	/**Method to get {@link Map} of supplied concept ids
 	 * and their details {@link Concept}s
-	 * @param page
-	 * @param size
+	 * @param release SNOMED® CT release in YYYY-mm-dd format
+	 * @param conceptIds list of valid concept ids
 	 * @return
 	 * @throws ConceptServiceException
 	 */
-	public Map<String, Concept> getConcepts(Set<String> conceptIds) throws ConceptServiceException ;
+	public Map<String, Concept> getConcepts(Set<String> conceptIds, String release) throws ConceptServiceException ;
 	
-	/**Method to retrieve {@link Concept} details for given concept id.
-	 * @param refsetId
+	/**
+	 * @param conceptId
+	 * @param release SNOMED® CT release in YYYY-mm-dd format
 	 * @return
 	 * @throws ConceptServiceException
+	 * @throws EntityNotFoundException
 	 */
-	public Concept getConcept(String conceptId) throws ConceptServiceException, EntityNotFoundException ;
+	public Concept getConcept(String conceptId, String release) throws ConceptServiceException, EntityNotFoundException ;
 
 	
 	/**Method to retrieve list of  {@link Concept} details for given concept id.
@@ -59,14 +61,6 @@ public interface ConceptLookupService {
 			throws RefsetGraphAccessException;
 
 	/**
-	 * @param rcIds
-	 * @return
-	 * @throws RefsetGraphAccessException
-	 */
-	Map<String, String> getMembersDescription(List<String> rcIds)
-			throws RefsetGraphAccessException;
-
-	/**
 	 * @param conceptIds
 	 * @return
 	 * @throws ConceptServiceException
@@ -82,6 +76,15 @@ public interface ConceptLookupService {
 	 */
 	ChangeRecord<Concept> getConceptHistory(String conceptId)
 			throws ConceptServiceException, EntityNotFoundException;
+
+	/**
+	 * @param rcIds
+	 * @param release SNOMED® CT release in YYYY-mm-dd format
+	 * @return
+	 * @throws RefsetGraphAccessException
+	 */
+	Map<String, String> getMembersDescription(List<String> rcIds, String release)
+			throws RefsetGraphAccessException;
 
 
 }

@@ -13,11 +13,10 @@ package org.ihtsdo.otf.refset.service.upload;
 
 import java.util.List;
 import java.util.Map;
-
 import org.ihtsdo.otf.refset.exception.EntityNotFoundException;
 import org.ihtsdo.otf.refset.exception.RefsetServiceException;
 import org.ihtsdo.otf.refset.graph.RefsetGraphAccessException;
-import org.ihtsdo.otf.refset.graph.gao.RefsetAdminGAO;
+import org.ihtsdo.otf.refset.service.authoring.RefsetAuthoringService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -29,8 +28,8 @@ import org.springframework.util.StringUtils;
 @Service(value="simpleRefsetProcessor")
 public class SimpleRefsetProcessor implements RefsetProcessor {
 	
-	private RefsetAdminGAO gao;
-
+	private RefsetAuthoringService service;
+	
 	/* (non-Javadoc)
 	 * @see org.ihtsdo.otf.refset.service.upload.RefsetProcessor#process(java.util.List)
 	 */
@@ -42,9 +41,11 @@ public class SimpleRefsetProcessor implements RefsetProcessor {
 			throw new RefsetServiceException("Not enough data to process. please check your request and imported file");
 		}
 		
+		
+		
 		try {
 			
-			return gao.addMembers(rf2rLst, refsetId, user);
+			return service.addMembers(rf2rLst, refsetId, user);
 			
 		} catch (RefsetGraphAccessException e) {
 
@@ -54,11 +55,11 @@ public class SimpleRefsetProcessor implements RefsetProcessor {
 	}
 
 	/**
-	 * @param gao the gao to set
+	 * @param gserviceao the service to set
 	 */
 	@Autowired
-	public void setGao(RefsetAdminGAO gao) {
-		this.gao = gao;
+	public void setService(RefsetAuthoringService service) {
+		this.service = service;
 	}
 
 
