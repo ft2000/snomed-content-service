@@ -82,5 +82,12 @@ public interface RefsetBrowseService {
 	 */
 	public Set<Integer> getRefsetVersions(String refSetId) throws RefsetServiceException ;
 
+	
+	/**Retrieves a {@link RefsetDTO} for given conceptId
+	 * @param conceptId
+	 * @return a {@link RefsetDTO} with member count and excluding all member details
+	 */
+	public RefsetDTO getRefsetHeaderByCoceptId(String conceptId, Integer version) throws RefsetServiceException ;
+
 
 }

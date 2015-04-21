@@ -105,4 +105,14 @@ public class RefsetBrowseServiceStub implements RefsetBrowseService {
 		return null;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.otf.refset.service.browse.RefsetBrowseService#getRefsetHeaderByCoceptId(java.lang.String, java.lang.Integer)
+	 */
+	@Override
+	public RefsetDTO getRefsetHeaderByCoceptId(String conceptId, Integer version)
+			throws RefsetServiceException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

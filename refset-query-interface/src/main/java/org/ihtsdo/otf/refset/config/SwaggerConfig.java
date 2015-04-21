@@ -3,8 +3,10 @@ package org.ihtsdo.otf.refset.config;
 import com.mangofactory.swagger.plugin.EnableSwagger;
 import com.mangofactory.swagger.paths.RelativeSwaggerPathProvider;
 import com.mangofactory.swagger.plugin.SwaggerSpringMvcPlugin;
+
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Bean;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.mangofactory.swagger.configuration.SpringSwaggerConfig;
@@ -15,6 +17,7 @@ import com.mangofactory.swagger.models.dto.ApiInfo;
 */
 @Configuration
 @EnableSwagger
+@EnableScheduling
 public class SwaggerConfig {
 	
 	private SpringSwaggerConfig swaggerConfig;

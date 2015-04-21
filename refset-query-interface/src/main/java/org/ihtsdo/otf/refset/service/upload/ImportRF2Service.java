@@ -11,6 +11,8 @@
 */
 package org.ihtsdo.otf.refset.service.upload;
 
+import static org.ihtsdo.otf.refset.common.Utility.getToDate;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -20,9 +22,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import javax.annotation.Resource;
+
 import org.apache.commons.lang3.StringUtils;
+import org.ihtsdo.otf.refset.domain.RefsetDTO;
+import org.ihtsdo.otf.refset.exception.EntityAlreadyExistException;
 import org.ihtsdo.otf.refset.exception.EntityNotFoundException;
 import org.ihtsdo.otf.refset.exception.RefsetServiceException;
+import org.ihtsdo.otf.refset.service.authoring.RefsetAuthoringService;
+import org.ihtsdo.otf.refset.service.termserver.TermServer;
+import org.ihtsdo.otf.snomed.domain.Concept;
+import org.ihtsdo.otf.snomed.exception.ConceptServiceException;
+import org.ihtsdo.otf.snomed.service.ConceptLookupService;
+import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
@@ -40,7 +52,15 @@ public class ImportRF2Service implements ImportService {
 	private static final DateTimeFormatter fmt = DateTimeFormat.forPattern("yyyyMMdd");
 	
 	private RefsetProcessor srp;
-
+	
+	@Resource
+	private RefsetAuthoringService aService;
+	
+	@Autowired
+	private ConceptLookupService lService;
+	
+	@Autowired
+	private TermServer tService;
 
 	/**
 	 * @param srp the srp to set
@@ -127,6 +147,40 @@ public class ImportRF2Service implements ImportService {
 				LOGGER.info("Could not close IO resources");
 			}
 		}
+	}
+	
+	
+	public String createRefsetHeader(String conceptId) throws RefsetServiceException, EntityAlreadyExistException, ConceptServiceException {
+		
+		RefsetDTO dto = new RefsetDTO();
+		dto.setUuid(conceptId);
+		dto.setActive(true);
+		dto.setPublished(false);//initially it should be unpublished
+		
+		String release = tService.getLatestRelease();
+		Concept concept = lService.getConcept(conceptId, release);
+		dto.setDescription(concept.getLabel());
+		dto.setCreated(new DateTime());
+		dto.setCreatedBy("system");
+		dto.setScope(String.format("Refset released in latest SNOMED® CT Version %s", release));
+		dto.setLanguageCode("en");
+		dto.setPublishedDate(getToDate(release));
+		dto.setExpectedReleaseDate(getToDate(release));
+		dto.setComponentTypeId("900000000000461009");//Tool supporting only concept type component
+		dto.setModuleId(concept.getModuleId());//
+		dto.setTypeId("446609009");//Tool supporting only simple type refsets
+		dto.setSnomedCTVersion(release);
+		LOGGER.debug("Creating refset header {}", dto);
+		return aService.addRefset(dto);
+		
+	}
+	
+	public Map<String, String> processRf2Records(List<Rf2Record> rf2RLst, String refsetId, String user) throws RefsetServiceException {
+		
+		LOGGER.debug("Importing rf2 records of refset {}", refsetId);
+
+    	return srp.process(rf2RLst, refsetId, user);
+
 	}
 
 }

@@ -62,7 +62,7 @@ public class Utility {
 	 * @param fromDate
 	 * @return
 	 */
-	public DateTime getFromDate(String fromDate, int daysOffset) {
+	public static DateTime getFromDate(String fromDate, int daysOffset) {
 		
 		DateTime fromDt = new DateTime().minusDays(daysOffset);
 		if (!StringUtils.isEmpty(fromDate)) {
@@ -77,7 +77,7 @@ public class Utility {
 	 * @param toDate
 	 * @return
 	 */
-	public DateTime getToDate(String toDate) {
+	public static DateTime getToDate(String toDate) {
 		
 		DateTime toDt = new DateTime();
 		if (!StringUtils.isEmpty(toDate)) {

@@ -181,4 +181,24 @@ public class RefsetGraphService implements RefsetBrowseService {
 
 		return gao.getRefsetVersions(refSetId);
 	}
+
+
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.otf.refset.service.browse.RefsetBrowseService#getRefsetHeaderByCoceptId(java.lang.String, java.lang.Integer)
+	 */
+	@Override
+	public RefsetDTO getRefsetHeaderByCoceptId(String conceptId, Integer version)
+			throws RefsetServiceException {
+
+		try {
+			
+			return gao.getRefsetHeaderByCoceptId(conceptId, version);
+			
+		} catch (RefsetGraphAccessException e) {
+
+			LOGGER.error("Error in graph db call", e);
+			throw new RefsetServiceException(e.getMessage());
+			
+		}
+	}
 }

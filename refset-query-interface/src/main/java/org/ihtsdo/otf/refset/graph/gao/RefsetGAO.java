@@ -5,6 +5,7 @@ package org.ihtsdo.otf.refset.graph.gao;
 import static org.ihtsdo.otf.refset.domain.RGC.DESC;
 import static org.ihtsdo.otf.refset.domain.RGC.END;
 import static org.ihtsdo.otf.refset.domain.RGC.ID;
+import static org.ihtsdo.otf.refset.domain.RGC.SCTID;
 import static org.ihtsdo.otf.refset.domain.RGC.PUBLISHED;
 import static org.ihtsdo.otf.refset.domain.RGC.TYPE;
 import static org.ihtsdo.otf.refset.domain.RGC.REFSET_STATUS;
@@ -171,11 +172,12 @@ public class RefsetGAO {
 
 
 
-	/**
+	/**Use instead {@link #getRefSets(SearchCriteria)}
 	 * @param published
 	 * @return
 	 * @throws RefsetGraphAccessException
 	 */
+	@Deprecated
 	public List<RefsetDTO> getRefSets(boolean published) throws RefsetGraphAccessException {
 		
 		TitanGraph g = null;
@@ -704,6 +706,69 @@ public class RefsetGAO {
 		}
 		
 		return versions;
+	}
+
+
+
+	/**
+	 * @param conceptId
+	 * @param version
+	 * @return
+	 * @throws RefsetGraphAccessException 
+	 */
+	public RefsetDTO getRefsetHeaderByCoceptId(String conceptId, Integer version) throws RefsetGraphAccessException {
+
+		
+		LOGGER.debug("getRefsetHeaderByCoceptId for {} and version {}", conceptId, version);
+		
+		TitanGraph g = null;
+		RefsetDTO r = null;
+		try {
+			
+			g = rgFactory.getReadOnlyGraph();
+
+			FramedGraph<TitanGraph> tg = fgf.create(g);
+			
+			FramedGraphQuery query = tg.query().has(SCTID, conceptId).has(TYPE, VertexType.refset.toString());
+			
+			if (version > 0) {
+			
+				query.has(VERSION, version);
+				
+			}
+			
+			Iterable<GRefset> vRs = query.limit(1).vertices(GRefset.class);
+			
+			
+			if (!vRs.iterator().hasNext()) {
+				
+				throw new EntityNotFoundException("Refset does not exist for given concept id " + conceptId);
+			} 
+			
+			GRefset vR = vRs.iterator().next();
+
+			r = RefsetConvertor.getRefset(vR);
+
+			LOGGER.debug("Returning refset {} ", r);
+
+			commit(g);			
+
+			
+		} catch(EntityNotFoundException e) {
+			
+			throw e;
+		}
+		
+		catch (Exception e) {
+			
+			rollback(g);			
+			LOGGER.error("Error getting refset for {}", conceptId, e);
+			throw new RefsetGraphAccessException(e.getMessage(), e);
+
+		}
+		
+		return r;
+	
 	}
 	
 
