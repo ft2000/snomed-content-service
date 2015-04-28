@@ -82,15 +82,16 @@
 
     <build>
         <plugins>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>findbugs-maven-plugin</artifactId>
-                <version>${findbugs.maven.plugin.version}</version>
-                <configuration>
-                    <findbugsXmlOutput>true</findbugsXmlOutput>
-                    <xmlOutput>true</xmlOutput>
-                </configuration>
-            </plugin>
+			<plugin>
+				<groupId>external.atlassian.jgitflow</groupId>
+				<artifactId>jgitflow-maven-plugin</artifactId>
+				<version>1.0-m4.3</version>
+				<configuration>
+					<autoVersionSubmodules>true</autoVersionSubmodules>
+					<enableSshAgent>true</enableSshAgent>
+					<noDeploy>true</noDeploy>
+				</configuration>
+			</plugin>
         </plugins>
     </build>
 
@@ -120,20 +121,6 @@
                             </execution>
                         </executions>
                     </plugin>
-
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-surefire-plugin</artifactId>
-                        <version>${maven.surefire.plugin.version}</version>
-                        <configuration combine.self="override">
-                            <redirectTestOutputToFile>true</redirectTestOutputToFile>
-                            <testFailureIgnore>true</testFailureIgnore>
-                            <argLine>
-                                -Xms128m -Xmx1G -XX:MaxPermSize=128M
-                            </argLine>
-                        </configuration>
-                    </plugin>
-
                 </plugins>
             </build>
             <reporting>
@@ -145,99 +132,6 @@
                     </plugin>
                 </plugins>
             </reporting>
-        </profile>
-
-
-        <profile>
-            <properties>
-                <argLine>
-                    -Xms128m -Xmx1G -XX:MaxPermSize=128M
-                </argLine>
-            </properties>
-            <id>test-coverage</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-surefire-plugin</artifactId>
-                        <version>${maven.surefire.plugin.version}</version>
-                        <configuration combine.self="override">
-                            <redirectTestOutputToFile>true</redirectTestOutputToFile>
-                            <testFailureIgnore>true</testFailureIgnore>
-                        </configuration>
-                    </plugin>
-
-                </plugins>
-            </build>
-        </profile>
-
-
-        <!-- unfortunately it isn't possible to chain profiles, so we need to duplicate the javadoc plugin-->
-
-        <profile>
-            <id>findbugs</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>findbugs-maven-plugin</artifactId>
-                        <version>${findbugs.maven.plugin.version}</version>
-                        <executions>
-                            <execution>
-                                <phase>compile</phase>
-                                <goals>
-                                    <goal>check</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                        <configuration>
-                            <failOnError>true</failOnError>
-                            <excludeFilterFile>${main.basedir}/findbugs/findbugs-exclude.xml</excludeFilterFile>
-                        </configuration>
-                    </plugin>
-
-                </plugins>
-            </build>
-        </profile>
-
-        <profile>
-            <id>nightly-build</id>
-            <build>
-                <plugins>
-
-
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-surefire-plugin</artifactId>
-                        <version>${maven.surefire.plugin.version}</version>
-                        <configuration combine.self="override">
-                            <parallel>none</parallel>
-                            <redirectTestOutputToFile>true</redirectTestOutputToFile>
-                            <argLine>-Xms128m -Xmx1G -XX:MaxPermSize=128M
-                            </argLine>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-
-        <profile>
-            <id>all-tests</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-surefire-plugin</artifactId>
-                        <version>${maven.surefire.plugin.version}</version>
-                        <configuration combine.self="override">
-                            <redirectTestOutputToFile>true</redirectTestOutputToFile>
-                            <parallel>none</parallel>
-                            <argLine>-Xms128m -Xmx1G -XX:MaxPermSize=128M
-                            </argLine>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
         </profile>
     </profiles>
     
