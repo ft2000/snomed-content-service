@@ -259,6 +259,27 @@ public class RefsetAuthoringController {
     	       
     }
 	
+	@RequestMapping( method = RequestMethod.POST, value = "/{refSetId}/add/members", produces = "application/json", consumes = "application/json" )
+	@ApiOperation( value = "Add no of members in this call", notes = "Adds no of members in single call to a refset identified by refset id in path" )
+	@PreAuthorize("hasRole('ROLE_ihtsdo-users')")
+    public ResponseEntity<Result< Map<String, Object>>> addConceptIds(@PathVariable(value = "refSetId") String refsetId, 
+    		@RequestBody( required = true) Set<String> conceptIds) throws Exception {
+		
+		logger.debug("Adding member {} to refset {}", conceptIds, refsetId);
+
+
+		Map<String, String> outcome = aService.addMembersByConceptIds(refsetId, conceptIds, getUserDetails().getUsername());
+		
+		Result<Map<String, Object>> result = getResult();
+		result.getData().put("outcome", outcome);
+		result.getMeta().add( linkTo( methodOn( RefsetBrowseController.class ).getRefsetHeader(refsetId, -1)).withRel("Refset"));
+
+		return new ResponseEntity<Result<Map<String,Object>>>(result, HttpStatus.OK);
+		
+	
+    	       
+    }
+	
 	/**
 	 * @param members
 	 */

@@ -91,6 +91,14 @@ public interface RefsetAuthoringService {
 	 */
 	public Map<String, String> addMembers(List<Rf2Record> rf2rLst,
 			String refsetId, String user) throws EntityNotFoundException, RefsetGraphAccessException;
+	
+	/**Method to add a list of concept ids as member of given {@link Refset}. and returns then outcome this process
+	 * @param refsetId
+	 * @param user
+	 * @return 
+	 * @throws RefsetServiceException
+	 */
+	public Map<String, String> addMembersByConceptIds(String refsetId, Set<String> members, String user) throws RefsetServiceException ;
 
 
 }

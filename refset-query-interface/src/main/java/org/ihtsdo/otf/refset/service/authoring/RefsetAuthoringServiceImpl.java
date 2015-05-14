@@ -29,6 +29,7 @@ import org.ihtsdo.otf.snomed.domain.Concept;
 import org.ihtsdo.otf.snomed.exception.ConceptServiceException;
 import org.ihtsdo.otf.snomed.service.ConceptLookupService;
 import org.ihtsdo.otf.snomed.service.RefsetMetadataService;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -461,5 +462,57 @@ public class RefsetAuthoringServiceImpl implements RefsetAuthoringService {
 		
 		return adminGao.addMembers(rf2rLst, refsetId, user, r.getSnomedCTVersion());
 	}
+
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.otf.refset.service.authoring.RefsetAuthoringService#addMembersByConceptIds(java.lang.String, java.util.Set, java.lang.String)
+	 */
+	@Override
+	public Map<String, String> addMembersByConceptIds(String refsetId,
+			Set<String> conceptIds, String user) throws RefsetServiceException,
+			EntityNotFoundException {
+
+		RefsetDTO r;
+		try {
+			r = gao.getRefsetHeader(refsetId, -1);
+		
+			Set<MemberDTO> members = new HashSet<MemberDTO>();
+			
+			for (List<String> ms : Iterables.partition(conceptIds, 100)) {
+				
+				Set<String> ids = new HashSet<String>();
+				ids.addAll(ms);
+				
+				Map<String, Concept> concepts = lService.getConcepts(ids, r.getSnomedCTVersion());
+				
+				Set<String> keys = concepts.keySet();
+				for (String key : keys) {
+					
+					Concept c = concepts.get(key);
+					if (c != null) {
+						
+						MemberDTO m = new MemberDTO();
+						m.setCreated(new DateTime());
+						m.setCreatedBy(user);
+						m.setReferencedComponentId(c.getId());
+						m.setDescription(c.getLabel());
+						members.add(m);
+						
+					}
+				}
+				
+			}
+			
+			addMembers(refsetId, members, user);
+		
+		} catch (RefsetGraphAccessException | ConceptServiceException e) {
+			
+			LOGGER.error("Error during service call", e);
+			throw new RefsetServiceException(e.getMessage());
+		}
+		return null;
+	}
+	
+	
+	
 
 }
