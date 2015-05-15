@@ -49,6 +49,4 @@
  	
  	<import resource="classpath:applicationContext-CrowdClient.xml" />
  	<import resource="classpath:application-im-common-security-config.xml" />
- 	<sec:debug/>
-
 </beans>

@@ -221,6 +221,8 @@ public class RefsetAuthoringServiceImpl implements RefsetAuthoringService {
 	 */
 	private void isOwner(String owner, String modifiedBy) {
 		
+		LOGGER.debug("isOwner owner {} and modifiedBy", owner, modifiedBy);
+
 		if (StringUtils.isEmpty(owner) || !owner.equalsIgnoreCase(modifiedBy)) {
 			
 			 throw new UpdateDeniedException("Only an owner can update refset");

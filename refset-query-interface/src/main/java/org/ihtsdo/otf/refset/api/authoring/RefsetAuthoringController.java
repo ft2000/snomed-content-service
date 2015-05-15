@@ -8,26 +8,34 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 import static org.ihtsdo.otf.refset.common.Utility.getUserDetails;
 import static org.ihtsdo.otf.refset.common.Utility.getResult;
 
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.file.AccessDeniedException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.zip.GZIPInputStream;
 
 import javax.annotation.Resource;
 
+import org.apache.commons.lang3.StringUtils;
 import org.ihtsdo.otf.refset.api.browse.RefsetBrowseController;
 import org.ihtsdo.otf.refset.common.Result;
 import org.ihtsdo.otf.refset.domain.MemberDTO;
 import org.ihtsdo.otf.refset.domain.MemberValidator;
 import org.ihtsdo.otf.refset.domain.RefsetDTO;
 import org.ihtsdo.otf.refset.domain.RefsetValidator;
+import org.ihtsdo.otf.refset.exception.RefsetServiceException;
 import org.ihtsdo.otf.refset.exception.ValidationException;
 import org.ihtsdo.otf.refset.service.authoring.RefsetAuthoringService;
 import org.ihtsdo.otf.refset.service.browse.RefsetBrowseService;
 import org.ihtsdo.otf.refset.service.termserver.TermServer;
+import org.ihtsdo.otf.refset.service.upload.Rf2Record;
 import org.ihtsdo.otf.snomed.service.RefsetMetadataService;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -44,7 +52,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.mangofactory.swagger.annotations.ApiIgnore;
 import com.wordnik.swagger.annotations.Api;
@@ -259,15 +269,46 @@ public class RefsetAuthoringController {
     	       
     }
 	
-	@RequestMapping( method = RequestMethod.POST, value = "/{refSetId}/add/members", produces = "application/json", consumes = "application/json" )
+	@RequestMapping( method = RequestMethod.POST, value = "/add/membersByConceptIds", produces = "application/json")
 	@ApiOperation( value = "Add no of members in this call", notes = "Adds no of members in single call to a refset identified by refset id in path" )
 	@PreAuthorize("hasRole('ROLE_ihtsdo-users')")
-    public ResponseEntity<Result< Map<String, Object>>> addConceptIds(@PathVariable(value = "refSetId") String refsetId, 
-    		@RequestBody( required = true) Set<String> conceptIds) throws Exception {
+    public ResponseEntity<Result< Map<String, Object>>> addConceptIds(@RequestParam(value = "refsetId") String refsetId, 
+    		 @RequestParam("file") MultipartFile file) throws Exception {
 		
-		logger.debug("Adding member {} to refset {}", conceptIds, refsetId);
+		logger.debug("Adding refset {}", refsetId);
+		
+		//call verify service
+		final InputStream is;
+		if (file.isEmpty()) {
+			
+			throw new IllegalArgumentException("Please check file supplied.");
+			
+		} else if(file.getOriginalFilename().endsWith(".gz")) {
+			
+			is = new GZIPInputStream(file.getInputStream());
+	        
+		} else {
+			
+			is = file.getInputStream();
+		}
 
-
+		BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+		Set<String> conceptIds = new HashSet<String>();
+		
+		String line;
+		while( (line = reader.readLine()) != null ) {
+			
+			String[] columns = StringUtils.splitByWholeSeparator(line, "\n");
+			if (columns != null && columns.length == 1 && !StringUtils.isEmpty(columns[0])) {
+				
+				conceptIds.add(StringUtils.trim(columns[0]));
+				
+			}
+		}
+		
+		reader.close();
+		is.close();
+		
 		Map<String, String> outcome = aService.addMembersByConceptIds(refsetId, conceptIds, getUserDetails().getUsername());
 		
 		Result<Map<String, Object>> result = getResult();
