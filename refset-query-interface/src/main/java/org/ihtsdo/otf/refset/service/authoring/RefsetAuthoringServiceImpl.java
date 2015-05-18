@@ -221,7 +221,7 @@ public class RefsetAuthoringServiceImpl implements RefsetAuthoringService {
 	 */
 	private void isOwner(String owner, String modifiedBy) {
 		
-		LOGGER.debug("isOwner owner {} and modifiedBy", owner, modifiedBy);
+		LOGGER.debug("isOwner owner : {} and modifiedBy : {}", owner, modifiedBy);
 
 		if (StringUtils.isEmpty(owner) || !owner.equalsIgnoreCase(modifiedBy)) {
 			
@@ -493,10 +493,15 @@ public class RefsetAuthoringServiceImpl implements RefsetAuthoringService {
 					if (c != null) {
 						
 						MemberDTO m = new MemberDTO();
+						m.setUuid(UUID.randomUUID().toString());
 						m.setCreated(new DateTime());
 						m.setCreatedBy(user);
+						m.setModifiedBy(user);
+						m.setModifiedDate(new DateTime());
+						m.setActive(true);
 						m.setReferencedComponentId(c.getId());
 						m.setDescription(c.getLabel());
+						m.setModuleId(c.getModuleId());
 						members.add(m);
 						
 					}
